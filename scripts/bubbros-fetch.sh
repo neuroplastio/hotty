@@ -4,9 +4,10 @@
 #   scripts/bubbros-fetch.sh
 #
 # It lives next to the repo's worktrees, at ../bubbros, pinned by commit and
-# never edited: examples/bubbros.py runs its game server unchanged. Its art is
-# Sebastian Wegner's, used with the project's permission; it is replaced before
-# anything built on it is published.
+# never edited: examples/bubbros.py runs its game server unchanged. The game is
+# MIT; its art is Sebastian Wegner's, which Bub-n-Bros redistributes with his
+# permission. It is fetched from the Bub-n-Bros repository and never committed
+# or redistributed here.
 set -eu
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 DIR="${BUBBROS_DIR:-$(dirname "$HERE")/bubbros}"
