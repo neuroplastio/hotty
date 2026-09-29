@@ -12,7 +12,7 @@ little.
 ## Format
 
 ```
-{ "version": 0,
+{ "version": "0.1",
   "vectors": [ { "name": …, "steps": [ step, … ] } ],
   "wire":    [ { "name": …, "stream": …, "commands": [ … ], "invalid": n } ] }
 ```

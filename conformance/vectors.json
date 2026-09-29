@@ -1,6 +1,6 @@
 {
- "version": 0,
- "protocol": "SPEC.md version 0",
+ "version": "0.1",
+ "protocol": "SPEC.md version 0.1",
  "vectors": [
   {
    "name": "a=q answers ok and echoes n",

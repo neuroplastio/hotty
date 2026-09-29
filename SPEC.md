@@ -1,8 +1,8 @@
 # HOTTY — HTML Over The TTY
 
-    Version:  0 (draft)
+    Version:  0.1 (draft)
     Date:     2026-09-29
-    Status:   Draft. Everything here may change before version 1. The open
+    Status:   Draft. Everything here may change before version 1.0. The open
               issues are listed in Appendix D.
     Licence:  CC BY 4.0 (this document); the conformance vectors are
               Apache-2.0.
@@ -225,7 +225,7 @@ The capabilities object:
 
 | field | meaning |
 | --- | --- |
-| `v` | the HOTTY version the host implements: `0` for this document |
+| `v` | the HOTTY version the host implements, as a string: `"0.1"` for this document |
 | `ops` | the patch ops it supports (§6) |
 | `events` | the event kinds it can send (§9) |
 | `cell` | `{"w": …, "h": …}`: the cell size in device pixels |
@@ -620,9 +620,11 @@ the text of §11.
 
 ## 15. Versioning and extensions
 
-- `v` in the capabilities is the protocol version. A change that breaks
-  existing programs or hosts gets a new version. Additions that old hosts
-  and programs can ignore do not.
+- `v` in the capabilities is the protocol version, a string `major.minor`.
+  From 1.0 on, a change that breaks existing programs or hosts gets a new
+  major version, and additions that old hosts and programs can ignore get a
+  new minor version. **Until 1.0, any minor version may break the previous
+  one**: versions 0.x are drafts.
 - A host **MUST** ignore control keys it does not know. An unknown action or
   patch op is `EINVAL`.
 - **Extensions** by an implementation use a vendor prefix:
@@ -637,7 +639,7 @@ the text of §11.
 
 ## 16. Conformance
 
-A host conforms to HOTTY version 0 when:
+A host conforms to HOTTY version 0.1 when:
 - it meets every **MUST** of this document;
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
@@ -660,7 +662,7 @@ Detection (payload shortened):
 
 ```
 program → ESC ] 7279 ; a=q:n=1 ST  CSI c
-host    → ESC ] 7279 ; a=ok:n=1:re=q ; eyJ2IjowLCJvcHMiOls… ST  CSI ? 62 ; 22 c
+host    → ESC ] 7279 ; a=ok:n=1:re=q ; eyJ2IjoiMC4xIiwib3BzIjpb… ST  CSI ? 62 ; 22 c
 ```
 
 A card placed below the prompt, then a patch and an event:
