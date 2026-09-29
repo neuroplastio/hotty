@@ -589,7 +589,10 @@ reads HOTTY messages from its input.
   host without a round trip:
   - focus, the caret and typing in text fields;
   - toggling checkboxes, radio buttons and `<details>`;
-  - hover;
+  - hover, and the pointer's shape: over a surface, a host that shows a
+    pointer shows the one the document asks for (CSS `cursor`, and as in
+    a browser, a pointer over a link and a text cursor over text);
+  - selecting text;
   - scrolling of overflowing elements.
 - **The detail** is a JSON value, base64-encoded. Values are the program's
   (§7): an `href` is reported as the document has it.
