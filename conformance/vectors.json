@@ -858,6 +858,44 @@
    ]
   },
   {
+   "name": "network URLs and links keep the program's values, whatever the base and the policy",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<base href=\"https://example.com/docs/\"><img id=i src=\"https://example.com/a.png\"><a id=l href=\"guide\">Guide</a>"
+    },
+    {
+     "inspect": [
+      "x",
+      "i"
+     ],
+     "expect": {
+      "attrs": {
+       "id": "i",
+       "src": "https://example.com/a.png"
+      }
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "l"
+     ],
+     "expect": {
+      "attrs": {
+       "id": "l",
+       "href": "guide"
+      },
+      "text": "Guide"
+     }
+    }
+   ]
+  },
+  {
    "name": "del removes a surface; later commands for it are ENOENT",
    "steps": [
     {

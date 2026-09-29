@@ -231,6 +231,7 @@ The capabilities object:
 | `scale` | device pixels per CSS pixel |
 | `scheme` | `"dark"` or `"light"`: the terminal's colour scheme |
 | `limits` | the host's limits (§13), such as `{"resources": <bytes>, "surfaces": <count>}` |
+| `net` | the host's network policy (§7.2), from directive to sources, such as `{"img-src": ["https://example.com"]}`. Absent or empty: the host fetches nothing from the network |
 | `host` | optional: a name for the implementation |
 
 Programs **MUST** ignore fields they do not know.
@@ -249,6 +250,8 @@ ESC ] 7279 ; a=doc:s=<name> ; <HTML> ST
 - The payload is an HTML document or a fragment, parsed with the HTML parsing
   algorithm. It creates the surface, or replaces its whole document.
 - Replacing a document keeps the surface's placement and size.
+- The document's `<base href>` sets its base URL (§7.3), and its
+  `<meta name="hotty-network">` asks for network access (§7.2).
 - The host applies its stylesheet (§8) and the security rules (§12) before
   the document is shown.
 
@@ -397,6 +400,11 @@ of what did not change.
 
 ## 7. Resources
 
+A surface loads what the program sent it (§7.1), and from the network only
+what the network policy allows (§7.2).
+
+### 7.1 In-band resources
+
 ```
 ESC ] 7279 ; a=res:id=<id>:type=<MIME type> ; <bytes> ST
 ```
@@ -417,12 +425,63 @@ stylesheet shared by several surfaces, an image, a font.
   resolved when it arrives.
 - **Quota:** the host reports its quota under `limits.resources`. A resource
   that would exceed it is refused with `EQUOTA`.
-- **The base URL** of every document is `https://hotty.invalid/`, so relative
-  URLs and a form's empty `action` resolve, and nothing under them can load.
 - **The program's values stand:** a host that rewrites references in order
   to load them (to `blob:` URLs, say) **MUST** still treat the attribute as
   having the program's value: in morphs, in `inspect` (§16), and in event
   details.
+
+### 7.2 The network
+
+The **network policy** decides what a surface may fetch from the network. It
+has two halves, and a URL may be fetched only when both allow it.
+
+**The host's half** is what the host allows. Its user sets it, or the page
+that embeds it. It lists **sources** per **directive**:
+
+| directive | covers |
+| --- | --- |
+| `img-src` | images: `<img>`, `srcset`, `<picture>`, `poster`, images in SVG, and images in CSS |
+| `media-src` | `<audio>` and `<video>` |
+| `font-src` | `@font-face` |
+| `style-src` | stylesheets: `<link rel=stylesheet>` and `@import` |
+
+- A source is an origin, `http` or `https` with an optional port
+  (`https://example.com`, `http://localhost:8080`), or `https:`, which
+  matches every HTTPS origin.
+- A host's policy is empty unless its user or embedder grants something.
+  The host reports it in its capabilities (`net`, §4).
+- A host run by a person (a terminal) **SHOULD** start with an empty policy.
+  Every fetch tells a server that the document is being shown, and where
+  from; that is the user's decision.
+
+**The document's half** says what it needs:
+
+```html
+<meta name="hotty-network" content="img-src https://example.com; font-src https:">
+```
+
+- The syntax is CSP's: directives separated by `;`, each followed by its
+  sources separated by spaces.
+- A document with no such element asks for nothing, and fetches nothing
+  from the network.
+
+**Fetching:**
+- A host **MUST NOT** fetch a URL unless a source in each half matches it,
+  for the directive that covers it.
+- It **SHOULD** send no referrer and no credentials (cookies,
+  authorization) with what it fetches.
+- A reference the policy does not allow fails as a missing resource does.
+  The program's value still stands (§7.1).
+
+### 7.3 The base URL
+
+- A document's base URL is the `href` of its first `<base>` element when
+  that is an absolute `http` or `https` URL, and `https://hotty.invalid/`
+  otherwise. Relative references resolve against it: for fetching, still
+  subject to §7.2, and for links (§9). A form's empty `action` resolves
+  too, and goes nowhere (§9).
+- The base URL grants nothing by itself: a fetch needs the network policy,
+  and nothing navigates.
 
 ## 8. The host stylesheet
 
@@ -471,7 +530,7 @@ reads HOTTY messages from its input.
 
 | `e` | when | detail |
 | --- | --- | --- |
-| `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `{"href": …}` for links; `{"value": …}` when the element has a `value` attribute; otherwise none |
+| `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `{"href": …, "url": …}` for links (below); `{"value": …}` when the element has a `value` attribute; otherwise none |
 | `change` | a checkbox or radio button toggled; a text control, `textarea` or `select` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": …, "value": …}` for checkboxes and radio buttons, `{"value": …}` otherwise |
 | `input` | every edit of a control with `data-on~=input` | `{"value": …}` |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields as an object of names to values, the submitter's included |
@@ -480,9 +539,21 @@ reads HOTTY messages from its input.
 
 - **The element that reports** a `click` is the nearest one, from the target
   of the click outward, that is one of those kinds. If it has no `id`,
-  nothing is reported: the id is the program's handle.
-- **Nothing reaches the network.** Links never navigate. Forms never submit
-  anywhere: `submit` is all that happens.
+  nothing is reported: the id is the program's handle. A link is the
+  exception: its `href` is the handle, and `t` is then empty.
+- **Links.** A link's detail carries `href`, the program's value, and `url`,
+  the `href` resolved against the document's base URL (§7.3). `url` is
+  absent when it would be under `https://hotty.invalid/`.
+- **A surface never navigates.** A click on a link is an event, and the
+  program decides what it means: it may show another page, or ask its
+  platform to open the link. Forms never submit anywhere: `submit` is all
+  that happens.
+- **Opening links.** A host **MAY** open a link whose `url` is `http`,
+  `https` or `mailto` outside the surface (a new tab or window, or the
+  system's handler) when the user asks for that with the gesture that means
+  it on the host's platform: a middle click, a Ctrl or Cmd click, a context
+  menu. It then sends the `click` with `"opened": true` in the detail, so
+  the program does not open it again. A plain click opens nothing.
 - **Local behaviour stays local.** HTML's own default actions happen in the
   host without a round trip:
   - focus, the caret and typing in text fields;
@@ -566,12 +637,14 @@ A host **MUST** ensure that:
 
 - **no script runs:** no `<script>`, event-handler attributes, `javascript:`
   URLs, or script inside SVG;
-- **nothing is fetched** except `cid:` resources and `data:` URLs. This covers
-  references from attributes and from CSS (`url()`, `@import`, `@font-face`,
-  `image-set()`), prefetch and preconnect hints, and nested documents
-  (`<iframe>`, `<object>`, `<embed>`);
-- **nothing navigates:** links, forms, `<meta http-equiv=refresh>` and
-  `<base>` have no effect beyond the events of §9;
+- **nothing is fetched** except `cid:` resources, `data:` URLs, and what the
+  network policy allows (§7.2). This covers references from attributes and
+  from CSS (`url()`, `@import`, `@font-face`, `image-set()`). Prefetch and
+  preconnect hints and nested documents (`<iframe>`, `<object>`, `<embed>`)
+  are never fetched;
+- **nothing navigates:** links, forms and `<meta http-equiv=refresh>` have no
+  effect beyond the events of §9, and a host that opens a link (§9) opens it
+  outside the surface. `<base>` only sets the base URL (§7.3);
 - **nothing opens a window, dialog or popup;**
 - **a surface cannot take the keyboard** from the terminal on its own
   (`autofocus`): only the user or the program gives it the keyboard (§10);
@@ -585,7 +658,8 @@ A host **MUST** ensure that:
 **Defence in depth:**
 - Two independent layers are recommended: a sanitizer that removes what can
   run, navigate or load before markup reaches a live document, and an engine
-  or policy that cannot fetch even if the sanitizer misses something.
+  or policy that cannot fetch beyond the network policy even if the
+  sanitizer misses something.
 - The second layer must hold on its own: a sanitizer working on attributes
   misses requests carried by CSS (`url()`, `@import`, `@font-face`).
 - A host built on a web engine inherits the policies of the page that embeds
@@ -678,6 +752,21 @@ host    → ESC ] 7279 ; a=ev:s=card:e=click:t=go ST
           (the user clicked it)
 ```
 
+A page that asks for images from its own site, on a host whose policy grants
+that origin (`"net": {"img-src": ["https://example.com"]}` in its
+capabilities):
+
+```
+program → ESC ] 7279 ; a=doc:s=post:q=2 ; … ST
+          (<base href="https://example.com/blog/">
+           <meta name="hotty-network" content="img-src https://example.com">
+           <img src="cover.png"> <a href="../about">About</a>)
+          (the host fetches https://example.com/blog/cover.png)
+host    → ESC ] 7279 ; a=ev:s=post:e=click:t= ; eyJocmVmIjoiLi4vYWJvdXQiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tL2Fib3V0In0= ST
+          ({"href":"../about","url":"https://example.com/about"}: the user
+           clicked the link, and the program decides where it goes)
+```
+
 A value that changes every frame, cheaply:
 
 ```
@@ -709,6 +798,15 @@ program → CSI ? 2026 l
     tree (immediate mode) while keeping what the user was doing.
 - **Why no script:** it keeps the sandbox small enough to defend, and the
   program in charge.
+- **Why the host grants and the document asks.** Markup can come from
+  anywhere, a file someone `cat`s included, and every fetch tells a server
+  who looked and where. So only the host (its user, or the page that embeds
+  it) can allow the network. A document names what it needs, can only get
+  less than the host allows, and fetches nothing unless it asks.
+- **Why a link click is an event.** The program is the application: a click
+  may mean another page in the program, not a URL to load. Hosts still give
+  links the gestures users expect of links, the way terminals open OSC 8
+  hyperlinks.
 - **Why synchronized output for transactions:** it is the terminal's
   existing mechanism for showing a batch of output at once, and programs use
   it for flicker-free text.
