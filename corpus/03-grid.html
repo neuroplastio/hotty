@@ -1,0 +1,11 @@
+<!-- Tests: grid-template-areas, fr/minmax/auto-fill, spanning, gap. -->
+<style> body { padding: 8px; font: 14px sans-serif; }
+ .g { display: grid; grid-template-columns: 180px 1fr 1fr; grid-template-rows: auto 1fr auto;
+      grid-template-areas: "nav head head" "nav main side" "foot foot foot"; gap: 8px; height: 300px; }
+ .g > * { background: color-mix(in srgb, var(--hotty-bg) 80%, white); border-radius: 6px; padding: 8px; }
+ nav { grid-area: nav; } header { grid-area: head; } main { grid-area: main; } aside { grid-area: side; } footer { grid-area: foot; }
+ .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; margin-top: 8px; }
+ .tiles div { background: var(--hotty-ansi-4); color: var(--hotty-bg); padding: 10px; border-radius: 4px; text-align: center; }
+ .tiles .wide { grid-column: span 2; background: var(--hotty-ansi-5); } </style>
+<div class=g><nav>nav</nav><header>header</header><main>main 1fr</main><aside>aside 1fr</aside><footer>footer spans three</footer></div>
+<div class=tiles><div>1</div><div class=wide>2 (span 2)</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div></div>

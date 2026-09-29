@@ -1,0 +1,14 @@
+<!-- Tests: :has, :is, :where, nesting, @layer, custom properties with calc/clamp/min/max, aspect-ratio, container queries. -->
+<style> @layer base, theme; @layer theme { .x { color: var(--hotty-ansi-2); } } @layer base { .x { color: red; } }
+ body { padding: 8px 16px; font: 14px sans-serif; --gap: 8px; }
+ .card { padding: calc(var(--gap) * 2); margin-bottom: var(--gap); border-radius: 6px; background: rgba(255,255,255,.06);
+         width: clamp(200px, 50%, 400px); & strong { color: var(--hotty-ansi-3); } }
+ .card:has(.flag) { outline: 2px solid var(--hotty-ansi-1); }
+ :is(h3, h4):where(.t) { margin: 0; color: var(--hotty-ansi-4); }
+ .sq { width: min(100px, 20%); aspect-ratio: 1; background: var(--hotty-ansi-5); }
+ .cq { container-type: inline-size; width: 300px; } @container (min-width: 250px) { .cq p { color: var(--hotty-ansi-6); } } </style>
+<p class=x>@layer: this should be green, not red.</p>
+<div class=card><h3 class=t>:is/:where heading</h3><strong>nested strong</strong> in a clamp() card.</div>
+<div class=card>This card has a <span class=flag>flag</span>: :has() should outline it red.</div>
+<div class=sq></div>
+<div class=cq><p>Container query: cyan if it applies.</p></div>

@@ -1,0 +1,11 @@
+<!-- Tests: shadows, gradients (linear, radial, conic), transforms, opacity, borders, clip-path, filter. -->
+<style> body { padding: 16px; font: 13px sans-serif; } .row { display: flex; gap: 16px; flex-wrap: wrap; }
+ .b { width: 110px; height: 70px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; }
+ .s { background: var(--hotty-ansi-4); box-shadow: 0 6px 16px rgba(0,0,0,.6); }
+ .l { background: linear-gradient(135deg, #e06c75, #61afef); } .r { background: radial-gradient(circle at 30% 30%, #e5c07b, #c678dd); }
+ .c { background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); }
+ .t { background: var(--hotty-ansi-2); transform: rotate(-8deg) scale(.9); } .o { background: var(--hotty-ansi-5); opacity: .5; }
+ .d { border: 3px dashed var(--hotty-ansi-3); color: var(--hotty-fg); } .p { background: var(--hotty-ansi-6); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+ .f { background: var(--hotty-ansi-1); filter: blur(2px); } </style>
+<div class=row><div class="b s">shadow</div><div class="b l">linear</div><div class="b r">radial</div><div class="b c">conic</div>
+<div class="b t">transform</div><div class="b o">opacity</div><div class="b d">dashed</div><div class="b p">clip</div><div class="b f">blur</div></div>

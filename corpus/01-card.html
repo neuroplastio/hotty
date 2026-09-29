@@ -1,0 +1,18 @@
+<!-- Tests: flow text, headings, inline code, flexbox row, border-radius, the host theme variables. -->
+<style>
+  .card { margin: 0.5rlh 2ch; padding: 0.5rlh 2ch; border: 1px solid var(--hotty-ansi-8);
+          border-radius: 8px; background: color-mix(in srgb, var(--hotty-bg) 85%, var(--hotty-ansi-4)); }
+  h1 { font: 600 1.4em/1.3 sans-serif; margin: 0 0 0.25em; color: var(--hotty-ansi-4); }
+  p { margin: 0.25em 0; font-family: sans-serif; }
+  code { font-family: var(--hotty-font); background: rgba(255,255,255,.08); padding: 0 4px; border-radius: 4px; }
+  .row { display: flex; gap: 1ch; margin-top: 0.5rlh; }
+  .pill { padding: 2px 10px; border-radius: 999px; background: var(--hotty-ansi-2); color: var(--hotty-bg); font: 600 0.85em sans-serif; }
+  .pill.warn { background: var(--hotty-ansi-3); }
+  .pill.err { background: var(--hotty-ansi-1); }
+</style>
+<div class="card">
+  <h1>HOTTY ✦ HTML over the TTY</h1>
+  <p>This card is <b>HTML and CSS</b>, sent by a program as <code>OSC 7279</code> and rendered by
+     Blitz (Stylo + Taffy + Parley) into a rectangle of cells.</p>
+  <div class="row"><span class="pill">flexbox</span><span class="pill warn">color-mix()</span><span class="pill err">rlh units</span></div>
+</div>

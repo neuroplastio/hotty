@@ -1,0 +1,13 @@
+<!-- Tests: headings, inline formatting, nested lists, blockquote, pre, hr, links. -->
+<style> body { padding: 0.5rlh 2ch; font-family: sans-serif; } h1,h2,h3 { margin: 0.3em 0; }
+ blockquote { border-left: 3px solid var(--hotty-ansi-4); margin: 0.5em 0; padding-left: 1ch; opacity: .85; }
+ pre { background: rgba(255,255,255,.06); padding: 6px 1ch; border-radius: 6px; font-family: var(--hotty-font); }
+ a { color: var(--hotty-ansi-4); } mark { background: var(--hotty-ansi-3); color: var(--hotty-bg); } </style>
+<h1>Heading one</h1><h2>Heading two</h2><h3>Heading three</h3>
+<p>Plain text with <b>bold</b>, <i>italic</i>, <u>underline</u>, <s>strike</s>, <code>code</code>, <mark>mark</mark>,
+x<sup>2</sup>, H<sub>2</sub>O and <a href="#x">a link</a>. A long sentence wraps across the width of the surface so that line breaking and justification can be compared.</p>
+<ul><li>First item</li><li>Second item<ol><li>nested one</li><li>nested two</li></ol></li><li>Third item</li></ul>
+<blockquote>A quotation, set off by a rule on the left.</blockquote>
+<pre>fn main() {
+    println!("pre keeps spaces   and newlines");
+}</pre><hr>

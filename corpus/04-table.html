@@ -1,0 +1,12 @@
+<!-- Tests: table layout, colspan, border-collapse, zebra rows, numeric alignment, caption. -->
+<style> body { padding: 8px; font: 14px sans-serif; } table { border-collapse: collapse; width: 100%; }
+ caption { text-align: left; font-weight: 600; padding-bottom: 4px; }
+ th, td { border: 1px solid var(--hotty-ansi-8); padding: 4px 8px; } th { background: rgba(255,255,255,.08); text-align: left; }
+ td.n { text-align: right; font-family: var(--hotty-font); } tbody tr:nth-child(even) td { background: rgba(255,255,255,.04); } </style>
+<table><caption>Quarterly figures</caption>
+<thead><tr><th>Region</th><th>Q1</th><th>Q2</th><th>Q3</th></tr></thead>
+<tbody><tr><td>North</td><td class=n>1,204</td><td class=n>1,387</td><td class=n>1,512</td></tr>
+<tr><td>South</td><td class=n>983</td><td class=n>1,020</td><td class=n>1,211</td></tr>
+<tr><td>East</td><td colspan=2>merged across Q1–Q2</td><td class=n>807</td></tr>
+<tr><td>West</td><td class=n>2,431</td><td class=n>2,002</td><td class=n>2,655</td></tr></tbody>
+<tfoot><tr><th>Total</th><th class=n>5,425</th><th class=n>4,409</th><th class=n>6,185</th></tr></tfoot></table>

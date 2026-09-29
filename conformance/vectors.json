@@ -1,0 +1,1032 @@
+{
+ "version": 0,
+ "protocol": "SPEC.md version 0",
+ "vectors": [
+  {
+   "name": "a=q answers ok and echoes n",
+   "steps": [
+    {
+     "send": {
+      "a": "q",
+      "n": "7"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "q",
+      "n": "7"
+     }
+    }
+   ]
+  },
+  {
+   "name": "an unknown action is EINVAL",
+   "steps": [
+    {
+     "send": {
+      "a": "frob"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a bad surface name is EINVAL",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "no/slash"
+     },
+     "payload": "<p>x</p>",
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a command for a missing surface is ENOENT",
+   "steps": [
+    {
+     "send": {
+      "a": "patch",
+      "s": "nope",
+      "op": "text",
+      "t": "p"
+     },
+     "payload": "x",
+     "reply": {
+      "a": "err",
+      "code": "ENOENT"
+     }
+    }
+   ]
+  },
+  {
+   "name": "doc, then a text patch",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x"
+     },
+     "payload": "<p id=p>hi</p>",
+     "reply": {
+      "a": "ok",
+      "re": "doc",
+      "s": "x"
+     }
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "text",
+      "t": "p"
+     },
+     "payload": "bye",
+     "reply": {
+      "a": "ok",
+      "re": "patch",
+      "s": "x"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "p"
+     ],
+     "expect": {
+      "tag": "p",
+      "text": "bye"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a missing target is ENOTARGET with the id as detail",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p>hi</p>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "text",
+      "t": "nope"
+     },
+     "payload": "x",
+     "reply": {
+      "a": "err",
+      "code": "ENOTARGET",
+      "detail": "nope"
+     }
+    }
+   ]
+  },
+  {
+   "name": "q=1 answers only errors; q=2 never answers",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "1"
+     },
+     "payload": "<p id=p>hi</p>",
+     "reply": null
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "text",
+      "t": "nope",
+      "q": "1"
+     },
+     "payload": "x",
+     "reply": {
+      "a": "err",
+      "code": "ENOTARGET"
+     }
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "text",
+      "t": "nope",
+      "q": "2"
+     },
+     "payload": "x",
+     "reply": null
+    }
+   ]
+  },
+  {
+   "name": "place answers with c and r; bad sizes are EINVAL",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p>hi</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "0",
+      "r": "4"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "r": "4"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    }
+   ]
+  },
+  {
+   "name": "append morphs a child with the same id in place, and appends the rest",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<ul id=l><li id=a>a</li><li id=b>b</li></ul>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "append",
+      "t": "l",
+      "q": "2"
+     },
+     "payload": "<li id=c>c</li><li id=b>B</li>"
+    },
+    {
+     "inspect": [
+      "x",
+      "l"
+     ],
+     "expect": {
+      "children": [
+       [
+        "li",
+        "a",
+        "a"
+       ],
+       [
+        "li",
+        "b",
+        "B"
+       ],
+       [
+        "li",
+        "c",
+        "c"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "prepend inserts first",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<ul id=l><li id=a>a</li></ul>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "prepend",
+      "t": "l",
+      "q": "2"
+     },
+     "payload": "<li id=z>z</li>"
+    },
+    {
+     "inspect": [
+      "x",
+      "l"
+     ],
+     "expect": {
+      "children": [
+       [
+        "li",
+        "z",
+        "z"
+       ],
+       [
+        "li",
+        "a",
+        "a"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "morph brings attributes and text in line with the payload",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p class=a style='color: red'>old</p>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "morph",
+      "t": "p",
+      "q": "2"
+     },
+     "payload": "<p id=p class=b>new</p>"
+    },
+    {
+     "inspect": [
+      "x",
+      "p"
+     ],
+     "expect": {
+      "attrs": {
+       "id": "p",
+       "class": "b"
+      },
+      "text": "new"
+     }
+    }
+   ]
+  },
+  {
+   "name": "morph is the default op",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p>old</p>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "t": "p",
+      "q": "2"
+     },
+     "payload": "<p id=p>new</p>"
+    },
+    {
+     "inspect": [
+      "x",
+      "p"
+     ],
+     "expect": {
+      "text": "new"
+     }
+    }
+   ]
+  },
+  {
+   "name": "morph without t matches top-level elements by id; a missing one is ENOTARGET",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p>p</p><p id=q>q</p>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "morph"
+     },
+     "payload": "<p id=p>P</p><p id=gone>g</p>",
+     "reply": {
+      "a": "err",
+      "code": "ENOTARGET",
+      "detail": "gone"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "p"
+     ],
+     "expect": {
+      "text": "P"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "q"
+     ],
+     "expect": {
+      "text": "q"
+     }
+    }
+   ]
+  },
+  {
+   "name": "morph with several top-level elements replaces the target with them",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<div id=d><p id=p>p</p></div>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "morph",
+      "t": "p",
+      "q": "2"
+     },
+     "payload": "<i id=i1>1</i><i id=i2>2</i>"
+    },
+    {
+     "inspect": [
+      "x",
+      "d"
+     ],
+     "expect": {
+      "children": [
+       [
+        "i",
+        "i1",
+        "1"
+       ],
+       [
+        "i",
+        "i2",
+        "2"
+       ]
+      ]
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "p"
+     ],
+     "expect": null
+    }
+   ]
+  },
+  {
+   "name": "inner matches children by id, then by position and kind",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<ul id=l><li>1</li><li id=k>k</li></ul>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "inner",
+      "t": "l",
+      "q": "2"
+     },
+     "payload": "<li id=k>K</li><li>2</li><li>3</li>"
+    },
+    {
+     "inspect": [
+      "x",
+      "l"
+     ],
+     "expect": {
+      "children": [
+       [
+        "li",
+        "k",
+        "K"
+       ],
+       [
+        "li",
+        null,
+        "2"
+       ],
+       [
+        "li",
+        null,
+        "3"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "replace swaps the element without morphing",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<div id=d><p id=p>p</p></div>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "replace",
+      "t": "p",
+      "q": "2"
+     },
+     "payload": "<h2 id=h>h</h2>"
+    },
+    {
+     "inspect": [
+      "x",
+      "d"
+     ],
+     "expect": {
+      "children": [
+       [
+        "h2",
+        "h",
+        "h"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "before and after insert siblings; remove removes",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<div id=d><p id=p>p</p></div>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "before",
+      "t": "p",
+      "q": "2"
+     },
+     "payload": "<i id=b>b</i>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "after",
+      "t": "p",
+      "q": "2"
+     },
+     "payload": "<i id=a>a</i>"
+    },
+    {
+     "inspect": [
+      "x",
+      "d"
+     ],
+     "expect": {
+      "children": [
+       [
+        "i",
+        "b",
+        "b"
+       ],
+       [
+        "p",
+        "p",
+        "p"
+       ],
+       [
+        "i",
+        "a",
+        "a"
+       ]
+      ]
+     }
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "remove",
+      "t": "p",
+      "q": "2"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "d"
+     ],
+     "expect": {
+      "children": [
+       [
+        "i",
+        "b",
+        "b"
+       ],
+       [
+        "i",
+        "a",
+        "a"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "attr sets and unattr removes an attribute; both need k",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p>p</p>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "attr",
+      "t": "p",
+      "k": "data-x",
+      "q": "2"
+     },
+     "payload": "1"
+    },
+    {
+     "inspect": [
+      "x",
+      "p"
+     ],
+     "expect": {
+      "attrs": {
+       "id": "p",
+       "data-x": "1"
+      }
+     }
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "unattr",
+      "t": "p",
+      "k": "data-x",
+      "q": "2"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "p"
+     ],
+     "expect": {
+      "attrs": {
+       "id": "p"
+      }
+     }
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "attr",
+      "t": "p"
+     },
+     "payload": "1",
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    }
+   ]
+  },
+  {
+   "name": "text replaces all children with one text node",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p><b>x</b> y</p>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "text",
+      "t": "p",
+      "q": "2"
+     },
+     "payload": "z"
+    },
+    {
+     "inspect": [
+      "x",
+      "p"
+     ],
+     "expect": {
+      "text": "z",
+      "children": []
+     }
+    }
+   ]
+  },
+  {
+   "name": "table rows parse in their context",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<table><tbody id=tb><tr id=r1><td>1</td></tr></tbody></table>"
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "append",
+      "t": "tb",
+      "q": "2"
+     },
+     "payload": "<tr id=r2><td>2</td></tr>"
+    },
+    {
+     "inspect": [
+      "x",
+      "tb"
+     ],
+     "expect": {
+      "children": [
+       [
+        "tr",
+        "r1",
+        "1"
+       ],
+       [
+        "tr",
+        "r2",
+        "2"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "doc replaces the whole document",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=a>a</p>"
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=b>b</p>"
+    },
+    {
+     "inspect": [
+      "x",
+      "a"
+     ],
+     "expect": null
+    },
+    {
+     "inspect": [
+      "x",
+      "b"
+     ],
+     "expect": {
+      "text": "b"
+     }
+    }
+   ]
+  },
+  {
+   "name": "cid: references keep the program's URL",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<img id=i src=cid:logo>"
+    },
+    {
+     "inspect": [
+      "x",
+      "i"
+     ],
+     "expect": {
+      "attrs": {
+       "id": "i",
+       "src": "cid:logo"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "del removes a surface; later commands for it are ENOENT",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p>p</p>"
+    },
+    {
+     "send": {
+      "a": "del",
+      "s": "x"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "del",
+      "s": "x"
+     }
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "text",
+      "t": "p"
+     },
+     "payload": "x",
+     "reply": {
+      "a": "err",
+      "code": "ENOENT"
+     }
+    }
+   ]
+  },
+  {
+   "name": "res stores and del removes a resource",
+   "steps": [
+    {
+     "send": {
+      "a": "res",
+      "id": "r",
+      "type": "text/css"
+     },
+     "payload": "p{}",
+     "reply": {
+      "a": "ok",
+      "re": "res"
+     }
+    },
+    {
+     "send": {
+      "a": "del",
+      "id": "r"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "del"
+     }
+    },
+    {
+     "send": {
+      "a": "res",
+      "type": "text/css"
+     },
+     "payload": "p{}",
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    }
+   ]
+  },
+  {
+   "name": "focus on a missing element is ENOTARGET",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<input id=i>"
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "nope"
+     },
+     "reply": {
+      "a": "err",
+      "code": "ENOTARGET"
+     }
+    }
+   ]
+  }
+ ],
+ "wire": [
+  {
+   "name": "one command, BEL terminated",
+   "stream": "\u001b]7279;a=q:n=1\u0007",
+   "commands": [
+    {
+     "control": {
+      "a": "q",
+      "n": "1"
+     },
+     "payload": ""
+    }
+   ],
+   "invalid": 0
+  },
+  {
+   "name": "a chunked command reassembles; continuation chunks carry only m",
+   "stream": "\u001b]7279;a=doc:s=x:m=1;PHA+\u001b\\\u001b]7279;m=0;aGk8L3A+\u001b\\",
+   "commands": [
+    {
+     "control": {
+      "a": "doc",
+      "s": "x"
+     },
+     "payload": "<p>hi</p>"
+    }
+   ],
+   "invalid": 0
+  },
+  {
+   "name": "an interrupted chunked command is invalid, and the next command works",
+   "stream": "\u001b]7279;a=doc:s=x:m=1;AAAA\u001b\\\u001b]7279;a=del:s=x\u001b\\",
+   "commands": [
+    {
+     "control": {
+      "a": "del",
+      "s": "x"
+     },
+     "payload": ""
+    }
+   ],
+   "invalid": 1
+  },
+  {
+   "name": "o=z payloads are zlib",
+   "stream": "\u001b]7279;a=doc:s=x:o=z;eJyzKbDLOLwyJyffRr/ADgAleAUf\u001b\\",
+   "commands": [
+    {
+     "control": {
+      "a": "doc",
+      "s": "x"
+     },
+     "payload": "<p>héllo</p>"
+    }
+   ],
+   "invalid": 0
+  },
+  {
+   "name": "payloads are UTF-8",
+   "stream": "\u001b]7279;a=patch:s=x:op=text:t=p;4oiRIG9rIOKAlCDDvA==\u001b\\",
+   "commands": [
+    {
+     "control": {
+      "a": "patch",
+      "op": "text"
+     },
+     "payload": "∑ ok — ü"
+    }
+   ],
+   "invalid": 0
+  }
+ ]
+}

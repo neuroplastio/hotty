@@ -1,0 +1,9 @@
+<!-- Tests: overflow scroll/auto, text-overflow ellipsis, nowrap, sticky header, absolute positioning. -->
+<style> body { padding: 8px 16px; font: 14px sans-serif; } .box { height: 110px; overflow: auto; border: 1px solid var(--hotty-ansi-8); width: 300px; position: relative; }
+ .box h4 { position: sticky; top: 0; margin: 0; background: var(--hotty-ansi-4); color: var(--hotty-bg); padding: 2px 6px; }
+ .ell { width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 8px; }
+ .rel { position: relative; height: 60px; width: 300px; margin-top: 8px; background: rgba(255,255,255,.05); }
+ .abs { position: absolute; right: 6px; bottom: 6px; background: var(--hotty-ansi-2); color: var(--hotty-bg); padding: 2px 6px; border-radius: 4px; } </style>
+<div class=box><h4>sticky header</h4><p>row 1</p><p>row 2</p><p>row 3</p><p>row 4</p><p>row 5</p><p>row 6</p></div>
+<div class=ell>This line is far too long to fit, so it should end with an ellipsis rather than wrap.</div>
+<div class=rel>relative box <span class=abs>absolute</span></div>
