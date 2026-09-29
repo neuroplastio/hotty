@@ -109,11 +109,19 @@ class Hotty:
     def doc(self, surface, html, quiet=1):
         self.send(html, a="doc", s=surface, q=quiet)
 
-    def place(self, surface, cols, rows="auto", move_cursor=True, quiet=1):
+    def place(self, surface, cols, rows="auto", move_cursor=True, quiet=1, window=None):
+        """Places a surface at the cursor. `window` is (x, y, w, h): the part
+        of the surface to show (SPEC §5.2), or None for all of it."""
         control = dict(a="place", s=surface, c=cols, r=rows, q=quiet)
+        if window is not None:
+            control.update(zip("xywh", window))
         if not move_cursor:
             control["C"] = 1
         self.send(**control)
+
+    def hide(self, surface, quiet=1):
+        """Removes the placement and keeps the surface (SPEC §5.4)."""
+        self.send(a="hide", s=surface, q=quiet)
 
     def patch(self, surface, op, target=None, payload="", key=None, quiet=1):
         control = dict(a="patch", s=surface, op=op, q=quiet)

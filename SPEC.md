@@ -160,7 +160,7 @@ into chunks of at most 4096 payload bytes each:
 
 | key | meaning |
 | --- | --- |
-| `a` | the action: `q`, `doc`, `place`, `patch`, `res`, `del`, `focus`, `blur` from the program (§4–§10); `ok`, `err`, `ev` from the host |
+| `a` | the action: `q`, `doc`, `place`, `hide`, `patch`, `res`, `del`, `focus`, `blur` from the program (§4–§10); `ok`, `err`, `ev` from the host |
 | `s` | a surface name: `[A-Za-z0-9_-]{1,64}` |
 | `n` | a request number chosen by the program, echoed in the reply |
 | `q` | quiet: `0` (default) reply always, `1` reply only on error, `2` never reply |
@@ -258,27 +258,42 @@ ESC ] 7279 ; a=doc:s=<name> ; <HTML> ST
 ### 5.2 Placement: `a=place`
 
 ```
-ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:C=1] ST
+ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:C=1] ST
 ```
 
-- **Position:** the surface is placed with its top-left corner at the
-  cursor's cell, over `c` columns and `r` rows. Both range from 1 to 1000; a
+- **Size:** the surface is `c` columns wide and `r` rows tall, and its
+  document is laid out at that size (§5.3). Both range from 1 to 1000; a
   missing `r` is `auto`.
 - **`r=auto`:** the host lays the document out `c` columns wide and uses the
   smallest number of rows that holds its content, up to 1000. The reply
   reports the rows chosen: `a=ok:…:c=<c>:r=<r>`.
-- **Moving and removing:** placing a surface that is already placed moves it:
-  the old placement is removed. `a=del` removes it (§5.4).
+- **The window:** `x`, `y`, `w` and `h` choose the part of the surface the
+  placement shows: `w` columns and `h` rows, starting `x` columns and `y`
+  rows into the surface. By default `x` and `y` are 0, and `w` and `h` reach
+  the surface's right and bottom edges, so a placement with none of them
+  shows the whole surface. A window that does not lie inside the surface, or
+  that has no cells, is `EINVAL`. The rest of the surface is laid out as
+  usual and not shown.
+- **Position:** the placement covers the window's `w` × `h` cells, with its
+  top-left corner at the cursor's cell.
+- **Moving and removing:** placing a surface that is already placed moves
+  it, or shows another window of it: the old placement is removed. A program
+  scrolling a region of the screen that holds a surface places it again with
+  the part in view. A change of window alone does not change the document's
+  layout, and a host **SHOULD** make it cheap. `a=del` removes a placement
+  (§5.4).
 - **The cursor:** unless the command has `C=1`, the host then moves the
-  cursor as if by `r` times IND (index) followed by CR. It ends at the start
-  of the line below the surface, scrolling if necessary. With `C=1` it does
+  cursor as if by `h` times IND (index) followed by CR. It ends at the start
+  of the line below the placement, scrolling if necessary. With `C=1` it does
   not move.
 
 ### 5.3 Geometry
 
-- The surface's viewport is its rectangle, `c` × `r` cells, in CSS pixels. Media
-  queries and viewport units refer to it. The document is laid out at that
-  width, and at that height for anything sized by the viewport.
+- The surface's viewport is its size, `c` × `r` cells, in CSS pixels,
+  whatever window of it is shown (§5.2). Media queries and viewport units
+  refer to it. The document is laid out at that width, and at that height
+  for anything sized by the viewport.
+- Only the window is shown, and only the window receives the pointer.
 - **What does not fit is clipped.** The document's root does not scroll, and
   the host shows no scrollbar for it. An element whose `overflow` is `auto`
   or `scroll` scrolls within the surface as usual; the host handles that
@@ -301,6 +316,22 @@ A placement behaves like a kitty graphics placement:
   removed when the terminal leaves the alternate screen, and the host
   **SHOULD** delete the surface as well.
 - A full reset (RIS) deletes every surface.
+
+A program removes a placement and keeps its surface with `a=hide`:
+
+```
+ESC ] 7279 ; a=hide:s=<name> ST
+```
+
+- The document stays as it is, with what the user did in it, and patches
+  still apply to it. Placing the surface again shows it as it is then,
+  without sending it again.
+- A program hides the surfaces it expects to show again soon, such as a card
+  scrolled out of view, and deletes the rest.
+- Hiding a surface that has the keyboard gives the keyboard back to the
+  terminal, as `a=blur` does (§10.1).
+- `ENOENT` if there is no such surface. Hiding a surface that is not placed
+  does nothing.
 
 `a=del` deletes explicitly:
 
@@ -668,7 +699,8 @@ A host **MUST** ensure that:
 ## 13. Limits
 
 - A host reports its limits under `limits` (§4) and refuses commands that
-  would exceed them with `EQUOTA`.
+  would exceed them with `EQUOTA`. Hidden surfaces (§5.4) count: a program
+  that keeps many deletes the ones it needs least.
 - Rendering must not stall the terminal. A host **MAY** abandon a render
   that exceeds its time budget and report `EBUDGET`: pathological CSS such
   as huge blurs, deep nesting, or enormous documents.
@@ -685,7 +717,8 @@ Between the two, a **polyfill** host can serve terminals that show images:
 - It sits on the pty between the program and the terminal, and passes every
   byte through except HOTTY messages.
 - It renders surfaces itself and sends them as pixels: kitty graphics
-  placements anchored where the cursor was, updated as frames change.
+  placements anchored where the cursor was, updated as frames change. A
+  window is a placement of part of the image.
 - It answers `a=q` on the terminal's behalf.
 
 Because it runs next to the terminal, a program on the far side of SSH needs
@@ -810,6 +843,14 @@ program → CSI ? 2026 l
 - **Why synchronized output for transactions:** it is the terminal's
   existing mechanism for showing a batch of output at once, and programs use
   it for flicker-free text.
+- **Why windows:** full-screen programs scroll content that holds surfaces:
+  a transcript, a document. Without a window, a surface at the edge of the
+  scrolling region can only disappear or cover the program's frame. With
+  one, the program shows the part in view, as a kitty placement shows part
+  of an image, and the document is not laid out again as it scrolls.
+- **Why hide:** sending a document and laying it out costs far more than
+  placing it. A program scrolling through many surfaces keeps the ones that
+  will come back, and only it knows which those are.
 - **Why clip rather than scroll the root:** a surface is a rectangle of the
   program's choosing, as an image is. A root scrollbar would also change the
   layout's width from host to host.

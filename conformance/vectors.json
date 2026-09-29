@@ -225,6 +225,194 @@
    ]
   },
   {
+   "name": "a window shows part of the surface; one that leaves it, or has no cells, is EINVAL",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p>hi</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "y": "1",
+      "h": "2"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "x": "10",
+      "y": "3"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "y": "3",
+      "h": "2"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "w": "31"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "x": "30"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "h": "0"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    }
+   ]
+  },
+  {
+   "name": "hide keeps the document: patches apply, and placing it again needs no doc",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p>hi</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "hide",
+      "s": "x"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hide",
+      "s": "x"
+     }
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "text",
+      "t": "p",
+      "q": "2"
+     },
+     "payload": "yo"
+    },
+    {
+     "inspect": [
+      "x",
+      "p"
+     ],
+     "expect": {
+      "text": "yo"
+     }
+    },
+    {
+     "send": {
+      "a": "hide",
+      "s": "x"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hide",
+      "s": "x"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "2"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "10",
+      "r": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "hide",
+      "s": "nope"
+     },
+     "reply": {
+      "a": "err",
+      "code": "ENOENT"
+     }
+    }
+   ]
+  },
+  {
    "name": "append morphs a child with the same id in place, and appends the rest",
    "steps": [
     {
