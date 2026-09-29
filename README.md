@@ -12,9 +12,12 @@ Clicks, changes and submits come back as events on the program's input.
 - Patches are addressed by element id, so a change costs what it changes.
 - Programs can detect a host and fall back to plain text where there is none.
 
-**Status: version 0.1, a draft.** The spec is implemented twice, by programs
-that share no code, and both pass the conformance vectors. It will change
-before version 1; its open issues are in Appendix D.
+**Status: version 0.1, a draft.** Versions 0.x may change incompatibly. Two
+implementations that share no code pass the conformance vectors:
+[hotty-blitz](https://github.com/neuroplastio/hotty-blitz), a renderer with a
+C ABI and a polyfill for terminals that show images, and
+[xterm-addon-hotty](https://github.com/neuroplastio/xterm-addon-hotty), for
+xterm.js in a browser.
 
 ## What is here
 

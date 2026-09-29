@@ -1,9 +1,7 @@
 # HOTTY — HTML Over The TTY
 
-    Version:  0.1 (draft)
-    Date:     2026-09-29
-    Status:   Draft. Everything here may change before version 1.0. The open
-              issues are listed in Appendix D.
+    Version:  0.1
+    Status:   Draft. Versions 0.x may change incompatibly (§15).
     Licence:  CC BY 4.0 (this document); the conformance vectors are
               Apache-2.0.
 
@@ -41,14 +39,13 @@ the program did not give it.
 15. Versioning and extensions
 16. Conformance
 
-Appendices: A. Examples · B. Rationale · C. Implementations ·
-D. Open issues · E. Prior art
+Appendices: A. Examples · B. Rationale · C. Prior art
 
 ---
 
 ## 1. Introduction
 
-A terminal program today has cells: monospace characters with a few
+A terminal program has cells: monospace characters with a few
 attributes. HOTTY adds a second kind of output: a **surface**, one HTML
 document, placed on a rectangle of cells. Inside it the host lays out and draws
 the document at the terminal's own resolution, with proportional type,
@@ -90,7 +87,9 @@ when, they appear in bold.
 - **Program**: the process whose output the terminal displays.
 - **Host**: whatever renders HOTTY for that program. Usually the terminal
   emulator itself. It can also be a pty shim between the program and a
-  terminal (a *polyfill*; §14), or a multiplexer.
+  terminal (a *polyfill*; §14). A multiplexer between a program and a
+  terminal either is a host itself, or passes HOTTY through and keeps
+  placements consistent with its own screen and scrollback.
 - **Session**: a program's connection to a host, from the first HOTTY command
   until a full reset or the end of the program's output.
 - **Surface**, **resource**, **patch**, **event**: §5, §7, §6 and §9.
@@ -466,7 +465,9 @@ ESC ] 7279 ; a=ev:s=<name>:e=<kind>:t=<element id> [; <base64 JSON detail>] ST
 ```
 
 The host reports what the user did. Events are not replies: they are sent
-whatever the value of `q`.
+whatever the value of `q`. Like replies (§3.6), they arrive on the program's
+input, interleaved with the user's keys, so a program that places surfaces
+reads HOTTY messages from its input.
 
 | `e` | when | detail |
 | --- | --- | --- |
@@ -585,9 +586,8 @@ A host **MUST** ensure that:
 - Two independent layers are recommended: a sanitizer that removes what can
   run, navigate or load before markup reaches a live document, and an engine
   or policy that cannot fetch even if the sanitizer misses something.
-- The second layer alone must hold: in testing, CSS-borne requests (`url()`,
-  `@import`, `@font-face`) are what a sanitizer working on attributes
-  misses.
+- The second layer must hold on its own: a sanitizer working on attributes
+  misses requests carried by CSS (`url()`, `@import`, `@font-face`).
 - A host built on a web engine inherits the policies of the page that embeds
   it. Its documentation must say what that page has to allow.
 
@@ -689,12 +689,10 @@ program → CSI ? 2026 l
 
 ## Appendix B. Rationale
 
-- **Why an OSC.**
-  - Terminals already parse and ignore unknown OSCs, which makes probing
-    safe.
-  - kitty uses OSC-shaped controls for its own extensions.
-  - An APC or DCS would do as well on the wire, but is dropped or mangled by
-    more of the software between a program and a terminal.
+- **Why an OSC.** Terminals parse OSC sequences and ignore the ones they do
+  not know, which makes probing safe. An APC or DCS would serve as well on
+  the wire, but more of the software between a program and a terminal drops
+  or mangles them.
 - **Why `:` between keys**, not `;`: some terminals limit the number of
   `;`-separated OSC fields.
 - **Why base64 always.**
@@ -702,65 +700,32 @@ program → CSI ? 2026 l
     newlines.
   - Raw bytes are at the mercy of every parser on the way.
   - zlib on markup more than pays for base64's third.
-- **Why 4096-byte chunks:** VTE ignores longer strings, and tmux discards a
-  string that takes too long to arrive.
+- **Why 4096-byte chunks:** some terminals ignore longer strings, and some
+  multiplexers discard a string that takes too long to arrive.
 - **Why ids and patches.**
   - Addressing by id keeps a patch's effect predictable, and makes an update
     cost what it changes.
   - `morph` without a target also serves programs that redraw their whole
     tree (immediate mode) while keeping what the user was doing.
 - **Why no script:** it keeps the sandbox small enough to defend, and the
-  program in charge. The program-side libraries play the part JavaScript
-  frameworks play for pages.
-- **Why synchronized output for transactions:** terminals already implement
-  it, and programs already use it for flicker-free text.
+  program in charge.
+- **Why synchronized output for transactions:** it is the terminal's
+  existing mechanism for showing a batch of output at once, and programs use
+  it for flicker-free text.
 - **Why clip rather than scroll the root:** a surface is a rectangle of the
   program's choosing, as an image is. A root scrollbar would also change the
   layout's width from host to host.
 
-## Appendix C. Implementations
+## Appendix C. Prior art
 
-| implementation | kind | notes |
-| --- | --- | --- |
-| **hotty-blitz** | a renderer (Rust, Blitz: Stylo, Taffy, Parley) with a C ABI, and a kitty-graphics polyfill | draws on the CPU; patch cost proportional to the depth of the change |
-| **xterm-addon-hotty** | an xterm.js addon | the browser is the engine: each surface is a sandboxed iframe |
+HOTTY takes from:
 
-The two share no code and pass the same vectors. **hottyterm**, a fork of
-Ghostty that links hotty-blitz, is a proof of concept of a native host; it is
-meant to end if Ghostty gains HOTTY support.
-
-## Appendix D. Open issues
-
-1. **The return channel.** Replies and events travel on the program's input,
-   mixed with the user's keys. A program's input parser must recognise and
-   skip OSC sequences it does not want. Is that acceptable to every kind of
-   program, or should events be opt-in per surface?
-2. **Batching.** Synchronized output is the transaction today. A host must
-   hold commands for a batch that may never end; terminals time these out.
-3. **Fonts.** Surfaces use the terminal's and the system's fonts. Fonts
-   supplied as resources are allowed by §7 but not yet tested by any vector.
-4. **Leaving a surface.** Escape reaches the program (§10.2), which decides.
-   Is a host-level way out needed for programs that never send `a=blur`?
-5. **Text (§11)** is a SHOULD that no implementation fully meets yet.
-6. **Selectors.** Patches address elements by id only. Selectors can be
-   matched by any engine, but make a patch's effect harder to predict.
-7. **Multiplexers.** A multiplexer between a program and a host must either
-   pass HOTTY through (with placement kept consistent with its own
-   scrollback), or be a host itself.
-8. **Events and keys in the vectors.** The vectors cover the document and the
-   wire; input is host-specific to drive, and is not covered yet.
-9. **Accessibility.** Hosts built on a web engine get an accessibility tree
-   for free; others do not. What should a host expose?
-
-## Appendix E. Prior art
-
-- **kitty's graphics protocol**: the shape of the envelope (key=value
-  controls, chunks, `q`, `C=1`), and the model of placements anchored to
-  cells.
-- **DomTerm** renders HTML fragments in its output, and Wave Terminal a
-  virtual DOM in its own blocks.
-- **Hotwire and Turbo**: "HTML over the wire", the name's model, and appending
-  by id.
-- **Datastar and idiomorph**: morphing, and matching top-level elements by
-  id.
+- **the kitty graphics protocol**: the shape of the envelope (key=value
+  controls, chunks, `q`, `C=1`), and placements anchored to cells;
+- **Hotwire and Turbo**: HTML over the wire, which the name follows, and
+  appending by id;
+- **Datastar and idiomorph**: morphing, and matching top-level elements by id;
 - **RFC 2392**: the `cid:` scheme.
+
+DomTerm, which renders HTML fragments in a terminal's output, is the closest
+related work.
