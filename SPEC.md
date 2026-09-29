@@ -725,8 +725,9 @@ program → CSI ? 2026 l
 | **hotty-blitz** | a renderer (Rust, Blitz: Stylo, Taffy, Parley) with a C ABI, and a kitty-graphics polyfill | draws on the CPU; patch cost proportional to the depth of the change |
 | **xterm-addon-hotty** | an xterm.js addon | the browser is the engine: each surface is a sandboxed iframe |
 
-The two share no code and pass the same vectors. A native host built into a
-fork of Ghostty uses hotty-blitz.
+The two share no code and pass the same vectors. **hottyterm**, a fork of
+Ghostty that links hotty-blitz, is a proof of concept of a native host; it is
+meant to end if Ghostty gains HOTTY support.
 
 ## Appendix D. Open issues
 
