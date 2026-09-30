@@ -325,6 +325,106 @@
    ]
   },
   {
+   "name": "z orders overlapping placements: an integer from -1000 to 1000, else EINVAL",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p>hi</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "z": "1"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "z": "-1000"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "z": "1000"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "z": "1001"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "z": "-1001"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "z": "top"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    }
+   ]
+  },
+  {
    "name": "hide keeps the document: patches apply, and placing it again needs no doc",
    "steps": [
     {

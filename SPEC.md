@@ -258,7 +258,7 @@ ESC ] 7279 ; a=doc:s=<name> ; <HTML> ST
 ### 5.2 Placement: `a=place`
 
 ```
-ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:C=1] ST
+ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:z=<n>][:C=1] ST
 ```
 
 - **Size:** the surface is `c` columns wide and `r` rows tall, and its
@@ -276,6 +276,14 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   usual and not shown.
 - **Position:** the placement covers the window's `w` × `h` cells, with its
   top-left corner at the cursor's cell.
+- **Stacking:** `z` orders placements that overlap, as CSS `z-index` orders
+  boxes: a placement with a greater `z` is above one with a smaller, and of
+  two with the same `z`, the surface created later (by the `a=doc` that
+  created it) is above. `z` is an integer from -1000 to 1000, else `EINVAL`;
+  a placement without it has 0. It belongs to the placement: placing the
+  surface again without `z` puts it back at 0. Every placement is above the
+  cells, whatever its `z`. Where placements overlap, the topmost one under
+  the pointer receives it (§5.3).
 - **Moving and removing:** placing a surface that is already placed moves
   it, or shows another window of it: the old placement is removed. A program
   scrolling a region of the screen that holds a surface places it again with
@@ -293,7 +301,8 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   whatever window of it is shown (§5.2). Media queries and viewport units
   refer to it. The document is laid out at that width, and at that height
   for anything sized by the viewport.
-- Only the window is shown, and only the window receives the pointer.
+- Only the window is shown, and only the window receives the pointer: where
+  windows overlap, the topmost (§5.2, `z`).
 - **What does not fit is clipped, and nothing in a surface scrolls.**
   - The host **MUST** clip overflow as `overflow: hidden` does: the
     document's root, and any element whose `overflow` is `auto` or
