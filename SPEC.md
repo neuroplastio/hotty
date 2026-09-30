@@ -294,10 +294,16 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   refer to it. The document is laid out at that width, and at that height
   for anything sized by the viewport.
 - Only the window is shown, and only the window receives the pointer.
-- **What does not fit is clipped.** The document's root does not scroll, and
-  the host shows no scrollbar for it. An element whose `overflow` is `auto`
-  or `scroll` scrolls within the surface as usual; the host handles that
-  scrolling.
+- **What does not fit is clipped, and nothing in a surface scrolls.**
+  - The host **MUST** clip overflow as `overflow: hidden` does: the
+    document's root, and any element whose `overflow` is `auto` or
+    `scroll`.
+  - It shows no scrollbars, and keeps every scroll offset at zero,
+    whatever the document's CSS or script-free defaults would do (such as
+    scrolling a focused element into view).
+  - The one exception is a text field's own text, which follows its caret.
+  - A program that has more to show than fits lays the surface out again,
+    at another size or with other content (§5.2, §6).
 - When the cell size changes (a zoom or a font change), the rectangle keeps
   its cells and changes its pixels. The host lays the document out again,
   with no involvement from the program, and sends `resize` (§9).
@@ -599,8 +605,13 @@ reads HOTTY messages from its input.
     pointer shows the one the document asks for (CSS `cursor`, and as in
     a browser, a pointer over a link and a text cursor over text). Over a
     hyperlink it shows what it shows over an OSC 8 hyperlink;
-  - selecting text;
-  - scrolling of overflowing elements.
+  - selecting text.
+- **Gestures that scroll are the terminal's.** A wheel, a touchpad's
+  scroll, or a touch drag over a surface does what it would do over the
+  cells beneath it. That is scrollback, or on the alternate screen, the
+  program's wheel input. The host **MUST** pass them on, with the position
+  of the pointer or the finger. Taps, clicks and long presses stay the
+  surface's.
 - **The detail** is a JSON value, base64-encoded. Values are the program's
   (§7): an `href` is reported as the document has it.
 
@@ -861,9 +872,17 @@ program → CSI ? 2026 l
 - **Why hide:** sending a document and laying it out costs far more than
   placing it. A program scrolling through many surfaces keeps the ones that
   will come back, and only it knows which those are.
-- **Why clip rather than scroll the root:** a surface is a rectangle of the
-  program's choosing, as an image is. A root scrollbar would also change the
-  layout's width from host to host.
+- **Why nothing scrolls:** a surface is a rectangle of the program's
+  choosing, as an image is.
+  - A scrollbar would change the layout's width from host to host.
+  - A scroll inside a surface would compete with the terminal's for the
+    same wheel or drag. The user could not tell which one a gesture
+    moves.
+  - On a touch screen, a surface that takes drags traps the finger: the
+    screen stops scrolling wherever a surface is.
+
+  The terminal owns scrolling, and a surface's content is whatever the
+  program lays out.
 
 ## Appendix C. Prior art
 
