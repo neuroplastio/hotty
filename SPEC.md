@@ -302,8 +302,11 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
     whatever the document's CSS or script-free defaults would do (such as
     scrolling a focused element into view).
   - The one exception is a text field's own text, which follows its caret.
-  - A program that has more to show than fits lays the surface out again,
-    at another size or with other content (§5.2, §6).
+  - **A program that needs to scroll** does it the way it scrolls cells:
+    it hears the terminal's wheel input (below) and moves its surfaces.
+    A surface partly out of view shows its visible part through a window
+    (§5.2). So the whole screen scrolls, with its surfaces in it. A
+    surface never scrolls on its own, however small.
 - When the cell size changes (a zoom or a font change), the rectangle keeps
   its cells and changes its pixels. The host lays the document out again,
   with no involvement from the program, and sends `resize` (§9).
