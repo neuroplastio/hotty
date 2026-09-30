@@ -577,21 +577,28 @@ reads HOTTY messages from its input.
   absent when it would be under `https://hotty.invalid/`.
 - **A surface never navigates.** A click on a link is an event, and the
   program decides what it means: it may show another page, or ask its
-  platform to open the link. Forms never submit anywhere: `submit` is all
-  that happens.
-- **Opening links.** A host **MAY** open a link whose `url` is `http`,
-  `https` or `mailto` outside the surface (a new tab or window, or the
-  system's handler) when the user asks for that with the gesture that means
-  it on the host's platform: a middle click, a Ctrl or Cmd click, a context
-  menu. It then sends the `click` with `"opened": true` in the detail, so
-  the program does not open it again. A plain click opens nothing.
+  platform to open the link. The host never opens a link itself, whatever
+  the gesture, except a hyperlink (below). Forms never submit anywhere:
+  `submit` is all that happens.
+- **Hyperlinks.** A link with `target="_blank"` is a hyperlink, as OSC 8
+  makes one of text in cells. It belongs to the terminal, not the program.
+  The host **MUST** treat it exactly as it treats an OSC 8 hyperlink:
+  - the same gesture opens it;
+  - hovering it gives the same feedback, such as the pointer and the
+    address;
+  - the same policies apply, such as the schemes it opens, a confirmation,
+    and a setting that turns hyperlinks off.
+
+  Its address is its `url`: a link without one is not a hyperlink. A click
+  on a hyperlink is not reported.
 - **Local behaviour stays local.** HTML's own default actions happen in the
   host without a round trip:
   - focus, the caret and typing in text fields;
   - toggling checkboxes, radio buttons and `<details>`;
   - hover, and the pointer's shape: over a surface, a host that shows a
     pointer shows the one the document asks for (CSS `cursor`, and as in
-    a browser, a pointer over a link and a text cursor over text);
+    a browser, a pointer over a link and a text cursor over text). Over a
+    hyperlink it shows what it shows over an OSC 8 hyperlink;
   - selecting text;
   - scrolling of overflowing elements.
 - **The detail** is a JSON value, base64-encoded. Values are the program's
