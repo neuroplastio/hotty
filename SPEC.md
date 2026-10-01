@@ -251,8 +251,9 @@ ESC ] 7279 ; a=doc:s=<name>[:d=1] ; <HTML> ST
 - The payload is an HTML document or a fragment, parsed with the HTML parsing
   algorithm. It creates the surface, or replaces its whole document.
 - Replacing a document keeps the surface's placement and size.
-- `d=1` creates the surface detached (§5.5), so a program that only shows a
-  document gives it up in the same command. A document sent without `d=1`
+- `d=1` creates the surface detached (§5.5), so a program that will hear
+  nothing from a document, even one it keeps patching, gives it up in the
+  same command. A document sent without `d=1`
   makes the surface the program's, whether it was detached or not.
 - The document's `<base href>` sets its base URL (§7.3), and its
   `<meta name="hotty-network">` asks for network access (§7.2).
@@ -380,6 +381,8 @@ or creates it detached, with `d=1` on the `a=doc` that sends its document
   the documents a command prints among its output, **SHOULD** detach them
   before it exits, or create them detached. Whatever reads the terminal's
   input after it, a shell for instance, knows nothing of them.
+- **What runs a program**, such as a shell, **MAY** detach the surfaces the
+  program named once it exits, if it knows their names.
 - **A detached surface stays on the screen as text does.** It is placed,
   hidden, patched and deleted as before, and moves with its line (§5.4).
   Nothing in it reaches the program any more:
@@ -387,6 +390,8 @@ or creates it detached, with `d=1` on the `a=doc` that sends its document
   - **It never has the keyboard.** A surface that has the keyboard when it
     is detached gives it back to the terminal, and sends neither `change`
     nor `blur`. A click in it takes nothing, and `a=focus` is `EDETACHED`.
+    A program that wants what the user typed in a focused field sends
+    `a=blur` first, and detaches once `blur` arrives (§10.1).
   - **Its form controls are disabled**, as if each had the `disabled`
     attribute: they match `:disabled`, and the user can neither focus,
     edit, toggle nor activate them. The document itself is unchanged: its
@@ -937,9 +942,10 @@ program → CSI ? 2026 l
   a host cannot tell when the program that drew a surface has gone: after it
   exits, a shell would read them as typed text. Only the program knows when
   it is done with a surface, and printing a document is the common case,
-  hence `d=1`. A program that crashes cannot detach. Its surfaces keep
-  reporting until they are deleted or leave the scrollback, as a crashed
-  program can leave mouse reporting on.
+  hence `d=1`. A program that crashes cannot detach. What ran it can, if it
+  knows the surfaces' names; otherwise they keep reporting until they are
+  deleted or leave the scrollback, as a crashed program can leave mouse
+  reporting on.
 - **Why hide:** sending a document and laying it out costs far more than
   placing it. A program scrolling through many surfaces keeps the ones that
   will come back, and only it knows which those are.
