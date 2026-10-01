@@ -392,14 +392,17 @@ or creates it detached, with `d=1` on the `a=doc` that sends its document
     nor `blur`. A click in it takes nothing, and `a=focus` is `EDETACHED`.
     A program that wants what the user typed in a focused field sends
     `a=blur` first, and detaches once `blur` arrives (§10.1).
-  - **Its form controls are disabled**, as if each had the `disabled`
-    attribute: they match `:disabled`, and the user can neither focus,
-    edit, toggle nor activate them. The document itself is unchanged: its
-    elements report the program's attributes (§16).
+  - **Its form controls are disabled**: every `input`, `select`, `textarea`
+    and `button`, including those patches add later, acts as if it had the
+    `disabled` attribute. They match `:disabled`, and the user can neither
+    focus, edit, toggle nor activate them. What the user had typed into
+    them stays. The document itself is unchanged: its elements report the
+    program's attributes (§16).
   - **What is local stays** (§9): hover, selecting text, toggling a
     `<details>`, and hyperlinks, which belong to the terminal and open as
-    before. Over a link that is not a hyperlink, the host **SHOULD** show
-    the pointer it shows over text.
+    before. Over anything else, the host **SHOULD NOT** show a pointer that
+    promises a click (a link's hand), whatever the document's `cursor`
+    asks for.
 - **Until its next document.** A surface stays detached until an `a=doc`
   without `d=1` replaces its document.
 - `ENOENT` if there is no such surface. Detaching a detached surface does
@@ -688,17 +691,23 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
 - **Without `t`:** the surface's focused element keeps focus, or else the
   first focusable element receives it.
 - **Echo:** no `focus` event is sent for focus the program gave.
-- **Elements that take focus** on a click are those a browser focuses: form
-  controls, links with an `href`, `summary`, and elements with a `tabindex`
-  of 0 or more, unless they are disabled.
+- **A click** is a press of the primary button, or a tap.
+- **Elements that take focus** on a click, unless they are disabled:
+  - `input`, `select`, `textarea` and `button`;
+  - links with an `href`, except hyperlinks (§9), which are the terminal's;
+  - the first `summary` of a `details`;
+  - editing hosts (`contenteditable`);
+  - any element with a `tabindex` of 0 or more.
+
+  A click on a `label` is a click on its control.
 - **A click on anything else takes nothing.** On a surface with no such
   element a click never takes the keyboard, and no `focus` is sent: every
   key would reach the program anyway (§10.2).
-- **A click elsewhere gives the keyboard back** to the terminal: outside the
-  surface, or inside it on an element that does not take focus. The host
-  sends `blur`.
+- **A click elsewhere gives the keyboard back** to the terminal: on the
+  cells, on another surface, or inside this one on an element that does not
+  take focus. The host sends `blur`.
 - **A detached surface** (§5.5) never has the keyboard: `a=focus` is
-  `EDETACHED`.
+  `EDETACHED`, whatever its `t`, and `a=blur` does nothing.
 
 The program takes the keyboard back with `a=blur:s=<name>`. The focused
 control commits its value first (a `change` may follow), and then `blur` is
