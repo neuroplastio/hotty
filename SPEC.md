@@ -694,7 +694,8 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
 - **A click** is a press of the primary button, or a tap.
 - **Elements that take focus** on a click, unless they are disabled:
   - `input`, `select`, `textarea` and `button`;
-  - links with an `href`, except hyperlinks (§9), which are the terminal's;
+  - links with an `href`, except hyperlinks (§9), which are the terminal's
+    whatever their `tabindex`;
   - the first `summary` of a `details`;
   - editing hosts (`contenteditable`);
   - any element with a `tabindex` of 0 or more.
