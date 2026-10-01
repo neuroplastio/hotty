@@ -160,7 +160,7 @@ into chunks of at most 4096 payload bytes each:
 
 | key | meaning |
 | --- | --- |
-| `a` | the action: `q`, `doc`, `place`, `hide`, `patch`, `res`, `del`, `focus`, `blur` from the program (§4–§10); `ok`, `err`, `ev` from the host |
+| `a` | the action: `q`, `doc`, `place`, `hide`, `patch`, `res`, `del`, `detach`, `focus`, `blur` from the program (§4–§10); `ok`, `err`, `ev` from the host |
 | `s` | a surface name: `[A-Za-z0-9_-]{1,64}` |
 | `n` | a request number chosen by the program, echoed in the reply |
 | `q` | quiet: `0` (default) reply always, `1` reply only on error, `2` never reply |
@@ -186,6 +186,7 @@ ESC ] 7279 ; a=ok|err [:n=<n>] [:s=<s>] :re=<action> [:<more>] [; <payload>] ST
 | `EINVAL` | an unknown action or op; a bad surface name; a missing `s`, `t`, `k`, `c` or `id`; `c` or `r` out of range |
 | `ENOENT` | no surface of that name |
 | `ENOTARGET` | no element with that id. The detail is the id, or the missing ids comma-separated (§6.2) |
+| `EDETACHED` | the surface is detached (§5.5) |
 | `EQUOTA` | over one of the host's limits (§13) |
 | `EBUDGET` | the host gave up on work that exceeded its time budget (§13) |
 
@@ -244,12 +245,15 @@ A **surface** is one HTML document, named by the program, and at most one
 ### 5.1 Documents: `a=doc`
 
 ```
-ESC ] 7279 ; a=doc:s=<name> ; <HTML> ST
+ESC ] 7279 ; a=doc:s=<name>[:d=1] ; <HTML> ST
 ```
 
 - The payload is an HTML document or a fragment, parsed with the HTML parsing
   algorithm. It creates the surface, or replaces its whole document.
 - Replacing a document keeps the surface's placement and size.
+- `d=1` creates the surface detached (§5.5), so a program that only shows a
+  document gives it up in the same command. A document sent without `d=1`
+  makes the surface the program's, whether it was detached or not.
 - The document's `<base href>` sets its base URL (§7.3), and its
   `<meta name="hotty-network">` asks for network access (§7.2).
 - The host applies its stylesheet (§8) and the security rules (§12) before
@@ -358,6 +362,43 @@ ESC ] 7279 ; a=hide:s=<name> ST
 | `a=del:s=<name>` | delete the surface and its placement (`ENOENT` if there is none) |
 | `a=del:id=<id>` | delete a resource (§7) |
 | `a=del` | delete every surface |
+
+### 5.5 Ownership: `a=detach`
+
+A surface belongs to the program that sent its document: it reports to that
+program (§9), and takes the keyboard on its behalf (§10). Once the program
+has nothing more to hear from a surface, it **detaches** it:
+
+```
+ESC ] 7279 ; a=detach:s=<name> ST
+```
+
+or creates it detached, with `d=1` on the `a=doc` that sends its document
+(§5.1).
+
+- **A program that leaves surfaces on the screen when it exits**, such as
+  the documents a command prints among its output, **SHOULD** detach them
+  before it exits, or create them detached. Whatever reads the terminal's
+  input after it, a shell for instance, knows nothing of them.
+- **A detached surface stays on the screen as text does.** It is placed,
+  hidden, patched and deleted as before, and moves with its line (§5.4).
+  Nothing in it reaches the program any more:
+  - **It sends no events** (§9), of any kind.
+  - **It never has the keyboard.** A surface that has the keyboard when it
+    is detached gives it back to the terminal, and sends neither `change`
+    nor `blur`. A click in it takes nothing, and `a=focus` is `EDETACHED`.
+  - **Its form controls are disabled**, as if each had the `disabled`
+    attribute: they match `:disabled`, and the user can neither focus,
+    edit, toggle nor activate them. The document itself is unchanged: its
+    elements report the program's attributes (§16).
+  - **What is local stays** (§9): hover, selecting text, toggling a
+    `<details>`, and hyperlinks, which belong to the terminal and open as
+    before. Over a link that is not a hyperlink, the host **SHOULD** show
+    the pointer it shows over text.
+- **Until its next document.** A surface stays detached until an `a=doc`
+  without `d=1` replaces its document.
+- `ENOENT` if there is no such surface. Detaching a detached surface does
+  nothing.
 
 ## 6. Patches
 
@@ -575,7 +616,7 @@ ESC ] 7279 ; a=ev:s=<name>:e=<kind>:t=<element id> [; <base64 JSON detail>] ST
 The host reports what the user did. Events are not replies: they are sent
 whatever the value of `q`. Like replies (§3.6), they arrive on the program's
 input, interleaved with the user's keys, so a program that places surfaces
-reads HOTTY messages from its input.
+reads HOTTY messages from its input. A detached surface sends none (§5.5).
 
 | `e` | when | detail |
 | --- | --- | --- |
@@ -631,8 +672,8 @@ reads HOTTY messages from its input.
 
 ### 10.1 Who has the keyboard
 
-A surface **has the keyboard** when the user clicks into it or the program
-gives it with:
+A surface **has the keyboard** when the user clicks an element in it that
+takes focus, or the program gives it with:
 
 ```
 ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
@@ -642,6 +683,17 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
 - **Without `t`:** the surface's focused element keeps focus, or else the
   first focusable element receives it.
 - **Echo:** no `focus` event is sent for focus the program gave.
+- **Elements that take focus** on a click are those a browser focuses: form
+  controls, links with an `href`, `summary`, and elements with a `tabindex`
+  of 0 or more, unless they are disabled.
+- **A click on anything else takes nothing.** On a surface with no such
+  element a click never takes the keyboard, and no `focus` is sent: every
+  key would reach the program anyway (§10.2).
+- **A click elsewhere gives the keyboard back** to the terminal: outside the
+  surface, or inside it on an element that does not take focus. The host
+  sends `blur`.
+- **A detached surface** (§5.5) never has the keyboard: `a=focus` is
+  `EDETACHED`.
 
 The program takes the keyboard back with `a=blur:s=<name>`. The focused
 control commits its value first (a `change` may follow), and then `blur` is
@@ -881,6 +933,13 @@ program → CSI ? 2026 l
   scrolling region can only disappear or cover the program's frame. With
   one, the program shows the part in view, as a kitty placement shows part
   of an image, and the document is not laid out again as it scrolls.
+- **Why detach.** Events arrive on whatever reads the terminal's input, and
+  a host cannot tell when the program that drew a surface has gone: after it
+  exits, a shell would read them as typed text. Only the program knows when
+  it is done with a surface, and printing a document is the common case,
+  hence `d=1`. A program that crashes cannot detach. Its surfaces keep
+  reporting until they are deleted or leave the scrollback, as a crashed
+  program can leave mouse reporting on.
 - **Why hide:** sending a document and laying it out costs far more than
   placing it. A program scrolling through many surfaces keeps the ones that
   will come back, and only it knows which those are.

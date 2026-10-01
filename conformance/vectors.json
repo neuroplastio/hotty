@@ -1281,6 +1281,257 @@
      }
     }
    ]
+  },
+  {
+   "name": "detach answers ok, and the detached surface refuses the keyboard with EDETACHED",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<form><input id=i><button id=b>go</button></form>"
+    },
+    {
+     "send": {
+      "a": "detach",
+      "s": "x"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "detach",
+      "s": "x"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "i"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EDETACHED"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EDETACHED"
+     }
+    },
+    {
+     "send": {
+      "a": "detach",
+      "s": "x"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "detach",
+      "s": "x"
+     }
+    },
+    {
+     "send": {
+      "a": "detach",
+      "s": "nope"
+     },
+     "reply": {
+      "a": "err",
+      "code": "ENOENT"
+     }
+    },
+    {
+     "send": {
+      "a": "detach"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    }
+   ]
+  },
+  {
+   "name": "detaching keeps the document as the program wrote it: patches apply, controls report no disabled",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p>hi</p><form><input id=i><button id=b>go</button></form>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "i"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "focus"
+     }
+    },
+    {
+     "send": {
+      "a": "detach",
+      "s": "x"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "detach"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "i"
+     ],
+     "expect": {
+      "tag": "input",
+      "attrs": {
+       "id": "i"
+      }
+     }
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "text",
+      "t": "p"
+     },
+     "payload": "yo",
+     "reply": {
+      "a": "ok",
+      "re": "patch"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "p"
+     ],
+     "expect": {
+      "text": "yo"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "i"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EDETACHED"
+     }
+    }
+   ]
+  },
+  {
+   "name": "d=1 on doc creates the surface detached; a doc without it gives it back to the program",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "d": "1"
+     },
+     "payload": "<form><input id=i><button id=b>go</button></form>",
+     "reply": {
+      "a": "ok",
+      "re": "doc"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "i"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EDETACHED"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<form><input id=i><button id=b>go</button></form>"
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "i"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "focus"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "d": "1",
+      "q": "2"
+     },
+     "payload": "<form><input id=i><button id=b>go</button></form>"
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EDETACHED"
+     }
+    }
+   ]
   }
  ],
  "wire": [
