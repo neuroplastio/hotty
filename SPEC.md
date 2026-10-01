@@ -263,7 +263,7 @@ ESC ] 7279 ; a=doc:s=<name>[:d=1] ; <HTML> ST
 ### 5.2 Placement: `a=place`
 
 ```
-ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:z=<n>][:C=1] ST
+ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:z=<n>][:p=1][:C=1] ST
 ```
 
 - **Size:** the surface is `c` columns wide and `r` rows tall, and its
@@ -289,6 +289,9 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   surface again without `z` puts it back at 0. Every placement is above the
   cells, whatever its `z`. Where placements overlap, the topmost one under
   the pointer receives it (§5.3).
+- **Presses:** with `p=1`, the program hears of every press in the window,
+  whatever it lands on, as `press` (§9). Like `z`, it belongs to the
+  placement: placing the surface again without it stops them.
 - **Moving and removing:** placing a surface that is already placed moves
   it, or shows another window of it: the old placement is removed. A program
   scrolling a region of the screen that holds a surface places it again with
@@ -386,7 +389,8 @@ or creates it detached, with `d=1` on the `a=doc` that sends its document
 - **A detached surface stays on the screen as text does.** It is placed,
   hidden, patched and deleted as before, and moves with its line (§5.4).
   Nothing in it reaches the program any more:
-  - **It sends no events** (§9), of any kind.
+  - **It sends no events** (§9), of any kind, `press` included, whatever
+    its placement's `p`.
   - **It never has the keyboard.** A surface that has the keyboard when it
     is detached gives it back to the terminal, and sends neither `change`
     nor `blur`. A click in it takes nothing, and `a=focus` is `EDETACHED`.
@@ -632,6 +636,7 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `change` | a checkbox or radio button toggled; a text control, `textarea` or `select` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": …, "value": …}` for checkboxes and radio buttons, `{"value": …}` otherwise |
 | `input` | every edit of a control with `data-on~=input` | `{"value": …}` |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields as an object of names to values, the submitter's included |
+| `press` | the primary button pressed, or a tap, anywhere in the window of a surface placed with `p=1` (§5.2) | none |
 | `focus`, `blur` | the surface gains or loses the keyboard (§10); `t` is empty | none |
 | `resize` | the surface's pixel size changed without its cells changing (§5.3); `t` is empty | `{"w": …, "h": …}` in CSS pixels |
 
@@ -639,6 +644,13 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   of the click outward, that is one of those kinds. If it has no `id`,
   nothing is reported: the id is the program's handle. A link is the
   exception: its `href` is the handle, and `t` is then empty.
+- **A press** is reported whatever it lands on: a control, an element with
+  a handler, plain text, or empty space. `t` is the id of the nearest
+  element that has one, from the pressed element outward, and empty if
+  none has. It comes before every other event the press causes, on this
+  surface or another (`change`, `blur`, `focus`), and so before the `click`
+  its release may make. A press the host takes for a hyperlink's own
+  gesture (below) is the terminal's, and is not reported.
 - **Links.** A link's detail carries `href`, the program's value, and `url`,
   the `href` resolved against the document's base URL (§7.3). `url` is
   absent when it would be under `https://hotty.invalid/`.
@@ -675,6 +687,9 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   surface's.
 - **The detail** is a JSON value, base64-encoded. Values are the program's
   (§7): an `href` is reported as the document has it.
+- **Unknown kinds.** A program **MUST** ignore an event whose kind it does
+  not know: later versions add kinds (§15). The capabilities list the kinds
+  a host sends (`events`, §4).
 
 ## 10. Keyboard and focus
 
@@ -703,7 +718,9 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
   A click on a `label` is a click on its control.
 - **A click on anything else takes nothing.** On a surface with no such
   element a click never takes the keyboard, and no `focus` is sent: every
-  key would reach the program anyway (§10.2).
+  key would reach the program anyway (§10.2). A program that needs to know
+  the user went to the surface all the same places it with `p=1`, and
+  hears `press` (§9).
 - **A click elsewhere gives the keyboard back** to the terminal: on the
   cells, on another surface, or inside this one on an element that does not
   take focus. The host sends `blur`.
@@ -833,7 +850,8 @@ the text of §11.
   new minor version. **Until 1.0, any minor version may break the previous
   one**: versions 0.x are drafts.
 - A host **MUST** ignore control keys it does not know. An unknown action or
-  patch op is `EINVAL`.
+  patch op is `EINVAL`. A program **MUST** ignore event kinds (§9) and
+  capability fields (§4) it does not know.
 - **Extensions** by an implementation use a vendor prefix:
   - control keys `x-<vendor>-<name>`;
   - attributes `data-<vendor>-<name>`;
@@ -956,6 +974,26 @@ program → CSI ? 2026 l
   knows the surfaces' names; otherwise they keep reporting until they are
   deleted or leave the scrollback, as a crashed program can leave mouse
   reporting on.
+- **Why `press`.** A program that shows several surfaces moves its own
+  selection to the one the user goes to: a dashboard selects the card
+  pressed, and a multiplexer that draws its panes and tools as surfaces
+  focuses the one pressed, as it does for a press on cells through mouse
+  reporting. A surface takes every press, and `focus` and `click` cover only
+  what takes focus or has a handler, so a press on text or empty space
+  told the program nothing. `data-on~=click` on a document's root would
+  cover the program's own documents, but only on the release, and not a
+  multiplexer relaying another program's documents, which it would have to
+  rewrite.
+  - **Asked for, not always sent**, because events reach whatever reads the
+    input: a document printed by a program that exits without detaching
+    (§5.5) would otherwise type an event into the shell on every click on
+    its text. The programs that ask are those that read events.
+  - **On the placement**, because the pointer belongs to the window that
+    receives it (§5.3), and a program that composes surfaces places them
+    every frame anyway. A multiplexer asks for every surface it relays, and
+    passes a `press` on only to a program whose own placement asked.
+  - **First**, as a browser's `pointerdown` comes before the focus moves: a
+    program hears where the user went before it hears what that did.
 - **Why hide:** sending a document and laying it out costs far more than
   placing it. A program scrolling through many surfaces keeps the ones that
   will come back, and only it knows which those are.

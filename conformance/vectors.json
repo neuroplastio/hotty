@@ -425,6 +425,50 @@
    ]
   },
   {
+   "name": "p=1 asks for presses; the placement answers as any other",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=p>hi</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "p": "1"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4"
+     }
+    }
+   ]
+  },
+  {
    "name": "hide keeps the document: patches apply, and placing it again needs no doc",
    "steps": [
     {
