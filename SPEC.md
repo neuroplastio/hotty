@@ -227,7 +227,7 @@ The capabilities object:
 | --- | --- |
 | `v` | the HOTTY version the host implements, as a string: `"0.1"` for this document |
 | `ops` | the patch ops it supports (§6) |
-| `events` | the event kinds it can send (§9) |
+| `events` | the event kinds it can send (§9). `drag` stands for `dragstart`, `drag` and `dragend` (§9.1) |
 | `cell` | `{"w": …, "h": …}`: the cell size in device pixels |
 | `scale` | device pixels per CSS pixel |
 | `scheme` | `"dark"` or `"light"`: the terminal's colour scheme |
@@ -389,8 +389,9 @@ or creates it detached, with `d=1` on the `a=doc` that sends its document
 - **A detached surface stays on the screen as text does.** It is placed,
   hidden, patched and deleted as before, and moves with its line (§5.4).
   Nothing in it reaches the program any more:
-  - **It sends no events** (§9), of any kind, `press` included, whatever
-    its placement's `p`.
+  - **It sends no events** (§9), of any kind, `press` and drags included,
+    whatever its placement's `p` and its `data-on`. A drag under way when
+    it is detached ends with nothing more reported (§9.1).
   - **It never has the keyboard.** A surface that has the keyboard when it
     is detached gives it back to the terminal, and sends neither `change`
     nor `blur`. A click in it takes nothing, and `a=focus` is `EDETACHED`.
@@ -637,6 +638,9 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `input` | every edit of a control with `data-on~=input` | `{"value": …}` |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields as an object of names to values, the submitter's included |
 | `press` | the primary button pressed, or a tap, anywhere in the window of a surface placed with `p=1` (§5.2) | none |
+| `dragstart` | a mouse's or a pen's primary button pressed on an element with `data-on~=drag` (§9.1) | `{"c": …, "r": …, "keys": […]}`: the pointer's cell and the keys held (§9.1) |
+| `drag` | during a drag, the element under the pointer changed (§9.1) | the same |
+| `dragend` | the drag ended: the button released, wherever the pointer is (§9.1) | the same |
 | `focus`, `blur` | the surface gains or loses the keyboard (§10); `t` is empty | none |
 | `resize` | the surface's pixel size changed without its cells changing (§5.3); `t` is empty | `{"w": …, "h": …}` in CSS pixels |
 
@@ -678,18 +682,83 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
     pointer shows the one the document asks for (CSS `cursor`, and as in
     a browser, a pointer over a link and a text cursor over text). Over a
     hyperlink it shows what it shows over an OSC 8 hyperlink;
-  - selecting text.
+  - selecting text, where CSS `user-select` allows it (§11).
 - **Gestures that scroll are the terminal's.** A wheel, a touchpad's
   scroll, or a touch drag over a surface does what it would do over the
   cells beneath it. That is scrollback, or on the alternate screen, the
   program's wheel input. The host **MUST** pass them on, with the position
-  of the pointer or the finger. Taps, clicks and long presses stay the
-  surface's.
+  of the pointer or the finger. Taps, clicks, long presses, and a mouse's
+  or a pen's drags (§9.1) stay the surface's.
 - **The detail** is a JSON value, base64-encoded. Values are the program's
   (§7): an `href` is reported as the document has it.
 - **Unknown kinds.** A program **MUST** ignore an event whose kind it does
   not know: later versions add kinds (§15). The capabilities list the kinds
   a host sends (`events`, §4).
+
+### 9.1 Drags
+
+An element opts in to drags with `drag` in its `data-on`, as it opts in to
+clicks with `click`. A **drag** is a press of a mouse's or a pen's primary
+button on such an element, the moves of the pointer while the button is
+down, and its release. A program hears through drags what a click cannot
+carry: a range dragged across a grid, a handle dragged to where it is let
+go.
+
+- **Three events:**
+  - `dragstart`, on the press. `t` is the element that opted in: the
+    nearest one, from the pressed element outward, with `drag` in its
+    `data-on`. If it has no `id`, there is no drag.
+  - `drag`, each time the element under the pointer changes. `t` is the
+    nearest element with an `id` and `drag` in its `data-on`, from the one
+    under the pointer outward, and empty where there is none, outside the
+    window included. While `t` is empty, a `drag` is sent each time the
+    cell under the pointer changes instead.
+  - `dragend`, once, on the release, wherever the pointer is. `t` is as
+    for `drag`.
+
+  A drag therefore costs a few events for each element it crosses, not one
+  for every move.
+- **The detail** of each is `{"c": …, "r": …, "keys": […]}`:
+  - `c` and `r` are the column and the row of the surface under the
+    pointer, counted from 0 at the surface's top left cell, not its
+    window's (§5.2). They go on counting outside the surface: negative
+    above it and to its left, its size or more below it and to its right.
+    A program that scrolls while the pointer is past an edge knows how far
+    past it the pointer is.
+  - `keys` are the modifier keys held: a list of `"shift"`, `"ctrl"`,
+    `"alt"` and `"meta"`, in that order, empty when none is.
+- **The pointer is the surface's until the release,** as a page's
+  `setPointerCapture` makes it an element's. Every move goes to the drag,
+  wherever the pointer is: over the cells, over another surface, or outside
+  the terminal's window where the platform allows it. None of it reaches
+  anything else: no other surface, and no mouse reporting to the program.
+- **A drag selects no text.** A press on an element that opts in starts no
+  text selection, whatever its CSS, as if it had `user-select: none` (§11).
+- **Mouse and pen only.** A touch on an element that opts in does what it
+  does on any other: a touch drag scrolls (§9), and a tap is a click, which
+  only `click` reports.
+- **Order.** The press that starts a drag is a press like any other
+  (§10.1). `press`, if the placement asked for it, comes first, then
+  `dragstart`, then everything else the press causes (`change`, `blur`,
+  `focus`). On the release, `dragend` comes before any `click`.
+- **A drag is a click only where it began.** When it ends on the element
+  it started on (`dragend`'s `t` is `dragstart`'s), its release is the
+  click it would have been without the drag: an element with `click` in its
+  `data-on` as well reports `click`, after `dragend`. A drag that ends
+  anywhere else reports no `click`.
+- **What ends a drag early.** The host sends `dragend` at once, with `t`
+  empty and the last cell the pointer was on, when before the release:
+  - the surface's placement goes away (`a=hide`, or its line leaving the
+    screen);
+  - a new document replaces the surface's (`a=doc`);
+  - or the host loses the pointer.
+
+  A surface that is detached or deleted during a drag reports nothing more
+  (§5.5). Nothing else ends a drag: neither a patch nor a new placement
+  (moving the surface, or showing another window of it).
+- **Detection.** `drag` in `events` (§4) stands for the three kinds. Where
+  it is absent, a program offers another way to do what its drags do, such
+  as keys or clicks.
 
 ## 10. Keyboard and focus
 
@@ -769,6 +838,11 @@ document, and therefore its text.
 
 - **Selecting and copying** inside a surface **SHOULD** copy the selected
   text of the document.
+- **`user-select: none`** is the document's to set, as in a browser. A host
+  **MUST NOT** start a selection on an element whose `user-select` is
+  `none` (its used value, CSS UI 4: the elements inside one with `auto`
+  included), or on one that opts in to drags (§9.1). It **SHOULD** leave
+  their text out of a selection that crosses them.
 - **Wherever the host extracts the screen as text** (scrollback search, "copy
   all", a serialised buffer), it **SHOULD** use for each row a surface covers
   the text of the elements laid out on that row. `data-hotty-text` on an
@@ -869,13 +943,18 @@ A host conforms to HOTTY version 0.1 when:
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
 The vectors check replies, error codes, every patch op, morph, context
-parsing, resources and the envelope. They inspect documents, not pixels.
+parsing, resources, drags and the envelope. They inspect documents and
+events, not pixels.
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
 - its attributes with the program's values (§7);
 - its text;
 - its child elements as `[tag, id, text]`.
+
+It also lets a test move a mouse's pointer to the centre of an element, or
+of a cell of a surface, and press and release its primary button there,
+with modifier keys held.
 
 This is a test interface, not part of the wire protocol.
 
@@ -994,6 +1073,34 @@ program → CSI ? 2026 l
     passes a `press` on only to a program whose own placement asked.
   - **First**, as a browser's `pointerdown` comes before the focus moves: a
     program hears where the user went before it hears what that did.
+- **Why drags.** A spreadsheet selects a range by dragging across it, and
+  fills by dragging its handle. Clicks cannot stand in for either. The
+  terminal's mouse reporting can, but it does not reach over a surface,
+  where the pointer is the surface's.
+  - **Opted in, element by element,** because elsewhere a mouse's drag
+    selects text, which the reader of a document expects of it.
+  - **Elements, not pixels.** An event for each element crossed is a few
+    for each cell of a grid, which a round trip over SSH can carry; one for
+    every move would not be.
+  - **The cell in the detail** says what elements cannot: where the
+    pointer is past the surface's edge, which a program that scrolls during
+    a drag needs. Cells are the one unit that the program and every host
+    share (§5.3). They are counted from the surface, not the screen, so a
+    multiplexer relaying a surface passes its events on unchanged.
+  - **The pointer is held,** as a browser's `setPointerCapture` holds it,
+    so a drag that leaves the window still ends, and the program hears
+    where.
+  - **Mouse and pen only,** because a touch drag scrolls (below): a surface
+    that took touch drags would trap the finger. A tap is still a click.
+  - **No text selection,** because one gesture cannot select both text and
+    cells.
+  - **In a browser's order:** the press is reported before the focus moves,
+    as `pointerdown` comes before it, and the release before the click, as
+    `pointerup` does. A browser clicks only where a press and its release
+    meet, so a drag that ends elsewhere is no click.
+  - **Not HTML's drag and drop** (`draggable`, `DataTransfer`). It moves
+    data between pages and applications, through script, which a surface
+    does not have. The program already holds the data.
 - **Why hide:** sending a document and laying it out costs far more than
   placing it. A program scrolling through many surfaces keeps the ones that
   will come back, and only it knows which those are.

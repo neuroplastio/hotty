@@ -469,6 +469,641 @@
    ]
   },
   {
+   "name": "a drag reports dragstart, a drag for each element crossed and each cell crossed outside them, and dragend, with the cell and the keys",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "top",
+      "q": "2"
+     },
+     "payload": "<p>top</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "top",
+      "c": "20",
+      "r": "3",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{position:absolute;top:0;height:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w));text-align:center;font-style:normal}</style><i id=a data-on=\"drag\" style=\"left:0\"><b id=s>A</b></i><i id=b data-on=\"drag\" style=\"left:calc(3*var(--hotty-cell-w))\">B</i><i id=g style=\"left:calc(6*var(--hotty-cell-w))\">g</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "s",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 4,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "g",
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "c": 7,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      7,
+      1
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "c": 7,
+        "r": 1,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      8,
+      1
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "c": 8,
+        "r": 1,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      7,
+      -2
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "c": 7,
+        "r": -2,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      30,
+      4
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "c": 30,
+        "r": 4,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "keys": [
+      "shift"
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": [
+         "shift"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "keys": [
+      "shift",
+      "ctrl"
+     ],
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": [
+         "shift",
+         "ctrl"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a drag that ends on the element it began on is a click as well; one that ends elsewhere is not",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{position:absolute;top:0;height:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w));text-align:center;font-style:normal}</style><i id=a data-on=\"click drag\" style=\"left:0\">A</i><i id=b data-on=\"click drag\" style=\"left:calc(3*var(--hotty-cell-w))\">B</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      },
+      {
+       "e": "click",
+       "s": "x",
+       "t": "a"
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 4,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 4,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 4,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 4,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 4,
+        "r": 0,
+        "keys": []
+       }
+      },
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "only an element with an id and drag in its data-on starts a drag",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{position:absolute;top:0;height:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w));text-align:center;font-style:normal}</style><i data-on=\"drag\" style=\"left:0\">no id</i><i id=n style=\"left:calc(3*var(--hotty-cell-w))\">N</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      4,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "hide and a new document end a drag with dragend; a detached surface reports nothing more",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{position:absolute;top:0;height:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w));text-align:center;font-style:normal}</style><i id=a data-on=\"drag\" style=\"left:0\">A</i><i id=b data-on=\"drag\" style=\"left:calc(3*var(--hotty-cell-w))\">B</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 4,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "hide",
+      "s": "x",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "c": 4,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{position:absolute;top:0;height:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w));text-align:center;font-style:normal}</style><i id=a data-on=\"drag\" style=\"left:0\">A</i><i id=b data-on=\"drag\" style=\"left:calc(3*var(--hotty-cell-w))\">B</i>",
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "detach",
+      "s": "x",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": []
+    }
+   ]
+  },
+  {
    "name": "hide keeps the document: patches apply, and placing it again needs no doc",
    "steps": [
     {
