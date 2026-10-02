@@ -233,6 +233,7 @@ The capabilities object:
 | `scheme` | `"dark"` or `"light"`: the terminal's colour scheme |
 | `limits` | the host's limits (§13), such as `{"resources": <bytes>, "surfaces": <count>}` |
 | `net` | the host's network policy (§7.2), from directive to sources, such as `{"img-src": ["https://example.com"]}`. Absent or empty: the host fetches nothing from the network |
+| `passthrough` | `true` when the pointer passes through the parts of a surface that take no pointer (§9.3). Absent: every window takes the pointer wherever it is |
 | `host` | optional: a name for the implementation |
 
 Programs **MUST** ignore fields they do not know.
@@ -311,7 +312,8 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   for anything sized by the viewport.
 - Only the window is shown, and only the window receives the pointer: where
   windows overlap, the topmost (§5.2, `z`). A press with Alt held is the
-  exception: it passes every surface (§9.2).
+  exception: it passes every surface (§9.2). On a host with `passthrough`,
+  so does the pointer over the parts of a window that take none (§9.3).
 - **What does not fit is clipped, and nothing in a surface scrolls.**
   - The host **MUST** clip overflow as `overflow: hidden` does: the
     document's root, and any element whose `overflow` is `auto` or
@@ -638,7 +640,7 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `change` | a checkbox or radio button toggled; a text control, `textarea` or `select` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": …, "value": …}` for checkboxes and radio buttons, `{"value": …}` otherwise |
 | `input` | every edit of a control with `data-on~=input` | `{"value": …}` |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields as an object of names to values, the submitter's included |
-| `press` | the primary button pressed, or a tap, anywhere in the window of a surface placed with `p=1` (§5.2), except with Alt held (§9.2) | none |
+| `press` | the primary button pressed, or a tap, anywhere in the window of a surface placed with `p=1` (§5.2), except with Alt held (§9.2) and where the pointer passes through (§9.3) | none |
 | `dragstart` | a mouse's or a pen's primary button pressed on an element with `data-on~=drag` (§9.1), without Alt (§9.2) | `{"c": …, "r": …, "keys": […]}`: the pointer's cell and the keys held (§9.1) |
 | `drag` | during a drag, the element under the pointer changed (§9.1) | the same |
 | `dragend` | the drag ended: the button released, wherever the pointer is (§9.1) | the same |
@@ -792,6 +794,42 @@ handles it as a press on the cells beneath the surface.
   type as Alt for keys (Ghostty's `macos-option-as-alt`, say). That setting
   is about text, and a press has none.
 - **Mouse and pen only.** A tap is a click whatever the keys held.
+
+### 9.3 Where the pointer passes through
+
+A surface that only shows something, such as a frame drawn around cells,
+should not keep the pointer from them. On a host that reports
+`passthrough` (§4), a surface takes the pointer only where an element is
+there for it: where CSS hit testing finds an element at the point, as a
+browser's does. Hit testing skips every box whose `pointer-events` is
+`none`; the property inherits, so `html { pointer-events: none }` makes a
+surface take no pointer, and an element in it with `pointer-events: auto`
+takes it back over its own box.
+
+Where a window takes no pointer, the pointer **passes through** it, as if
+the window were not there:
+
+- **To what is below:** the topmost other window at that point that takes
+  the pointer there, or else the cells. Over the cells, the terminal does
+  what it does with the pointer over cells: with mouse reporting on, the
+  program hears presses, releases and motion as it hears them over cells
+  (the SGR encoding, say), and the pointer has the shape the terminal
+  gives the cells (the one the program set with OSC 22, for instance).
+- **The press decides,** as in §9.2: a gesture whose press passed through
+  is not the surface's until its release, wherever the pointer goes, and a
+  gesture whose press a surface took (a drag, §9.1) stays that surface's
+  over the parts that take no pointer.
+- **The surface hears nothing of it:** no `press`, whatever `p` asked for,
+  no `dragstart` and no `click`; it takes no focus and starts no selection.
+  A press passing through takes the keyboard back as a click on the cells
+  does (§10.1). The pointer there hovers nothing in the surface, and
+  `:hover` matches nothing under it.
+- **Gestures that scroll** reach the cells as everywhere (§9).
+
+A host without `passthrough` gives a window the pointer wherever it is
+(§5.3). A program that relies on the cells under a surface hearing the
+pointer checks for `passthrough`, and otherwise keeps its surfaces off the
+cells whose pointer it needs.
 
 ## 10. Keyboard and focus
 
@@ -978,7 +1016,8 @@ A host conforms to HOTTY version 0.1 when:
 
 The vectors check replies, error codes, every patch op, morph, context
 parsing, resources, drags, presses with Alt and the envelope. They inspect documents and
-events, not pixels.
+events, not pixels. The vectors marked `"passthrough"` apply to a host that
+reports it (§9.3).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
@@ -988,7 +1027,8 @@ To be tested, a host exposes a way to *inspect* an element, reporting:
 
 It also lets a test move a mouse's pointer to the centre of an element, or
 of a cell of a surface, and press and release its primary button there,
-with modifier keys held.
+with modifier keys held. A host with `passthrough` also tells the test
+whether each of those reached the surface or passed through it.
 
 This is a test interface, not part of the wire protocol.
 

@@ -17,7 +17,9 @@ little.
   "wire":    [ { "name": …, "stream": …, "commands": [ … ], "invalid": n } ] }
 ```
 
-Each vector starts on a fresh host. Its steps come in three kinds.
+Each vector starts on a fresh host. A vector with `"requires":
+"passthrough"` applies only to a host that reports `passthrough` (SPEC §4,
+§9.3); others skip it. Its steps come in three kinds.
 
 **Send** `{ "send": {control}, "payload": text?, "reply": …, "events": … }`:
 the command goes to the host as the program would send it. It is
@@ -53,6 +55,8 @@ checked).
   pointer is.
 - `"keys"`: the modifier keys held during the step (`shift`, `ctrl`, `alt`,
   `meta`); none when absent.
+- `"through"`: `true` if the step passes through the surface (SPEC §9.3),
+  `false` if the surface gets it. Absent: not checked.
 - `"events"`: every event (`a=ev`) the step makes the host send, in order,
   and nothing more. Each is compared as a reply is: every key but `detail`
   with the event's control, and `detail`, when present, with its JSON body

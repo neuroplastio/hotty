@@ -2364,6 +2364,126 @@
      }
     }
    ]
+  },
+  {
+   "name": "pointer-events: none lets the pointer through: no press, drag or click there, whatever p asked for; an element with pointer-events: auto takes it back; the press decides",
+   "requires": "passthrough",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>html{pointer-events:none}body{margin:0}i{position:absolute;top:0;height:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w));text-align:center;font-style:normal}#h{pointer-events:auto}</style><i id=a data-on=\"click drag\" style=\"left:0\">A</i><i id=h data-on=\"click drag\" style=\"left:calc(3*var(--hotty-cell-w))\">H</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "p": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "h",
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      10,
+      1
+     ],
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "h",
+     "through": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "through": false,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "h"
+      },
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "c": 4,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "through": false,
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "through": false,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    }
+   ]
   }
  ],
  "wire": [
