@@ -125,8 +125,12 @@ value   = *( %x20-39 / %x3C / %x3E-7E )    ; printable ASCII except ":" ";" "="
 
 - A key appears at most once.
 - A host **MUST** ignore keys it does not know (§15).
-- Where a host must send a value that contains `:`, `;`, `=` or a control
-  character (an element id, say), it replaces each such character with `_`.
+- **A value is printable ASCII.** Whoever sends one, a host or a program,
+  **MUST** replace each character a value may not hold with `_`: `:`, `;`,
+  `=`, a control character, and any character outside ASCII. It replaces
+  each Unicode code point with one `_`, and each byte that is not UTF-8 with
+  one `_`. An element whose id is `café` is reported as `t=caf_`, so a
+  program that needs its ids back gives them in ASCII.
 
 ### 3.3 Payload
 
@@ -134,8 +138,9 @@ value   = *( %x20-39 / %x3C / %x3E-7E )    ; printable ASCII except ":" ";" "="
 alphabet).
 - Hosts **MUST** accept base64 with or without padding, and ignore
   whitespace in it.
-- A body **MAY** be compressed with zlib (RFC 1950) before encoding, and
-  marked `o=z`.
+- A program **MAY** compress a body with zlib (RFC 1950) before encoding
+  it, and mark it `o=z`. A host **MUST NOT** compress what it sends (replies
+  and events), so a program needs no zlib to read them.
 - An empty body is sent as nothing, and the `;` before it may then be
   omitted.
 - Text bodies (markup, patch values) are UTF-8.
@@ -200,6 +205,9 @@ A malformed message:
 - a payload that is not valid base64 or zlib;
 - an aborted chunked message.
 
+Each counts once: a malformed message that arrives before the last chunk of
+another aborts it (§3.4), and makes two, the aborted message and itself.
+
 The host **MUST NOT** act on it. It sends no reply, since it cannot know what
 the program meant. It **MAY** log it.
 
@@ -220,6 +228,12 @@ ESC ] 7279 ; a=ok:n=1:re=q ; <base64 JSON> ST
 
 If the DA1 answer arrives with no HOTTY reply before it, there is no host. The
 program **SHOULD** then fall back (§14).
+
+A DA1 answer may belong to a question asked earlier, by the program or by
+whatever ran before it. A program **MAY** wait a little after a DA1 that
+arrives before any reply, for the reply and the DA1 behind it. A host answers
+the query before that DA1, so the wait costs a terminal that is not a host
+only that little. SDK.md sets how long.
 
 The capabilities object:
 
@@ -1137,6 +1151,10 @@ the surface or passed through it.
 
 This is a test interface, not part of the wire protocol.
 
+A library that speaks HOTTY for programs, an SDK, conforms when it meets
+[SDK.md](SDK.md) and passes the vectors' SDK sections: `build`, `encode`,
+`decode`, `scan` and `detect`.
+
 ---
 
 ## Appendix A. Examples
@@ -1200,6 +1218,13 @@ program → CSI ? 2026 l
   - zlib on markup more than pays for base64's third.
 - **Why 4096-byte chunks:** some terminals ignore longer strings, and some
   multiplexers discard a string that takes too long to arrive.
+- **Why values are ASCII.** A byte of UTF-8 may be 0x9C, which a parser that
+  reads 8-bit controls takes for ST, and ends the sequence there. Neovim's
+  input parser is one. An id cut to `_` is a smaller loss than an event cut
+  in two.
+- **Why hosts do not compress.** Replies and events are small, and zlib is
+  the one dependency a program would need only to read them. Programs keep
+  it for what they send, where documents are large.
 - **Why ids and patches.**
   - Addressing by id keeps a patch's effect predictable, and makes an update
     cost what it changes.

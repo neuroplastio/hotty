@@ -24,10 +24,11 @@ xterm.js in a browser.
 | path | what |
 | --- | --- |
 | [`SPEC.md`](SPEC.md) | the protocol |
-| [`conformance/`](conformance/) | the conformance vectors: what a host must do, as data |
+| [`SDK.md`](SDK.md) | what a library that speaks HOTTY for programs provides, in any language: its components, options, defaults and names |
+| [`conformance/`](conformance/) | the conformance vectors: what a host and an SDK must do, as data |
 | [`corpus/`](corpus/) | pages that exercise the HTML and CSS a surface is expected to handle |
 | [`examples/`](examples/) | programs that speak HOTTY: a card, a dashboard, a form, a large grid, a game |
-| [`clients/python/hotty.py`](clients/python/hotty.py) | a dependency-free reference client, used by the examples and the hosts' tests |
+| [`clients/python/hotty.py`](clients/python/hotty.py) | a dependency-free reference client with SDK.md's whole wire layer, used by the examples and the hosts' tests; `test_vectors.py` runs the SDK vectors against it |
 
 ## Implementations
 

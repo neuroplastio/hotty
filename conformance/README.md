@@ -1,20 +1,30 @@
 # HOTTY conformance vectors
 
-`vectors.json` is what a host must do, as data. Two implementations that share
-no code run it:
+`vectors.json` is what a host and an SDK must do, as data.
+
+The host sections (`vectors`, `wire`) are run by two hosts that share no
+code:
 - hotty-blitz: `crates/hotty-blitz/tests/conformance.rs`;
 - xterm-addon-hotty: `tests/e2e/conformance.spec.ts` and
   `tests/unit/conformance.test.ts`.
 
-A disagreement is either a bug or a line of `SPEC.md` that says too
-little.
+The SDK sections (`wire`, `build`, `encode`, `decode`, `scan`, `detect`;
+SDK.md §5) are run by:
+- the Python client: `clients/python/test_vectors.py`, every section;
+- hotty-go: `hotty_test.go` (`wire`) and `vectors_test.go` (`build`,
+  `encode`, `decode`).
+
+A disagreement is either a bug or a line of `SPEC.md` or `SDK.md` that says
+too little.
 
 ## Format
 
 ```
 { "version": "0.1",
   "vectors": [ { "name": …, "steps": [ step, … ] } ],
-  "wire":    [ { "name": …, "stream": …, "commands": [ … ], "invalid": n } ] }
+  "wire":    [ { "name": …, "stream": …, "commands": [ … ], "invalid": n } ],
+  "build":   [ … ], "encode": [ … ], "decode": [ … ], "scan": [ … ],
+  "detect":  [ … ] }
 ```
 
 Each vector starts on a fresh host. A vector with `"requires"` applies only
@@ -73,6 +83,9 @@ The documents of pointer steps size their elements in cells
 (`--hotty-cell-w`, `--hotty-cell-h`, SPEC §8), and point at centres that lie
 well inside a cell, so the cell reported is the same on every host.
 
+A host never compresses what it sends (SPEC §3.3): a runner checks that no
+reply or event it reads carries `o`.
+
 **Wire vectors** check the envelope alone. The `stream` (JSON-escaped bytes)
 must decode into `commands`: listed control keys equal, `m` and `o` never
 present, and the payload is UTF-8 text. It must also report `invalid`
@@ -80,3 +93,82 @@ malformed or interrupted commands.
 
 The vectors check the document, the events and the wire, not pixels (§5.3:
 pixels may differ between hosts).
+
+## The SDK sections
+
+They check an SDK's wire layer (SDK.md §3). Names in them are canonical, in
+snake case (SDK.md Appendix A): a runner maps `set_text`, `keep_cursor` and
+`fit_rows` to its own. Strings are the UTF-8 of the JSON string. `null`
+means absent: Go's zero value, Python's `None`. A vector with `"requires"`
+applies to an SDK that implements what it names; a runner declares what it
+implements, and skips the rest:
+
+| `requires` | what it names |
+| --- | --- |
+| `place.hover` | `Placement.Hover` (`v=1`) |
+| `event.hover` | `Event.Hover()` |
+| `caps.passthrough`, `caps.version` | those fields of `Caps` |
+| `caps.lenient` | a capability field of an unexpected type is ignored (SDK.md §2.7) |
+| `caps.drag-kinds` | `Sends` answers for `dragstart` and `dragend` as for `drag` (SPEC §4) |
+| `options.unordered` | a `q` given wins over the `q` that `n` implies, whatever their order |
+| `decode.abort-count` | a malformed message that aborts a chunked one counts twice (SPEC §3.7) |
+| `decode.unterminated` | `Feed` takes a sequence without its terminator |
+| `scanner.da1` | the Scanner's `da1` segments |
+
+**Build** `{ "build": builder, "args": {…}, "options": {…}?, "out": [ … ] }`:
+the runner calls the builder with `args`, and with the reply options `n`
+and `q` and `detached` from `options`, which have no order. `sync` takes
+`args.commands`, each a `{ "build", "args", "options" }` of its own. The
+output, split into raw bytes and HOTTY sequences, must be `out`:
+- `{ "raw": text }`: bytes that are not HOTTY's, such as `PlaceAt`'s cursor
+  moves, `Query`'s DA1 and `Sync`'s brackets;
+- `{ "cmd": { "control": {…}, "payload": text? } }`: one command, decoded.
+  Its control has exactly these keys (`m` and `o` never), and its payload is
+  this text, empty when absent.
+
+**Encode** `{ "control": [[key, value], …], "payload": text | "payload_b64":
+…, "bytes"?: text, "chunks"?: [ { "control": text, "len": n } ] }`: the
+runner calls `Encode` with the control in that order. With `bytes`, the
+output must be exactly that: these are payloads that cannot be compressed,
+under 256 bytes or random. With `chunks`, it is split into sequences, and
+each one's control (between `ESC ] 7279 ;` and `;`) and base64 length must
+match. Every case must also decode back to the payload, with the control's
+keys in order.
+
+**Decode** `{ "seqs": [ text, … ], "results": [ … ], "invalid": n,
+"messages": [ … ] }`: each sequence goes to one Decoder's `Feed`, in order.
+`results` are its results (`not_hotty`, `partial`, `complete`, `invalid`),
+and `invalid` its count after the last. `messages` are the complete ones,
+in order:
+- `control`: exactly these keys and values;
+- `reply`: `Reply`'s fields (`ok`, `re`, `n`, `surface`, `cols`, `rows`,
+  `code`, `detail`);
+- `event`: `Event`'s fields and accessors (`surface`, `kind`, `target`,
+  `value`, `checked`, `fields`, `link` with `href` and `url`, `size` with
+  `w` and `h`, `fit_rows`, `drag` with `c`, `r` and `keys`, `hover` with
+  `c`, `r` and `out`);
+- `caps`: `Caps`'s fields, and its answers: `supports` and `sends` map an
+  argument to the answer, `drags`, `hovers`, `light`, `cell_css` with `w`
+  and `h`.
+
+Only the keys listed are checked. Numbers compare as numbers.
+
+**Scan** `{ "stream": text, "segments": [ … ], "held"?: text, "flush"?: [
+… ], "invalid"?: n }`: the stream goes to a Scanner, which looks for DA1
+answers only when the vector requires `scanner.da1`. The runner feeds it
+whole, cut in two at every offset (or, in a long stream, at every offset
+near its ends and at a stride between), and a byte at a time; each time,
+the segments must be `segments` (adjacent `pass` segments merged), what it
+holds after the stream `held` (none when absent), what `Flush` returns
+`flush` (none when absent), and its count of dropped sequences `invalid`
+(0 when absent). A segment is `{ "pass": text }`, `{ "osc": text }` or `{
+"da1": text }`.
+
+**Detect** `{ "n"?: n, "steps": [ … ], "caps"?: {…} }`: one Detector, with
+the query's number `n` (1 when absent). Each step happens at time `at`, in
+milliseconds, and is one of `start`, `da1`, `osc` (a sequence, decoded, and
+given to `Reply`), `tick` and `end`. After each, every key the step lists
+must equal the Detector's: `took` (what `DA1` or `Reply` returned), `state`
+(`detecting`, `native`, `text`), `decided`, `done`, and `deadline` (`null`
+when there is none). `caps` is checked against the capabilities at the
+end.

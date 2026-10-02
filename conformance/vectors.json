@@ -872,6 +872,68 @@
    ]
   },
   {
+   "name": "an id outside printable ASCII is reported with one _ for each character that is not (SPEC \u00a73.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{position:absolute;top:0;height:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w));font-style:normal}</style><i id=\"caf\u00e9\" data-on=click style=\"left:0\">A</i><i id=\"a\ud83d\ude00b\" data-on=click style=\"left:calc(4*var(--hotty-cell-w))\">B</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "caf\u00e9",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "caf_"
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a\ud83d\ude00b",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "a_b"
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "only an element with an id and drag in its data-on starts a drag",
    "steps": [
     {
@@ -3716,6 +3778,2493 @@
     }
    ],
    "invalid": 0
+  }
+ ],
+ "build": [
+  {
+   "name": "query: a=q with n, fenced by DA1",
+   "build": "query",
+   "args": {
+    "n": 1
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "q",
+       "n": "1"
+      }
+     }
+    },
+    {
+     "raw": "\u001b[c"
+    }
+   ]
+  },
+  {
+   "name": "doc answers only errors by default (q=1)",
+   "build": "doc",
+   "args": {
+    "surface": "card",
+    "html": "<p>hi</p>"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "doc",
+       "s": "card",
+       "q": "1"
+      },
+      "payload": "<p>hi</p>"
+     }
+    }
+   ]
+  },
+  {
+   "name": "doc, detached: d=1",
+   "build": "doc",
+   "args": {
+    "surface": "card",
+    "html": "<p>hi</p>"
+   },
+   "options": {
+    "detached": true
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "doc",
+       "s": "card",
+       "d": "1",
+       "q": "1"
+      },
+      "payload": "<p>hi</p>"
+     }
+    }
+   ]
+  },
+  {
+   "name": "n numbers a command and asks for its reply: q=0",
+   "build": "doc",
+   "args": {
+    "surface": "card",
+    "html": "<p>hi</p>"
+   },
+   "options": {
+    "n": 4
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "doc",
+       "s": "card",
+       "n": "4",
+       "q": "0"
+      },
+      "payload": "<p>hi</p>"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a q given wins over the q that n implies",
+   "build": "doc",
+   "args": {
+    "surface": "card",
+    "html": "<p>hi</p>"
+   },
+   "options": {
+    "n": 4,
+    "q": 2
+   },
+   "requires": [
+    "options.unordered"
+   ],
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "doc",
+       "s": "card",
+       "n": "4",
+       "q": "2"
+      },
+      "payload": "<p>hi</p>"
+     }
+    }
+   ]
+  },
+  {
+   "name": "place: rows 0 is r=auto, and it answers only errors",
+   "build": "place",
+   "args": {
+    "surface": "card",
+    "placement": {
+     "cols": 40
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "place",
+       "s": "card",
+       "c": "40",
+       "r": "auto",
+       "q": "1"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "place with every option but hover",
+   "build": "place",
+   "args": {
+    "surface": "card",
+    "placement": {
+     "cols": 40,
+     "rows": 10,
+     "window": {
+      "x": 0,
+      "y": 2,
+      "w": 40,
+      "h": 5
+     },
+     "z": -3,
+     "press": true,
+     "fit": true,
+     "keep_cursor": true
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "place",
+       "s": "card",
+       "c": "40",
+       "r": "10",
+       "x": "0",
+       "y": "2",
+       "w": "40",
+       "h": "5",
+       "z": "-3",
+       "p": "1",
+       "f": "1",
+       "C": "1",
+       "q": "1"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "place with hover: v=1",
+   "build": "place",
+   "requires": [
+    "place.hover"
+   ],
+   "args": {
+    "surface": "card",
+    "placement": {
+     "cols": 40,
+     "rows": 2,
+     "hover": true
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "place",
+       "s": "card",
+       "c": "40",
+       "r": "2",
+       "v": "1",
+       "q": "1"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "a window that shows the whole surface is left out",
+   "build": "place",
+   "args": {
+    "surface": "card",
+    "placement": {
+     "cols": 40,
+     "rows": 3,
+     "window": {
+      "x": 0,
+      "y": 0,
+      "w": 40,
+      "h": 3
+     }
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "place",
+       "s": "card",
+       "c": "40",
+       "r": "3",
+       "q": "1"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "with r=auto, a window is always sent",
+   "build": "place",
+   "args": {
+    "surface": "card",
+    "placement": {
+     "cols": 40,
+     "window": {
+      "x": 0,
+      "y": 0,
+      "w": 40,
+      "h": 3
+     }
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "place",
+       "s": "card",
+       "c": "40",
+       "r": "auto",
+       "x": "0",
+       "y": "0",
+       "w": "40",
+       "h": "3",
+       "q": "1"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "place_at: save the cursor, move it, place with C=1, restore it",
+   "build": "place_at",
+   "args": {
+    "surface": "c",
+    "x": 4,
+    "y": 2,
+    "placement": {
+     "cols": 40
+    }
+   },
+   "options": {
+    "n": 3
+   },
+   "out": [
+    {
+     "raw": "\u001b7\u001b[3;5H"
+    },
+    {
+     "cmd": {
+      "control": {
+       "a": "place",
+       "s": "c",
+       "c": "40",
+       "r": "auto",
+       "C": "1",
+       "n": "3",
+       "q": "0"
+      }
+     }
+    },
+    {
+     "raw": "\u001b8"
+    }
+   ]
+  },
+  {
+   "name": "hide never answers by default (q=2)",
+   "build": "hide",
+   "args": {
+    "surface": "card"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "hide",
+       "s": "card",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "a q given sets the quiet level",
+   "build": "hide",
+   "args": {
+    "surface": "card"
+   },
+   "options": {
+    "q": 0
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "hide",
+       "s": "card",
+       "q": "0"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "patch with a target",
+   "build": "patch",
+   "args": {
+    "surface": "x",
+    "op": "inner",
+    "target": "list",
+    "payload": "<li>a</li>"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "patch",
+       "s": "x",
+       "op": "inner",
+       "t": "list",
+       "q": "2"
+      },
+      "payload": "<li>a</li>"
+     }
+    }
+   ]
+  },
+  {
+   "name": "patch without a target sends no t",
+   "build": "patch",
+   "args": {
+    "surface": "x",
+    "op": "morph",
+    "payload": "<p id=a>1</p>"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "patch",
+       "s": "x",
+       "op": "morph",
+       "q": "2"
+      },
+      "payload": "<p id=a>1</p>"
+     }
+    }
+   ]
+  },
+  {
+   "name": "set_text is op=text",
+   "build": "set_text",
+   "args": {
+    "surface": "x",
+    "target": "clock",
+    "text": "12:00"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "patch",
+       "s": "x",
+       "op": "text",
+       "t": "clock",
+       "q": "2"
+      },
+      "payload": "12:00"
+     }
+    }
+   ]
+  },
+  {
+   "name": "set_var is op=var with k",
+   "build": "set_var",
+   "args": {
+    "surface": "x",
+    "target": "bar",
+    "name": "w",
+    "value": "40%"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "patch",
+       "s": "x",
+       "op": "var",
+       "t": "bar",
+       "k": "w",
+       "q": "2"
+      },
+      "payload": "40%"
+     }
+    }
+   ]
+  },
+  {
+   "name": "set_attr is op=attr with k",
+   "build": "set_attr",
+   "args": {
+    "surface": "x",
+    "target": "ok",
+    "name": "title",
+    "value": "Save"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "patch",
+       "s": "x",
+       "op": "attr",
+       "t": "ok",
+       "k": "title",
+       "q": "2"
+      },
+      "payload": "Save"
+     }
+    }
+   ]
+  },
+  {
+   "name": "remove_attr is op=unattr with k and no payload",
+   "build": "remove_attr",
+   "args": {
+    "surface": "x",
+    "target": "ok",
+    "name": "disabled"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "patch",
+       "s": "x",
+       "op": "unattr",
+       "t": "ok",
+       "k": "disabled",
+       "q": "2"
+      },
+      "payload": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "morph_to is op=morph with a target",
+   "build": "morph_to",
+   "args": {
+    "surface": "x",
+    "target": "card",
+    "html": "<div id=card>2</div>"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "patch",
+       "s": "x",
+       "op": "morph",
+       "t": "card",
+       "q": "2"
+      },
+      "payload": "<div id=card>2</div>"
+     }
+    }
+   ]
+  },
+  {
+   "name": "res carries its id and MIME type",
+   "build": "res",
+   "args": {
+    "id": "logo",
+    "mime": "image/svg+xml",
+    "data": "<svg/>"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "res",
+       "id": "logo",
+       "type": "image/svg+xml",
+       "q": "2"
+      },
+      "payload": "<svg/>"
+     }
+    }
+   ]
+  },
+  {
+   "name": "del_res deletes a resource",
+   "build": "del_res",
+   "args": {
+    "id": "logo"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "del",
+       "id": "logo",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "del deletes a surface",
+   "build": "del",
+   "args": {
+    "surface": "x"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "del",
+       "s": "x",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "del_all deletes every surface",
+   "build": "del_all",
+   "args": {},
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "del",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "detach",
+   "build": "detach",
+   "args": {
+    "surface": "x"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "detach",
+       "s": "x",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "focus with a target",
+   "build": "focus",
+   "args": {
+    "surface": "f",
+    "target": "name"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "focus",
+       "s": "f",
+       "t": "name",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "focus without a target sends no t",
+   "build": "focus",
+   "args": {
+    "surface": "f"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "focus",
+       "s": "f",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "blur",
+   "build": "blur",
+   "args": {
+    "surface": "f"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "blur",
+       "s": "f",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "sync brackets commands in synchronized output",
+   "build": "sync",
+   "args": {
+    "commands": [
+     {
+      "build": "set_text",
+      "args": {
+       "surface": "x",
+       "target": "a",
+       "text": "1"
+      }
+     },
+     {
+      "build": "set_var",
+      "args": {
+       "surface": "x",
+       "target": "b",
+       "name": "w",
+       "value": "2"
+      }
+     }
+    ]
+   },
+   "out": [
+    {
+     "raw": "\u001b[?2026h"
+    },
+    {
+     "cmd": {
+      "control": {
+       "a": "patch",
+       "s": "x",
+       "op": "text",
+       "t": "a",
+       "q": "2"
+      },
+      "payload": "1"
+     }
+    },
+    {
+     "cmd": {
+      "control": {
+       "a": "patch",
+       "s": "x",
+       "op": "var",
+       "t": "b",
+       "k": "w",
+       "q": "2"
+      },
+      "payload": "2"
+     }
+    },
+    {
+     "raw": "\u001b[?2026l"
+    }
+   ]
+  },
+  {
+   "name": "values a builder is given are cleaned: each character outside printable ASCII is one _",
+   "build": "set_text",
+   "args": {
+    "surface": "x",
+    "target": "caf\u00e9:\ud83d\ude00",
+    "text": "caf\u00e9"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "patch",
+       "s": "x",
+       "op": "text",
+       "t": "caf___",
+       "q": "2"
+      },
+      "payload": "caf\u00e9"
+     }
+    }
+   ]
+  }
+ ],
+ "encode": [
+  {
+   "name": "each character a value may not hold becomes one _: : ; = a control character, and each code point outside ASCII",
+   "control": [
+    [
+     "a",
+     "patch"
+    ],
+    [
+     "s",
+     "x"
+    ],
+    [
+     "t",
+     "a:b;c=d\u0007\u00e9\ud83d\ude00"
+    ]
+   ],
+   "payload": "",
+   "bytes": "\u001b]7279;a=patch:s=x:t=a_b_c_d___\u001b\\"
+  },
+  {
+   "name": "keys go out in the order given; an empty payload sends no ;",
+   "control": [
+    [
+     "a",
+     "del"
+    ],
+    [
+     "s",
+     "x"
+    ],
+    [
+     "q",
+     "2"
+    ]
+   ],
+   "payload": "",
+   "bytes": "\u001b]7279;a=del:s=x:q=2\u001b\\"
+  },
+  {
+   "name": "a payload under 256 bytes is never compressed",
+   "control": [
+    [
+     "a",
+     "doc"
+    ],
+    [
+     "s",
+     "x"
+    ]
+   ],
+   "payload": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "bytes": "\u001b]7279;a=doc:s=x;YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\u001b\\"
+  },
+  {
+   "name": "3072 bytes that do not compress are 4096 of base64: one sequence",
+   "control": [
+    [
+     "a",
+     "res"
+    ],
+    [
+     "id",
+     "x"
+    ],
+    [
+     "q",
+     "2"
+    ]
+   ],
+   "payload_b64": "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",
+   "bytes": "\u001b]7279;a=res:id=x:q=2;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\u001b\\"
+  },
+  {
+   "name": "3073 bytes are chunked: the first carries the control and m=1, the last m=0 and q",
+   "control": [
+    [
+     "a",
+     "res"
+    ],
+    [
+     "id",
+     "x"
+    ],
+    [
+     "q",
+     "2"
+    ]
+   ],
+   "payload_b64": "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",
+   "chunks": [
+    {
+     "control": "a=res:id=x:q=2:m=1",
+     "len": 4096
+    },
+    {
+     "control": "m=0:q=2",
+     "len": 4
+    }
+   ]
+  },
+  {
+   "name": "without q, a continuation carries only m",
+   "control": [
+    [
+     "a",
+     "res"
+    ],
+    [
+     "id",
+     "x"
+    ]
+   ],
+   "payload_b64": "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",
+   "chunks": [
+    {
+     "control": "a=res:id=x:m=1",
+     "len": 4096
+    },
+    {
+     "control": "m=0",
+     "len": 3904
+    }
+   ]
+  },
+  {
+   "name": "every chunk but the last is exactly 4096",
+   "control": [
+    [
+     "a",
+     "res"
+    ],
+    [
+     "id",
+     "x"
+    ],
+    [
+     "q",
+     "1"
+    ]
+   ],
+   "payload_b64": "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",
+   "chunks": [
+    {
+     "control": "a=res:id=x:q=1:m=1",
+     "len": 4096
+    },
+    {
+     "control": "m=1:q=1",
+     "len": 4096
+    },
+    {
+     "control": "m=0:q=1",
+     "len": 3808
+    }
+   ]
+  },
+  {
+   "name": "a payload that compresses may go compressed: it decodes to what was sent",
+   "control": [
+    [
+     "a",
+     "doc"
+    ],
+    [
+     "s",
+     "x"
+    ],
+    [
+     "q",
+     "1"
+    ]
+   ],
+   "payload": "<p>hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world hello, world </p>"
+  }
+ ],
+ "decode": [
+  {
+   "name": "an ok reply to place carries c and r",
+   "seqs": [
+    "\u001b]7279;a=ok:n=4:s=card:re=place:c=40:r=3\u001b\\"
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "4",
+      "s": "card",
+      "re": "place",
+      "c": "40",
+      "r": "3"
+     },
+     "reply": {
+      "ok": true,
+      "re": "place",
+      "n": 4,
+      "surface": "card",
+      "cols": 40,
+      "rows": 3,
+      "code": null,
+      "detail": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "BEL ends a message as ST does; a reply to res has no s",
+   "seqs": [
+    "\u001b]7279;a=ok:n=2:re=res\u0007"
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "res"
+     },
+     "reply": {
+      "ok": true,
+      "re": "res",
+      "n": 2,
+      "surface": null,
+      "cols": null,
+      "rows": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "error replies carry the code, and the detail when there is one",
+   "seqs": [
+    "\u001b]7279;a=err:re=frob;eyJjb2RlIjoiRUlOVkFMIn0=\u001b\\",
+    "\u001b]7279;a=err:n=3:s=x:re=patch;eyJjb2RlIjoiRU5PVEFSR0VUIiwiZGV0YWlsIjoibm9wZSJ9\u001b\\",
+    "\u001b]7279;a=err:s=gone:re=place;eyJjb2RlIjoiRU5PRU5UIn0=\u001b\\",
+    "\u001b]7279;a=err:s=x:re=focus;eyJjb2RlIjoiRURFVEFDSEVEIn0=\u001b\\",
+    "\u001b]7279;a=err:s=y:re=doc;eyJjb2RlIjoiRVFVT1RBIiwiZGV0YWlsIjoic3VyZmFjZXMifQ==\u001b\\",
+    "\u001b]7279;a=err:s=y:re=doc;eyJjb2RlIjoiRUJVREdFVCJ9\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "err",
+      "re": "frob"
+     },
+     "reply": {
+      "ok": false,
+      "re": "frob",
+      "code": "EINVAL",
+      "detail": null
+     }
+    },
+    {
+     "control": {
+      "a": "err",
+      "n": "3",
+      "s": "x",
+      "re": "patch"
+     },
+     "reply": {
+      "ok": false,
+      "n": 3,
+      "surface": "x",
+      "code": "ENOTARGET",
+      "detail": "nope"
+     }
+    },
+    {
+     "control": {
+      "a": "err",
+      "s": "gone",
+      "re": "place"
+     },
+     "reply": {
+      "ok": false,
+      "code": "ENOENT"
+     }
+    },
+    {
+     "control": {
+      "a": "err",
+      "s": "x",
+      "re": "focus"
+     },
+     "reply": {
+      "ok": false,
+      "code": "EDETACHED"
+     }
+    },
+    {
+     "control": {
+      "a": "err",
+      "s": "y",
+      "re": "doc"
+     },
+     "reply": {
+      "ok": false,
+      "code": "EQUOTA",
+      "detail": "surfaces"
+     }
+    },
+    {
+     "control": {
+      "a": "err",
+      "s": "y",
+      "re": "doc"
+     },
+     "reply": {
+      "ok": false,
+      "code": "EBUDGET"
+     }
+    }
+   ]
+  },
+  {
+   "name": "the reply to q carries the capabilities",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIiwib3BzIjpbIm1vcnBoIiwiaW5uZXIiLCJ0ZXh0IiwidmFyIl0sImV2ZW50cyI6WyJjbGljayIsImNoYW5nZSIsImRyYWciLCJmaXQiXSwiY2VsbCI6eyJ3IjoxNiwiaCI6MzJ9LCJzY2FsZSI6Miwic2NoZW1lIjoibGlnaHQiLCJsaW1pdHMiOnsic3VyZmFjZXMiOjY0LCJyZXNvdXJjZXMiOjE2Nzc3MjE2fSwibmV0Ijp7ImltZy1zcmMiOlsiaHR0cHM6Ly9leGFtcGxlLmNvbSJdfSwiaG9zdCI6IngifQ==\u001b\\"
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 1
+     },
+     "caps": {
+      "v": "0.1",
+      "ops": [
+       "morph",
+       "inner",
+       "text",
+       "var"
+      ],
+      "events": [
+       "click",
+       "change",
+       "drag",
+       "fit"
+      ],
+      "cell": {
+       "w": 16,
+       "h": 32
+      },
+      "scale": 2,
+      "scheme": "light",
+      "limits": {
+       "surfaces": 64,
+       "resources": 16777216
+      },
+      "net": {
+       "img-src": [
+        "https://example.com"
+       ]
+      },
+      "host": "x",
+      "supports": {
+       "morph": true,
+       "inner": true,
+       "after": false
+      },
+      "sends": {
+       "click": true,
+       "drag": true,
+       "hover": false
+      },
+      "drags": true,
+      "hovers": false,
+      "light": true,
+      "cell_css": {
+       "w": 8,
+       "h": 16
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "drag in events stands for dragstart, drag and dragend (SPEC \u00a74)",
+   "requires": [
+    "caps.drag-kinds"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIiwiZXZlbnRzIjpbImNsaWNrIiwiZHJhZyJdfQ==\u001b\\"
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "caps": {
+      "sends": {
+       "dragstart": true,
+       "drag": true,
+       "dragend": true
+      },
+      "drags": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "a host that lists no ops supports them all, and no events sends them all, but neither drags nor hover; no cell is 9x18",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;eyJ2IjoiMC4xIiwiZXZlbnRzIjpbImhvdmVyIl0sImNlbGwiOnsidyI6MjAsImgiOjQwfX0=\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "caps": {
+      "supports": {
+       "morph": true,
+       "after": true
+      },
+      "sends": {
+       "click": true,
+       "zoom": true
+      },
+      "drags": false,
+      "hovers": false,
+      "light": false,
+      "cell_css": {
+       "w": 9,
+       "h": 18
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "q"
+     },
+     "caps": {
+      "sends": {
+       "hover": true,
+       "click": false
+      },
+      "drags": false,
+      "hovers": true,
+      "cell_css": {
+       "w": 20,
+       "h": 40
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "capabilities: passthrough, and the host's version",
+   "requires": [
+    "caps.passthrough",
+    "caps.version"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIiwicGFzc3Rocm91Z2giOnRydWUsImhvc3QiOiJob3R0eS1ibGl0eiIsInZlcnNpb24iOiIwLjAuMTAifQ==\u001b\\"
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "caps": {
+      "v": "0.1",
+      "passthrough": true,
+      "host": "hotty-blitz",
+      "version": "0.0.10"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a capability field of an unexpected type is ignored, and the rest are read",
+   "requires": [
+    "caps.lenient"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIiwibGltaXRzIjp7InN1cmZhY2VzIjoibWFueSIsInJlc291cmNlcyI6MTAwfSwiZXZlbnRzIjpbImNsaWNrIiwzXSwic2NhbGUiOiIyIiwiZnV0dXJlIjp7IngiOjF9fQ==\u001b\\"
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "caps": {
+      "v": "0.1",
+      "limits": {
+       "resources": 100
+      },
+      "events": [
+       "click"
+      ],
+      "scale": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "click: the value of the element, if it has one",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=click:t=ok;eyJ2YWx1ZSI6InllcyJ9\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=go\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "ok"
+     },
+     "event": {
+      "value": "yes",
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "surface": "f",
+      "kind": "click",
+      "target": "ok"
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "go"
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "surface": "f",
+      "kind": "click",
+      "target": "go"
+     }
+    }
+   ]
+  },
+  {
+   "name": "click on a link: href and url, t empty; url absent when there is none",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=click:t=;eyJocmVmIjoiL2RvY3MiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tL2RvY3MifQ==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=;eyJocmVmIjoiI3RvcCJ9\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": ""
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": {
+       "href": "/docs",
+       "url": "https://example.com/docs"
+      },
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "surface": "f",
+      "kind": "click",
+      "target": ""
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": ""
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": {
+       "href": "#top",
+       "url": null
+      },
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "surface": "f",
+      "kind": "click",
+      "target": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "change, input and submit",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=change:t=agree;eyJjaGVja2VkIjp0cnVlLCJ2YWx1ZSI6Im9uIn0=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=change:t=name;eyJ2YWx1ZSI6IkFkYSJ9\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=input:t=q;eyJ2YWx1ZSI6ImFiIn0=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=submit:t=form;eyJuYW1lIjoiQWRhIiwicGxhbiI6InBybyJ9\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "change",
+      "t": "agree"
+     },
+     "event": {
+      "value": "on",
+      "checked": true,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "change",
+      "target": "agree"
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "change",
+      "t": "name"
+     },
+     "event": {
+      "value": "Ada",
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "change",
+      "target": "name"
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "input",
+      "t": "q"
+     },
+     "event": {
+      "value": "ab",
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "input",
+      "target": "q"
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "submit",
+      "t": "form"
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "submit",
+      "target": "form",
+      "fields": {
+       "name": "Ada",
+       "plan": "pro"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "a submit's field that is not a string is its JSON, and a null is left out",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=submit:t=form;eyJuYW1lIjoiQWRhIiwibiI6Mywib2siOnRydWUsIngiOm51bGx9\u001b\\"
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "submit",
+      "t": "form"
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "submit",
+      "target": "form",
+      "fields": {
+       "name": "Ada",
+       "n": "3",
+       "ok": "true"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "press, focus and blur carry no detail",
+   "seqs": [
+    "\u001b]7279;a=ev:s=card:e=press:t=title\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=focus:t=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=blur:t=\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "card",
+      "e": "press",
+      "t": "title"
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "surface": "card",
+      "kind": "press",
+      "target": "title"
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "focus",
+      "t": ""
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "focus",
+      "target": ""
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "blur",
+      "t": ""
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "blur",
+      "target": ""
+     }
+    }
+   ]
+  },
+  {
+   "name": "resize carries the size in CSS pixels; fit the rows",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=resize:t=;eyJ3IjozMjAuNSwiaCI6NDh9\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=fit:t=;eyJyIjo3fQ==\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "resize",
+      "t": ""
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": {
+       "w": 320.5,
+       "h": 48
+      },
+      "fit_rows": null,
+      "drag": null,
+      "kind": "resize"
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "fit",
+      "t": ""
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": 7,
+      "drag": null,
+      "kind": "fit"
+     }
+    }
+   ]
+  },
+  {
+   "name": "drags carry the cell and the keys held",
+   "seqs": [
+    "\u001b]7279;a=ev:s=g:e=dragstart:t=c1;eyJjIjoxLCJyIjowLCJrZXlzIjpbXX0=\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag:t=;eyJjIjotMiwiciI6NSwia2V5cyI6WyJzaGlmdCIsImFsdCJdfQ==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=dragend:t=c4;eyJjIjo0LCJyIjowLCJrZXlzIjpbImN0cmwiXX0=\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "dragstart",
+      "t": "c1"
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": {
+       "c": 1,
+       "r": 0,
+       "keys": []
+      },
+      "kind": "dragstart",
+      "target": "c1"
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "drag",
+      "t": ""
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": {
+       "c": -2,
+       "r": 5,
+       "keys": [
+        "shift",
+        "alt"
+       ]
+      },
+      "kind": "drag",
+      "target": ""
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "dragend",
+      "t": "c4"
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": {
+       "c": 4,
+       "r": 0,
+       "keys": [
+        "ctrl"
+       ]
+      },
+      "kind": "dragend",
+      "target": "c4"
+     }
+    }
+   ]
+  },
+  {
+   "name": "hover carries the cell, or out",
+   "requires": [
+    "event.hover"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ev:s=g:e=hover:t=c1;eyJjIjozLCJyIjoxfQ==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=hover:t=;eyJvdXQiOnRydWV9\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "hover",
+      "t": "c1"
+     },
+     "event": {
+      "kind": "hover",
+      "target": "c1",
+      "hover": {
+       "c": 3,
+       "r": 1,
+       "out": false
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "hover",
+      "t": ""
+     },
+     "event": {
+      "kind": "hover",
+      "target": "",
+      "hover": {
+       "c": null,
+       "r": null,
+       "out": true
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "an event of a kind the program does not know is an event all the same",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=zoom:t=map;eyJ6IjoyfQ==\u001b\\"
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "zoom",
+      "t": "map"
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "surface": "f",
+      "kind": "zoom",
+      "target": "map"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a key the program does not know is kept, and changes nothing",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=click:t=ok:x-foo-bar=1\u001b\\"
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "ok",
+      "x-foo-bar": "1"
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "click",
+      "target": "ok"
+     }
+    }
+   ]
+  },
+  {
+   "name": "chunks are joined before their base64 is decoded, wherever they split it",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;eyJuYW\u001b\\",
+    "\u001b]7279;m=0;1lIjoiQSJ9\u001b\\"
+   ],
+   "results": [
+    "partial",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "submit",
+      "t": "form"
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "submit",
+      "target": "form",
+      "fields": {
+       "name": "A"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "another OSC between chunks does not interrupt them",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;eyJuYW\u001b\\",
+    "\u001b]11;?\u0007",
+    "\u001b]7279;m=0;1lIjoiQSJ9\u001b\\"
+   ],
+   "results": [
+    "partial",
+    "not_hotty",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "submit",
+      "t": "form"
+     },
+     "event": {
+      "value": null,
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "submit",
+      "fields": {
+       "name": "A"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "a message that interrupts a chunked one aborts it, and is decoded as usual",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;eyJuYW\u001b\\",
+    "\u001b]7279;a=ok:n=5:re=del\u001b\\"
+   ],
+   "results": [
+    "partial",
+    "complete"
+   ],
+   "invalid": 1,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "5",
+      "re": "del"
+     },
+     "reply": {
+      "ok": true,
+      "re": "del",
+      "n": 5
+     }
+    }
+   ]
+  },
+  {
+   "name": "a malformed message that interrupts a chunked one makes two malformed messages (SPEC \u00a73.7)",
+   "requires": [
+    "decode.abort-count"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;eyJuYW\u001b\\",
+    "\u001b]7279;a=ok:bad key=1\u001b\\"
+   ],
+   "results": [
+    "partial",
+    "invalid"
+   ],
+   "invalid": 2,
+   "messages": []
+  },
+  {
+   "name": "a continuation with nothing before it is malformed",
+   "seqs": [
+    "\u001b]7279;m=0;AAAA\u001b\\"
+   ],
+   "results": [
+    "invalid"
+   ],
+   "invalid": 1,
+   "messages": []
+  },
+  {
+   "name": "a sequence with no terminator decodes as one with it",
+   "requires": [
+    "decode.unterminated"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q"
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 1
+     }
+    }
+   ]
+  },
+  {
+   "name": "base64 without padding, and with whitespace, decodes; stray bytes are malformed",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=input:t=x;eyJ2YWx1ZSI6ImEifQ\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=input:t=x;eyJ2YWx1 ZSI6ImEifQ==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=input:t=x;eyJ2!!\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "invalid"
+   ],
+   "invalid": 1,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "input",
+      "t": "x"
+     },
+     "event": {
+      "value": "a",
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "input"
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "input",
+      "t": "x"
+     },
+     "event": {
+      "value": "a",
+      "checked": null,
+      "link": null,
+      "size": null,
+      "fit_rows": null,
+      "drag": null,
+      "kind": "input"
+     }
+    }
+   ]
+  },
+  {
+   "name": "controls are strict: a duplicate key, an empty control, a value outside ASCII",
+   "seqs": [
+    "\u001b]7279;a=ok:a=err\u001b\\",
+    "\u001b]7279\u001b\\",
+    "\u001b]7279;\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=caf\u00e9\u001b\\"
+   ],
+   "results": [
+    "invalid",
+    "invalid",
+    "invalid",
+    "invalid"
+   ],
+   "invalid": 4,
+   "messages": []
+  },
+  {
+   "name": "other OSCs, and other numbers, are not HOTTY's",
+   "seqs": [
+    "\u001b]11;rgb:0/0/0\u001b\\",
+    "\u001b]72790;x\u0007"
+   ],
+   "results": [
+    "not_hotty",
+    "not_hotty"
+   ],
+   "invalid": 0,
+   "messages": []
+  }
+ ],
+ "scan": [
+  {
+   "name": "keys around a HOTTY message pass; the message comes out whole",
+   "stream": "a\u00e9\u001b]7279;a=ev:s=f:e=press:t=card\u001b\\cd",
+   "segments": [
+    {
+     "pass": "a\u00e9"
+    },
+    {
+     "osc": "\u001b]7279;a=ev:s=f:e=press:t=card\u001b\\"
+    },
+    {
+     "pass": "cd"
+    }
+   ]
+  },
+  {
+   "name": "BEL ends a message as ST does",
+   "stream": "\u001b]7279;a=ok:re=del\u0007x",
+   "segments": [
+    {
+     "osc": "\u001b]7279;a=ok:re=del\u0007"
+    },
+    {
+     "pass": "x"
+    }
+   ]
+  },
+  {
+   "name": "other OSCs, other numbers and CSI keys pass unchanged",
+   "stream": "\u001b]11;rgb:0/0/0\u001b\\\u001b]72790;x\u0007\u001b[A\u001b[1;5C",
+   "segments": [
+    {
+     "pass": "\u001b]11;rgb:0/0/0\u001b\\\u001b]72790;x\u0007\u001b[A\u001b[1;5C"
+    }
+   ]
+  },
+  {
+   "name": "a lone ESC at the end is held until the stream ends",
+   "stream": "x\u001b",
+   "segments": [
+    {
+     "pass": "x"
+    }
+   ],
+   "held": "\u001b",
+   "flush": [
+    {
+     "pass": "\u001b"
+    }
+   ]
+  },
+  {
+   "name": "a HOTTY message cut short is held, and dropped as malformed at the end",
+   "stream": "x\u001b]7279;a=ev:s=f",
+   "segments": [
+    {
+     "pass": "x"
+    }
+   ],
+   "held": "\u001b]7279;a=ev:s=f",
+   "flush": [],
+   "invalid": 1
+  },
+  {
+   "name": "an ESC that does not end a HOTTY message drops it, and begins what follows",
+   "stream": "\u001b]7279;a=ok\u001b[A",
+   "segments": [
+    {
+     "pass": "\u001b[A"
+    }
+   ],
+   "invalid": 1
+  },
+  {
+   "name": "a HOTTY message longer than 64 KiB is dropped, up to its end",
+   "stream": "\u001b]7279;a=doc:s=x;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\u001b\\k",
+   "segments": [
+    {
+     "pass": "k"
+    }
+   ],
+   "invalid": 1
+  },
+  {
+   "name": "DA1 answers come out on their own",
+   "requires": [
+    "scanner.da1"
+   ],
+   "stream": "k\u001b]7279;a=ok:n=1:re=q\u001b\\\u001b[?62;22c\u001b[A",
+   "segments": [
+    {
+     "pass": "k"
+    },
+    {
+     "osc": "\u001b]7279;a=ok:n=1:re=q\u001b\\"
+    },
+    {
+     "da1": "\u001b[?62;22c"
+    },
+    {
+     "pass": "\u001b[A"
+    }
+   ]
+  },
+  {
+   "name": "other answers that begin as DA1 does pass",
+   "requires": [
+    "scanner.da1"
+   ],
+   "stream": "\u001b[?1u\u001b[?2026;2$y",
+   "segments": [
+    {
+     "pass": "\u001b[?1u\u001b[?2026;2$y"
+    }
+   ]
+  }
+ ],
+ "detect": [
+  {
+   "name": "a host: its reply, then the DA1 behind it",
+   "steps": [
+    {
+     "at": 0,
+     "start": true,
+     "state": "detecting",
+     "decided": false,
+     "done": false,
+     "deadline": 1500
+    },
+    {
+     "at": 20,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "took": true,
+     "state": "native",
+     "decided": true,
+     "done": false,
+     "deadline": 320
+    },
+    {
+     "at": 25,
+     "da1": true,
+     "took": true,
+     "state": "native",
+     "done": true,
+     "deadline": null
+    },
+    {
+     "at": 30,
+     "da1": true,
+     "took": false
+    }
+   ],
+   "caps": {
+    "v": "0.1"
+   }
+  },
+  {
+   "name": "not a host: a DA1 with no reply, then 150 ms",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 30,
+     "da1": true,
+     "took": true,
+     "state": "detecting",
+     "decided": false,
+     "deadline": 180
+    },
+    {
+     "at": 179,
+     "tick": true,
+     "state": "detecting",
+     "deadline": 180
+    },
+    {
+     "at": 180,
+     "tick": true,
+     "state": "text",
+     "decided": true,
+     "done": true,
+     "deadline": null
+    }
+   ]
+  },
+  {
+   "name": "a DA1 before the reply may answer an earlier question: a reply within 150 ms wins",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 5,
+     "da1": true,
+     "took": true,
+     "deadline": 155
+    },
+    {
+     "at": 40,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "took": true,
+     "state": "native",
+     "deadline": 340
+    },
+    {
+     "at": 45,
+     "da1": true,
+     "took": true,
+     "done": true
+    }
+   ]
+  },
+  {
+   "name": "silence: not a host at 1500 ms",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 1499,
+     "tick": true,
+     "state": "detecting",
+     "deadline": 1500
+    },
+    {
+     "at": 1500,
+     "tick": true,
+     "state": "text",
+     "done": true,
+     "deadline": null
+    }
+   ]
+  },
+  {
+   "name": "a reply with another n, or an error, is not detection's",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 10,
+     "osc": "\u001b]7279;a=ok:n=2:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "took": false,
+     "state": "detecting"
+    },
+    {
+     "at": 12,
+     "osc": "\u001b]7279;a=err:n=1:re=q;eyJjb2RlIjoiRUlOVkFMIn0=\u001b\\",
+     "took": false,
+     "state": "detecting"
+    },
+    {
+     "at": 20,
+     "da1": true,
+     "took": true,
+     "deadline": 170
+    },
+    {
+     "at": 170,
+     "tick": true,
+     "state": "text"
+    }
+   ]
+  },
+  {
+   "name": "a reply with no DA1 behind it: done 300 ms later",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 100,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "took": true,
+     "state": "native",
+     "deadline": 400
+    },
+    {
+     "at": 399,
+     "tick": true,
+     "done": false
+    },
+    {
+     "at": 400,
+     "tick": true,
+     "done": true,
+     "state": "native",
+     "deadline": null
+    }
+   ]
+  },
+  {
+   "name": "the 300 ms end at 1500 ms all the same",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 1400,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "took": true,
+     "deadline": 1500
+    },
+    {
+     "at": 1500,
+     "tick": true,
+     "done": true
+    }
+   ]
+  },
+  {
+   "name": "a reply that comes too late is taken, and changes nothing",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 10,
+     "da1": true,
+     "took": true
+    },
+    {
+     "at": 200,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "took": true,
+     "state": "text",
+     "done": true
+    }
+   ]
+  },
+  {
+   "name": "a DA1 at the grace period's end comes too late",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 10,
+     "da1": true,
+     "took": true,
+     "deadline": 160
+    },
+    {
+     "at": 160,
+     "da1": true,
+     "took": false,
+     "state": "text",
+     "done": true
+    }
+   ]
+  },
+  {
+   "name": "the input ends: what is decided stays, and nothing decided is not a host",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 50,
+     "end": true,
+     "state": "text",
+     "decided": true,
+     "done": true,
+     "deadline": null
+    }
+   ]
+  },
+  {
+   "name": "the input ends after the reply: a host, done",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 10,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "took": true
+    },
+    {
+     "at": 20,
+     "end": true,
+     "state": "native",
+     "done": true,
+     "deadline": null
+    }
+   ]
   }
  ]
 }
