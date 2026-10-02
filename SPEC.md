@@ -265,7 +265,7 @@ ESC ] 7279 ; a=doc:s=<name>[:d=1] ; <HTML> ST
 ### 5.2 Placement: `a=place`
 
 ```
-ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:z=<n>][:p=1][:f=1][:C=1] ST
+ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:z=<n>][:p=1][:f=1][:v=1][:C=1] ST
 ```
 
 - **Size:** the surface is `c` columns wide and `r` rows tall, and its
@@ -315,6 +315,11 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   - Like `z`, it belongs to the placement: placing the surface again without
     it stops them, and placing it again with it starts again from the new
     placement's rows.
+- **Hover:** with `v=1`, the program hears `hover` (§9.4) each time the
+  element the pointer is over in the window changes, and when the pointer
+  leaves the window. (`h` is taken: it is the window's rows.) `v` other
+  than `1` is as if absent. Like `z`, it belongs to the placement: placing
+  the surface again without it stops them.
 - **Moving and removing:** placing a surface that is already placed moves
   it, or shows another window of it: the old placement is removed. A program
   scrolling a region of the screen that holds a surface places it again with
@@ -414,9 +419,10 @@ or creates it detached, with `d=1` on the `a=doc` that sends its document
 - **A detached surface stays on the screen as text does.** It is placed,
   hidden, patched and deleted as before, and moves with its line (§5.4).
   Nothing in it reaches the program any more:
-  - **It sends no events** (§9), of any kind, `press` and drags included,
-    whatever its placement's `p` and its `data-on`. A drag under way when
-    it is detached ends with nothing more reported (§9.1).
+  - **It sends no events** (§9), of any kind, `press`, `hover` and drags
+    included, whatever its placement's `p` and `v` and its `data-on`. A
+    drag under way when it is detached ends with nothing more reported
+    (§9.1).
   - **It never has the keyboard.** A surface that has the keyboard when it
     is detached gives it back to the terminal, and sends neither `change`
     nor `blur`. A click in it takes nothing, and `a=focus` is `EDETACHED`.
@@ -673,6 +679,7 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `focus`, `blur` | the surface gains or loses the keyboard (§10); `t` is empty | none |
 | `resize` | the surface's pixel size changed without its cells changing (§5.3); `t` is empty | `{"w": …, "h": …}` in CSS pixels |
 | `fit` | on a placement made with `f=1` (§5.2), the rows the document needs at the placement's width changed; `t` is empty | `{"r": …}`: the rows `r=auto` would choose now |
+| `hover` | on a placement made with `v=1` (§5.2), the element the pointer is over changed, or the pointer left the window (§9.4) | `{"c": …, "r": …}`: the pointer's cell (§9.1); `{"out": true}` when it left, with `t` empty |
 
 - **The element that reports** a `click` is the nearest one, from the target
   of the click outward, that is one of those kinds. If it has no `id`,
@@ -709,10 +716,12 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   host without a round trip:
   - focus, the caret and typing in text fields;
   - toggling checkboxes, radio buttons and `<details>`;
-  - hover, and the pointer's shape: over a surface, a host that shows a
-    pointer shows the one the document asks for (CSS `cursor`, and as in
-    a browser, a pointer over a link and a text cursor over text). Over a
-    hyperlink it shows what it shows over an OSC 8 hyperlink;
+  - hover, and the pointer's shape: `:hover` needs no program (a
+    placement may still ask to hear where the pointer is, §9.4). Over a
+    surface, a host that shows a pointer shows the one the document asks
+    for (CSS `cursor`, and as in a browser, a pointer over a link and a
+    text cursor over text). Over a hyperlink it shows what it shows over
+    an OSC 8 hyperlink;
   - selecting text, where CSS `user-select` allows it (§11).
 - **Gestures that scroll are the terminal's.** A wheel, a touchpad's
   scroll, or a touch drag over a surface does what it would do over the
@@ -765,7 +774,8 @@ go.
   `setPointerCapture` makes it an element's. Every move goes to the drag,
   wherever the pointer is: over the cells, over another surface, or outside
   the terminal's window where the platform allows it. None of it reaches
-  anything else: no other surface, and no mouse reporting to the program.
+  anything else: no other surface, no `hover` (§9.4), and no mouse
+  reporting to the program.
 - **A drag selects no text.** A press on an element that opts in starts no
   text selection, whatever its CSS, as if it had `user-select: none` (§11).
 - **Mouse and pen only.** A touch on an element that opts in does what it
@@ -807,7 +817,7 @@ handles it as a press on the cells beneath the surface.
 - **The surface hears nothing of it.** No `press`, whatever `p` asked for,
   no `dragstart`, and no `click` on its release. It takes no focus, starts
   no selection, and opens no hyperlink. The surface under the pointer is no
-  longer hovered.
+  longer hovered: the pointer has left its window (§9.4).
 - **The keyboard** goes back to the terminal, as on a click on the cells
   (§10.1): a surface that had it sends `blur`.
 - **The gesture is the program's until the release.** Every move and the
@@ -850,13 +860,75 @@ the window were not there:
   no `dragstart` and no `click`; it takes no focus and starts no selection.
   A press passing through takes the keyboard back as a click on the cells
   does (§10.1). The pointer there hovers nothing in the surface, and
-  `:hover` matches nothing under it.
+  `:hover` matches nothing under it: it is out of the window (§9.4).
 - **Gestures that scroll** reach the cells as everywhere (§9).
 
 A host without `passthrough` gives a window the pointer wherever it is
 (§5.3). A program that relies on the cells under a surface hearing the
 pointer checks for `passthrough`, and otherwise keeps its surfaces off the
 cells whose pointer it needs.
+
+### 9.4 Hover
+
+Hover stays local (§9): `:hover` and the pointer's shape need no program.
+A program that asks, with `v=1` on a placement (§5.2), also hears where the
+pointer is over the window, element by element: to show a hint of its own
+for what is under it, or to know that the pointer has gone from what the
+program draws itself, such as cells it lit while the pointer was over them.
+
+- **Over the window.** `hover` is sent each time the element the pointer
+  is over changes. `t` is the nearest element with an `id`, from the one
+  under the pointer outward (the innermost one `:hover` matches), and
+  empty where none has an id. The detail is `{"c": …, "r": …}`, the cell
+  of the surface under the pointer, counted as for drags (§9.1): from the
+  surface's top left cell, not its window's.
+- **Out.** `hover` with `t` empty and the detail `{"out": true}` is sent
+  when the window loses the pointer. A window has the pointer while it
+  receives it (§5.3): the pointer is in it, it is the topmost window there,
+  and on a host with `passthrough` it takes the pointer at that point
+  (§9.3). It loses the pointer when the pointer:
+  - moves onto the cells, or onto another window;
+  - moves onto a part of it that lets the pointer through (§9.3);
+  - leaves the terminal's window, or the host loses it otherwise;
+  - is pressed with Alt (§9.2): the gesture is the program's, and hovers
+    nothing until its release.
+
+  The pointer is in at most one window at a time. Moving from one window
+  to another, the first one's out comes before the second one's `hover`.
+- **Only changes.** A `hover` is sent when `t`, or whether the window has
+  the pointer, differs from what the program last heard: neither a move
+  within an element nor a new cell sends one. A placement made with `v=1`
+  starts from out. A host **MAY** send only the last of the changes
+  between two frames it draws, so at most one per surface per frame.
+- **A held button holds hover.** From a press a surface takes to its
+  release, no surface sends `hover`: the pointer is the gesture's, and a
+  drag reports its own targets (§9.1). At the release, the surface reports
+  where the pointer is now, if that differs from what the program last
+  heard, after every other event of the release (`dragend`, `click`,
+  `change`, `focus`, `blur`). A window the pointer is then in, another one
+  included, reports it at the pointer's next move. A press itself sends no
+  `hover`.
+- **Mouse and pen.** A touch's moves scroll (§9) and hover nothing. A tap
+  is a press and a release: at its release, a host **MAY** report what it
+  landed on, as browsers leave `:hover` on what a tap touched.
+- **Not the keyboard's.** Focus moving, to the surface or away from it,
+  changes nothing: a window reports the pointer whether or not it has the
+  keyboard (§10).
+- **Under a pointer that does not move.** When a patch, a new document, a
+  resource, or a new placement changes what lies under a pointer that has
+  not moved, a host **MAY** report it only at the pointer's next move.
+- **Lifetime.** Like `p`, it belongs to the placement: placing the surface
+  again without `v=1` stops it, and so does hiding it. Placing it again
+  with `v=1` goes on from what the program last heard, or from out if the
+  placement before did not ask. A new document keeps it, and what the
+  program last heard: an element with the same id under the pointer is
+  not reported again. A detached surface sends none (§5.5); once a document
+  makes it the program's again, it hears how the pointer differs from what
+  it heard last.
+- **Detection.** `hover` in `events` (§4). Where it is absent, a program
+  never hears that the pointer has left for a surface, and does not keep a
+  state of its own that waits for it: it clears it on the next thing it
+  hears instead, a key or a press.
 
 ## 10. Keyboard and focus
 
@@ -1046,9 +1118,10 @@ A host conforms to HOTTY version 0.1 when:
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
 The vectors check replies, error codes, every patch op, morph, context
-parsing, resources, drags, presses with Alt, `fit` and the envelope. They inspect documents and
-events, not pixels. The vectors marked `"passthrough"` apply to a host that
-reports it (§9.3).
+parsing, resources, drags, presses with Alt, `fit`, hover and the
+envelope. They inspect documents and events, not pixels. The vectors marked
+`"passthrough"` apply to a host that reports it (§9.3), and those marked
+`"hover"` to a host whose `events` list it (§9.4).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
@@ -1057,9 +1130,10 @@ To be tested, a host exposes a way to *inspect* an element, reporting:
 - its child elements as `[tag, id, text]`.
 
 It also lets a test move a mouse's pointer to the centre of an element, or
-of a cell of a surface, and press and release its primary button there,
-with modifier keys held. A host with `passthrough` also tells the test
-whether each of those reached the surface or passed through it.
+of a cell of a surface, press and release its primary button there, with
+modifier keys held, and take the pointer out of the terminal's window. A
+host with `passthrough` also tells the test whether each of those reached
+the surface or passed through it.
 
 This is a test interface, not part of the wire protocol.
 
@@ -1213,6 +1287,27 @@ program → CSI ? 2026 l
   - **Not HTML's drag and drop** (`draggable`, `DataTransfer`). It moves
     data between pages and applications, through script, which a surface
     does not have. The program already holds the data.
+- **Why hover is reported.** A multiplexer draws its own controls in cells
+  next to the surfaces it relays, and lights them while the pointer is over
+  them, from mouse reporting. When the pointer goes from such a control
+  straight onto a surface, mouse reporting stops, and the control stays lit.
+  A program that shows hints of its own for what is under the pointer, in
+  a box that may reach past the surface, needs to know what that is.
+  `:hover` alone can do neither.
+  - **Asked for**, like `press` and for the same reason: events reach
+    whatever reads the input. A multiplexer asks for the surfaces it
+    relays, and passes `hover` on only to a program whose own placement
+    asked.
+  - **Elements, not moves,** as for drags: an event for each element
+    crossed, which a round trip over SSH can carry. The id is the
+    program's handle; the program wrote the document, and knows what its
+    elements mean without being told their attributes.
+  - **Out is said,** not left to the next event: going onto the cells, a
+    program with mouse reporting hears motion there, but going onto
+    another program's surface, or out of the terminal, it hears nothing.
+  - **Not while a button is held,** because the gesture has the pointer
+    (§9.1), and a drag already reports what it crosses.
+  - **`v`,** because `h` is the window's rows.
 - **Why a press with Alt passes a surface.** A surface takes every press
   in its window (§5.3), so a program could not start a gesture of its own
   over one. A multiplexer that draws its panes and tools as surfaces moves

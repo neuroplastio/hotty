@@ -17,9 +17,11 @@ little.
   "wire":    [ { "name": …, "stream": …, "commands": [ … ], "invalid": n } ] }
 ```
 
-Each vector starts on a fresh host. A vector with `"requires":
-"passthrough"` applies only to a host that reports `passthrough` (SPEC §4,
-§9.3); others skip it. Its steps come in three kinds.
+Each vector starts on a fresh host. A vector with `"requires"` applies only
+to a host that has what it names, and others skip it: `"passthrough"`, a
+host that reports `passthrough` (SPEC §4, §9.3); `"hover"`, a host that
+lists `hover` in `events` (§9.4). A list names several, all required. Its
+steps come in three kinds.
 
 **Send** `{ "send": {control}, "payload": text?, "reply": …, "events": … }`:
 the command goes to the host as the program would send it. It is
@@ -46,15 +48,18 @@ element as the program wrote it:
 `expect` must equal the reported value exactly (keys it leaves out are not
 checked).
 
-**Pointer** `{ "pointer": "move" | "down" | "up", "s": surface, "at": …,
-"keys": [ … ], "events": [ … ] }`: a mouse, as the user would move it (SPEC
+**Pointer** `{ "pointer": "move" | "down" | "up" | "leave", "s": surface,
+"at": …, "keys": [ … ], "events": [ … ] }`: a mouse, as the user would move it (SPEC
 §9.1, §16).
 - `"move"` puts the pointer on surface `s` at `at`: an element's id, for
   the centre of its box, or `[c, r]`, for the centre of that cell of the
   surface, counted from its top left cell (§9.1). A cell can lie outside
-  the window, outside the surface, and over another surface.
+  the window, outside the surface, and over another surface. Moving onto
+  another surface `s`, with no button down, takes the pointer off the one
+  it was on, as a terminal does: that one is left first (SPEC §9.4).
 - `"down"` and `"up"` press and release the primary button where the
   pointer is.
+- `"leave"` takes the pointer out of the terminal's window.
 - `"keys"`: the modifier keys held during the step (`shift`, `ctrl`, `alt`,
   `meta`); none when absent.
 - `"through"`: `true` if the step passes through the surface (SPEC §9.3),
