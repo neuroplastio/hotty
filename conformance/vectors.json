@@ -1953,15 +1953,24 @@
    ]
   },
   {
-   "name": "cid: references keep the program's URL",
+   "name": "cid: references keep the program's URL: an <img>'s src, an SVG <image>'s href",
    "steps": [
+    {
+     "send": {
+      "a": "res",
+      "id": "logo",
+      "type": "image/svg+xml",
+      "q": "2"
+     },
+     "payload": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"10\" height=\"10\"><rect width=\"10\" height=\"10\" fill=\"#0f0\"/></svg>"
+    },
     {
      "send": {
       "a": "doc",
       "s": "x",
       "q": "2"
      },
-     "payload": "<img id=i src=cid:logo>"
+     "payload": "<img id=i src=cid:logo><svg width=10 height=10><image id=si href=cid:logo width=10 height=10 /></svg>"
     },
     {
      "inspect": [
@@ -1972,6 +1981,21 @@
       "attrs": {
        "id": "i",
        "src": "cid:logo"
+      }
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "si"
+     ],
+     "expect": {
+      "tag": "image",
+      "attrs": {
+       "id": "si",
+       "href": "cid:logo",
+       "width": "10",
+       "height": "10"
       }
      }
     }
