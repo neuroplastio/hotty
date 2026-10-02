@@ -1104,6 +1104,159 @@
    ]
   },
   {
+   "name": "a press with Alt is the program's: the surface hears nothing of it or of its gesture, whatever p asked for; the press decides, not the keys held later",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{position:absolute;top:0;height:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w));text-align:center;font-style:normal}</style><i id=a data-on=\"click drag\" style=\"left:0\">A</i><i id=b data-on=\"click drag\" style=\"left:calc(3*var(--hotty-cell-w))\">B</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "p": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "keys": [
+      "alt"
+     ],
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "keys": [
+      "alt"
+     ],
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      12,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "a"
+      },
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "keys": [
+      "alt"
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 4,
+        "r": 0,
+        "keys": [
+         "alt"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "keys": [
+      "alt"
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": [
+         "alt"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "keys": [
+      "alt"
+     ],
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": [
+         "alt"
+        ]
+       }
+      },
+      {
+       "e": "click",
+       "s": "x",
+       "t": "a"
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "hide keeps the document: patches apply, and placing it again needs no doc",
    "steps": [
     {

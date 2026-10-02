@@ -310,7 +310,8 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   refer to it. The document is laid out at that width, and at that height
   for anything sized by the viewport.
 - Only the window is shown, and only the window receives the pointer: where
-  windows overlap, the topmost (§5.2, `z`).
+  windows overlap, the topmost (§5.2, `z`). A press with Alt held is the
+  exception: it passes every surface (§9.2).
 - **What does not fit is clipped, and nothing in a surface scrolls.**
   - The host **MUST** clip overflow as `overflow: hidden` does: the
     document's root, and any element whose `overflow` is `auto` or
@@ -637,8 +638,8 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `change` | a checkbox or radio button toggled; a text control, `textarea` or `select` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": …, "value": …}` for checkboxes and radio buttons, `{"value": …}` otherwise |
 | `input` | every edit of a control with `data-on~=input` | `{"value": …}` |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields as an object of names to values, the submitter's included |
-| `press` | the primary button pressed, or a tap, anywhere in the window of a surface placed with `p=1` (§5.2) | none |
-| `dragstart` | a mouse's or a pen's primary button pressed on an element with `data-on~=drag` (§9.1) | `{"c": …, "r": …, "keys": […]}`: the pointer's cell and the keys held (§9.1) |
+| `press` | the primary button pressed, or a tap, anywhere in the window of a surface placed with `p=1` (§5.2), except with Alt held (§9.2) | none |
+| `dragstart` | a mouse's or a pen's primary button pressed on an element with `data-on~=drag` (§9.1), without Alt (§9.2) | `{"c": …, "r": …, "keys": […]}`: the pointer's cell and the keys held (§9.1) |
 | `drag` | during a drag, the element under the pointer changed (§9.1) | the same |
 | `dragend` | the drag ended: the button released, wherever the pointer is (§9.1) | the same |
 | `focus`, `blur` | the surface gains or loses the keyboard (§10); `t` is empty | none |
@@ -654,7 +655,8 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   none has. It comes before every other event the press causes, on this
   surface or another (`change`, `blur`, `focus`), and so before the `click`
   its release may make. A press the host takes for a hyperlink's own
-  gesture (below) is the terminal's, and is not reported.
+  gesture (below) is the terminal's, and is not reported, and neither is
+  a press with Alt held (§9.2), which is the program's.
 - **Links.** A link's detail carries `href`, the program's value, and `url`,
   the `href` resolved against the document's base URL (§7.3). `url` is
   absent when it would be under `https://hotty.invalid/`.
@@ -688,7 +690,8 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   cells beneath it. That is scrollback, or on the alternate screen, the
   program's wheel input. The host **MUST** pass them on, with the position
   of the pointer or the finger. Taps, clicks, long presses, and a mouse's
-  or a pen's drags (§9.1) stay the surface's.
+  or a pen's drags (§9.1) stay the surface's, unless they begin with Alt
+  held (§9.2).
 - **The detail** is a JSON value, base64-encoded. Values are the program's
   (§7): an `href` is reported as the document has it.
 - **Unknown kinds.** A program **MUST** ignore an event whose kind it does
@@ -726,7 +729,9 @@ go.
     A program that scrolls while the pointer is past an edge knows how far
     past it the pointer is.
   - `keys` are the modifier keys held: a list of `"shift"`, `"ctrl"`,
-    `"alt"` and `"meta"`, in that order, empty when none is.
+    `"alt"` and `"meta"`, in that order, empty when none is. `"alt"` is
+    never in `dragstart`'s: a press with Alt held starts no drag (§9.2).
+    Alt pressed later is reported, and the drag goes on.
 - **The pointer is the surface's until the release,** as a page's
   `setPointerCapture` makes it an element's. Every move goes to the drag,
   wherever the pointer is: over the cells, over another surface, or outside
@@ -760,6 +765,34 @@ go.
   it is absent, a program offers another way to do what its drags do, such
   as keys or clicks.
 
+### 9.2 Presses with Alt
+
+A press of the primary button with Alt held is the program's, never a
+surface's. Wherever it lands, in any window and whatever its `z`, the host
+handles it as a press on the cells beneath the surface.
+
+- **With mouse reporting on,** the program hears it as it hears a press on
+  the cells, Alt included: in the SGR encoding, `CSI < 8 ; <col> ; <row> M`.
+  With mouse reporting off, the terminal does what it does with such a
+  press on the cells, such as starting a rectangular selection.
+- **The surface hears nothing of it.** No `press`, whatever `p` asked for,
+  no `dragstart`, and no `click` on its release. It takes no focus, starts
+  no selection, and opens no hyperlink. The surface under the pointer is no
+  longer hovered.
+- **The keyboard** goes back to the terminal, as on a click on the cells
+  (§10.1): a surface that had it sends `blur`.
+- **The gesture is the program's until the release.** Every move and the
+  release go where those of a press on the cells go, over any surface, and
+  none of them reaches a surface.
+- **The press decides,** and the keys held later change nothing. A drag
+  that a press without Alt began stays the surface's when Alt is pressed
+  during it (its `keys` then list `"alt"`, §9.1). A gesture that a press
+  with Alt began stays the program's when Alt is let go.
+- **On macOS, Alt is Option**, whether or not the terminal makes Option
+  type as Alt for keys (Ghostty's `macos-option-as-alt`, say). That setting
+  is about text, and a press has none.
+- **Mouse and pen only.** A tap is a click whatever the keys held.
+
 ## 10. Keyboard and focus
 
 ### 10.1 Who has the keyboard
@@ -775,7 +808,8 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
 - **Without `t`:** the surface's focused element keeps focus, or else the
   first focusable element receives it.
 - **Echo:** no `focus` event is sent for focus the program gave.
-- **A click** is a press of the primary button, or a tap.
+- **A click** is a press of the primary button without Alt (§9.2), or a
+  tap.
 - **Elements that take focus** on a click, unless they are disabled:
   - `input`, `select`, `textarea` and `button`;
   - links with an `href`, except hyperlinks (§9), which are the terminal's
@@ -943,7 +977,7 @@ A host conforms to HOTTY version 0.1 when:
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
 The vectors check replies, error codes, every patch op, morph, context
-parsing, resources, drags and the envelope. They inspect documents and
+parsing, resources, drags, presses with Alt and the envelope. They inspect documents and
 events, not pixels.
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
@@ -1101,6 +1135,33 @@ program → CSI ? 2026 l
   - **Not HTML's drag and drop** (`draggable`, `DataTransfer`). It moves
     data between pages and applications, through script, which a surface
     does not have. The program already holds the data.
+- **Why a press with Alt passes a surface.** A surface takes every press
+  in its window (§5.3), so a program could not start a gesture of its own
+  over one. A multiplexer that draws its panes and tools as surfaces moves
+  them with Alt and a drag, as a window manager moves windows, and a pane
+  or a tool is mostly surface. Terminals already pass a layer this way:
+  Shift takes a press past a program's mouse reporting, to the terminal's
+  selection. Alt takes it past a surface, to the program.
+  - **Alt,** because the other keys are taken. Ctrl, or Cmd on macOS, is
+    the hyperlink gesture (§9). Shift is the terminal's way past mouse
+    reporting, and Super is often the window manager's. A browser does
+    little with an Alt-click (some save a link), and a surface has no
+    downloads.
+  - **As on the cells,** so the program hears it as it hears every other
+    press: a report at a cell, with Alt set, then the moves and the
+    release. A program that reads no mouse loses nothing a surface would
+    have told it.
+  - **No `press`,** whatever `p` asked for: the press is not the surface's,
+    and the program hears it already, through its mouse reporting. Hearing
+    it twice, it would act on it twice, such as focusing a pane and then
+    moving it.
+  - **The press decides,** because a gesture has one owner from its press
+    to its release, as a drag holds the pointer (§9.1). A gesture that
+    changed hands when a key did would leave each side half of it.
+  - **Option on macOS,** because it is the key a Mac user holds for Alt.
+    Ghostty reports it as Alt to mouse reporting whatever
+    `macos-option-as-alt` says. That setting chooses what Option types,
+    and a press types nothing.
 - **Why hide:** sending a document and laying it out costs far more than
   placing it. A program scrolling through many surfaces keeps the ones that
   will come back, and only it knows which those are.
