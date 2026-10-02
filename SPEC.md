@@ -265,7 +265,7 @@ ESC ] 7279 ; a=doc:s=<name>[:d=1] ; <HTML> ST
 ### 5.2 Placement: `a=place`
 
 ```
-ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:z=<n>][:p=1][:C=1] ST
+ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:z=<n>][:p=1][:f=1][:C=1] ST
 ```
 
 - **Size:** the surface is `c` columns wide and `r` rows tall, and its
@@ -294,6 +294,27 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
 - **Presses:** with `p=1`, the program hears of every press in the window,
   whatever it lands on, as `press` (§9). Like `z`, it belongs to the
   placement: placing the surface again without it stops them.
+- **Fit:** with `f=1`, the program hears `fit` (§9) whenever the number of
+  rows the document needs at the placement's width — the rows `r=auto` would
+  choose — differs from the rows it last heard. The first it hears are the
+  placement's own: `r`, or for `r=auto` the rows chosen, whether or not a
+  reply carries them (§3.5). `f` other than `1` is as if absent. A
+  document's height changes after it is placed when a resource it refers to
+  arrives or is replaced (§7.1), an image or font it fetched loads (§7.2), a
+  patch changes it (§6), or the cell size changes (§5.3).
+  - The placement keeps its size: the footprint is the program's (§11), and
+    placing the surface again with the new rows is the program's to do.
+  - A host sends at most one `fit` per surface per frame it draws, with the
+    rows of the layout drawn in it. A placement the host does not draw,
+    scrolled out of view (§5.4), hears of a change once it is drawn again.
+    Its order with other events the same change causes, such as `resize`
+    (§5.3), is not set.
+  - A detached surface sends none (§5.5), and the rows the program last
+    heard stay as they were: once a document makes it the program's again,
+    it hears how they differ.
+  - Like `z`, it belongs to the placement: placing the surface again without
+    it stops them, and placing it again with it starts again from the new
+    placement's rows.
 - **Moving and removing:** placing a surface that is already placed moves
   it, or shows another window of it: the old placement is removed. A program
   scrolling a region of the screen that holds a surface places it again with
@@ -529,7 +550,8 @@ stylesheet shared by several surfaces, an image, a font.
   refers to it is drawn again. `a=del:id=<id>` deletes it, after which
   references to it fail as if missing.
 - **Late arrival:** a reference to a resource that does not exist yet is
-  resolved when it arrives.
+  resolved when it arrives. A placement made with `f=1` hears whether that
+  changed the document's height (§5.2).
 - **Quota:** the host reports its quota under `limits.resources`. A resource
   that would exceed it is refused with `EQUOTA`.
 - **The program's values stand:** a host that rewrites references in order
@@ -578,6 +600,9 @@ that embeds it. It lists **sources** per **directive**:
 - It **SHOULD** send no referrer and no credentials (cookies,
   authorization) with what it fetches.
 - A reference the policy does not allow fails as a missing resource does.
+- What is fetched arrives after the document is laid out, as a late
+  resource does (§7.1), and changes its height the same way: a program that
+  sizes a surface by its content places it with `f=1` (§5.2).
   The program's value still stands (§7.1).
 
 ### 7.3 The base URL
@@ -647,6 +672,7 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `dragend` | the drag ended: the button released, wherever the pointer is (§9.1) | the same |
 | `focus`, `blur` | the surface gains or loses the keyboard (§10); `t` is empty | none |
 | `resize` | the surface's pixel size changed without its cells changing (§5.3); `t` is empty | `{"w": …, "h": …}` in CSS pixels |
+| `fit` | on a placement made with `f=1` (§5.2), the rows the document needs at the placement's width changed; `t` is empty | `{"r": …}`: the rows `r=auto` would choose now |
 
 - **The element that reports** a `click` is the nearest one, from the target
   of the click outward, that is one of those kinds. If it has no `id`,
@@ -1020,7 +1046,7 @@ A host conforms to HOTTY version 0.1 when:
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
 The vectors check replies, error codes, every patch op, morph, context
-parsing, resources, drags, presses with Alt and the envelope. They inspect documents and
+parsing, resources, drags, presses with Alt, `fit` and the envelope. They inspect documents and
 events, not pixels. The vectors marked `"passthrough"` apply to a host that
 reports it (§9.3).
 
@@ -1107,6 +1133,13 @@ program → CSI ? 2026 l
     tree (immediate mode) while keeping what the user was doing.
 - **Why no script:** it keeps the sandbox small enough to defend, and the
   program in charge.
+- **Why `fit` tells, and the host does not resize.** A document's height can
+  change after its placement is answered: an image arrives, a font loads, a
+  stylesheet is replaced. A host that grew the placement on its own would
+  cover the cells below it, which are the program's (§11). `fit` tells the
+  program the rows the content needs now; the program decides where they
+  come from. It is opt-in so a program that never sizes by content hears
+  nothing new.
 - **Why the host grants and the document asks.** Markup can come from
   anywhere, a file someone `cat`s included, and every fetch tells a server
   who looked and where. So only the host (its user, or the page that embeds

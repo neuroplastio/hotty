@@ -2484,6 +2484,280 @@
      ]
     }
    ]
+  },
+  {
+   "name": "f=1 hears the rows a document needs when they differ from the placement's",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><div id=d style=\"height: calc(3 * var(--hotty-cell-h))\"></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "1",
+      "f": "1"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20",
+      "r": "1"
+     },
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "detail": {
+        "r": 3
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "f=1 on r=auto is silent until the document's height changes; a patch that changes it is heard, the placement keeps its rows",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><div id=d style=\"height: calc(var(--n, 2) * var(--hotty-cell-h))\"></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "auto",
+      "f": "1"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "var",
+      "t": "d",
+      "k": "n",
+      "q": "2"
+     },
+     "payload": "4",
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "detail": {
+        "r": 4
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "var",
+      "t": "d",
+      "k": "n",
+      "q": "2"
+     },
+     "payload": "4",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "var",
+      "t": "d",
+      "k": "n",
+      "q": "2"
+     },
+     "payload": "1",
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "detail": {
+        "r": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a resource that arrives late and changes the height is heard with f=1",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><link rel=stylesheet href=\"cid:tall\"><div id=d>x</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "auto",
+      "f": "1"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "res",
+      "id": "tall",
+      "type": "text/css",
+      "q": "2"
+     },
+     "payload": "#d { height: calc(5 * var(--hotty-cell-h)) }",
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "detail": {
+        "r": 5
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "without f=1 nothing is heard; placing again without it stops fit, and with it starts from the new placement's rows",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><div id=d style=\"height: calc(var(--n, 2) * var(--hotty-cell-h))\"></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "auto"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20"
+     }
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "var",
+      "t": "d",
+      "k": "n",
+      "q": "2"
+     },
+     "payload": "3",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3",
+      "f": "1"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3"
+     }
+    },
+    {
+     "send": {
+      "a": "patch",
+      "s": "x",
+      "op": "var",
+      "t": "d",
+      "k": "n",
+      "q": "2"
+     },
+     "payload": "6",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "f": "1"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2"
+     },
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "detail": {
+        "r": 6
+       }
+      }
+     ]
+    }
+   ]
   }
  ],
  "wire": [

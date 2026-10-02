@@ -30,7 +30,9 @@ base64-encoded and chunked as needed, and the payload is UTF-8.
   but `code` and `detail` is compared with the reply's control; `code` and
   `detail` with the JSON body of an `a=err`.
 - `"events"`: the events the command makes the host send, as for a pointer
-  step (below).
+  step (below). Some follow the command by a frame or a load (`fit`, SPEC
+  §5.2), so a runner waits for them, and then a frame or two more to see
+  one too many.
 
 **Inspect** `{ "inspect": [surface, id], "expect": … }`: the host reports the
 element as the program wrote it:

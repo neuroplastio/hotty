@@ -109,11 +109,12 @@ class Hotty:
     def doc(self, surface, html, quiet=1):
         self.send(html, a="doc", s=surface, q=quiet)
 
-    def place(self, surface, cols, rows="auto", move_cursor=True, quiet=1, window=None, z=0, press=False):
+    def place(self, surface, cols, rows="auto", move_cursor=True, quiet=1, window=None, z=0, press=False, fit=False):
         """Places a surface at the cursor. `window` is (x, y, w, h): the part
         of the surface to show (SPEC §5.2), or None for all of it; `z` puts
         the placement above (greater) or below overlapping ones; `press`
-        asks for a `press` event on every press in it (SPEC §9)."""
+        asks for a `press` event on every press in it (SPEC §9); `fit` asks
+        for a `fit` event whenever the rows its document needs change."""
         control = dict(a="place", s=surface, c=cols, r=rows, q=quiet)
         if window is not None:
             control.update(zip("xywh", window))
@@ -121,6 +122,8 @@ class Hotty:
             control["z"] = z
         if press:
             control["p"] = 1
+        if fit:
+            control["f"] = 1
         if not move_cursor:
             control["C"] = 1
         self.send(**control)
