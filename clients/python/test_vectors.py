@@ -106,8 +106,8 @@ def build(b):
         return hotty.place(a["surface"], placement(a["placement"]), **ro)
     if name == "place_at":
         return hotty.place_at(a["surface"], a["x"], a["y"], placement(a["placement"]), **ro)
-    if name == "patch":
-        return hotty.patch(a["surface"], a["op"], a.get("target", ""), a.get("key", ""), a.get("payload", ""), **ro)
+    if name == "delta":
+        return hotty.delta(a["surface"], a["op"], a.get("target", ""), a.get("key", ""), a.get("payload", ""), **ro)
     if name == "sync":
         return hotty.sync(*(build(c) for c in a["commands"]))
     fn = {

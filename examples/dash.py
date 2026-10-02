@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """dash.py — a live dashboard on the alternate screen (M2).
 
-    hotty run -- python3 examples/dash.py            # targeted patches
+    hotty run -- python3 examples/dash.py            # targeted deltas
     hotty run -- python3 examples/dash.py --morph    # whole tree, morphed, every frame
     options: --hz 10  --seconds N (exit after N s and print the byte count)
 
@@ -129,7 +129,7 @@ def main():
     morph = "--morph" in args
     hz = float(args[args.index("--hz") + 1]) if "--hz" in args else 10.0
     seconds = float(args[args.index("--seconds") + 1]) if "--seconds" in args else None
-    # --cores K: update only the clock and K core bars per frame (patch-size experiments).
+    # --cores K: update only the clock and K core bars per frame (delta-size experiments).
     only = int(args[args.index("--cores") + 1]) if "--cores" in args else None
     record = args[args.index("--record") + 1] if "--record" in args else None
     if record:
@@ -152,7 +152,7 @@ def main():
         lam.write("\x1b[?1049h\x1b[?25l\x1b[H\x1b[2J")
         prev = read_cpu()
         state = {
-            "mode": "morph" if morph else "patch",
+            "mode": "morph" if morph else "delta",
             "clock": "",
             "cpu": [0.0] * len(prev),
             "mem": meminfo(),
@@ -195,7 +195,7 @@ def main():
                     continue
                 with lam.sync():
                     if morph:
-                        lam.patch("dash", "morph", "app", body(state))
+                        lam.delta("dash", "morph", "app", body(state))
                     elif only is not None:
                         lam.text("dash", "clock", state["clock"])
                         for i, p in enumerate(state["cpu"][1 : 1 + only]):
@@ -214,7 +214,7 @@ def main():
                             lam.var("dash", f"c{i}", "p", f"{p:.0f}")
                             lam.text("dash", f"cv{i}", f"{p:4.0f}%")
                         if now - last_procs < 1.0 / hz:
-                            lam.patch("dash", "inner", "procs", procs_rows(state["procs"]))
+                            lam.delta("dash", "inner", "procs", procs_rows(state["procs"]))
                     lam.write(f"\x1b[{size.lines};1H q quits · {state['mode']} · {hz:g} Hz\x1b[K")
         except (KeyboardInterrupt, EOFError):
             pass
@@ -232,7 +232,7 @@ def main():
 
 def frame_ops(lam, state, morph, procs_changed):
     if morph:
-        lam.patch("dash", "morph", "app", body(state))
+        lam.delta("dash", "morph", "app", body(state))
         return
     total, used = state["mem"]
     lam.text("dash", "clock", state["clock"])
@@ -246,7 +246,7 @@ def frame_ops(lam, state, morph, procs_changed):
         lam.var("dash", f"c{i}", "p", f"{p:.0f}")
         lam.text("dash", f"cv{i}", f"{p:4.0f}%")
     if procs_changed:
-        lam.patch("dash", "inner", "procs", procs_rows(state["procs"]))
+        lam.delta("dash", "inner", "procs", procs_rows(state["procs"]))
 
 
 def record_stream(path, morph, frames):
@@ -257,7 +257,7 @@ def record_stream(path, morph, frames):
         lam = Hotty(out=f)
         ncores = 24
         state = {
-            "mode": "morph" if morph else "patch",
+            "mode": "morph" if morph else "delta",
             "clock": "00:00:00.000",
             "cpu": [0.0] * (ncores + 1),
             "mem": (32 << 20, 12 << 20),

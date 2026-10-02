@@ -175,7 +175,7 @@ And these sets, each value under its canonical name:
   (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
   `EBUDGET` (SPEC.md §3.6);
-- **patch ops**: `morph`, `inner`, `replace`, `append`, `prepend`, `before`,
+- **delta ops**: `morph`, `inner`, `replace`, `append`, `prepend`, `before`,
   `after`, `remove`, `attr`, `unattr`, `text`, `var` (SPEC.md §6.1);
 - **quiet levels**: `ReplyAlways` 0, `ReplyOnError` 1, `NoReply` 2
   (SPEC.md §3.5).
@@ -224,12 +224,12 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | `Place` | `a=place` (§3.4.1) | surface, placement | 1 |
 | `PlaceAt` | `ESC 7`, `ESC [ <y+1> ; <x+1> H`, `Place` with `C=1`, `ESC 8` | surface, x, y, placement | 1 |
 | `Hide` | `a=hide:s` | surface | 2 |
-| `Patch` | `a=patch:s:op[:t][:k]` and the payload; `t` and `k` only when given | surface, op, target, key, payload | 2 |
-| `SetText` | `Patch` with `op=text` | surface, target, text | 2 |
-| `SetVar` | `Patch` with `op=var`, `k` the name | surface, target, name, value | 2 |
-| `SetAttr` | `Patch` with `op=attr`, `k` the name | surface, target, name, value | 2 |
-| `RemoveAttr` | `Patch` with `op=unattr`, `k` the name, no payload | surface, target, name | 2 |
-| `MorphTo` | `Patch` with `op=morph` | surface, target, html | 2 |
+| `Delta` | `a=delta:s:op[:t][:k]` and the payload; `t` and `k` only when given | surface, op, target, key, payload | 2 |
+| `SetText` | `Delta` with `op=text` | surface, target, text | 2 |
+| `SetVar` | `Delta` with `op=var`, `k` the name | surface, target, name, value | 2 |
+| `SetAttr` | `Delta` with `op=attr`, `k` the name | surface, target, name, value | 2 |
+| `RemoveAttr` | `Delta` with `op=unattr`, `k` the name, no payload | surface, target, name | 2 |
+| `MorphTo` | `Delta` with `op=morph` | surface, target, html | 2 |
 | `Res` | `a=res:id:type` and the data | id, mime, data | 2 |
 | `DelRes` | `a=del:id` | id | 2 |
 | `Del` | `a=del:s` | surface | 2 |
@@ -241,7 +241,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 
 - **`Doc` and `Place` answer errors**, since a refused document or placement
   (`EQUOTA`, `ENOENT`) is something a program must hear. Everything else
-  answers nothing unless asked: a program that patches every frame would
+  answers nothing unless asked: a program that sends deltas every frame would
   otherwise fill its input with replies.
 - **`PlaceAt`** places a surface at screen cell (x, y), counted from 0, and
   leaves the cursor where it was: for a full-screen program, which places
@@ -576,7 +576,7 @@ Go: `hottytest.Host`.
   graphics query. It tracks the alternate screen and full resets as a host
   does (SPEC.md §5.4), and keeps the cells the program printed. Made as a
   terminal that is not a host, it answers no HOTTY command.
-- **The host.** It keeps every surface's document with the patch operations
+- **The host.** It keeps every surface's document with the delta operations
   and the morph of SPEC.md §6, answers as SPEC.md §3.6 has hosts do, and
   passes the host vectors' `send` and `inspect` steps. It lays nothing out:
   `r=auto` gets an estimate the test may replace.
@@ -661,7 +661,7 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Query` | `hotty.Query` | `query` | `query` | `query` | `query` |
 | `Doc` | `Doc` | `doc` | `doc` | `doc` | `doc` |
 | `Place`, `PlaceAt` | `Place`, `PlaceAt` | `place`, `place_at` | `place`, `place_at` | `place`, `place_at` | `place`, `placeAt` |
-| `Hide`, `Patch` | `Hide`, `Patch` | `hide`, `patch` | `hide`, `patch` | `hide`, `patch` | `hide`, `patch` |
+| `Hide`, `Delta` | `Hide`, `Delta` | `hide`, `delta` | `hide`, `delta` | `hide`, `delta` | `hide`, `delta` |
 | `SetText`, `SetVar`, `SetAttr`, `RemoveAttr`, `MorphTo` | the same | `set_text`, `set_var`, `set_attr`, `remove_attr`, `morph_to` | as Python | as Python | `setText`, `setVar`, `setAttr`, `removeAttr`, `morphTo` |
 | `Res`, `DelRes` | `Res`, `DelRes` | `res`, `del_res` | `res`, `del_res` | `res`, `del_res` | `res`, `delRes` |
 | `Del`, `DelAll` | `Del`, `DelAll` | `delete`, `del_all` | `del`, `del_all` | `del`, `del_all` | `del`, `delAll` |
@@ -694,7 +694,7 @@ In the vectors, every name is in snake case: `place_at`, `keep_cursor`,
   language.
 - **Why `Doc` and `Place` answer errors and nothing else does.** A refused
   document or placement leaves a hole in the program's screen, which the
-  program must hear about; a patch that names a missing element is the
+  program must hear about; a delta that names a missing element is the
   program's bug, which a test finds. Asking for every reply would fill the
   input with them.
 - **Why a `Q` given wins over `N`.** Options in most languages have no

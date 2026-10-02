@@ -6,7 +6,7 @@
              --contain (CSS containment on groups and cells, for browser hosts)
 
 The same shapes as hotty-blitz's `hotty bench`: nested flex groups of F fixed-size cells, or
-one flat grid. Each frame sends K text patches to cells on screen, so the cost
+one flat grid. Each frame sends K text deltas to cells on screen, so the cost
 of a frame should depend on K and on the depth of the tree, not on N. q quits.
 """
 import os

@@ -53,7 +53,7 @@
    "steps": [
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "nope",
       "op": "text",
       "t": "p"
@@ -67,7 +67,7 @@
    ]
   },
   {
-   "name": "doc, then a text patch",
+   "name": "doc, then a text delta",
    "steps": [
     {
      "send": {
@@ -83,7 +83,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "text",
       "t": "p"
@@ -91,7 +91,7 @@
      "payload": "bye",
      "reply": {
       "a": "ok",
-      "re": "patch",
+      "re": "delta",
       "s": "x"
      }
     },
@@ -120,7 +120,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "text",
       "t": "nope"
@@ -148,7 +148,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "text",
       "t": "nope",
@@ -162,7 +162,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "text",
       "t": "nope",
@@ -1319,7 +1319,7 @@
    ]
   },
   {
-   "name": "hide keeps the document: patches apply, and placing it again needs no doc",
+   "name": "hide keeps the document: deltas apply, and placing it again needs no doc",
    "steps": [
     {
      "send": {
@@ -1351,7 +1351,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "text",
       "t": "p",
@@ -1419,7 +1419,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "append",
       "t": "l",
@@ -1467,7 +1467,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "prepend",
       "t": "l",
@@ -1510,7 +1510,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "morph",
       "t": "p",
@@ -1546,7 +1546,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "t": "p",
       "q": "2"
@@ -1577,7 +1577,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "morph"
      },
@@ -1621,7 +1621,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "morph",
       "t": "p",
@@ -1671,7 +1671,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "inner",
       "t": "l",
@@ -1719,7 +1719,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "replace",
       "t": "p",
@@ -1757,7 +1757,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "before",
       "t": "p",
@@ -1767,7 +1767,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "after",
       "t": "p",
@@ -1802,7 +1802,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "remove",
       "t": "p",
@@ -1844,7 +1844,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "attr",
       "t": "p",
@@ -1867,7 +1867,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "unattr",
       "t": "p",
@@ -1888,7 +1888,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "attr",
       "t": "p"
@@ -1914,7 +1914,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "text",
       "t": "p",
@@ -1947,7 +1947,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "append",
       "t": "tb",
@@ -2125,7 +2125,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "text",
       "t": "p"
@@ -2276,7 +2276,7 @@
    ]
   },
   {
-   "name": "detaching keeps the document as the program wrote it: patches apply, controls report no disabled",
+   "name": "detaching keeps the document as the program wrote it: deltas apply, controls report no disabled",
    "steps": [
     {
      "send": {
@@ -2330,7 +2330,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "text",
       "t": "p"
@@ -2338,7 +2338,7 @@
      "payload": "yo",
      "reply": {
       "a": "ok",
-      "re": "patch"
+      "re": "delta"
      }
     },
     {
@@ -2610,7 +2610,7 @@
    ]
   },
   {
-   "name": "f=1 on r=auto is silent until the document's height changes; a patch that changes it is heard, the placement keeps its rows",
+   "name": "f=1 on r=auto is silent until the document's height changes; a delta that changes it is heard, the placement keeps its rows",
    "steps": [
     {
      "send": {
@@ -2638,7 +2638,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "var",
       "t": "d",
@@ -2658,7 +2658,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "var",
       "t": "d",
@@ -2670,7 +2670,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "var",
       "t": "d",
@@ -2764,7 +2764,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "var",
       "t": "d",
@@ -2808,7 +2808,7 @@
     },
     {
      "send": {
-      "a": "patch",
+      "a": "delta",
       "s": "x",
       "op": "var",
       "t": "d",
@@ -3767,11 +3767,11 @@
   },
   {
    "name": "payloads are UTF-8",
-   "stream": "\u001b]7279;a=patch:s=x:op=text:t=p;4oiRIG9rIOKAlCDDvA==\u001b\\",
+   "stream": "\u001b]7279;a=delta:s=x:op=text:t=p;4oiRIG9rIOKAlCDDvA==\u001b\\",
    "commands": [
     {
      "control": {
-      "a": "patch",
+      "a": "delta",
       "op": "text"
      },
      "payload": "\u2211 ok \u2014 \u00fc"
@@ -4130,8 +4130,8 @@
    ]
   },
   {
-   "name": "patch with a target",
-   "build": "patch",
+   "name": "delta with a target",
+   "build": "delta",
    "args": {
     "surface": "x",
     "op": "inner",
@@ -4142,7 +4142,7 @@
     {
      "cmd": {
       "control": {
-       "a": "patch",
+       "a": "delta",
        "s": "x",
        "op": "inner",
        "t": "list",
@@ -4154,8 +4154,8 @@
    ]
   },
   {
-   "name": "patch without a target sends no t",
-   "build": "patch",
+   "name": "delta without a target sends no t",
+   "build": "delta",
    "args": {
     "surface": "x",
     "op": "morph",
@@ -4165,7 +4165,7 @@
     {
      "cmd": {
       "control": {
-       "a": "patch",
+       "a": "delta",
        "s": "x",
        "op": "morph",
        "q": "2"
@@ -4187,7 +4187,7 @@
     {
      "cmd": {
       "control": {
-       "a": "patch",
+       "a": "delta",
        "s": "x",
        "op": "text",
        "t": "clock",
@@ -4211,7 +4211,7 @@
     {
      "cmd": {
       "control": {
-       "a": "patch",
+       "a": "delta",
        "s": "x",
        "op": "var",
        "t": "bar",
@@ -4236,7 +4236,7 @@
     {
      "cmd": {
       "control": {
-       "a": "patch",
+       "a": "delta",
        "s": "x",
        "op": "attr",
        "t": "ok",
@@ -4260,7 +4260,7 @@
     {
      "cmd": {
       "control": {
-       "a": "patch",
+       "a": "delta",
        "s": "x",
        "op": "unattr",
        "t": "ok",
@@ -4284,7 +4284,7 @@
     {
      "cmd": {
       "control": {
-       "a": "patch",
+       "a": "delta",
        "s": "x",
        "op": "morph",
        "t": "card",
@@ -4473,7 +4473,7 @@
     {
      "cmd": {
       "control": {
-       "a": "patch",
+       "a": "delta",
        "s": "x",
        "op": "text",
        "t": "a",
@@ -4485,7 +4485,7 @@
     {
      "cmd": {
       "control": {
-       "a": "patch",
+       "a": "delta",
        "s": "x",
        "op": "var",
        "t": "b",
@@ -4512,7 +4512,7 @@
     {
      "cmd": {
       "control": {
-       "a": "patch",
+       "a": "delta",
        "s": "x",
        "op": "text",
        "t": "caf___",
@@ -4530,7 +4530,7 @@
    "control": [
     [
      "a",
-     "patch"
+     "delta"
     ],
     [
      "s",
@@ -4542,7 +4542,7 @@
     ]
    ],
    "payload": "",
-   "bytes": "\u001b]7279;a=patch:s=x:t=a_b_c_d___\u001b\\"
+   "bytes": "\u001b]7279;a=delta:s=x:t=a_b_c_d___\u001b\\"
   },
   {
    "name": "keys go out in the order given; an empty payload sends no ;",
@@ -4764,7 +4764,7 @@
    "name": "error replies carry the code, and the detail when there is one",
    "seqs": [
     "\u001b]7279;a=err:re=frob;eyJjb2RlIjoiRUlOVkFMIn0=\u001b\\",
-    "\u001b]7279;a=err:n=3:s=x:re=patch;eyJjb2RlIjoiRU5PVEFSR0VUIiwiZGV0YWlsIjoibm9wZSJ9\u001b\\",
+    "\u001b]7279;a=err:n=3:s=x:re=delta;eyJjb2RlIjoiRU5PVEFSR0VUIiwiZGV0YWlsIjoibm9wZSJ9\u001b\\",
     "\u001b]7279;a=err:s=gone:re=place;eyJjb2RlIjoiRU5PRU5UIn0=\u001b\\",
     "\u001b]7279;a=err:s=x:re=focus;eyJjb2RlIjoiRURFVEFDSEVEIn0=\u001b\\",
     "\u001b]7279;a=err:s=y:re=doc;eyJjb2RlIjoiRVFVT1RBIiwiZGV0YWlsIjoic3VyZmFjZXMifQ==\u001b\\",
@@ -4797,7 +4797,7 @@
       "a": "err",
       "n": "3",
       "s": "x",
-      "re": "patch"
+      "re": "delta"
      },
      "reply": {
       "ok": false,

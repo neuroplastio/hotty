@@ -9,7 +9,7 @@
 
 HOTTY lets a program running in a terminal show **surfaces**: small HTML
 documents drawn by the terminal into rectangles of cells, the way the kitty
-graphics protocol places images. The program sends markup and patches
+graphics protocol places images. The program sends markup and deltas
 in-band, as escape sequences in its ordinary output, so it works over a pty,
 over SSH and through anything else that carries a terminal's bytes. The
 terminal lays the markup out, draws it, and handles focus, typing and hover
@@ -27,7 +27,7 @@ the program did not give it.
 3. The envelope
 4. Detection and capabilities
 5. Surfaces
-6. Patches
+6. Deltas
 7. Resources
 8. The host stylesheet
 9. Events
@@ -58,12 +58,12 @@ HOTTY is designed around four constraints:
   stream. Nothing is loaded from files or the network, so a program behaves
   the same locally, over SSH and inside a container.
 - **The program is the application.** Surfaces have no script. The program
-  patches the document and hears about events. It never runs code in the
-  terminal.
+  changes the document with deltas and hears about events. It never runs
+  code in the terminal.
 - **Degradable.** A program asks whether the terminal is a HOTTY host before
   using it, and paints ordinary text when it is not. Terminals that are not
   hosts ignore HOTTY sequences.
-- **Cheap to update.** Changes are patches addressed by element id, so a
+- **Cheap to update.** Changes are deltas addressed by element id, so a
   program changing one number sends a few bytes, and a host repaints what
   changed.
 
@@ -92,7 +92,7 @@ when, they appear in bold.
   placements consistent with its own screen and scrollback.
 - **Session**: a program's connection to a host, from the first HOTTY command
   until a full reset or the end of the program's output.
-- **Surface**, **resource**, **patch**, **event**: §5, §7, §6 and §9.
+- **Surface**, **resource**, **delta**, **event**: §5, §7, §6 and §9.
 - `ESC` is 0x1B, `BEL` 0x07, `ST` the two bytes `ESC \`. `CSI` is `ESC [`.
 - **CSS pixel**: CSS's reference pixel. A host's **scale** is device pixels
   per CSS pixel.
@@ -143,7 +143,7 @@ alphabet).
   and events), so a program needs no zlib to read them.
 - An empty body is sent as nothing, and the `;` before it may then be
   omitted.
-- Text bodies (markup, patch values) are UTF-8.
+- Text bodies (markup, delta values) are UTF-8.
 
 ### 3.4 Chunks
 
@@ -165,7 +165,7 @@ into chunks of at most 4096 payload bytes each:
 
 | key | meaning |
 | --- | --- |
-| `a` | the action: `q`, `doc`, `place`, `hide`, `patch`, `res`, `del`, `detach`, `focus`, `blur` from the program (§4–§10); `ok`, `err`, `ev` from the host |
+| `a` | the action: `q`, `doc`, `place`, `hide`, `delta`, `res`, `del`, `detach`, `focus`, `blur` from the program (§4–§10); `ok`, `err`, `ev` from the host |
 | `s` | a surface name: `[A-Za-z0-9_-]{1,64}` |
 | `n` | a request number chosen by the program, echoed in the reply |
 | `q` | quiet: `0` (default) reply always, `1` reply only on error, `2` never reply |
@@ -240,7 +240,7 @@ The capabilities object:
 | field | meaning |
 | --- | --- |
 | `v` | the HOTTY version the host implements, as a string: `"0.1"` for this document |
-| `ops` | the patch ops it supports (§6) |
+| `ops` | the delta ops it supports (§6) |
 | `events` | the event kinds it can send (§9). `drag` stands for `dragstart`, `drag` and `dragend` (§9.1) |
 | `cell` | `{"w": …, "h": …}`: the cell size in device pixels |
 | `scale` | device pixels per CSS pixel |
@@ -268,9 +268,9 @@ ESC ] 7279 ; a=doc:s=<name>[:d=1] ; <HTML> ST
   algorithm. It creates the surface, or replaces its whole document.
 - Replacing a document keeps the surface's placement and size.
 - `d=1` creates the surface detached (§5.5), so a program that will hear
-  nothing from a document, even one it keeps patching, gives it up in the
-  same command. A document sent without `d=1`
-  makes the surface the program's, whether it was detached or not.
+  nothing from a document, even one it keeps changing with deltas, gives it
+  up in the same command. A document sent without `d=1` makes the surface
+  the program's, whether it was detached or not.
 - The document's `<base href>` sets its base URL (§7.3), and its
   `<meta name="hotty-network">` asks for network access (§7.2).
 - The host applies its stylesheet (§8) and the security rules (§12) before
@@ -315,7 +315,7 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   reply carries them (§3.5). `f` other than `1` is as if absent. A
   document's height changes after it is placed when a resource it refers to
   arrives or is replaced (§7.1), an image or font it fetched loads (§7.2), a
-  patch changes it (§6), or the cell size changes (§5.3).
+  delta changes it (§6), or the cell size changes (§5.3).
   - The placement keeps its size: the footprint is the program's (§11), and
     placing the surface again with the new rows is the program's to do.
   - A host sends at most one `fit` per surface per frame it draws, with the
@@ -393,7 +393,7 @@ A program removes a placement and keeps its surface with `a=hide`:
 ESC ] 7279 ; a=hide:s=<name> ST
 ```
 
-- The document stays as it is, with what the user did in it, and patches
+- The document stays as it is, with what the user did in it, and deltas
   still apply to it. Placing the surface again shows it as it is then,
   without sending it again.
 - A program hides the surfaces it expects to show again soon, such as a card
@@ -431,7 +431,8 @@ or creates it detached, with `d=1` on the `a=doc` that sends its document
 - **What runs a program**, such as a shell, **MAY** detach the surfaces the
   program named once it exits, if it knows their names.
 - **A detached surface stays on the screen as text does.** It is placed,
-  hidden, patched and deleted as before, and moves with its line (§5.4).
+  hidden, changed by deltas and deleted as before, and moves with its line
+  (§5.4).
   Nothing in it reaches the program any more:
   - **It sends no events** (§9), of any kind, `press`, `hover` and drags
     included, whatever its placement's `p` and `v` and its `data-on`. A
@@ -443,7 +444,7 @@ or creates it detached, with `d=1` on the `a=doc` that sends its document
     A program that wants what the user typed in a focused field sends
     `a=blur` first, and detaches once `blur` arrives (§10.1).
   - **Its form controls are disabled**: every `input`, `select`, `textarea`
-    and `button`, including those patches add later, acts as if it had the
+    and `button`, including those deltas add later, acts as if it had the
     `disabled` attribute. They match `:disabled`, and the user can neither
     focus, edit, toggle nor activate them. What the user had typed into
     them stays. The document itself is unchanged: its elements report the
@@ -458,15 +459,15 @@ or creates it detached, with `d=1` on the `a=doc` that sends its document
 - `ENOENT` if there is no such surface. Detaching a detached surface does
   nothing.
 
-## 6. Patches
+## 6. Deltas
 
-### 6.1 `a=patch`
+### 6.1 `a=delta`
 
 ```
-ESC ] 7279 ; a=patch:s=<name>:op=<op>[:t=<element id>][:k=<name>] ; <payload> ST
+ESC ] 7279 ; a=delta:s=<name>:op=<op>[:t=<element id>][:k=<name>] ; <payload> ST
 ```
 
-Patches change one surface's document, addressing elements by id.
+Deltas change one surface's document, addressing elements by id.
 
 | `op` | payload | effect |
 | --- | --- | --- |
@@ -488,7 +489,7 @@ Patches change one surface's document, addressing elements by id.
 - **Context:** a payload is parsed as a fragment in the context of the
   element it will become a child of, so table rows, cells and list items
   parse as they would in place.
-- **The cheap path:** `var` and `text` are the patches that change every
+- **The cheap path:** `var` and `text` are the deltas that change every
   frame (a bar's width, a clock). A host **SHOULD** make them cheap.
 
 ### 6.2 Morph
@@ -812,7 +813,7 @@ go.
   - or the host loses the pointer.
 
   A surface that is detached or deleted during a drag reports nothing more
-  (§5.5). Nothing else ends a drag: neither a patch nor a new placement
+  (§5.5). Nothing else ends a drag: neither a delta nor a new placement
   (moving the surface, or showing another window of it).
 - **Detection.** `drag` in `events` (§4) stands for the three kinds. Where
   it is absent, a program offers another way to do what its drags do, such
@@ -928,7 +929,7 @@ program draws itself, such as cells it lit while the pointer was over them.
 - **Not the keyboard's.** Focus moving, to the surface or away from it,
   changes nothing: a window reports the pointer whether or not it has the
   keyboard (§10).
-- **Under a pointer that does not move.** When a patch, a new document, a
+- **Under a pointer that does not move.** When a delta, a new document, a
   resource, or a new placement changes what lies under a pointer that has
   not moved, a host **MAY** report it only at the pointer's next move.
 - **Lifetime.** Like `p`, it belongs to the placement: placing the surface
@@ -1109,7 +1110,7 @@ the text of §11.
   new minor version. **Until 1.0, any minor version may break the previous
   one**: versions 0.x are drafts.
 - A host **MUST** ignore control keys it does not know. An unknown action or
-  patch op is `EINVAL`. A program **MUST** ignore event kinds (§9) and
+  delta op is `EINVAL`. A program **MUST** ignore event kinds (§9) and
   capability fields (§4) it does not know.
 - `host` and `version` (§4) only name an implementation. A program **MAY**
   use them to avoid a known bug of some of its versions, and falls back as
@@ -1131,7 +1132,7 @@ A host conforms to HOTTY version 0.1 when:
 - it meets every **MUST** of this document;
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
-The vectors check replies, error codes, every patch op, morph, context
+The vectors check replies, error codes, every delta op, morph, context
 parsing, resources, drags, presses with Alt, `fit`, hover and the
 envelope. They inspect documents and events, not pixels. The vectors marked
 `"passthrough"` apply to a host that reports it (§9.3), and those marked
@@ -1166,14 +1167,14 @@ program → ESC ] 7279 ; a=q:n=1 ST  CSI c
 host    → ESC ] 7279 ; a=ok:n=1:re=q ; eyJ2IjoiMC4xIiwib3BzIjpb… ST  CSI ? 62 ; 22 c
 ```
 
-A card placed below the prompt, then a patch and an event:
+A card placed below the prompt, then a delta and an event:
 
 ```
 program → ESC ] 7279 ; a=doc:s=card:q=2 ; PGJ1dHRvbiBpZD1nbz5HbzwvYnV0dG9uPg== ST
           (<button id=go>Go</button>)
 program → ESC ] 7279 ; a=place:s=card:c=40:r=auto ST
 host    → ESC ] 7279 ; a=ok:s=card:re=place:c=40:r=2 ST
-program → ESC ] 7279 ; a=patch:s=card:op=text:t=go:q=2 ; U3RhcnQ= ST
+program → ESC ] 7279 ; a=delta:s=card:op=text:t=go:q=2 ; U3RhcnQ= ST
           (the button now reads "Start")
 host    → ESC ] 7279 ; a=ev:s=card:e=click:t=go ST
           (the user clicked it)
@@ -1198,8 +1199,8 @@ A value that changes every frame, cheaply:
 
 ```
 program → CSI ? 2026 h
-program → ESC ] 7279 ; a=patch:s=dash:op=var:t=cpu:k=p:q=2 ; NDI= ST        (--p: 42)
-program → ESC ] 7279 ; a=patch:s=dash:op=text:t=clock:q=2 ; MTI6MDA6MDE= ST  (12:00:01)
+program → ESC ] 7279 ; a=delta:s=dash:op=var:t=cpu:k=p:q=2 ; NDI= ST        (--p: 42)
+program → ESC ] 7279 ; a=delta:s=dash:op=text:t=clock:q=2 ; MTI6MDA6MDE= ST  (12:00:01)
 program → CSI ? 2026 l
 ```
 
@@ -1225,8 +1226,8 @@ program → CSI ? 2026 l
 - **Why hosts do not compress.** Replies and events are small, and zlib is
   the one dependency a program would need only to read them. Programs keep
   it for what they send, where documents are large.
-- **Why ids and patches.**
-  - Addressing by id keeps a patch's effect predictable, and makes an update
+- **Why ids and deltas.**
+  - Addressing by id keeps a delta's effect predictable, and makes an update
     cost what it changes.
   - `morph` without a target also serves programs that redraw their whole
     tree (immediate mode) while keeping what the user was doing.

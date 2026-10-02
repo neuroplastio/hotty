@@ -2,14 +2,14 @@
 
 HOTTY lets a terminal program show **surfaces**: small HTML documents that the
 terminal lays out and draws into a rectangle of cells, the way kitty's
-graphics protocol places images. The program sends markup and patches in its
+graphics protocol places images. The program sends markup and deltas in its
 ordinary output. The terminal handles layout, drawing, focus and typing.
 Clicks, changes and submits come back as events on the program's input.
 
 - No script and no network: the program is the application, the terminal
   the view.
 - It works over a pty and SSH, since everything travels in-band.
-- Patches are addressed by element id, so a change costs what it changes.
+- Deltas are addressed by element id, so a change costs what it changes.
 - Programs can detect a host and fall back to plain text where there is none.
 
 **Status: version 0.1, a draft.** Versions 0.x may change incompatibly. Two

@@ -15,7 +15,7 @@ it gets replaced before anything built on it is published.
 
 Each frame the game describes the screen as a list of ~380 sprites (walls
 included), of which a handful move. The canvas client repaints all of them.
-Here each sprite is an element, and only the ones that changed get a patch
+Here each sprite is an element, and only the ones that changed get a delta
 (one `attr style`), inside synchronized output: the host repaints only those.
 
 Key releases come from the kitty keyboard protocol (SPEC §10.3). Where the
@@ -175,7 +175,7 @@ class Screen:
         return s
 
     def frame(self, drawing):
-        """Patches for one frame: new icons, then only the slots that changed."""
+        """Deltas for one frame: new icons, then only the slots that changed."""
         for icon in self.pending:
             self.define(icon)
         self.pending.clear()
@@ -193,14 +193,14 @@ class Screen:
                 self.slots[n] = st
                 changed += 1
         if new:
-            self.lam.patch("game", "append", "board", "".join(new))
+            self.lam.delta("game", "append", "board", "".join(new))
             changed += len(new)
         self.frames += 1
         self.changed += changed
 
     def restyle(self):
         """After a rescale: every slot again."""
-        self.lam.patch("game", "replace", "board", self.board_html())
+        self.lam.delta("game", "replace", "board", self.board_html())
         self.slots = []
 
 

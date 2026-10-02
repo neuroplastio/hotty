@@ -241,9 +241,9 @@ def hide(surface, n=None, q=None):
     return _command([("a", "hide"), ("s", surface)], b"", NO_REPLY, n, q)
 
 
-def patch(surface, op, target="", key="", payload=b"", n=None, q=None):
+def delta(surface, op, target="", key="", payload=b"", n=None, q=None):
     """Changes a surface's document (SPEC §6.1)."""
-    pairs = [("a", "patch"), ("s", surface), ("op", op)]
+    pairs = [("a", "delta"), ("s", surface), ("op", op)]
     if target:
         pairs.append(("t", target))
     if key:
@@ -252,23 +252,23 @@ def patch(surface, op, target="", key="", payload=b"", n=None, q=None):
 
 
 def set_text(surface, target, text, n=None, q=None):
-    return patch(surface, "text", target, "", text, n, q)
+    return delta(surface, "text", target, "", text, n, q)
 
 
 def set_var(surface, target, name, value, n=None, q=None):
-    return patch(surface, "var", target, name, str(value), n, q)
+    return delta(surface, "var", target, name, str(value), n, q)
 
 
 def set_attr(surface, target, name, value, n=None, q=None):
-    return patch(surface, "attr", target, name, str(value), n, q)
+    return delta(surface, "attr", target, name, str(value), n, q)
 
 
 def remove_attr(surface, target, name, n=None, q=None):
-    return patch(surface, "unattr", target, name, b"", n, q)
+    return delta(surface, "unattr", target, name, b"", n, q)
 
 
 def morph_to(surface, target, html, n=None, q=None):
-    return patch(surface, "morph", target, "", html, n, q)
+    return delta(surface, "morph", target, "", html, n, q)
 
 
 def res(id, mime, data, n=None, q=None):
@@ -507,7 +507,7 @@ class Caps:
         self.version = get("version", lambda v: isinstance(v, str))
 
     def supports(self, op):
-        """Whether the host supports a patch op; one that lists none, all."""
+        """Whether the host supports a delta op; one that lists none, all."""
         return not self.ops or op in self.ops
 
     def sends(self, kind):
@@ -898,8 +898,8 @@ class Hotty:
         """Removes the placement and keeps the surface (SPEC §5.4)."""
         self.write(hide(surface, q=quiet))
 
-    def patch(self, surface, op, target=None, payload="", key=None, quiet=NO_REPLY):
-        self.write(patch(surface, op, target or "", key or "", payload, q=quiet))
+    def delta(self, surface, op, target=None, payload="", key=None, quiet=NO_REPLY):
+        self.write(delta(surface, op, target or "", key or "", payload, q=quiet))
 
     def text(self, surface, target, text):
         self.write(set_text(surface, target, text))
