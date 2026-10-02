@@ -235,6 +235,7 @@ The capabilities object:
 | `net` | the host's network policy (§7.2), from directive to sources, such as `{"img-src": ["https://example.com"]}`. Absent or empty: the host fetches nothing from the network |
 | `passthrough` | `true` when the pointer passes through the parts of a surface that take no pointer (§9.3). Absent: every window takes the pointer wherever it is |
 | `host` | optional: a name for the implementation |
+| `version` | optional, with `host`: the implementation's version, as dot-separated numbers compared one by one (`"0.0.10"` is after `"0.0.9"`) |
 
 Programs **MUST** ignore fields they do not know.
 
@@ -998,6 +999,10 @@ the text of §11.
 - A host **MUST** ignore control keys it does not know. An unknown action or
   patch op is `EINVAL`. A program **MUST** ignore event kinds (§9) and
   capability fields (§4) it does not know.
+- `host` and `version` (§4) only name an implementation. A program **MAY**
+  use them to avoid a known bug of some of its versions, and falls back as
+  if the bug were there when either is absent. What a capability field
+  says, a program learns from the field, never from the name.
 - **Extensions** by an implementation use a vendor prefix:
   - control keys `x-<vendor>-<name>`;
   - attributes `data-<vendor>-<name>`;
