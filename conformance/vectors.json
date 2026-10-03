@@ -225,6 +225,77 @@
    ]
   },
   {
+   "name": "r=auto takes the rows of the content, not of the root: html and body the viewport sizes (height: 100%) are as tall as what they hold, and what an inner box clips does not count (SPEC \u00a75.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>html, body { margin: 0; height: 100% }</style><div style=\"height: calc(29.5 * var(--hotty-cell-h))\"></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20",
+      "r": "30"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>html, body { margin: 0; height: 100% }</style><div style=\"height: calc(1.5 * var(--hotty-cell-h))\"></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>html, body { margin: 0; height: 100% }</style><div style=\"height: calc(2.5 * var(--hotty-cell-h)); overflow: hidden\"><div style=\"height: calc(50 * var(--hotty-cell-h))\"></div></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3"
+     }
+    }
+   ]
+  },
+  {
    "name": "a window shows part of the surface; one that leaves it, or has no cells, is EINVAL",
    "steps": [
     {
