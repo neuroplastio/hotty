@@ -22,6 +22,9 @@ FEATURES = {
     "caps.lenient",
     "caps.drag-kinds",
     "options.unordered",
+    "doc.scroll",
+    "event.area",
+    "caps.scroll",
     "decode.abort-count",
     "decode.unterminated",
     "scanner.da1",
@@ -101,7 +104,7 @@ def build(b):
     if name == "query":
         return hotty.query(a["n"])
     if name == "doc":
-        return hotty.doc(a["surface"], a["html"], detached=o.get("detached", False), **ro)
+        return hotty.doc(a["surface"], a["html"], detached=o.get("detached", False), scroll=o.get("scroll", 0), **ro)
     if name == "place":
         return hotty.place(a["surface"], placement(a["placement"]), **ro)
     if name == "place_at":
@@ -193,6 +196,7 @@ def event_view(e):
     size = e.size()
     drag = e.drag()
     hover = e.hover()
+    area = e.area()
     return {
         "surface": e.surface,
         "kind": e.kind,
@@ -205,6 +209,7 @@ def event_view(e):
         "fit_rows": e.fit_rows(),
         "drag": {"c": drag.c, "r": drag.r, "keys": drag.keys} if drag else None,
         "hover": {"c": hover.c, "r": hover.r, "out": hover.out} if hover else None,
+        "area": {"c": area.c, "r": area.r, "w": area.w, "h": area.h} if area else None,
     }
 
 
@@ -219,6 +224,7 @@ def caps_view(c, want):
         "limits": c.limits,
         "net": c.net,
         "passthrough": c.passthrough,
+        "scroll": c.scroll,
         "host": c.host,
         "version": c.version,
         "drags": c.drags(),

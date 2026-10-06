@@ -175,11 +175,19 @@ def query(n=1):
     return encode([("a", "q"), ("n", n)]) + "\x1b[c"
 
 
-def doc(surface, html, detached=False, n=None, q=None):
-    """Sends a surface's document (SPEC §5.1); `detached` creates it detached."""
+SCROLL_VERTICAL = 1
+SCROLL_HORIZONTAL = 2
+
+
+def doc(surface, html, detached=False, scroll=0, n=None, q=None):
+    """Sends a surface's document (SPEC §5.1); `detached` creates it detached,
+    and `scroll` lets it scroll along the axes it names, a bitmask of
+    SCROLL_VERTICAL and SCROLL_HORIZONTAL (0: it does not scroll)."""
     pairs = [("a", "doc"), ("s", surface)]
     if detached:
         pairs.append(("d", "1"))
+    if scroll:
+        pairs.append(("scroll", str(scroll)))
     return _command(pairs, html, REPLY_ON_ERROR, n, q)
 
 
@@ -404,6 +412,17 @@ class Hover:
     out: bool = False
 
 
+@dataclass
+class Area:
+    """The cells an element covers, counted from the surface's top left
+    cell (SPEC §9)."""
+
+    c: int
+    r: int
+    w: int
+    h: int
+
+
 def _is_int(v):
     return isinstance(v, int) and not isinstance(v, bool)
 
@@ -469,6 +488,15 @@ class Event:
             return None
         return Drag(c, r, [k for k in keys if isinstance(k, str)] if isinstance(keys, list) else [])
 
+    def area(self):
+        """The cells of a click's or a press's element (SPEC §9)."""
+        if self.kind not in (EVENT_CLICK, EVENT_PRESS):
+            return None
+        a = self._d.get("area")
+        if not isinstance(a, dict) or not all(_is_int(a.get(k)) for k in "crwh"):
+            return None
+        return Area(a["c"], a["r"], a["w"], a["h"])
+
     def hover(self):
         if self.kind != EVENT_HOVER:
             return None
@@ -503,6 +531,7 @@ class Caps:
         net = get("net", lambda v: isinstance(v, dict), {})
         self.net = {k: [s for s in v if isinstance(s, str)] for k, v in net.items() if isinstance(v, list)}
         self.passthrough = get("passthrough", lambda v: isinstance(v, bool), False)
+        self.scroll = get("scroll", lambda v: isinstance(v, bool), False)
         self.host = get("host", lambda v: isinstance(v, str))
         self.version = get("version", lambda v: isinstance(v, str))
 
@@ -871,8 +900,8 @@ class Hotty:
         self.out.write(text.encode() if isinstance(text, str) else text)
         self.out.flush()
 
-    def doc(self, surface, html, quiet=REPLY_ON_ERROR, detached=False):
-        self.write(doc(surface, html, detached=detached, q=quiet))
+    def doc(self, surface, html, quiet=REPLY_ON_ERROR, detached=False, scroll=0):
+        self.write(doc(surface, html, detached=detached, scroll=scroll, q=quiet))
 
     def place(self, surface, cols, rows="auto", move_cursor=True, quiet=REPLY_ON_ERROR, window=None, z=0, press=False, fit=False, hover=False):
         """Places a surface at the cursor. `window` is (x, y, w, h): the part

@@ -220,7 +220,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | builder | sends | parameters | default `q` |
 | --- | --- | --- | --- |
 | `Query` | `a=q:n=<n>`, then DA1 (`ESC [ c`) | n | none |
-| `Doc` | `a=doc:s` and the HTML; `d=1` with the `Detached` option | surface, html | 1 |
+| `Doc` | `a=doc:s` and the HTML; `d=1` with the `Detached` option, `scroll` with `Scroll` | surface, html | 1 |
 | `Place` | `a=place` (§3.4.1) | surface, placement | 1 |
 | `PlaceAt` | `ESC 7`, `ESC [ <y+1> ; <x+1> H`, `Place` with `C=1`, `ESC 8` | surface, x, y, placement | 1 |
 | `Hide` | `a=hide:s` | surface | 2 |
@@ -271,7 +271,10 @@ Every builder but `Query` and `Sync` takes two options:
 - **`Q(q)`** sets the quiet level. A `Q` given wins over the level `N`
   implies, whatever the order in which the program gives them.
 
-Each key goes out once. `Doc` also takes **`Detached`** (`d=1`).
+Each key goes out once. `Doc` also takes **`Detached`** (`d=1`) and
+**`Scroll(axes)`** (`scroll=<axes>`, SPEC.md §5.1): a bitmask of
+`ScrollVertical` (1) and `ScrollHorizontal` (2). `0`, the default, sends
+no key; any other value goes out as given, for the host to judge.
 
 ### 3.5 Names
 
@@ -419,10 +422,11 @@ read the detail, each absent when the event does not carry it:
 | `FitRows()` | `r` | `fit` |
 | `Drag()` | `c`, `r` and `keys` | `dragstart`, `drag`, `dragend` |
 | `Hover()` | `c` and `r`, or out | `hover` |
+| `Area()` | `area`: `c`, `r`, `w` and `h`, the element's cells; absent unless all four are whole numbers | `click`, `press` |
 
 **`Caps`** (SPEC.md §4) has every field SPEC.md lists: `V`, `Ops`,
 `Events`, `Cell` (`w`, `h`), `Scale`, `Scheme`, `Limits`, `Net`,
-`Passthrough`, `Host`, `Version`. Each field is read on its own (§2.7). It
+`Passthrough`, `Scroll`, `Host`, `Version`. Each field is read on its own (§2.7). It
 also answers:
 - `Supports(op)`: whether `op` is in `ops`; a host that lists no ops is
   taken to support them all;
@@ -640,7 +644,7 @@ every SDK section.
 
 | SDK | language | wire layer | SDK layer |
 | --- | --- | --- | --- |
-| [hotty-go](https://github.com/neuroplastio/hotty-go) | Go | the reference; lacks the Scanner, the Detector as a public component, `Caps.Passthrough` and `Caps.Version`, lenient capabilities, `Sends` for `dragstart` and `dragend`, unordered reply options, and counting a malformed message that aborts a chunked one twice | `hottyterm`, `hottytea`, `hottytest` |
+| [hotty-go](https://github.com/neuroplastio/hotty-go) | Go | the reference; lacks the Scanner, the Detector as a public component, `Caps.Passthrough` and `Caps.Version`, lenient capabilities, `Sends` for `dragstart` and `dragend`, unordered reply options, counting a malformed message that aborts a chunked one twice, the `Scroll` option, `Event.Area()` and `Caps.Scroll` | `hottyterm`, `hottytea`, `hottytest` |
 | `clients/python` (this repository) | Python | complete | `Hotty`, for the examples |
 | hotty.lua | Lua | planned, for Neovim and plx scripts | §4.2 |
 
@@ -667,7 +671,8 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Del`, `DelAll` | `Del`, `DelAll` | `delete`, `del_all` | `del`, `del_all` | `del`, `del_all` | `del`, `delAll` |
 | `Detach`, `Focus`, `Blur`, `Sync` | the same | `detach`, `focus`, `blur`, `sync` | as Python | as Python | `detach`, `focus`, `blur`, `sync` |
 | `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor }` |
-| `N`, `Q`, `Detached` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()` | `n=`, `q=`, `detached=` | `{ n = …, q = … }` | builder methods | `{ n, q, detached }` |
+| `N`, `Q`, `Detached`, `Scroll` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)` | `n=`, `q=`, `detached=`, `scroll=` | `{ n = …, q = …, detached = …, scroll = … }` | builder methods | `{ n, q, detached, scroll }` |
+| `ScrollVertical`, `ScrollHorizontal` | `hotty.ScrollVertical`, `hotty.ScrollHorizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `scroll_vertical`, `scroll_horizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` |
 | `Decoder.Feed`, `Invalid` | `(*Decoder).Feed`, `.Invalid` | `Decoder.feed`, `.invalid` | `decoder:feed` | `Decoder::feed` | `Decoder.feed` |
 | `Scanner`, `Detector` | — | `Scanner`, `Detector` | `scanner`, `detector` | `Scanner`, `Detector` | `Scanner`, `Detector` |
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |

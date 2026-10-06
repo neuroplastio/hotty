@@ -4593,6 +4593,88 @@
      }
     }
    ]
+  },
+  {
+   "name": "doc that scrolls vertically: scroll=1",
+   "build": "doc",
+   "requires": [
+    "doc.scroll"
+   ],
+   "args": {
+    "surface": "list",
+    "html": "<ul><li>a</li></ul>"
+   },
+   "options": {
+    "scroll": 1
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "doc",
+       "s": "list",
+       "scroll": "1",
+       "q": "1"
+      },
+      "payload": "<ul><li>a</li></ul>"
+     }
+    }
+   ]
+  },
+  {
+   "name": "doc that scrolls both ways, detached: scroll=3 beside d=1",
+   "build": "doc",
+   "requires": [
+    "doc.scroll"
+   ],
+   "args": {
+    "surface": "log",
+    "html": "<pre>x</pre>"
+   },
+   "options": {
+    "detached": true,
+    "scroll": 3
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "doc",
+       "s": "log",
+       "d": "1",
+       "scroll": "3",
+       "q": "1"
+      },
+      "payload": "<pre>x</pre>"
+     }
+    }
+   ]
+  },
+  {
+   "name": "scroll 0 is the default and sends no key",
+   "build": "doc",
+   "requires": [
+    "doc.scroll"
+   ],
+   "args": {
+    "surface": "card",
+    "html": "<p>hi</p>"
+   },
+   "options": {
+    "scroll": 0
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "doc",
+       "s": "card",
+       "q": "1"
+      },
+      "payload": "<p>hi</p>"
+     }
+    }
+   ]
   }
  ],
  "encode": [
@@ -5936,6 +6018,145 @@
    ],
    "invalid": 0,
    "messages": []
+  },
+  {
+   "name": "click and press carry the element's area; another kind's, or one missing a field, is not read",
+   "requires": [
+    "event.area"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=click:t=env;eyJ2YWx1ZSI6InN0YWdpbmciLCJhcmVhIjp7ImMiOjIsInIiOjAsInciOjEyLCJoIjoxfX0=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press:t=title;eyJhcmVhIjp7ImMiOi0xLCJyIjozLCJ3Ijo1LCJoIjoyfX0=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press:t=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=change:t=env;eyJ2YWx1ZSI6InByb2R1Y3Rpb24iLCJhcmVhIjp7ImMiOjIsInIiOjAsInciOjEyLCJoIjoxfX0=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=go;eyJhcmVhIjp7ImMiOjEsInIiOjAsImgiOjF9fQ==\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "env"
+     },
+     "event": {
+      "kind": "click",
+      "target": "env",
+      "value": "staging",
+      "area": {
+       "c": 2,
+       "r": 0,
+       "w": 12,
+       "h": 1
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press",
+      "t": "title"
+     },
+     "event": {
+      "kind": "press",
+      "target": "title",
+      "area": {
+       "c": -1,
+       "r": 3,
+       "w": 5,
+       "h": 2
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press",
+      "t": ""
+     },
+     "event": {
+      "kind": "press",
+      "target": "",
+      "area": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "change",
+      "t": "env"
+     },
+     "event": {
+      "kind": "change",
+      "target": "env",
+      "value": "production",
+      "area": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "go"
+     },
+     "event": {
+      "kind": "click",
+      "target": "go",
+      "area": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "capabilities: scroll, false when absent",
+   "requires": [
+    "caps.scroll"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIiwic2Nyb2xsIjp0cnVlfQ==\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;eyJ2IjoiMC4xIn0=\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "caps": {
+      "v": "0.1",
+      "scroll": true
+     }
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "q"
+     },
+     "caps": {
+      "v": "0.1",
+      "scroll": false
+     }
+    }
+   ]
   }
  ],
  "scan": [

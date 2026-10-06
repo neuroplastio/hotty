@@ -107,7 +107,9 @@ implements, and skips the rest:
 | --- | --- |
 | `place.hover` | `Placement.Hover` (`v=1`) |
 | `event.hover` | `Event.Hover()` |
-| `caps.passthrough`, `caps.version` | those fields of `Caps` |
+| `caps.passthrough`, `caps.version`, `caps.scroll` | those fields of `Caps` |
+| `doc.scroll` | `Doc`'s `Scroll` option (`scroll=<axes>`) |
+| `event.area` | `Event.Area()` |
 | `caps.lenient` | a capability field of an unexpected type is ignored (SDK.md §2.7) |
 | `caps.drag-kinds` | `Sends` answers for `dragstart` and `dragend` as for `drag` (SPEC §4) |
 | `options.unordered` | a `q` given wins over the `q` that `n` implies, whatever their order |
@@ -117,7 +119,7 @@ implements, and skips the rest:
 
 **Build** `{ "build": builder, "args": {…}, "options": {…}?, "out": [ … ] }`:
 the runner calls the builder with `args`, and with the reply options `n`
-and `q` and `detached` from `options`, which have no order. `sync` takes
+and `q`, `detached` and `scroll` from `options`, which have no order. `sync` takes
 `args.commands`, each a `{ "build", "args", "options" }` of its own. The
 output, split into raw bytes and HOTTY sequences, must be `out`:
 - `{ "raw": text }`: bytes that are not HOTTY's, such as `PlaceAt`'s cursor
