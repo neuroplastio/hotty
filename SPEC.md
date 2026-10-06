@@ -248,6 +248,7 @@ The capabilities object:
 | `limits` | the host's limits (§13), such as `{"resources": <bytes>, "surfaces": <count>}` |
 | `net` | the host's network policy (§7.2), from directive to sources, such as `{"img-src": ["https://example.com"]}`. Absent or empty: the host fetches nothing from the network |
 | `passthrough` | `true` when the pointer passes through the parts of a surface that take no pointer (§9.3). Absent: every window takes the pointer wherever it is |
+| `scroll` | `true` when a document can ask to scroll (`scroll`, §5.1, §5.3). Absent: nothing in a surface scrolls |
 | `host` | optional: a name for the implementation |
 | `version` | optional, with `host`: the implementation's version, as dot-separated numbers compared one by one (`"0.0.10"` is after `"0.0.9"`) |
 
@@ -261,7 +262,7 @@ A **surface** is one HTML document, named by the program, and at most one
 ### 5.1 Documents: `a=doc`
 
 ```
-ESC ] 7279 ; a=doc:s=<name>[:d=1] ; <HTML> ST
+ESC ] 7279 ; a=doc:s=<name>[:d=1][:scroll=<axes>] ; <HTML> ST
 ```
 
 - The payload is an HTML document or a fragment, parsed with the HTML parsing
@@ -271,6 +272,11 @@ ESC ] 7279 ; a=doc:s=<name>[:d=1] ; <HTML> ST
   nothing from a document, even one it keeps changing with deltas, gives it
   up in the same command. A document sent without `d=1` makes the surface
   the program's, whether it was detached or not.
+- `scroll` lets the document scroll (§5.3) along the axes it names, a
+  bitmask: `1` vertically, `2` horizontally, `3` both. Absent or anything
+  else, it does not scroll. Like `d`, it belongs to the document: a new
+  document sent without it does not scroll. A host without `scroll` in its
+  capabilities ignores it (§15).
 - The document's `<base href>` sets its base URL (§7.3), and its
   `<meta name="hotty-network">` asks for network access (§7.2).
 - The host applies its stylesheet (§8) and the security rules (§12) before
@@ -355,7 +361,8 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   windows overlap, the topmost (§5.2, `z`). A press with Alt held is the
   exception: it passes every surface (§9.2). On a host with `passthrough`,
   so does the pointer over the parts of a window that take none (§9.3).
-- **What does not fit is clipped, and nothing in a surface scrolls.**
+- **What does not fit is clipped, and a surface scrolls only where its
+  document asks** (`scroll`, §5.1). Along an axis it did not ask for:
   - The host **MUST** clip overflow as `overflow: hidden` does: the
     document's root, and any element whose `overflow` is `auto` or
     `scroll`.
@@ -366,8 +373,23 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   - **A program that needs to scroll** does it the way it scrolls cells:
     it hears the terminal's wheel input (below) and moves its surfaces.
     A surface partly out of view shows its visible part through a window
-    (§5.2). So the whole screen scrolls, with its surfaces in it. A
-    surface never scrolls on its own, however small.
+    (§5.2). So the whole screen scrolls, with its surfaces in it.
+- **A scrolling document** scrolls along the axes it asked for as a page
+  does in a browser:
+  - Its root, and any element whose `overflow` is `auto` or `scroll`,
+    scroll their overflow, with the host's scrollbars. CSS
+    `scrollbar-width`, `scrollbar-color` and `scrollbar-gutter` apply, and
+    a scrollbar takes pixels inside the rectangle, never cells: the
+    footprint stays the program's.
+  - The user scrolls it with a wheel, a touchpad or a touch drag over its
+    window, and with the keys a browser scrolls with while the surface has
+    the keyboard (§10). Focus scrolls an element into view.
+  - A gesture scrolls the innermost element under the pointer that can
+    still move that way. Where none can, it goes on outward, and past the
+    root to the terminal, as if over the cells beneath (§9), unless CSS
+    `overscroll-behavior` stops it there.
+  - Scrolling is local: the program hears nothing of it. A delta keeps the
+    offsets (§6.2), and a new document starts at the top left.
 - When the cell size changes (a zoom or a font change), the rectangle keeps
   its cells and changes its pixels. The host lays the document out again,
   with no involvement from the program, and sends `resize` (§9).
@@ -683,11 +705,11 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 
 | `e` | when | detail |
 | --- | --- | --- |
-| `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `{"href": …, "url": …}` for links (below); `{"value": …}` when the element has a `value` attribute; otherwise none |
+| `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `area`, the element's cells (below); with `href` and `url` for links (below), and `value` when the element has a `value` attribute |
 | `change` | a checkbox or radio button toggled; a text control, `textarea` or `select` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": …, "value": …}` for checkboxes and radio buttons, `{"value": …}` otherwise |
 | `input` | every edit of a control with `data-on~=input` | `{"value": …}` |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields as an object of names to values, the submitter's included |
-| `press` | the primary button pressed, or a tap, anywhere in the window of a surface placed with `p=1` (§5.2), except with Alt held (§9.2) and where the pointer passes through (§9.3) | none |
+| `press` | the primary button pressed, or a tap, anywhere in the window of a surface placed with `p=1` (§5.2), except with Alt held (§9.2) and where the pointer passes through (§9.3) | `area`, the cells of the element `t` names (below); none when `t` is empty |
 | `dragstart` | a mouse's or a pen's primary button pressed on an element with `data-on~=drag` (§9.1), without Alt (§9.2) | `{"c": …, "r": …, "keys": […]}`: the pointer's cell and the keys held (§9.1) |
 | `drag` | during a drag, the element under the pointer changed (§9.1) | the same |
 | `dragend` | the drag ended: the button released, wherever the pointer is (§9.1) | the same |
@@ -700,6 +722,16 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   of the click outward, that is one of those kinds. If it has no `id`,
   nothing is reported: the id is the program's handle. A link is the
   exception: its `href` is the handle, and `t` is then empty.
+- **Where the element is.** A `click`'s and a `press`'s `area` is
+  `{"c": …, "r": …, "w": …, "h": …}`: the cells the element's border box
+  covers as the user sees it, scrolled (§5.3) included. `c` and `r` are the
+  first column and row it touches, counted from 0 at the surface's top left
+  cell as a drag's are (§9.1), and `w` and `h` the columns and rows it
+  spans. An element partly clipped or scrolled away reports its whole
+  area, so `c` and `r` may be negative or past the surface. A click from
+  the keyboard carries it too. A program places what belongs next to the
+  element by it, as a browser places a select's list or a menu by its
+  control.
 - **A press** is reported whatever it lands on: a control, an element with
   a handler, plain text, or empty space. `t` is the id of the nearest
   element that has one, from the pressed element outward, and empty if
@@ -738,13 +770,14 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
     text cursor over text). Over a hyperlink it shows what it shows over
     an OSC 8 hyperlink;
   - selecting text, where CSS `user-select` allows it (§11).
-- **Gestures that scroll are the terminal's.** A wheel, a touchpad's
-  scroll, or a touch drag over a surface does what it would do over the
-  cells beneath it. That is scrollback, or on the alternate screen, the
-  program's wheel input. The host **MUST** pass them on, with the position
-  of the pointer or the finger. Taps, clicks, long presses, and a mouse's
-  or a pen's drags (§9.1) stay the surface's, unless they begin with Alt
-  held (§9.2).
+- **Gestures that scroll are the terminal's,** except over a document that
+  scrolls (§5.3), which takes them while it can move that way. A wheel, a
+  touchpad's scroll, or a touch drag over any other surface does what it
+  would do over the cells beneath it. That is scrollback, or on the
+  alternate screen, the program's wheel input. The host **MUST** pass them
+  on, with the position of the pointer or the finger. Taps, clicks, long
+  presses, and a mouse's or a pen's drags (§9.1) stay the surface's, unless
+  they begin with Alt held (§9.2).
 - **The detail** is a JSON value, base64-encoded. Values are the program's
   (§7): an `href` is reported as the document has it.
 - **Unknown kinds.** A program **MUST** ignore an event whose kind it does
@@ -1364,17 +1397,28 @@ program → CSI ? 2026 l
 - **Why hide:** sending a document and laying it out costs far more than
   placing it. A program scrolling through many surfaces keeps the ones that
   will come back, and only it knows which those are.
-- **Why nothing scrolls:** a surface is a rectangle of the program's
-  choosing, as an image is.
-  - A scrollbar would change the layout's width from host to host.
-  - A scroll inside a surface would compete with the terminal's for the
-    same wheel or drag. The user could not tell which one a gesture
-    moves.
-  - On a touch screen, a surface that takes drags traps the finger: the
-    screen stops scrolling wherever a surface is.
-
-  The terminal owns scrolling, and a surface's content is whatever the
-  program lays out.
+- **Why nothing scrolls unless it asks:** a surface is a rectangle of the
+  program's choosing, as an image is.
+  - A scroll inside a surface competes with the terminal's for the same
+    wheel or drag, and on a touch screen a surface that takes drags traps
+    the finger. So the terminal owns scrolling by default, and a surface's
+    content is whatever the program lays out.
+  - Some content cannot be laid out to fit: a select's list longer than
+    the screen, a log beside a form. Paging it by placing windows (§5.2)
+    on every wheel step costs a round trip per step. A document that asks
+    scrolls locally, as a page's element does, and hands a gesture back
+    to the terminal at its end, as a browser chains it to the page.
+  - **Per axis,** because a list scrolls down and a wide table across, and
+    an axis a document did not ask for keeps the default.
+  - **On the document,** because whether content scrolls is the content's
+    nature, as `overflow` is, while the placement only chooses where it
+    shows.
+  - **Scrollbars take pixels, not cells,** so a scrollbar's width, which
+    differs between hosts, changes no footprint (§5.3).
+- **Why `area`:** a program that shows something next to an element (a
+  select's list in a surface of its own, a menu) needs to know where the
+  element is, and only the host lays the document out. Terminals call a
+  rectangle of cells an area (DEC's rectangular-area operations).
 
 ## Appendix C. Prior art
 
