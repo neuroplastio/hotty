@@ -3777,6 +3777,1364 @@
      ]
     }
    ]
+  },
+  {
+   "name": "click and press report area: the cells the element's border box covers, from the surface's top left cell; a press with no id has none",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i{position:absolute;display:block;height:var(--hotty-cell-h);font-style:normal;font-weight:normal}</style><b id=b data-on=click value=v style=\"left:calc(2*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w));height:calc(2*var(--hotty-cell-h))\">B</b><i id=h data-on=click style=\"left:calc(7.5*var(--hotty-cell-w));top:0;width:calc(2*var(--hotty-cell-w))\"><u>h</u></i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "4",
+      "p": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "area": {
+         "c": 2,
+         "r": 1,
+         "w": 3,
+         "h": 2
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "value": "v",
+        "area": {
+         "c": 2,
+         "r": 1,
+         "w": 3,
+         "h": 2
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "h",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "area": {
+         "c": 7,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "area": {
+         "c": 7,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      15,
+      3
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "",
+       "detail": null
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "area counts from the surface's top left cell, not its window's",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><b id=e data-on=click style=\"position:absolute;display:block;left:calc(4*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(2*var(--hotty-cell-w));height:var(--hotty-cell-h)\">e</b>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "4",
+      "x": "2",
+      "y": "1",
+      "w": "10",
+      "h": "3",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "e",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "e",
+       "detail": {
+        "area": {
+         "c": 4,
+         "r": 2,
+         "w": 2,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a click from the keyboard carries area too, a link's with its href; an element the surface clips reports its whole area, past the surface's edges",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}button,a{position:absolute;display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit}</style><button id=k style=\"left:calc(-1*var(--hotty-cell-w));top:calc(3*var(--hotty-cell-h));width:calc(4*var(--hotty-cell-w));height:calc(2*var(--hotty-cell-h))\">k</button><a href=next style=\"left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w));height:var(--hotty-cell-h)\">next</a>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "k",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": -1,
+         "r": 3,
+         "w": 4,
+         "h": 2
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "Tab",
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "href": "next",
+        "area": {
+         "c": 10,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "scroll=1 scrolls the document down and up, not across; a gesture past its end, or across, goes on to the terminal; area is where the user sees the element",
+   "requires": "scroll",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#w{width:calc(40*var(--hotty-cell-w))}</style><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div><div id=w>w</div><div id=z>z</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "p": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      1
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 1,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 1,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      20,
+      0
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 1,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      -20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 1,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      -20
+     ],
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "scroll=2 scrolls the document across, not down",
+   "requires": "scroll",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "2",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0;width:calc(30*var(--hotty-cell-w));height:calc(10*var(--hotty-cell-h))}i{position:absolute;top:0;display:block;height:var(--hotty-cell-h);width:calc(2*var(--hotty-cell-w))}</style><i id=a style=\"left:0\">a</i><i id=u style=\"left:calc(20*var(--hotty-cell-w))\">u</i><i id=p style=\"left:calc(28*var(--hotty-cell-w))\">p</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "p": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 2,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      40,
+      0
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "u",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 2,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      8,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "p",
+       "detail": {
+        "area": {
+         "c": 8,
+         "r": 0,
+         "w": 2,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      40,
+      0
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      -40,
+      0
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      -40,
+      0
+     ],
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a gesture scrolls the innermost element under the pointer that can still move that way; at its end the next one scrolls the root; at the root's, the terminal",
+   "requires": "scroll",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#box{height:calc(3*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w));overflow:auto}</style><div id=a>a</div><div id=box><div id=b0>b0</div><div id=b1>b1</div><div id=b2>b2</div><div id=b3>b3</div><div id=b4>b4</div><div id=b5>b5</div><div id=b6>b6</div><div id=b7>b7</div></div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "p": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "b1",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 2,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "b6",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 2,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 2,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      -20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "b6",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 2,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      -20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "b1",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 2,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "overscroll-behavior: contain stops a gesture where it is set: past the element's end it scrolls neither the root nor the terminal",
+   "requires": "scroll",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>html{overscroll-behavior:contain}body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#box{height:calc(3*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w));overflow:auto;overscroll-behavior:contain}</style><div id=a>a</div><div id=box><div id=b0>b0</div><div id=b1>b1</div><div id=b2>b2</div><div id=b3>b3</div><div id=b4>b4</div><div id=b5>b5</div><div id=b6>b6</div><div id=b7>b7</div></div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "p": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      8,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "d",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a delta keeps the scroll offsets; a new document starts at the top left, and one without scroll=1, 2 or 3 does not scroll",
+   "requires": "scroll",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div><div id=i>i</div><div id=j>j</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "p": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "text",
+      "t": "a",
+      "q": "2"
+     },
+     "payload": "A",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "attr",
+      "t": "j",
+      "k": "title",
+      "q": "2"
+     },
+     "payload": "last",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div><div id=i>i</div><div id=j>j</div>",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div><div id=i>i</div><div id=j>j</div>",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "4",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div><div id=i>i</div><div id=j>j</div>",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "while the surface has the keyboard, the keys a browser scrolls with scroll the document; where nothing can move that way, the key goes on to the program",
+   "requires": "scroll",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><button id=k>k</button><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "k",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": -5,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Home",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "Home",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "ArrowUp",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "ArrowRight",
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "focus scrolls an element into view",
+   "requires": "scroll",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div><div id=i>i</div><button id=k>k</button>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "k",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 3,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "Home",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 9,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
   }
  ],
  "wire": [

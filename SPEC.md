@@ -1194,10 +1194,11 @@ A host conforms to HOTTY version 0.1 when:
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
 The vectors check replies, error codes, every delta op, morph, context
-parsing, resources, drags, presses with Alt, `fit`, hover and the
-envelope. They inspect documents and events, not pixels. The vectors marked
-`"passthrough"` apply to a host that reports it (§9.3), and those marked
-`"hover"` to a host whose `events` list it (§9.4).
+parsing, resources, drags, presses with Alt, `fit`, hover, `area`,
+scrolling and the envelope. They inspect documents and events, not pixels.
+The vectors marked `"passthrough"` apply to a host that reports it (§9.3),
+those marked `"hover"` to a host whose `events` list it (§9.4), and those
+marked `"scroll"` to a host that reports it (§5.3).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
@@ -1207,9 +1208,11 @@ To be tested, a host exposes a way to *inspect* an element, reporting:
 
 It also lets a test move a mouse's pointer to the centre of an element, or
 of a cell of a surface, press and release its primary button there, with
-modifier keys held, and take the pointer out of the terminal's window. A
-host with `passthrough` also tells the test whether each of those reached
-the surface or passed through it.
+modifier keys held, turn its wheel there, take the pointer out of the
+terminal's window, and press keys where the keyboard is. A host with
+`passthrough` also tells the test whether each of those reached the surface
+or passed through it, and a host with `scroll` whether a wheel or a key
+went on to the terminal.
 
 This is a test interface, not part of the wire protocol.
 

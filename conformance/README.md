@@ -30,8 +30,9 @@ too little.
 Each vector starts on a fresh host. A vector with `"requires"` applies only
 to a host that has what it names, and others skip it: `"passthrough"`, a
 host that reports `passthrough` (SPEC §4, §9.3); `"hover"`, a host that
-lists `hover` in `events` (§9.4). A list names several, all required. Its
-steps come in three kinds.
+lists `hover` in `events` (§9.4); `"scroll"`, a host that reports `scroll`
+(§4, §5.3). A list names several, all required. Its steps come in four
+kinds.
 
 **Send** `{ "send": {control}, "payload": text?, "reply": …, "events": … }`:
 the command goes to the host as the program would send it. It is
@@ -69,19 +70,41 @@ checked).
   it was on, as a terminal does: that one is left first (SPEC §9.4).
 - `"down"` and `"up"` press and release the primary button where the
   pointer is.
+- `"wheel"` turns the wheel where the pointer is, by `"by": [c, r]`, columns
+  and rows of the surface (positive: right and down), a cell's pixels each.
+  It is one gesture: a runner may send it as several wheel events (a
+  browser scrolls no more than a page for one), lets what it scrolls come
+  to rest before the step's events are read, and lets the gesture end
+  before the next step, so each wheel step is a gesture of its own.
 - `"leave"` takes the pointer out of the terminal's window.
 - `"keys"`: the modifier keys held during the step (`shift`, `ctrl`, `alt`,
   `meta`); none when absent.
 - `"through"`: `true` if the step passes through the surface (SPEC §9.3),
   `false` if the surface gets it. Absent: not checked.
+- `"terminal"`, for a wheel: `true` if the gesture went on to the terminal,
+  as over the cells beneath (SPEC §9), `false` if it did not (the document
+  scrolled, or `overscroll-behavior` stopped it, §5.3). Absent: not
+  checked.
 - `"events"`: every event (`a=ev`) the step makes the host send, in order,
   and nothing more. Each is compared as a reply is: every key but `detail`
   with the event's control, and `detail`, when present, with its JSON body
-  (equal as JSON values). Absent: events are not checked.
+  (equal as JSON values; `null` when the event has none). Absent: events
+  are not checked.
+
+**Key** `{ "key": name, "keys": [ … ], "terminal": …, "events": [ … ] }`: a
+key pressed and released where the keyboard is (SPEC §10): on the surface
+that has it, or else on the terminal. `name` is the key as the DOM's
+`KeyboardEvent.key` has it (`"Enter"`, `"Tab"`, `"End"`, `"ArrowDown"`).
+`"keys"` are the modifier keys held, as for a pointer step. `"terminal"`:
+`true` if the key reached the program as terminal input (§10.2), `false` if
+the surface used it; absent, not checked. `"events"` as for a pointer step.
 
 The documents of pointer steps size their elements in cells
 (`--hotty-cell-w`, `--hotty-cell-h`, SPEC §8), and point at centres that lie
-well inside a cell, so the cell reported is the same on every host.
+well inside a cell, so the cell reported is the same on every host. Wheels
+and keys scroll a document to an end, or bring an element into view where
+any alignment ends at the same offset, never by a distance: how far a
+wheel's notch or an arrow key moves differs between hosts.
 
 A host never compresses what it sends (SPEC §3.3): a runner checks that no
 reply or event it reads carries `o`.
