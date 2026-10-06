@@ -686,9 +686,10 @@ contains at least:
 }
 body { margin: 0; }
 
-/* Controls in the terminal's colours. */
-input:not([type=checkbox], [type=radio], [type=range]), textarea, select,
-button {
+/* Controls in the terminal's colours. :where() keeps this rule below the
+   state rules after it, such as :disabled. */
+:where(input:not([type=checkbox], [type=radio], [type=range]), textarea,
+       select, button) {
   color: var(--hotty-fg);
   background: var(--hotty-bg);
   border: 1px solid var(--hotty-ansi-8);
