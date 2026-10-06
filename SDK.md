@@ -203,6 +203,8 @@ the program (compression), so the `encode` vectors compare bytes.
 - **Compression is the program's choice.** An SDK **MAY** compress a payload
   with zlib and mark it `o=z`, and then only a payload of 256 bytes or more,
   and only when compressing makes it smaller. `o=z` follows the other keys.
+- **`o` and `m` are Encode's.** A control given with either goes out
+  without it, and Encode sets them as this section says.
 - **Chunks.** A payload whose base64 is longer than 4096 bytes is split
   into chunks of exactly 4096, the last one excepted. Nothing of 4096 or
   less is chunked.

@@ -175,7 +175,7 @@ def run_encode(v):
     m = results[-1][1]
     if m.payload != payload:
         return False, "payload differs after the round trip"
-    if list(m.control) != [k for k, _ in v["control"]]:
+    if list(m.control) != [k for k, _ in v["control"] if k not in ("m", "o")]:
         return False, f"control keys {list(m.control)}"
     return True, ""
 

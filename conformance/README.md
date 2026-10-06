@@ -158,7 +158,7 @@ output must be exactly that: these are payloads that cannot be compressed,
 under 256 bytes or random. With `chunks`, it is split into sequences, and
 each one's control (between `ESC ] 7279 ;` and `;`) and base64 length must
 match. Every case must also decode back to the payload, with the control's
-keys in order.
+keys in order, but `m` and `o`, which are Encode's (SDK.md §3.3).
 
 **Decode** `{ "seqs": [ text, … ], "results": [ … ], "invalid": n,
 "messages": [ … ] }`: each sequence goes to one Decoder's `Feed`, in order.

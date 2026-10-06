@@ -112,7 +112,8 @@ def encode(control, payload=b"", compress=True):
     (key, value) pairs, in the order they are sent. Values are cleaned
     (`clean_value`); a payload of 256 bytes or more is compressed when that
     makes it smaller; a base64 payload longer than 4096 is chunked at exactly
-    4096."""
+    4096. The keys `o` and `m` are Encode's: a control given with them goes
+    out without them."""
     if isinstance(payload, str):
         payload = payload.encode()
     pairs = list(control.items()) if isinstance(control, dict) else list(control)
@@ -125,6 +126,8 @@ def encode(control, payload=b"", compress=True):
     quiet = None
     parts = []
     for k, v in pairs:
+        if k in ("o", "m"):
+            continue  # Encode's to set
         v = clean_value(v)
         parts.append(f"{k}={v}")
         if k == "q":
