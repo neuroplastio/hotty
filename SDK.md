@@ -430,6 +430,11 @@ read the detail, each absent when the event does not carry it:
 | `Hover()` | `c` and `r`, or out | `hover` |
 | `Area()` | `area`: `c`, `r`, `w` and `h`, the element's cells; absent unless all four are whole numbers | `click`, `press` |
 
+A count of cells in a detail (`FitRows`, `Drag`, `Hover` and `Area`) is a
+whole number: a JSON number with no fractional part, however it is written.
+JSON has one kind of number, so `2.0` is `2`. `2.5`, or a value that is not
+a number, leaves the accessor absent.
+
 **`Caps`** (SPEC.md §4) has every field SPEC.md lists: `V`, `Ops`,
 `Events`, `Cell` (`w`, `h`), `Scale`, `Scheme`, `Limits`, `Net`,
 `Passthrough`, `Scroll`, `Host`, `Version`. Each field is read on its own (§2.7). It
@@ -678,7 +683,7 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Detach`, `Focus`, `Blur`, `Sync` | the same | `detach`, `focus`, `blur`, `sync` | as Python | as Python | `detach`, `focus`, `blur`, `sync` |
 | `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor }` |
 | `N`, `Q`, `Detached`, `Scroll` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)` | `n=`, `q=`, `detached=`, `scroll=` | `{ n = …, q = …, detached = …, scroll = … }` | builder methods | `{ n, q, detached, scroll }` |
-| `ScrollVertical`, `ScrollHorizontal` | `hotty.ScrollVertical`, `hotty.ScrollHorizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `scroll_vertical`, `scroll_horizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` |
+| `ScrollVertical`, `ScrollHorizontal` | `hotty.ScrollVertical`, `hotty.ScrollHorizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` |
 | `Decoder.Feed`, `Invalid` | `(*Decoder).Feed`, `.Invalid` | `Decoder.feed`, `.invalid` | `decoder:feed` | `Decoder::feed` | `Decoder.feed` |
 | `Scanner`, `Detector` | `Scanner`, `Detector` | `Scanner`, `Detector` | `scanner`, `detector` | `Scanner`, `Detector` | `Scanner`, `Detector` |
 | `Holding`, `InSequence` | `(*Scanner).Holding`, `.InSequence` | `Scanner.holding`, `.in_sequence` | `scanner:holding`, `:in_sequence` | `Scanner::holding`, `::in_sequence` | `Scanner.holding`, `.inSequence` |

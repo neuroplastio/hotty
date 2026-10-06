@@ -430,6 +430,16 @@ def _is_int(v):
     return isinstance(v, int) and not isinstance(v, bool)
 
 
+def _whole(v):
+    """A count of cells: a number with no fractional part, 2.0 as 2
+    (SDK.md §3.9); None for anything else."""
+    if isinstance(v, bool) or not isinstance(v, (int, float)):
+        return None
+    if isinstance(v, float):
+        return int(v) if v.is_integer() else None
+    return v
+
+
 def _is_num(v):
     return isinstance(v, (int, float)) and not isinstance(v, bool)
 
@@ -480,14 +490,14 @@ class Event:
         return w, h
 
     def fit_rows(self):
-        r = self._d.get("r")
-        return r if self.kind == EVENT_FIT and _is_int(r) else None
+        r = _whole(self._d.get("r"))
+        return r if self.kind == EVENT_FIT else None
 
     def drag(self):
         if self.kind not in (EVENT_DRAG_START, EVENT_DRAG, EVENT_DRAG_END):
             return None
-        c, r, keys = self._d.get("c"), self._d.get("r"), self._d.get("keys", [])
-        if not (_is_int(c) and _is_int(r)):
+        c, r, keys = _whole(self._d.get("c")), _whole(self._d.get("r")), self._d.get("keys", [])
+        if c is None or r is None:
             return None
         return Drag(c, r, [k for k in keys if isinstance(k, str)] if isinstance(keys, list) else [])
 
@@ -496,17 +506,18 @@ class Event:
         if self.kind not in (EVENT_CLICK, EVENT_PRESS):
             return None
         a = self._d.get("area")
-        if not isinstance(a, dict) or not all(_is_int(a.get(k)) for k in "crwh"):
+        cells = [_whole(a.get(k)) for k in "crwh"] if isinstance(a, dict) else [None]
+        if None in cells:
             return None
-        return Area(a["c"], a["r"], a["w"], a["h"])
+        return Area(*cells)
 
     def hover(self):
         if self.kind != EVENT_HOVER:
             return None
         if self._d.get("out") is True:
             return Hover(out=True)
-        c, r = self._d.get("c"), self._d.get("r")
-        if not (_is_int(c) and _is_int(r)):
+        c, r = _whole(self._d.get("c")), _whole(self._d.get("r"))
+        if c is None or r is None:
             return None
         return Hover(c, r)
 

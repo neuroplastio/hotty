@@ -7083,6 +7083,76 @@
    ]
   },
   {
+   "name": "a count of cells may be written 2.0, which is 2; 2.5 is not one",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=fit:t=;eyJyIjo3LjB9\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=fit:t=;eyJyIjo3LjV9\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag:t=;eyJjIjoxLjAsInIiOi0yLjAsImtleXMiOltdfQ==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag:t=;eyJjIjoxLjUsInIiOjAsImtleXMiOltdfQ==\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "fit",
+      "t": ""
+     },
+     "event": {
+      "kind": "fit",
+      "fit_rows": 7
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "fit",
+      "t": ""
+     },
+     "event": {
+      "kind": "fit",
+      "fit_rows": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "drag",
+      "t": ""
+     },
+     "event": {
+      "kind": "drag",
+      "drag": {
+       "c": 1,
+       "r": -2,
+       "keys": []
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "drag",
+      "t": ""
+     },
+     "event": {
+      "kind": "drag",
+      "drag": null
+     }
+    }
+   ]
+  },
+  {
    "name": "hover carries the cell, or out",
    "requires": [
     "event.hover"
@@ -7129,6 +7199,53 @@
        "r": null,
        "out": true
       }
+     }
+    }
+   ]
+  },
+  {
+   "name": "hover's cell may be written 3.0, which is 3; 3.5 is not one",
+   "requires": [
+    "event.hover"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ev:s=g:e=hover:t=c1;eyJjIjozLjAsInIiOjEuMH0=\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=hover:t=c1;eyJjIjozLjUsInIiOjF9\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "hover",
+      "t": "c1"
+     },
+     "event": {
+      "kind": "hover",
+      "target": "c1",
+      "hover": {
+       "c": 3,
+       "r": 1,
+       "out": false
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "hover",
+      "t": "c1"
+     },
+     "event": {
+      "kind": "hover",
+      "target": "c1",
+      "hover": null
      }
     }
    ]
@@ -7521,6 +7638,54 @@
      "event": {
       "kind": "click",
       "target": "go",
+      "area": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "an area may be written 2.0, which is 2; one with 5.5 in it is not read",
+   "requires": [
+    "event.area"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=click:t=env;eyJhcmVhIjp7ImMiOjIuMCwiciI6MC4wLCJ3IjoxMi4wLCJoIjoxLjB9fQ==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press:t=title;eyJhcmVhIjp7ImMiOjEsInIiOjAsInciOjUuNSwiaCI6MX19\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "env"
+     },
+     "event": {
+      "kind": "click",
+      "target": "env",
+      "area": {
+       "c": 2,
+       "r": 0,
+       "w": 12,
+       "h": 1
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press",
+      "t": "title"
+     },
+     "event": {
+      "kind": "press",
+      "target": "title",
       "area": null
      }
     }
