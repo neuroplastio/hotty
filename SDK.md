@@ -340,6 +340,10 @@ none (§2.8), but the wire layer has one all the same.
   them), and a HOTTY sequence in progress. Everything else goes out in the
   same `Feed` that brought it. So the segments do not depend on how the
   stream was split, and a key is never kept waiting for the next read.
+- **`Holding()`** returns what it holds, and **`InSequence()`** whether
+  that is a HOTTY sequence in progress (or one too long, being dropped),
+  which the next `Feed` goes on with, rather than the start of a segment,
+  which a program reading keys may flush after a moment as typing.
 - **An ESC inside a HOTTY sequence** that does not begin its ST ends the
   sequence unfinished: the sequence is dropped as malformed, and the ESC
   begins what comes next.
@@ -646,14 +650,14 @@ every SDK section.
 
 | SDK | language | wire layer | SDK layer |
 | --- | --- | --- | --- |
-| [hotty-go](https://github.com/neuroplastio/hotty-go) | Go | the reference; lacks the Scanner, the Detector as a public component, `Caps.Passthrough` and `Caps.Version`, lenient capabilities, `Sends` for `dragstart` and `dragend`, unordered reply options, and counting a malformed message that aborts a chunked one twice | `hottyterm`, `hottytea`, `hottytest` |
+| [hotty-go](https://github.com/neuroplastio/hotty-go) | Go | the reference; complete, with what a relay writes as a host (replies, events, `Message.Placement`, `CursorBelow`) | `hottyterm`, `hottytea`, `hottytest` |
 | `clients/python` (this repository) | Python | complete | `Hotty`, for the examples |
-| hotty.lua | Lua | planned, for Neovim and plx scripts | §4.2 |
+| [hotty-lua](https://github.com/neuroplastio/hotty-lua) | Lua | complete, under LuaJIT, Lua 5.1, Neovim and gopher-lua (plx's) | `hotty.nvim` (§4.2) |
 
-hotty-go's runner (`vectors_test.go`) runs the `build`, `encode` and
-`decode` sections, and skips the vectors that require what it lacks; `scan`
-and `detect` wait for its Scanner and Detector. plx's `sdk/hotty` (Go) is a relay's codec, to be
-replaced by hotty-go's. hotty-blitz's `hotty-wire` (Rust) is a host's.
+hotty-go's runner (`vectors_test.go`) and hotty-lua's (`tests/vectors.lua`,
+under each of its runtimes) run every SDK section and skip nothing. plx's
+`sdk/hotty` (Go) is a relay's codec, to be replaced by hotty-go's, which
+has all that plexos listed it uses. hotty-blitz's `hotty-wire` (Rust) is a host's.
 
 ---
 
@@ -676,7 +680,8 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `N`, `Q`, `Detached`, `Scroll` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)` | `n=`, `q=`, `detached=`, `scroll=` | `{ n = …, q = …, detached = …, scroll = … }` | builder methods | `{ n, q, detached, scroll }` |
 | `ScrollVertical`, `ScrollHorizontal` | `hotty.ScrollVertical`, `hotty.ScrollHorizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `scroll_vertical`, `scroll_horizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` |
 | `Decoder.Feed`, `Invalid` | `(*Decoder).Feed`, `.Invalid` | `Decoder.feed`, `.invalid` | `decoder:feed` | `Decoder::feed` | `Decoder.feed` |
-| `Scanner`, `Detector` | — | `Scanner`, `Detector` | `scanner`, `detector` | `Scanner`, `Detector` | `Scanner`, `Detector` |
+| `Scanner`, `Detector` | `Scanner`, `Detector` | `Scanner`, `Detector` | `scanner`, `detector` | `Scanner`, `Detector` | `Scanner`, `Detector` |
+| `Holding`, `InSequence` | `(*Scanner).Holding`, `.InSequence` | `Scanner.holding`, `.in_sequence` | `scanner:holding`, `:in_sequence` | `Scanner::holding`, `::in_sequence` | `Scanner.holding`, `.inSequence` |
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |
 | `FitRows`, `CellCSS` | `FitRows`, `CellCSS` | `fit_rows`, `cell_css` | as Python | as Python | `fitRows`, `cellCss` |
 

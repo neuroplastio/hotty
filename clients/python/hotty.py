@@ -700,6 +700,14 @@ class Scanner:
         """The bytes held for the next feed."""
         return self._held
 
+    @property
+    def in_sequence(self):
+        """Whether a HOTTY sequence is in progress, or one too long is being
+        dropped: the next feed goes on with it, and flush would drop it.
+        Otherwise what is held is the start of a segment, which a program
+        reading keys may flush after a moment, as typing (SDK.md §3.7)."""
+        return self._mode != self._GROUND
+
     def feed(self, data):
         out = []
         for b in data:

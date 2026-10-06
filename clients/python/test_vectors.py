@@ -300,6 +300,9 @@ def scan_once(v, data, cuts):
         segs += sc.feed(data[prev:c])
         prev = c
     held = sc.holding
+    # A sequence held is in progress; the start of a segment is not.
+    if held and sc.in_sequence != held.startswith(b"\x1b]7279;"):
+        held = b"in_sequence is " + str(sc.in_sequence).encode() + b" holding " + held
     flushed = sc.flush()
     return hotty._merge(segs), held, flushed, sc.invalid
 
