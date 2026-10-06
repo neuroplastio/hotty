@@ -550,10 +550,11 @@ frameworks get their own adapter, with the same responsibilities.
 - **Layout.** With each frame, the program says which surfaces it wants
   where: name, rectangle on the screen, an optional clip (the part of the
   screen the surface shows in, such as a scrolling region), `Keep`, `Z`,
-  `Press`, `Fit`, `Hover`, and a function that returns the document. The
-  Session sends only what changed:
-  - a document once, attached, with `q=1`, and again only when the host has
-    lost it;
+  `Press`, `Fit`, `Hover`, `Scroll` (the axes the host scrolls the document
+  along, §3.4.2), and a function that returns the document. The Session
+  sends only what changed:
+  - a document once, attached, with `q=1` and its `Scroll`, and again only
+    when the host has lost it or its `Scroll` changed;
   - a placement (`PlaceAt`) when its rectangle, window or options changed;
     a surface clipped to nothing is as good as not wanted;
   - for a surface no longer wanted, `Hide` if `Keep`, else `Del`.
