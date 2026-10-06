@@ -644,7 +644,7 @@ every SDK section.
 
 | SDK | language | wire layer | SDK layer |
 | --- | --- | --- | --- |
-| [hotty-go](https://github.com/neuroplastio/hotty-go) | Go | the reference; lacks the Scanner, the Detector as a public component, `Caps.Passthrough` and `Caps.Version`, lenient capabilities, `Sends` for `dragstart` and `dragend`, unordered reply options, counting a malformed message that aborts a chunked one twice, the `Scroll` option, `Event.Area()` and `Caps.Scroll` | `hottyterm`, `hottytea`, `hottytest` |
+| [hotty-go](https://github.com/neuroplastio/hotty-go) | Go | the reference; lacks the Scanner, the Detector as a public component, `Caps.Passthrough` and `Caps.Version`, lenient capabilities, `Sends` for `dragstart` and `dragend`, unordered reply options, and counting a malformed message that aborts a chunked one twice | `hottyterm`, `hottytea`, `hottytest` |
 | `clients/python` (this repository) | Python | complete | `Hotty`, for the examples |
 | hotty.lua | Lua | planned, for Neovim and plx scripts | §4.2 |
 
