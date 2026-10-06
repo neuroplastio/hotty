@@ -672,6 +672,7 @@ contains at least:
   --hotty-bg: …;                   /* and background */
   --hotty-ansi-0: …;               /* … the 16 ANSI colours … */
   --hotty-ansi-15: …;
+  --hotty-accent: var(--hotty-ansi-12);  /* dark; ansi-4 when light */
   --hotty-cell-w: …px;             /* one cell, in CSS pixels */
   --hotty-cell-h: …px;
   --hotty-font: <the terminal's font family>, monospace;
@@ -681,11 +682,38 @@ contains at least:
   color: var(--hotty-fg);
   background: var(--hotty-bg);
   overflow: hidden;                /* §5.3 */
+  accent-color: var(--hotty-accent);
 }
 body { margin: 0; }
+
+/* Controls in the terminal's colours. */
+input:not([type=checkbox], [type=radio], [type=range]), textarea, select,
+button {
+  color: var(--hotty-fg);
+  background: var(--hotty-bg);
+  border: 1px solid var(--hotty-ansi-8);
+}
+button:enabled, input:is([type=button], [type=submit], [type=reset]):enabled {
+  background: var(--hotty-ansi-8);
+}
+::placeholder, :disabled { color: var(--hotty-ansi-8); }
+:focus-visible { outline: 1px solid var(--hotty-accent); }
+:any-link { color: var(--hotty-accent); }
+::selection { color: var(--hotty-bg); background: var(--hotty-accent); }
 ```
 
 - `prefers-color-scheme` follows the terminal's scheme.
+- **The palette dresses the controls.** Fields, buttons, checks, focus,
+  links and selected text take the terminal's colours, not the engine's,
+  so they look the same on every host and like the terminal around them.
+  A document that styles its own controls wins, as with every rule here.
+  - `--hotty-accent` is the terminal's blue: `--hotty-ansi-12` when the
+    scheme is dark, `--hotty-ansi-4` when it is light, as plain blue is
+    hard to read on most dark backgrounds. A document may use it as the
+    terminal's accent.
+  - `ansi-8` (bright black) is the dim grey themes give for secondary
+    text: borders, buttons, placeholders and what is disabled. A disabled
+    button keeps the background, so its text stays legible.
 - When the terminal's theme, font or cell size changes, the host updates the
   stylesheet and draws every surface again.
 
@@ -1415,6 +1443,11 @@ program → CSI ? 2026 l
     shows.
   - **Scrollbars take pixels, not cells,** so a scrollbar's width, which
     differs between hosts, changes no footprint (§5.3).
+- **Why controls take the palette:** a field drawn in an engine's own
+  colours looks like a web page pasted into the terminal, and differs
+  between hosts (Chromium's and Blitz's greys are not the same). The 16
+  colours are the one palette every terminal theme designs for contrast,
+  so the host stylesheet draws controls with them and nothing else.
 - **Why `area`:** a program that shows something next to an element (a
   select's list in a surface of its own, a menu) needs to know where the
   element is, and only the host lays the document out. Terminals call a
