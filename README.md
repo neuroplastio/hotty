@@ -12,7 +12,6 @@ back to plain text where there is no host.
 ![HOTTY in one terminal: cells and HTML surfaces, events as deltas, charts, a scrolled document and scrolling cards.](demo.gif)
 
 [![status: 0.1 draft](https://img.shields.io/badge/status-0.1%20draft-orange)](#status)
-[![hosts: two that share no code](https://img.shields.io/badge/hosts-two%20that%20share%20no%20code-7a6cff)](#status)
 [![spec: CC BY 4.0](https://img.shields.io/badge/spec-CC%20BY%204.0-lightgrey)](LICENSE-CC-BY-4.0)
 [![code: Apache-2.0](https://img.shields.io/badge/code-Apache--2.0-blue)](LICENSE-APACHE)
 
