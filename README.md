@@ -9,7 +9,7 @@ lays them out and draws them into rectangles of cells. No script, no network, no
 browser: everything travels in-band, so it works over a pty and SSH, and falls
 back to plain text where there is no host.
 
-![HOTTY full screen in one terminal: the shell asks a form through askhot, plothot streams a chart, metrics pins a moment, a document scrolls, cards move in a feed, and an agent runs a diff, an approval and a load test.](demo.gif)
+![HOTTY full screen in one terminal: the shell asks a form through askhot, plothot streams a chart, a metrics chart is hovered and pinned, a document scrolls, cards move in a feed, and an agent runs a diff, an approval and a load test.](demo.gif)
 
 [![status: 0.1 draft](https://img.shields.io/badge/status-0.1%20draft-orange)](#status)
 [![spec: CC BY 4.0](https://img.shields.io/badge/spec-CC%20BY%204.0-lightgrey)](LICENSE-CC-BY-4.0)
