@@ -12,6 +12,10 @@ Clicks, changes and submits come back as events on the program's input.
 - Deltas are addressed by element id, so a change costs what it changes.
 - Programs can detect a host and fall back to plain text where there is none.
 
+The website, [hotty.neuroplast.io](https://hotty.neuroplast.io), is itself a
+terminal program: the tour, the demo apps and a toolkit of HOTTY tools, in a
+browser through xterm-addon-hotty or natively in hottyterm.
+
 **Status: version 0.1, a draft.** Versions 0.x may change incompatibly. Two
 implementations that share no code pass the conformance vectors:
 [hotty-blitz](https://github.com/neuroplastio/hotty-blitz), a renderer with a
@@ -34,10 +38,20 @@ xterm.js in a browser.
 
 | repository | what |
 | --- | --- |
+| `neuroplastio/hotty-demo` | the website, hotty.neuroplast.io: the tour, the demo apps and the toolkit, as one terminal program (native and WebAssembly) |
+| `neuroplastio/hottyterm` | a terminal that speaks HOTTY natively: a fork of Ghostty with hotty-blitz built in, installed as `brew install --cask neuroplastio/tap/hottyterm` (macOS on Apple silicon) or the AUR's `hottyterm-bin` (Arch on x86_64) |
 | `neuroplastio/hotty-blitz` | a renderer (Rust, on Blitz) with a C ABI for terminals, and `hotty run`, a polyfill that shows surfaces in any terminal with kitty graphics |
 | `neuroplastio/xterm-addon-hotty` | an xterm.js addon: the browser renders each surface in a sandboxed iframe |
 
 ## Try it
+
+With hottyterm, a terminal that speaks HOTTY natively (Homebrew:
+`brew install --cask neuroplastio/tap/hottyterm`; Arch's AUR:
+`yay -S hottyterm-bin`):
+
+```
+python3 examples/dash.py
+```
 
 With hotty-blitz built, in kitty, Ghostty, or any terminal with kitty
 graphics:
