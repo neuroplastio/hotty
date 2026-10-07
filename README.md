@@ -79,6 +79,8 @@ browser through xterm-addon-hotty or natively in hottyterm.
 | repository | what |
 | --- | --- |
 | `hotty` | this one: the protocol, its conformance vectors and the reference material |
+| [`hotty-go`](https://github.com/neuroplastio/hotty-go) | the Go SDK: the protocol, `hottytea` for Bubble Tea, `hottyterm` for command-line tools, and `hottytest`, a host for tests |
+| [`hotty-lua`](https://github.com/neuroplastio/hotty-lua) | the Lua SDK: the wire layer, `hotty.nvim` for Neovim and `hotty.plx` for plx scripts |
 | [`hotty-demo`](https://github.com/neuroplastio/hotty-demo) | the website, [hotty.neuroplast.io](https://hotty.neuroplast.io): the tour, the demo apps and the toolkit, as one terminal program (native and WebAssembly) |
 | [`hottyterm`](https://github.com/neuroplastio/hottyterm) | a terminal that speaks HOTTY natively: a fork of Ghostty with hotty-blitz built in, installed with Homebrew or the AUR |
 | [`hotty-blitz`](https://github.com/neuroplastio/hotty-blitz) | a renderer (Rust, on Blitz) with a C ABI for terminals, and `hotty run`, a polyfill that shows surfaces in any terminal with kitty graphics |
