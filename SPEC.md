@@ -20,20 +20,19 @@ the state and decides what every event means. The terminal is the view. A
 surface can do nothing the program did not send it, and can learn nothing
 the program did not give it.
 
-![hotty-demo, the HOTTY website, in xterm.js: the page's header and footer
-are surfaces around a terminal; a slide is shown in cells and then as HTML,
-with proportional type and a vector chart; a form takes typing and clicks,
-whose events come back as deltas; a card sits in a stream of cells and
-answers a click; a metrics chart is hovered and a moment pinned; a scrolled
-document holds a table and an SVG diagram; cards scroll as surfaces; and the
-page reveals that it is one terminal program.](demo.gif)
+![hotty-demo's demo apps, full screen in xterm.js: a metrics chart hovered for
+its values and a moment pinned, with a latency heatmap; a design document
+scrolled a row at a time, with a table and an SVG diagram and a comment typed
+on a block; cards, images and charts scrolling in a feed; and an agent's
+transcript with a diff, an approval the user gives and a load test.](demo.gif)
 
 *[hotty-demo](https://github.com/neuroplastio/hotty-demo), the HOTTY website
 ([hotty.neuroplast.io](https://hotty.neuroplast.io)), running in xterm.js with
 [xterm-addon-hotty](https://github.com/neuroplastio/xterm-addon-hotty), one of
-the two hosts that share no code and pass the conformance vectors. The header,
-the footer, the slides, the charts, the form, the table, the diagram and the
-cards are all HTML the program sent in-band, in the terminal's own output.*
+the two hosts that share no code and pass the conformance vectors. Every
+surface — the charts, the table, the diagram, the cards, the diff, the
+approval — is HTML the program sent in-band, in the terminal's own output;
+the cells around them are the program's too.*
 
 ## Contents
 
