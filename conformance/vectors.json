@@ -5135,6 +5135,207 @@
      ]
     }
    ]
+  },
+  {
+   "name": "a focused text input edits with Backspace and Delete, and moves its caret with Left, Right, Home and End; the program hears none of them, nor Backspace in an empty input",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><form id=f><input id=reason name=reason data-on=input></form>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "reason",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "a",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "reason",
+       "detail": {
+        "value": "a"
+       }
+      }
+     ]
+    },
+    {
+     "key": "b",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "reason",
+       "detail": {
+        "value": "ab"
+       }
+      }
+     ]
+    },
+    {
+     "key": "c",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "reason",
+       "detail": {
+        "value": "abc"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Backspace",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "reason",
+       "detail": {
+        "value": "ab"
+       }
+      }
+     ]
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "reason",
+       "detail": {
+        "value": "abx"
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowLeft",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Delete",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "reason",
+       "detail": {
+        "value": "ab"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Home",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Delete",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "reason",
+       "detail": {
+        "value": "b"
+       }
+      }
+     ]
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "ArrowRight",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Backspace",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "reason",
+       "detail": {
+        "value": ""
+       }
+      }
+     ]
+    },
+    {
+     "key": "Backspace",
+     "terminal": false
+    },
+    {
+     "key": "B",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "reason",
+       "detail": {
+        "value": "B"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Backspace",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "reason",
+       "detail": {
+        "value": ""
+       }
+      }
+     ]
+    }
+   ]
   }
  ],
  "wire": [
