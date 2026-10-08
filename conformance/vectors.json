@@ -5580,7 +5580,16 @@
       "t": "b",
       "q": "2"
      },
-     "events": []
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "abcd"
+       }
+      }
+     ]
     },
     {
      "key": "End",
@@ -5597,6 +5606,119 @@
        "t": "b",
        "detail": {
         "value": "xy"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "there is one keyboard: a=focus on another surface takes it from the one that had it, which commits its value and sends blur, and keys go to the new one (SPEC \u00a710.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=a data-on=input>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "y",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=b data-on=input>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "y",
+      "c": "30",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "p",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "p"
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "y",
+      "t": "b",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "p"
+       }
+      },
+      {
+       "e": "blur",
+       "s": "x",
+       "t": ""
+      }
+     ]
+    },
+    {
+     "key": "q",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "y",
+       "t": "b",
+       "detail": {
+        "value": "q"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Backspace",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "y",
+       "t": "b",
+       "detail": {
+        "value": ""
        }
       }
      ]
