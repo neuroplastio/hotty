@@ -9995,6 +9995,15 @@
    ]
   },
   {
+   "name": "a modifier field below 2 is no modifier",
+   "input": "\u001b[1;0D\u001b[1;1C\u001b[1;D",
+   "keys": [
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowLeft"
+   ]
+  },
+  {
    "name": "a sequence the table does not name is no key",
    "input": "\u001b[200~\u001b[<0;10;5Ma",
    "keys": [
@@ -10146,9 +10155,9 @@
    "format": "ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward Home=line-start Control+a=line-start End=line-end Control+e=line-end Backspace=delete-char-backward Control+h=delete-char-backward Delete=delete-char-forward Control+d=delete-char-forward Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next PageUp=page-up PageDown=page-down Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end Control+m=newline"
   },
   {
-   "name": "a key bound twice keeps its first place and its last action; any white space separates",
-   "parse": "Control+a=line-start  Alt+b=word-backward\tControl+a=line-end\n",
-   "format": "Control+a=line-end Alt+b=word-backward"
+   "name": "a key bound twice keeps its first place and its last action; ASCII white space separates, other white space does not",
+   "parse": "Control+a=line-start  Alt+b=word-backward\tControl+a=line-end\n\u00a0Control+e=line-end\fAlt+f=word-forward\r",
+   "format": "Control+a=line-end Alt+b=word-backward Alt+f=word-forward"
   },
   {
    "name": "bindings a host ignores are dropped, and keys are canonical",

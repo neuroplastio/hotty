@@ -783,7 +783,7 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `ParseKey`, `DecodeKeys` | `hotty.ParseKey`, `hotty.DecodeKeys` | `parse_key`, `decode_keys` | as Python | as Python | `parseKey`, `decodeKeys` |
 | `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.format` |
 | `TerminalKeys` | `hotty.TerminalKeys` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` |
-| `Field`, `Do`, `Type` | `hottyedit.Field`, `(*Field).Do`, `.Type` | `Field`, `.do`, `.type` | `field`, `:do`, `:type` | `Field`, `do_action`, `type_text` | `Field`, `.do`, `.type` |
+| `Field`, `Do`, `Type` | `hottyedit.Field`, `(*Field).Do`, `.Type` | `Field`, `.do`, `.type` | `field`, `:do_action` (`do` is a keyword), `:type` | `Field`, `do_action`, `type_text` | `Field`, `.do`, `.type` |
 
 In the vectors, every name is in snake case: `place_at`, `keep_cursor`,
 `fit_rows`, `cell_css`.

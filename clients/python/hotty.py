@@ -1021,7 +1021,7 @@ def _mods(field):
         e = int(parts[1]) if len(parts) > 1 and parts[1] else 1
     except ValueError:
         return None, False
-    bits = m - 1
+    bits = max(m - 1, 0)
     mods = [n for n, b in (("Shift", 1), ("Alt", 2), ("Control", 4)) if bits & b]
     if bits & (8 | 32):
         mods.append("Meta")
@@ -1173,7 +1173,7 @@ class Keymap:
 def parse_keymap(value):
     """A data-keys value's bindings, without those a host ignores."""
     m = Keymap()
-    for b in value.split():
+    for b in re.split(r"[ \t\n\f\r]+", value):
         i = b.rfind("=")
         if i < 0:
             continue

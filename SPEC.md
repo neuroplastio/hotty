@@ -1097,7 +1097,9 @@ and leaves the others as they were. A program sets its keymap once, on an
 element that holds its fields, and a field that needs one key otherwise says
 only that.
 
-`data-keys` is a list of bindings separated by white space. A binding is
+`data-keys` is a list of bindings separated by ASCII white space (space,
+tab, line feed, form feed, carriage return), as HTML's space-separated
+tokens are. A binding is
 `key=action`, split at its last `=`: the key is named as §10.4 has it
 (`Control+a`, `Alt+ArrowLeft`, `Alt+==line-start` binds `Alt+=`), and the
 action is one of the table below. A host **MUST** ignore a binding whose key
@@ -1218,9 +1220,10 @@ binding that sends text) is each of them in turn.
 | `CSI 27 ; m ; c ~` (`modifyOtherKeys`) | the key whose code is `c`, with the modifiers in `m` |
 | `CSI c [: s [: b]] [; m [: e] [; t]] u`, and the kitty protocol's `CSI 1 ; m : e X` and `CSI n ; m : e ~` | the key whose code is `c`, with the modifiers in `m`; a release (`e` = 3) is no key |
 
-- **Modifiers `m`:** `m` − 1 is a sum of bits: 1 Shift, 2 Alt, 4 Control,
-  8 Meta (the kitty protocol's Super) and 32 Meta. Other bits (Hyper, Caps
-  Lock, Num Lock) name no modifier.
+- **Modifiers `m`:** absent, empty or below 2, no modifier. Otherwise `m` − 1
+  is a sum of bits: 1 Shift, 2 Alt, 4 Control, 8 Meta (the kitty protocol's
+  Super) and 32 Meta. Other bits (Hyper, Caps Lock, Num Lock) name no
+  modifier.
 - **Codes `c`:** 9 is Tab, 13 Enter, 27 Escape, 8 and 127 Backspace; another
   code below 57344 is the character with that code point, and the kitty
   protocol's codes from 57344 are the keys it gives them. A character key
