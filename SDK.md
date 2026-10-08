@@ -746,14 +746,17 @@ every SDK section, `edit` where it provides a Field.
 
 | SDK | language | wire layer | SDK layer |
 | --- | --- | --- | --- |
-| [hotty-go](https://github.com/neuroplastio/hotty-go) | Go | the reference; complete, with what a relay writes as a host (replies, events, `Message.Placement`, `CursorBelow`) | `hottyterm`, `hottytea`, `hottytest` |
+| [hotty-go](https://github.com/neuroplastio/hotty-go) | Go | the reference; complete, with what a relay writes as a host (replies, events, `Message.Placement`, `CursorBelow`) | `hottyterm`, `hottytea`, `hottytest`, `hottyedit` (§4.6) |
 | `clients/python` (this repository) | Python | complete | `Hotty`, for the examples |
 | [hotty-lua](https://github.com/neuroplastio/hotty-lua) | Lua | complete, under LuaJIT, Lua 5.1, Neovim and gopher-lua (plx's) | `hotty.nvim` (§4.2) |
 
-hotty-go's runner (`vectors_test.go`) and hotty-lua's (`tests/vectors.lua`,
-under each of its runtimes) run every SDK section and skip nothing. plx's
-`sdk/hotty` (Go) is a relay's codec, to be replaced by hotty-go's, which
-has all that plexos listed it uses. hotty-blitz's `hotty-wire` (Rust) is a host's.
+hotty-go's runners (`vectors_test.go`, and `hottyedit`'s for `edit`) run
+every SDK section and skip nothing. hotty-lua's (`tests/vectors.lua`, under
+each of its runtimes) and the Python client's count code points (§4.6) and
+skip only the vectors that require `graphemes`. plx's `sdk/hotty` (Go) is a
+relay's codec, to be replaced by hotty-go's, which has all that plexos
+listed it uses. hotty-blitz's `hotty-wire` (Rust) is a host's; its tests
+run the `keys`, `keymap` and `edit` sections.
 
 ---
 

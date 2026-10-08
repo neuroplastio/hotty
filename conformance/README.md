@@ -4,15 +4,24 @@
 
 The host sections (`vectors`, `wire`) are run by two hosts that share no
 code:
-- hotty-blitz: `crates/hotty-blitz/tests/conformance.rs`;
+- hotty-blitz: `crates/hotty-blitz/tests/conformance.rs`, which runs the
+  `keys`, `keymap` and `edit` sections too, the edits on a real surface;
 - xterm-addon-hotty: `tests/e2e/conformance.spec.ts` and
-  `tests/unit/conformance.test.ts`.
+  `tests/unit/conformance.test.ts` (with `keys`, `keymap` and `edit`).
+
+hotty-go's test host runs `vectors` too (`hottytest/conformance_test.go`).
 
 The SDK sections (`wire`, `build`, `encode`, `decode`, `scan`, `detect`,
 `keys`, `keymap`, `edit`; SDK.md §5) are run by:
 - the Python client: `clients/python/test_vectors.py`, every section;
-- hotty-go: `hotty_test.go` (`wire`) and `vectors_test.go` (`build`,
-  `encode`, `decode`).
+- hotty-go: `hotty_test.go` (`wire`), `vectors_test.go` (`build`,
+  `encode`, `decode`, `scan`, `detect`, `keys`, `keymap`) and
+  `hottyedit/field_test.go` (`edit`);
+- hotty-lua: `tests/vectors.lua`, every section, under each of its
+  runtimes.
+
+The Python client and hotty-lua count code points, not grapheme clusters
+(SDK.md §4.6), and skip the vectors that require `graphemes`.
 
 A disagreement is either a bug or a line of `SPEC.md` or `SDK.md` that says
 too little.
