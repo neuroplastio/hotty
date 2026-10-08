@@ -5441,6 +5441,167 @@
      ]
     }
    ]
+  },
+  {
+   "name": "a program's value reaches an input that is not focused, but not the focused one: attr, unattr and morph leave what the user typed (SPEC \u00a76.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=a data-on=input><input id=b data-on=input>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "60",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "a",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "a"
+       }
+      }
+     ]
+    },
+    {
+     "key": "b",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "ab"
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "attr",
+      "t": "a",
+      "k": "value",
+      "q": "2"
+     },
+     "payload": "zzz",
+     "events": []
+    },
+    {
+     "key": "c",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "abc"
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "unattr",
+      "t": "a",
+      "k": "value",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "morph",
+      "t": "a",
+      "q": "2"
+     },
+     "payload": "<input id=a data-on=input value=q>",
+     "events": []
+    },
+    {
+     "key": "d",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "abcd"
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "attr",
+      "t": "b",
+      "k": "value",
+      "q": "2"
+     },
+     "payload": "x",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "y",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "value": "xy"
+       }
+      }
+     ]
+    }
+   ]
   }
  ],
  "wire": [
