@@ -1067,14 +1067,16 @@ sent.
 ### 10.2 Keys
 
 While a surface has the keyboard, each key either goes to its focused element
-or reaches the program:
+or reaches the program. A host names the key as the program would read it
+(§10.4). A key the terminal turns into other input, such as a binding that
+sends text or a key the user remapped, is the key that input reads as.
 
-| focused element | keys it uses (unmodified, or with Shift only) |
+| focused element | keys it uses |
 | --- | --- |
-| text-like `input` | printable characters, Space, Backspace, Delete, Left, Right, Home, End, Enter |
-| `textarea`, `contenteditable` | the same, plus Up, Down, Page Up and Page Down |
-| `select` | printable characters, Space, Up, Down, Home, End, Page Up, Page Down, Enter |
-| `button`, `a`, `summary`, checkbox, radio button | Space and Enter |
+| text field: an `input` of type `text`, `search`, `url`, `tel`, `email`, `password` or `number` (or a type the host does not know, which is `text`), a `textarea`, an editing host (`contenteditable`) | the keys its keymap binds, and printable characters (below) |
+| an `input` of a date or time type | printable characters, Space, Backspace, Delete, the arrows, Home, End, Page Up, Page Down, Enter, unmodified or with Shift only |
+| `select` | printable characters, Space, Up, Down, Home, End, Page Up, Page Down, Enter, unmodified or with Shift only |
+| `button`, `a`, `summary`, checkbox, radio button | Space and Enter, unmodified or with Shift only |
 
 - **Tab and Shift+Tab** move between the surface's focusable elements. Past
   the last one, or before the first, the surface loses the keyboard: the
@@ -1085,6 +1087,87 @@ or reaches the program:
   keyboard encoding the program has enabled. A program's own keymap therefore
   keeps working while a surface holds the keyboard.
 
+#### Text fields
+
+A text field's **keymap** binds keys to editing actions. It is the default
+keymap, then the `data-keys` attribute of each element from the document's
+root down to the field, the field's own last. Each `data-keys` overrides what
+came before it key by key: a binding replaces the earlier binding of its key,
+and leaves the others as they were. A program sets its keymap once, on an
+element that holds its fields, and a field that needs one key otherwise says
+only that.
+
+`data-keys` is a list of bindings separated by white space. A binding is
+`key=action`, split at its last `=`: the key is named as §10.4 has it
+(`Control+a`, `Alt+ArrowLeft`, `Alt+==line-start` binds `Alt+=`), and the
+action is one of the table below. A host **MUST** ignore a binding whose key
+does not parse or whose action it does not know, and bindings of Tab,
+Shift+Tab and Escape, which keep their meaning above.
+
+The default keymap is:
+
+| key | action |
+| --- | --- |
+| ArrowLeft, ArrowRight | `char-backward`, `char-forward` |
+| Home, End | `line-start`, `line-end` |
+| Backspace, Delete | `delete-char-backward`, `delete-char-forward` |
+| ArrowUp, ArrowDown | `line-previous`, `line-next` |
+| PageUp, PageDown | `page-up`, `page-down` |
+| Enter | `submit` in an `input`, `newline` in a multi-line field |
+
+A key goes to the field's keymap:
+- **Bound:** the field does the action. A key bound to `program`, or to an
+  action the field does not have (a multi-line one in an `input`), reaches
+  the program.
+- **Not bound, with Shift:** the key is looked up again without Shift, so
+  Shift+ArrowLeft does what ArrowLeft does. A character shows Shift in
+  itself (`A`, §10.4), so this concerns the other keys.
+- **Not bound, a printable character** without Control, Alt and Meta: the
+  field types it at the caret.
+- **Otherwise** the key reaches the program.
+
+So a field uses only the keys its keymap names, and the characters it types:
+a key the program did not give the field stays the program's.
+
+The actions:
+
+| action | what it does |
+| --- | --- |
+| `char-backward`, `char-forward` | moves the caret one character back, or forward |
+| `word-backward` | moves the caret back over spaces, then over the word before them, to its start |
+| `word-forward` | moves the caret forward over spaces, then over the word after them, to its end |
+| `line-start`, `line-end` | moves the caret to the start, or the end, of its line |
+| `delete-char-backward`, `delete-char-forward` | deletes the character before the caret, or after it |
+| `delete-word-backward`, `delete-word-forward` | deletes from the caret to where `word-backward`, or `word-forward`, would move it |
+| `delete-to-line-start`, `delete-to-line-end` | deletes from the start of the caret's line to the caret, or from the caret to the end of its line |
+| `line-previous`, `line-next` † | moves the caret to the row above, or below, as near as it can to the place along the row where a run of these moves began; from the first row to the start of the value, from the last to its end |
+| `page-up`, `page-down` † | moves the caret as many rows up, or down, as the field shows, the same way |
+| `input-start`, `input-end` † | moves the caret to the start, or the end, of the value |
+| `newline` † | types a line break |
+| `submit` | submits the field's form, as Enter does in a text `input` (§9 `submit`) |
+| `program` | nothing: the key reaches the program |
+
+† Multi-line fields only: a `textarea` and an editing host.
+
+- **Characters** are grapheme clusters (Unicode UAX #29, extended), and a
+  line break (CR LF, LF or CR) is one. The caret stops at the value's ends.
+- **A space** is a character whose first code point has the Unicode
+  `White_Space` property; a line break is one. **A word** is a run of
+  characters that are not spaces.
+- **A line** is the text between line breaks; an `input`'s value is one
+  line. A **row** is a line as the field lays it out: a line that wraps is
+  several rows.
+- **A password field** (`type=password`) is one word: the word actions move
+  to, or delete to, the start or the end of the value.
+- **A selection**, which the user makes with the pointer, comes first:
+  typing replaces it, and a delete action deletes it and nothing else. A
+  move starts from its start when it goes back or up, and from its end
+  otherwise, and the selection goes; `char-backward` and `char-forward`
+  stop there.
+- **Selecting with keys** is not in this version: with Shift, a move moves
+  the caret as it does without (above).
+- **Every edit** is an edit for the `input` and `change` events (§9).
+
 ### 10.3 Key releases
 
 HOTTY has no key events of its own. A program that needs to know when a key is
@@ -1094,6 +1177,60 @@ without HOTTY.
 - The alternate screen keeps its own stack of keyboard flags, so a
   full-screen program enables them after switching to it.
 - A surface that does not have the keyboard does not affect the keys at all.
+
+### 10.4 Key names
+
+A key is named by its W3C UI Events key value, after the modifier keys held,
+each followed by `+`: `a`, `A`, `Enter`, `ArrowLeft`, `Control+a`,
+`Alt+Backspace`, `Control+Shift+ArrowRight`.
+- **Modifiers** are `Control`, `Alt`, `Meta` and `Shift`, written in that
+  order. A name read from a document may have them in any order.
+- **A character** is the one the key types. Shift shows in the character
+  (`A`, `!`), and is written only where it does not: `Shift+Enter`,
+  `Shift+Tab`. With Control, Alt or Meta, a letter with Shift is its capital
+  (`Control+A`), and `Shift` with a small letter is the capital
+  (`Control+Shift+a` reads as `Control+A`).
+- **`Space`** is the space bar's key value, a space, written so that it can
+  stand in a list (`Control+Space`). `+` is the plus key (`Control++`).
+
+A host names a key from what the terminal would send the program for it: the
+bytes of the keyboard encoding the program has set (legacy, xterm's
+`modifyOtherKeys`, or the kitty keyboard protocol), after the terminal's own
+bindings, read as this table says. A host that receives keys in another form
+names them so that the names are the same. Input that is several keys (a
+binding that sends text) is each of them in turn.
+
+| input | key |
+| --- | --- |
+| a printable character: one grapheme cluster, in UTF-8 | that character; `Space` for `0x20` |
+| `0x00` | `Control+Space` |
+| `0x01`–`0x1a`, but those below | `Control+a` … `Control+z` |
+| `0x08` | `Control+h` |
+| `0x09`, `0x0d`, `0x1b`, `0x7f` | `Tab`, `Enter`, `Escape`, `Backspace` |
+| `0x1c`–`0x1f` | `Control+\`, `Control+]`, `Control+^`, `Control+_` |
+| `ESC` before one of the above | that key, with Alt: `ESC b` is `Alt+b`, `ESC 0x7f` is `Alt+Backspace` |
+| `CSI A`, `B`, `C`, `D`; `SS3 A` … `D` | `ArrowUp`, `ArrowDown`, `ArrowRight`, `ArrowLeft` |
+| `CSI H`, `SS3 H`, `CSI 1 ~`, `CSI 7 ~` | `Home` |
+| `CSI F`, `SS3 F`, `CSI 4 ~`, `CSI 8 ~` | `End` |
+| `CSI 2 ~`, `CSI 3 ~`, `CSI 5 ~`, `CSI 6 ~` | `Insert`, `Delete`, `PageUp`, `PageDown` |
+| `CSI Z` | `Shift+Tab` |
+| `CSI 1 ; m X`, for each `X` above; `CSI n ; m ~` | the key above, with the modifiers in `m` |
+| `CSI 27 ; m ; c ~` (`modifyOtherKeys`) | the key whose code is `c`, with the modifiers in `m` |
+| `CSI c [: s [: b]] [; m [: e] [; t]] u`, and the kitty protocol's `CSI 1 ; m : e X` and `CSI n ; m : e ~` | the key whose code is `c`, with the modifiers in `m`; a release (`e` = 3) is no key |
+
+- **Modifiers `m`:** `m` − 1 is a sum of bits: 1 Shift, 2 Alt, 4 Control,
+  8 Meta (the kitty protocol's Super) and 32 Meta. Other bits (Hyper, Caps
+  Lock, Num Lock) name no modifier.
+- **Codes `c`:** 9 is Tab, 13 Enter, 27 Escape, 8 and 127 Backspace; another
+  code below 57344 is the character with that code point, and the kitty
+  protocol's codes from 57344 are the keys it gives them. A character key
+  with Shift is the shifted key `s` when given, else the text `t` when
+  given, else the capital of `c`; Shift is written only when that is `c`
+  itself (`Shift+1`).
+- **`ESC [` and `ESC O`** begin CSI and SS3. Alone, they are `Alt+[` and
+  `Alt+O`.
+- **Anything else,** such as a sequence this table does not name, is no key
+  a field uses: it reaches the program.
 
 ## 11. Text
 
@@ -1212,7 +1349,8 @@ A host conforms to HOTTY version 0.1 when:
 
 The vectors check replies, error codes, every delta op, morph, context
 parsing, resources, drags, presses with Alt, `fit`, hover, `area`,
-scrolling and the envelope. They inspect documents and events, not pixels.
+scrolling, keymaps and the envelope, and their `keys`, `keymap` and `edit`
+sections a host's key names (§10.4), keymaps and actions (§10.2). They inspect documents and events, not pixels.
 The vectors marked `"passthrough"` apply to a host that reports it (§9.3),
 those marked `"hover"` to a host whose `events` list it (§9.4), and those
 marked `"scroll"` to a host that reports it (§5.3).
@@ -1235,7 +1373,8 @@ This is a test interface, not part of the wire protocol.
 
 A library that speaks HOTTY for programs, an SDK, conforms when it meets
 [SDK.md](SDK.md) and passes the vectors' SDK sections: `build`, `encode`,
-`decode`, `scan` and `detect`.
+`decode`, `scan`, `detect`, `keys` and `keymap`, and `edit` where it edits
+fields (SDK.md §4.6).
 
 ---
 
@@ -1472,6 +1611,25 @@ program → CSI ? 2026 l
   select's list in a surface of its own, a menu) needs to know where the
   element is, and only the host lays the document out. Terminals call a
   rectangle of cells an area (DEC's rectangular-area operations).
+- **Why a field's keys are the program's.** A program that draws a field
+  in cells reads its keys from the terminal and edits the field as its own
+  keymap says. On a surface the same field is drawn by the host, and should
+  edit the same: the same keys, the same moves. The host cannot know which
+  keys the program binds, so the program says, in `data-keys`, and what it
+  does not give the field stays its own.
+  - **Named as the program reads them,** not as the platform does. The
+    terminal's bindings and the user's remapping decide what the program
+    reads (macOS terminals send Control+e for Cmd+→), and only that is the
+    same in cells and on a surface.
+  - **Inherited,** because a program has one keymap and many fields: it is
+    set once, and overridden where a field differs.
+  - **A small default,** the keys a field used before keymaps, so that a
+    program that names none loses none of its own.
+  - **Readline's actions,** with the words and lines of Bubble Tea's text
+    input and text area. Terminal programs share them, more or less, so a
+    program's cells and its surfaces can share one implementation
+    (SDK.md).
+  - **No selection by keys yet:** cells have no common way to show one.
 
 ## Appendix C. Prior art
 

@@ -1,5 +1,6 @@
 """Runs the conformance vectors' SDK sections against this client: wire,
-build, encode, decode, scan and detect (conformance/README.md).
+build, encode, decode, scan, detect, keys, keymap and edit
+(conformance/README.md).
 
     python3 clients/python/test_vectors.py [vectors.json]
 """
@@ -367,6 +368,42 @@ def run_detect(v):
     return True, ""
 
 
+# --- keys, keymap, edit --------------------------------------------------------
+
+
+def run_keys(v):
+    if "input" in v:
+        got = hotty.decode_keys(v["input"])
+        return got == v["keys"], f"{got!r}, want {v['keys']!r}"
+    got = hotty.parse_key(v["key"])
+    return got == v["canon"], f"{got!r}, want {v['canon']!r}"
+
+
+def run_keymap(v):
+    if "lookup" not in v:
+        got = hotty.parse_keymap(v["parse"] if "parse" in v else hotty.TERMINAL_KEYS).format()
+        return got == v["format"], f"{got!r}, want {v['format']!r}"
+    layers = ([hotty.TERMINAL_KEYS] if v.get("terminal_keys") else []) + v["keys"]
+    m = hotty.resolve(v["multiline"], *layers)
+    for key, want in v["lookup"].items():
+        got = m.lookup(key)
+        if got != want:
+            return False, f"{key!r}: {got!r}, want {want!r}"
+    return True, ""
+
+
+def run_edit(v):
+    f = v["field"]
+    fld = hotty.Field(f["value"], f["caret"], f.get("multiline", False), f.get("password", False), f.get("rows", 1))
+    for i, st in enumerate(v["steps"]):
+        changed = fld.do(st["do"]) if "do" in st else fld.type(st["type"])
+        got = {"value": fld.value, "caret": fld.caret, "changed": changed}
+        for k in ("value", "caret", "changed"):
+            if k in st and got[k] != st[k]:
+                return False, f"step {i} ({st.get('do', st.get('type'))!r}): {k} {got[k]!r}, want {st[k]!r}"
+    return True, ""
+
+
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "..", "..", "conformance", "vectors.json")
     data = json.load(open(path))
@@ -374,7 +411,8 @@ def main():
         print(f"the vectors are for {data['version']}, this client for {hotty.VERSION}")
         return 1
     skipped = 0
-    for section, run in (("wire", run_wire), ("build", run_build), ("encode", run_encode), ("decode", run_decode), ("scan", run_scan), ("detect", run_detect)):
+    for section, run in (("wire", run_wire), ("build", run_build), ("encode", run_encode), ("decode", run_decode), ("scan", run_scan), ("detect", run_detect),
+                         ("keys", run_keys), ("keymap", run_keymap), ("edit", run_edit)):
         for v in data.get(section, []):
             if not runs(v):
                 skipped += 1

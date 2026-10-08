@@ -8,8 +8,8 @@ code:
 - xterm-addon-hotty: `tests/e2e/conformance.spec.ts` and
   `tests/unit/conformance.test.ts`.
 
-The SDK sections (`wire`, `build`, `encode`, `decode`, `scan`, `detect`;
-SDK.md §5) are run by:
+The SDK sections (`wire`, `build`, `encode`, `decode`, `scan`, `detect`,
+`keys`, `keymap`, `edit`; SDK.md §5) are run by:
 - the Python client: `clients/python/test_vectors.py`, every section;
 - hotty-go: `hotty_test.go` (`wire`) and `vectors_test.go` (`build`,
   `encode`, `decode`).
@@ -94,8 +94,12 @@ checked).
 **Key** `{ "key": name, "keys": [ … ], "terminal": …, "events": [ … ] }`: a
 key pressed and released where the keyboard is (SPEC §10): on the surface
 that has it, or else on the terminal. `name` is the key as the DOM's
-`KeyboardEvent.key` has it (`"Enter"`, `"Tab"`, `"End"`, `"ArrowDown"`).
-`"keys"` are the modifier keys held, as for a pointer step. `"terminal"`:
+`KeyboardEvent.key` has it (`"Enter"`, `"Tab"`, `"End"`, `"ArrowDown"`,
+`"B"`). `"keys"` are the modifier keys held, as for a pointer step. The host
+names the key as SPEC §10.4 does: the modifiers before `name`, Shift left
+out before a character. A runner that gives the host keys by name uses that
+name; one that presses keys on a terminal gets it from the terminal's
+encoding, which, for the keys the vectors press, is the same. `"terminal"`:
 `true` if the key reached the program as terminal input (§10.2), `false` if
 the surface used it; absent, not checked. `"events"` as for a pointer step.
 
@@ -139,6 +143,7 @@ implements, and skips the rest:
 | `decode.abort-count` | a malformed message that aborts a chunked one counts twice (SPEC §3.7) |
 | `decode.unterminated` | `Feed` takes a sequence without its terminator |
 | `scanner.da1` | the Scanner's `da1` segments |
+| `graphemes` | text is split into grapheme clusters (UAX #29), not code points (SDK.md §4.6) |
 
 **Build** `{ "build": builder, "args": {…}, "options": {…}?, "out": [ … ] }`:
 the runner calls the builder with `args`, and with the reply options `n`
@@ -188,6 +193,30 @@ holds after the stream `held` (none when absent), what `Flush` returns
 `flush` (none when absent), and its count of dropped sequences `invalid`
 (0 when absent). A segment is `{ "pass": text }`, `{ "osc": text }` or `{
 "da1": text }`.
+
+**Keys** checks key names (SPEC §10.4, SDK.md §3.10), in two forms:
+- `{ "input": text, "keys": [ … ] }`: `DecodeKeys(input)` must return
+  `keys`, one entry for each key, `null` for input that is no key;
+- `{ "key": text, "canon": text | null }`: `ParseKey(key)` must return
+  `canon`, `null` when the name does not parse.
+
+**Keymap** checks keymaps (SPEC §10.2, SDK.md §3.10), in two forms:
+- `{ "parse": text, "format": text }`: `ParseKeymap(parse).Format()` must be
+  `format`; with `"terminal_keys": true` and no `parse`, `TerminalKeys`
+  formatted must be `format`;
+- `{ "multiline": bool, "terminal_keys"?: true, "keys": [ … ], "lookup": {
+  key: action | null } }`: `Resolve(multiline, …)` with `TerminalKeys`
+  first when `terminal_keys` is true, then each of `keys`. `Lookup` of each
+  key of `lookup` must return its value: an action, `"insert"`, or `null`
+  when the key is not the field's.
+
+**Edit** `{ "field": { "value", "caret", "multiline"?, "password"?, "rows"?
+}, "steps": [ … ] }`: a Field (SDK.md §4.6) made from `field`, absent keys
+false, or 1 for `rows`. Each step is `{ "do": action }` or `{ "type": text
+}`, and after it every key the step lists must equal the Field's: `value`,
+`caret` (in characters), and `changed`, what `Do` or `Type` returned.
+`"requires": ["graphemes"]` marks the vectors whose text has a character of
+more than one code point, other than CR LF.
 
 **Detect** `{ "n"?: n, "steps": [ … ], "caps"?: {…} }`: one Detector, with
 the query's number `n` (1 when absent). Each step happens at time `at`, in

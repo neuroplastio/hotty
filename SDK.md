@@ -90,8 +90,8 @@ are to be interpreted as in SPEC.md §2.
 
 ### 2.3 Shared defaults
 
-The defaults in this document (quiet levels, timeouts, limits) are the same
-in every SDK, so a program behaves the same in every language. An SDK
+The defaults in this document (quiet levels, timeouts, limits, the keymap
+of §3.10) are the same in every SDK, so a program behaves the same in every language. An SDK
 **MUST NOT** choose other defaults; it **MAY** let the program change them.
 
 ### 2.4 Protocol only
@@ -102,6 +102,10 @@ code, drawing charts, or building forms from a schema, is presentation, and
 outside this document. An SDK **MAY** ship such helpers beside it. They
 depend on the SDK; the SDK never depends on them, and nothing in §3 or §4
 needs them.
+
+What a text field does with a key is the protocol's (SPEC.md §10.2), so
+keymaps (§3.10) and editing a field in cells as a host edits it (§4.6) are
+in this document.
 
 ### 2.5 Three renditions
 
@@ -158,6 +162,7 @@ An SDK **MUST** provide every component of this section.
 | Scanner (§3.7) | HOTTY sequences out of a byte stream | — | `scan` |
 | Detector (§3.8) | whether the terminal is a host | `internal/detect` | `detect` |
 | messages (§3.9) | replies, events, capabilities, errors | `Reply`, `Event`, `Caps`, `Error` | `decode` |
+| keys (§3.10) | key names, keymaps, the SDK's keymap | `ParseKey`, `DecodeKeys`, `Keymap`, `TerminalKeys` | `keys`, `keymap` |
 
 ### 3.1 Constants and named sets
 
@@ -453,6 +458,63 @@ also answers:
 
 **An error** carries `Code` and `Detail`, and its message names both.
 
+### 3.10 Keys
+
+What a text field does with a key (SPEC.md §10.2, §10.4), as data: so that a
+program that draws its fields in cells edits them as a host edits them on a
+surface, and the keymap it gives a surface is the one it uses in cells.
+
+- **`ParseKey(name)`** reads a key's name in any of the forms SPEC.md §10.4
+  allows (`Shift+Control+a`, `Control+ `) and returns it in the canonical
+  one (`Control+A`, `Control+Space`): modifiers in the order `Control`,
+  `Alt`, `Meta`, `Shift`, Shift shown in a character where the character
+  can show it, `Space` for a space. A name that does not parse (empty, an
+  unknown modifier, `Control+` with no key) is absent.
+- **`DecodeKeys(input)`** reads input from the terminal, the bytes a
+  program reads, as SPEC.md §10.4 names it: a list with one entry for each
+  key, the key's canonical name, or absent for input that is no key it
+  names (a mouse report, a sequence it does not know). It is pure: an `ESC`
+  at the end of the input is `Escape`, and the caller passes each read
+  whole (a framework's parser has already cut the input into keys).
+- **`Keymap`** is a set of bindings, key to action. `ParseKeymap(value)`
+  reads a `data-keys` value as SPEC.md §10.2 has hosts read it, dropping
+  the bindings a host ignores; `Format()` writes one back: each key once,
+  where it was first bound, with its last action, as `key=action`,
+  separated by a space.
+- **`Resolve(multiline, values…)`** builds a field's keymap: SPEC.md's
+  default keymap for an `input`, or for a multi-line field, then each
+  `data-keys` value in turn, the root's first.
+- **`Lookup(key)`** on a resolved keymap returns what the field does with
+  the key: an action; `insert` for a character it types; or absent when the
+  key is not the field's (it reaches the program, or Tab moves focus). Tab,
+  Shift+Tab and Escape are never the field's, nor a key bound to `program`
+  or to an action the field does not have.
+- **`TerminalKeys`** is the SDK's keymap, the same in every SDK (§2.3): the
+  keys of Bubble Tea's text input and text area (bubbles), which a program
+  that edits fields in cells is likely to share. A program puts it in the
+  `data-keys` of an element that holds its fields, and gives its cells
+  rendition the same keymap, `Resolve(multiline, TerminalKeys)`.
+
+  | action | keys |
+  | --- | --- |
+  | `char-backward`, `char-forward` | ArrowLeft, Control+b; ArrowRight, Control+f |
+  | `word-backward` | Alt+ArrowLeft, Control+ArrowLeft, Alt+b |
+  | `word-forward` | Alt+ArrowRight, Control+ArrowRight, Alt+f |
+  | `line-start`, `line-end` | Home, Control+a; End, Control+e |
+  | `delete-char-backward` | Backspace, Control+h |
+  | `delete-char-forward` | Delete, Control+d |
+  | `delete-word-backward` | Alt+Backspace, Control+w, Control+Backspace |
+  | `delete-word-forward` | Alt+Delete, Alt+d, Control+Delete |
+  | `delete-to-line-start`, `delete-to-line-end` | Control+u; Control+k |
+  | `line-previous`, `line-next` | ArrowUp, Control+p; ArrowDown, Control+n |
+  | `page-up`, `page-down` | PageUp; PageDown |
+  | `input-start`, `input-end` | Alt+<, Control+Home; Alt+>, Control+End |
+  | `newline` | Control+m |
+
+  It leaves Enter to SPEC.md's default (`submit` in an `input`, `newline`
+  in a multi-line field). In the order of this table, it is the value
+  vectors call `terminal_keys`.
+
 ## 4. The SDK layer
 
 What a program does with a terminal depends on the kind of program, and on
@@ -618,6 +680,31 @@ program's pane is, and passes events back to the program whose surface they
 came from. plx's `pkg/hottyrelay` is one. This section is reserved: what a
 relay does will be specified here, with its own vectors.
 
+### 4.6 Field
+
+A text field's value and caret, edited as SPEC.md §10.2's actions edit them,
+for a program that draws its fields in cells (the second rendition, §2.5).
+Go: `hottyedit.Field`, a module of its own for its grapheme segmentation.
+
+- **The field.** `Value`, `Caret` (a count of characters, grapheme
+  clusters, from the start), `Multiline`, `Password`, and `Rows`, the rows
+  it shows (1 when absent), for `page-up` and `page-down`.
+- **Rows are lines.** A field in cells does not wrap: each line is a row,
+  and the place along it is a count of characters. A rendition that wraps
+  moves the caret between its rows itself.
+- **`Do(action)`** does an action, and reports whether the value changed,
+  so the program knows when to report an `input`. `submit` and `program`
+  are the program's, and change nothing. A run of `line-previous`,
+  `line-next`, `page-up` and `page-down` keeps the place along the row it
+  started from; any other action, or typing, ends it.
+- **`Type(text)`** types text at the caret.
+- **A selection** is the host's (SPEC.md §10.2): a Field has none.
+
+An SDK whose language has no grapheme segmentation **MAY** count code
+points instead, CR LF still one, and says so (§5.3); it then skips the
+vectors that require `graphemes`. So does its `DecodeKeys`, for a character
+of more than one code point.
+
 ## 5. Conformance
 
 ### 5.1 Vector sections
@@ -634,9 +721,12 @@ relay does will be specified here, with its own vectors.
 | `decode` | the Decoder and the messages (§3.6, §3.9) | SDKs |
 | `scan` | the Scanner (§3.7) | SDKs |
 | `detect` | the Detector (§3.8) | SDKs |
+| `keys` | key names and `DecodeKeys` (§3.10, SPEC.md §10.4) | hosts and SDKs |
+| `keymap` | `ParseKeymap`, `Resolve`, `Lookup` and `TerminalKeys` (§3.10, SPEC.md §10.2) | hosts and SDKs |
+| `edit` | the actions on a value: a Field (§4.6) | hosts, and SDKs with a Field |
 
 An SDK conforms when it meets every **MUST** of this document and passes
-every SDK section.
+every SDK section, `edit` where it provides a Field.
 
 ### 5.2 Runners
 
@@ -690,6 +780,10 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Holding`, `InSequence` | `(*Scanner).Holding`, `.InSequence` | `Scanner.holding`, `.in_sequence` | `scanner:holding`, `:in_sequence` | `Scanner::holding`, `::in_sequence` | `Scanner.holding`, `.inSequence` |
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |
 | `FitRows`, `CellCSS` | `FitRows`, `CellCSS` | `fit_rows`, `cell_css` | as Python | as Python | `fitRows`, `cellCss` |
+| `ParseKey`, `DecodeKeys` | `hotty.ParseKey`, `hotty.DecodeKeys` | `parse_key`, `decode_keys` | as Python | as Python | `parseKey`, `decodeKeys` |
+| `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.format` |
+| `TerminalKeys` | `hotty.TerminalKeys` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` |
+| `Field`, `Do`, `Type` | `hottyedit.Field`, `(*Field).Do`, `.Type` | `Field`, `.do`, `.type` | `field`, `:do`, `:type` | `Field`, `do_action`, `type_text` | `Field`, `.do`, `.type` |
 
 In the vectors, every name is in snake case: `place_at`, `keep_cursor`,
 `fit_rows`, `cell_css`.
@@ -718,6 +812,12 @@ In the vectors, every name is in snake case: `place_at`, `keep_cursor`,
 - **Why a `Q` given wins over `N`.** Options in most languages have no
   order: keyword arguments, a table, a struct. The rule that needs no order
   is the one every SDK can follow.
+- **Why the SDK has a keymap of its own.** SPEC.md's default keymap is
+  small, so that a program that names no keys loses none. A program that
+  edits fields in cells, though, has a keymap already, usually its
+  framework's, and wants its surfaces' fields to edit the same. Bubble
+  Tea's is the one the reference SDK's programs have; one keymap shared by
+  every SDK keeps a program the same in every language (§2.3).
 - **Why presentation is out.** HOTTY carries any HTML. How one program
   presents its content is that program's choice, and an SDK that builds
   documents would make it for every program, in each language differently.

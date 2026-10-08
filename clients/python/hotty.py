@@ -901,6 +901,433 @@ class Detector:
         self.done = True
 
 
+# --- keys (SDK.md §3.10; SPEC.md §10.2, §10.4) --------------------------------
+
+MODIFIERS = ("Control", "Alt", "Meta", "Shift")
+
+ACTIONS = (
+    "char-backward", "char-forward", "word-backward", "word-forward", "line-start", "line-end",
+    "delete-char-backward", "delete-char-forward", "delete-word-backward", "delete-word-forward",
+    "delete-to-line-start", "delete-to-line-end", "line-previous", "line-next", "page-up", "page-down",
+    "input-start", "input-end", "newline", "submit", "program",
+)
+# The actions only a multi-line field has (SPEC.md §10.2).
+MULTILINE_ACTIONS = frozenset(("line-previous", "line-next", "page-up", "page-down", "input-start", "input-end", "newline"))
+# What Lookup returns for a character the field types.
+INSERT = "insert"
+
+# The SDK's keymap (SDK.md §3.10): Bubble Tea's text input and text area.
+TERMINAL_KEYS = " ".join((
+    "ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward",
+    "Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward",
+    "Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward",
+    "Home=line-start Control+a=line-start End=line-end Control+e=line-end",
+    "Backspace=delete-char-backward Control+h=delete-char-backward",
+    "Delete=delete-char-forward Control+d=delete-char-forward",
+    "Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward",
+    "Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward",
+    "Control+u=delete-to-line-start Control+k=delete-to-line-end",
+    "ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next",
+    "PageUp=page-up PageDown=page-down",
+    "Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end",
+    "Control+m=newline",
+))
+
+_NAMED = re.compile(r"[A-Z][A-Za-z0-9]+\Z")
+
+
+def chars(s):
+    """A text's characters. This client counts code points, CR LF one
+    (SDK.md §4.6): it has no grapheme segmentation."""
+    out, i = [], 0
+    while i < len(s):
+        n = 2 if s.startswith("\r\n", i) else 1
+        out.append(s[i:i + n])
+        i += n
+    return out
+
+
+def _is_char(v):
+    c = chars(v)
+    return len(c) == 1 and ord(v[0]) >= 0x20 and v[0] != "\x7f"
+
+
+def _split_key(name):
+    """A key's name as (modifiers, value), or None when it does not parse."""
+    if name.endswith("++") and len(name) > 2:
+        head, value = name[:-2], "+"
+    elif name == "+":
+        head, value = "", "+"
+    else:
+        i = name.rfind("+")
+        head, value = (name[:i], name[i + 1:]) if i >= 0 else ("", name)
+    mods = head.split("+") if head else []
+    if any(m not in MODIFIERS for m in mods) or len(set(mods)) != len(mods):
+        return None
+    if value == "Space":
+        value = " "
+    if not (_is_char(value) or _NAMED.match(value)):
+        return None
+    return mods, value
+
+
+def _key_name(mods, value):
+    """The canonical name of a key: modifiers in order, Shift shown in a
+    letter where it can be, Space for a space."""
+    mods = set(mods)
+    if "Shift" in mods and _is_char(value) and len(value) == 1:
+        up, low = value.upper(), value.lower()
+        if len(up) == 1 and up != value:
+            value, mods = up, mods - {"Shift"}
+        elif len(low) == 1 and low != value:
+            mods = mods - {"Shift"}
+    return "+".join([m for m in MODIFIERS if m in mods] + ["Space" if value == " " else value])
+
+
+def parse_key(name):
+    """A key's name in its canonical form (SDK.md §3.10), or None."""
+    k = _split_key(name)
+    return None if k is None else _key_name(*k)
+
+
+_C0 = {0x00: "Control+Space", 0x08: "Control+h", 0x09: "Tab", 0x0D: "Enter", 0x1B: "Escape", 0x7F: "Backspace",
+       0x1C: "Control+\\", 0x1D: "Control+]", 0x1E: "Control+^", 0x1F: "Control+_"}
+_CSI_FINAL = {"A": "ArrowUp", "B": "ArrowDown", "C": "ArrowRight", "D": "ArrowLeft", "H": "Home", "F": "End"}
+_TILDE = {1: "Home", 7: "Home", 4: "End", 8: "End", 2: "Insert", 3: "Delete", 5: "PageUp", 6: "PageDown"}
+_CODES = {9: "Tab", 13: "Enter", 27: "Escape", 8: "Backspace", 127: "Backspace"}
+# The kitty keyboard protocol's codes from 57344 that name keys.
+_KITTY = {57399 + i: str(i) for i in range(10)}
+_KITTY.update({57409: ".", 57410: "/", 57411: "*", 57412: "-", 57413: "+", 57414: "Enter", 57415: "=",
+               57417: "ArrowLeft", 57418: "ArrowRight", 57419: "ArrowUp", 57420: "ArrowDown",
+               57421: "PageUp", 57422: "PageDown", 57423: "Home", 57424: "End", 57425: "Insert", 57426: "Delete",
+               57441: "Shift", 57442: "Control", 57443: "Alt", 57444: "Meta", 57447: "Shift", 57448: "Control",
+               57449: "Alt", 57450: "Meta"})
+
+
+def _with(name, add):
+    """A key's name with more modifiers."""
+    if name is None:
+        return None
+    mods, value = _split_key(name)
+    return _key_name(mods + [m for m in add if m not in mods], value)
+
+
+def _mods(field):
+    """The modifiers in a CSI parameter `m[:e]`, and whether it is a
+    release."""
+    parts = field.split(":")
+    try:
+        m = int(parts[0]) if parts[0] else 1
+        e = int(parts[1]) if len(parts) > 1 and parts[1] else 1
+    except ValueError:
+        return None, False
+    bits = m - 1
+    mods = [n for n, b in (("Shift", 1), ("Alt", 2), ("Control", 4)) if bits & b]
+    if bits & (8 | 32):
+        mods.append("Meta")
+    return mods, e == 3
+
+
+def _code_key(code, mods, shifted=None, text=None):
+    """The key a kitty or modifyOtherKeys code names."""
+    if code in _CODES:
+        return _key_name(mods, _CODES[code])
+    if code >= 57344:
+        return _key_name(mods, _KITTY[code]) if code in _KITTY else None
+    if code < 0x20 or code == 0x7F:
+        return None
+    value = chr(code)
+    if "Shift" in mods:
+        if shifted:
+            value = chr(shifted)
+        elif text:
+            value = text
+        elif len(value.upper()) == 1:
+            value = value.upper()
+        if value != chr(code):
+            mods = [m for m in mods if m != "Shift"]
+    return "+".join([m for m in MODIFIERS if m in mods] + ["Space" if value == " " else value])
+
+
+def _csi(params, final):
+    """The key a CSI sequence names, or None."""
+    if params[:1] in ("<", "=", ">", "?"):
+        return None
+    fields = params.split(";")
+    try:
+        if final == "u":
+            codes = [int(x) if x else 0 for x in fields[0].split(":")]
+            mods, release = _mods(fields[1]) if len(fields) > 1 else ([], False)
+            if release or mods is None:
+                return None
+            text = "".join(chr(int(x)) for x in fields[2].split(":") if x) if len(fields) > 2 else None
+            return _code_key(codes[0], mods, codes[1] if len(codes) > 1 else None, text)
+        if final == "~":
+            n = int(fields[0]) if fields[0] else 0
+            if n == 27 and len(fields) >= 3:
+                mods, release = _mods(fields[1])
+                return None if release or mods is None else _code_key(int(fields[2]), mods)
+            if n not in _TILDE:
+                return None
+            mods, release = _mods(fields[1]) if len(fields) > 1 else ([], False)
+            return None if release or mods is None else _key_name(mods, _TILDE[n])
+        if final in _CSI_FINAL:
+            mods, release = _mods(fields[1]) if len(fields) > 1 else ([], False)
+            return None if release or mods is None else _key_name(mods, _CSI_FINAL[final])
+        if final == "Z":
+            return "Shift+Tab"
+    except ValueError:
+        return None
+    return None
+
+
+def _one(data, i):
+    """The key of a control byte or a character at data[i], and its length."""
+    b = data[i]
+    if b < 0x20 or b == 0x7F:
+        return (_C0[b] if b in _C0 else "Control+" + chr(b + 0x60)), 1
+    n = 1 if b < 0x80 else 2 if b >> 5 == 6 else 3 if b >> 4 == 14 else 4 if b >> 3 == 30 else 0
+    try:
+        c = data[i:i + n].decode() if n else None
+    except UnicodeDecodeError:
+        c = None
+    if c is None or len(c) != 1:
+        return None, 1
+    return ("Space" if c == " " else c), n
+
+
+def decode_keys(data):
+    """The keys in input from the terminal (SDK.md §3.10, SPEC.md §10.4): a
+    canonical name for each, None for input that is no key."""
+    if isinstance(data, str):
+        data = data.encode()
+    out, i = [], 0
+    while i < len(data):
+        if data[i] != 0x1B:
+            k, n = _one(data, i)
+            out.append(k)
+            i += n
+            continue
+        if i + 1 == len(data):
+            out.append("Escape")
+            break
+        nxt = data[i + 1]
+        if nxt in (0x5B, 0x4F) and i + 2 < len(data):
+            if nxt == 0x4F:
+                out.append(_CSI_FINAL.get(chr(data[i + 2])) if chr(data[i + 2]) in "ABCDHF" else None)
+                i += 3
+                continue
+            j = i + 2
+            while j < len(data) and 0x30 <= data[j] <= 0x3F:
+                j += 1
+            params = data[i + 2:j].decode()
+            while j < len(data) and 0x20 <= data[j] <= 0x2F:
+                j += 1
+            if j == len(data):
+                out.append(None)
+                break
+            out.append(_csi(params, chr(data[j])) if data[j] >= 0x40 else None)
+            i = j + 1
+            continue
+        k, n = _one(data, i + 1)
+        out.append(_with(k, ["Alt"]))
+        i += 1 + n
+    return out
+
+
+class Keymap:
+    """Bindings of keys to actions (SPEC.md §10.2). `resolve` makes the one a
+    field uses, whose `lookup` says what the field does with a key."""
+
+    def __init__(self, multiline=False):
+        self.bindings = {}
+        self.multiline = multiline
+
+    def bind(self, key, action):
+        self.bindings[key] = action
+
+    def update(self, other):
+        for k, a in other.bindings.items():
+            self.bindings[k] = a
+
+    def format(self):
+        return " ".join(f"{k}={a}" for k, a in self.bindings.items())
+
+    def lookup(self, key):
+        """An action, INSERT for a character the field types, or None when
+        the key is not the field's."""
+        k = parse_key(key)
+        if k is None or k in ("Tab", "Shift+Tab", "Escape"):
+            return None
+        mods, value = _split_key(k)
+        a = self.bindings.get(k)
+        if a is None and "Shift" in mods:
+            a = self.bindings.get(_key_name([m for m in mods if m != "Shift"], value))
+        if a is not None:
+            return None if a == "program" or (a in MULTILINE_ACTIONS and not self.multiline) else a
+        if _is_char(value) and not {"Control", "Alt", "Meta"} & set(mods):
+            return INSERT
+        return None
+
+
+def parse_keymap(value):
+    """A data-keys value's bindings, without those a host ignores."""
+    m = Keymap()
+    for b in value.split():
+        i = b.rfind("=")
+        if i < 0:
+            continue
+        k, a = parse_key(b[:i]), b[i + 1:]
+        if k is None or a not in ACTIONS or k in ("Tab", "Shift+Tab", "Escape"):
+            continue
+        m.bind(k, a)
+    return m
+
+
+def resolve(multiline, *values):
+    """A field's keymap: SPEC.md's default, then each data-keys value, the
+    root's first."""
+    m = Keymap(multiline)
+    for k, a in (("ArrowLeft", "char-backward"), ("ArrowRight", "char-forward"), ("Home", "line-start"),
+                 ("End", "line-end"), ("Backspace", "delete-char-backward"), ("Delete", "delete-char-forward"),
+                 ("ArrowUp", "line-previous"), ("ArrowDown", "line-next"), ("PageUp", "page-up"),
+                 ("PageDown", "page-down"), ("Enter", "newline" if multiline else "submit")):
+        m.bind(k, a)
+    for v in values:
+        m.update(parse_keymap(v))
+    return m
+
+
+# --- a field in cells (SDK.md §4.6) -------------------------------------------
+
+_WHITE_SPACE = frozenset([*range(0x09, 0x0E), 0x20, 0x85, 0xA0, 0x1680, *range(0x2000, 0x200B), 0x2028, 0x2029, 0x202F, 0x205F, 0x3000])
+
+
+def _space(c):
+    return ord(c[0]) in _WHITE_SPACE
+
+
+def _break(c):
+    return c in ("\n", "\r", "\r\n")
+
+
+class Field:
+    """A text field's value and caret, edited by SPEC.md §10.2's actions. The
+    caret counts characters (`chars`)."""
+
+    def __init__(self, value="", caret=None, multiline=False, password=False, rows=1):
+        self.value = value
+        self.caret = len(chars(value)) if caret is None else caret
+        self.multiline = multiline
+        self.password = password
+        self.rows = rows
+        self._goal = None
+
+    def _lines(self, c):
+        """The start and end of each line."""
+        out, start = [], 0
+        for i, ch in enumerate(c):
+            if self.multiline and _break(ch):
+                out.append((start, i))
+                start = i + 1
+        out.append((start, len(c)))
+        return out
+
+    def _word_back(self, c, p):
+        if self.password:
+            return 0
+        while p > 0 and _space(c[p - 1]):
+            p -= 1
+        while p > 0 and not _space(c[p - 1]):
+            p -= 1
+        return p
+
+    def _word_forward(self, c, p):
+        if self.password:
+            return len(c)
+        while p < len(c) and _space(c[p]):
+            p += 1
+        while p < len(c) and not _space(c[p]):
+            p += 1
+        return p
+
+    def _rows(self, c, p, by):
+        lines = self._lines(c)
+        r = next(i for i, (s, e) in enumerate(lines) if s <= p <= e)
+        if self._goal is None:
+            self._goal = p - lines[r][0]
+        t = r + by
+        if t < 0:
+            return 0
+        if t >= len(lines):
+            return len(c)
+        s, e = lines[t]
+        return s + min(self._goal, e - s)
+
+    def _delete(self, c, a, b):
+        if a >= b:
+            return False
+        self.value = "".join(c[:a] + c[b:])
+        self.caret = a
+        return True
+
+    def do(self, action):
+        """Does an action; returns whether the value changed."""
+        c = chars(self.value)
+        p = min(max(self.caret, 0), len(c))
+        rows = action in ("line-previous", "line-next", "page-up", "page-down")
+        if not rows:
+            self._goal = None
+        if action in MULTILINE_ACTIONS and not self.multiline:
+            return False
+        lines = self._lines(c)
+        s, e = next((s, e) for s, e in lines if s <= p <= e)
+        move = {
+            "char-backward": lambda: max(p - 1, 0),
+            "char-forward": lambda: min(p + 1, len(c)),
+            "word-backward": lambda: self._word_back(c, p),
+            "word-forward": lambda: self._word_forward(c, p),
+            "line-start": lambda: s,
+            "line-end": lambda: e,
+            "line-previous": lambda: self._rows(c, p, -1),
+            "line-next": lambda: self._rows(c, p, 1),
+            "page-up": lambda: self._rows(c, p, -max(self.rows, 1)),
+            "page-down": lambda: self._rows(c, p, max(self.rows, 1)),
+            "input-start": lambda: 0,
+            "input-end": lambda: len(c),
+        }.get(action)
+        if move is not None:
+            self.caret = move()
+            return False
+        span = {
+            "delete-char-backward": (max(p - 1, 0), p),
+            "delete-char-forward": (p, min(p + 1, len(c))),
+            "delete-word-backward": (self._word_back(c, p), p),
+            "delete-word-forward": (p, self._word_forward(c, p)),
+            "delete-to-line-start": (s, p),
+            "delete-to-line-end": (p, e),
+        }.get(action)
+        if span is not None:
+            self.caret = p
+            return self._delete(c, *span)
+        if action == "newline":
+            return self.type("\n")
+        return False
+
+    def type(self, text):
+        """Types text at the caret; returns whether the value changed."""
+        self._goal = None
+        if not text:
+            return False
+        c = chars(self.value)
+        p = min(max(self.caret, 0), len(c))
+        before = "".join(c[:p]) + text
+        self.value = before + "".join(c[p:])
+        self.caret = len(chars(before))
+        return True
+
+
+
 # --- I/O for the examples ----------------------------------------------------
 
 

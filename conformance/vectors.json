@@ -5724,6 +5724,1003 @@
      ]
     }
    ]
+  },
+  {
+   "name": "with no data-keys, a text input uses the default keymap only: keys with Control or Alt reach the program, and Shift+ArrowLeft moves the caret as ArrowLeft does (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t data-on=input>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "a",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "a"
+       }
+      }
+     ]
+    },
+    {
+     "key": "b",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "ab"
+       }
+      }
+     ]
+    },
+    {
+     "key": "c",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abc"
+       }
+      }
+     ]
+    },
+    {
+     "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "e",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "ArrowLeft",
+     "keys": [
+      "alt"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "ArrowLeft",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "b",
+     "keys": [
+      "alt"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Backspace",
+     "keys": [
+      "alt"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "ArrowLeft",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abxc"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "data-keys on an ancestor binds keys to actions in the fields under it: Control+a and Control+e to the line's ends, Alt+b and Alt+f by words, Control+w and Alt+d delete words, Control+u and Control+k to the line's ends; an unbound Control key still reaches the program (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form id=f data-keys=\"Control+a=line-start Control+e=line-end Alt+b=word-backward Alt+f=word-forward Control+w=delete-word-backward Alt+d=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end\"><input id=t data-on=input value=\"foo bar baz\"></form>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "w",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "foo bar "
+       }
+      }
+     ]
+    },
+    {
+     "key": "b",
+     "keys": [
+      "alt"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "d",
+     "keys": [
+      "alt"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "foo  "
+       }
+      }
+     ]
+    },
+    {
+     "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "f",
+     "keys": [
+      "alt"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "k",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "foo"
+       }
+      }
+     ]
+    },
+    {
+     "key": "u",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": ""
+       }
+      }
+     ]
+    },
+    {
+     "key": "x",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a nearer data-keys overrides a farther one key by key, and program gives a key back to the program: the field's Control+a and ArrowLeft reach the program, its form's Control+e still moves the caret (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form data-keys=\"Control+a=line-start Control+e=line-end\"><input id=t data-on=input value=ab data-keys=\"Control+a=program ArrowLeft=program\"></form>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "ArrowLeft",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Home",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "e",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "c",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abc"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Escape and Tab cannot be bound, and a binding whose action is unknown or whose key does not parse is ignored; a binding splits at its last =, so Alt+==line-start binds Alt+= (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t data-on=input value=ab data-keys=\"Escape=line-start Tab=line-end Control+a=frobnicate Hyper+b=line-start Control+=line-end Alt+==line-start\">"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Escape",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "b",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "=",
+     "keys": [
+      "alt"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "xab"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "xab"
+       }
+      },
+      {
+       "e": "blur",
+       "s": "x",
+       "t": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a key with Shift that no binding names does what the key does without it; a binding that names it with Shift wins (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t data-on=input value=abc data-keys=\"Shift+ArrowLeft=program\">"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "ArrowLeft",
+     "keys": [
+      "shift"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Home",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "xabc"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a multi-line action reaches the program from an input, and moves the caret in a textarea: by rows, keeping its place along them, and to the ends of the value (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys=\"Control+p=line-previous Control+n=line-next Alt+<=input-start Alt+>=input-end\"><input id=i data-on=input><textarea id=t data-on=input cols=20 rows=3></textarea></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "5",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "i",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "p",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "ArrowUp",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": ">",
+     "keys": [
+      "alt"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "a",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "a"
+       }
+      }
+     ]
+    },
+    {
+     "key": "b",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "ab"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "ab\n"
+       }
+      }
+     ]
+    },
+    {
+     "key": "c",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "ab\nc"
+       }
+      }
+     ]
+    },
+    {
+     "key": "d",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "ab\ncd"
+       }
+      }
+     ]
+    },
+    {
+     "key": "p",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abx\ncd"
+       }
+      }
+     ]
+    },
+    {
+     "key": ">",
+     "keys": [
+      "alt"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "y",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abx\ncdy"
+       }
+      }
+     ]
+    },
+    {
+     "key": "<",
+     "keys": [
+      "alt"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "z",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "zabx\ncdy"
+       }
+      }
+     ]
+    },
+    {
+     "key": "n",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "w",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "zabx\ncwdy"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "in a password input the word actions go to the ends of the value, which is one word (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t type=password data-on=input value=\"hunter two\" data-keys=\"Alt+b=word-backward Control+w=delete-word-backward\">"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "b",
+     "keys": [
+      "alt"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "xhunter two"
+       }
+      }
+     ]
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "w",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": ""
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a key bound to submit submits the field's form (SPEC \u00a710.2, \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form id=f data-keys=\"Control+s=submit\"><input id=t name=q value=hi></form>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "s",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "submit",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "q": "hi"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "SDK.md's TerminalKeys as data-keys: Control+ArrowLeft and Alt+ArrowRight move by words, Alt+Backspace and Control+Delete delete them, Control+Home and Control+End go to the ends of a textarea's value (SPEC \u00a710.2, SDK.md \u00a73.10)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys=\"ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward Home=line-start Control+a=line-start End=line-end Control+e=line-end Backspace=delete-char-backward Control+h=delete-char-backward Delete=delete-char-forward Control+d=delete-char-forward Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next PageUp=page-up PageDown=page-down Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end Control+m=newline\"><textarea id=t data-on=input cols=24 rows=3>one two\nthree four</textarea></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "5",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "End",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "ArrowLeft",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Backspace",
+     "keys": [
+      "alt"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "one two\nfour"
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowLeft",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Delete",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "one \nfour"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Home",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "ArrowRight",
+     "keys": [
+      "alt"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "!",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "one! \nfour"
+       }
+      }
+     ]
+    },
+    {
+     "key": "u",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": " \nfour"
+       }
+      }
+     ]
+    }
+   ]
   }
  ],
  "wire": [
@@ -8717,6 +9714,1415 @@
      "done": true,
      "deadline": null
     }
+   ]
+  }
+ ],
+ "keys": [
+  {
+   "name": "a character is itself",
+   "input": "a",
+   "keys": [
+    "a"
+   ]
+  },
+  {
+   "name": "a capital shows Shift itself",
+   "input": "A",
+   "keys": [
+    "A"
+   ]
+  },
+  {
+   "name": "the space bar is Space",
+   "input": " ",
+   "keys": [
+    "Space"
+   ]
+  },
+  {
+   "name": "text is a key for each character",
+   "input": "ab!",
+   "keys": [
+    "a",
+    "b",
+    "!"
+   ]
+  },
+  {
+   "name": "a character beyond ASCII",
+   "input": "\u00e9\u4e2d",
+   "keys": [
+    "\u00e9",
+    "\u4e2d"
+   ]
+  },
+  {
+   "name": "a grapheme cluster is one character",
+   "input": "e\u0301\ud83d\udc69\u200d\ud83d\udcbb",
+   "keys": [
+    "e\u0301",
+    "\ud83d\udc69\u200d\ud83d\udcbb"
+   ],
+   "requires": [
+    "graphemes"
+   ]
+  },
+  {
+   "name": "NUL is Control+Space",
+   "input": "\u0000",
+   "keys": [
+    "Control+Space"
+   ]
+  },
+  {
+   "name": "C0 controls are Control with a letter",
+   "input": "\u0001\u0005\u000b\u0015\u0017\u001a",
+   "keys": [
+    "Control+a",
+    "Control+e",
+    "Control+k",
+    "Control+u",
+    "Control+w",
+    "Control+z"
+   ]
+  },
+  {
+   "name": "BS is Control+h, LF Control+j",
+   "input": "\b\n",
+   "keys": [
+    "Control+h",
+    "Control+j"
+   ]
+  },
+  {
+   "name": "HT, CR, ESC and DEL are Tab, Enter, Escape and Backspace",
+   "input": "\t\r\u007f",
+   "keys": [
+    "Tab",
+    "Enter",
+    "Backspace"
+   ]
+  },
+  {
+   "name": "ESC at the end of the input is Escape",
+   "input": "\u001b",
+   "keys": [
+    "Escape"
+   ]
+  },
+  {
+   "name": "0x1c to 0x1f",
+   "input": "\u001c\u001d\u001e\u001f",
+   "keys": [
+    "Control+\\",
+    "Control+]",
+    "Control+^",
+    "Control+_"
+   ]
+  },
+  {
+   "name": "ESC before a key adds Alt",
+   "input": "\u001bb\u001bf\u001bB\u001b<",
+   "keys": [
+    "Alt+b",
+    "Alt+f",
+    "Alt+B",
+    "Alt+<"
+   ]
+  },
+  {
+   "name": "ESC before DEL is Alt+Backspace, before a control Control+Alt",
+   "input": "\u001b\u007f\u001b\u0001\u001b\r",
+   "keys": [
+    "Alt+Backspace",
+    "Control+Alt+a",
+    "Alt+Enter"
+   ]
+  },
+  {
+   "name": "ESC before ESC is Alt+Escape, before a space Alt+Space",
+   "input": "\u001b\u001b\u001b ",
+   "keys": [
+    "Alt+Escape",
+    "Alt+Space"
+   ]
+  },
+  {
+   "name": "ESC [ and ESC O alone are Alt+[ and Alt+O",
+   "input": "\u001b[",
+   "keys": [
+    "Alt+["
+   ]
+  },
+  {
+   "name": "ESC O alone is Alt+O",
+   "input": "\u001bO",
+   "keys": [
+    "Alt+O"
+   ]
+  },
+  {
+   "name": "the arrows, as CSI and as SS3",
+   "input": "\u001b[A\u001b[B\u001b[C\u001b[D\u001bOA\u001bOB\u001bOC\u001bOD",
+   "keys": [
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowRight",
+    "ArrowLeft",
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowRight",
+    "ArrowLeft"
+   ]
+  },
+  {
+   "name": "Home and End, every way",
+   "input": "\u001b[H\u001bOH\u001b[1~\u001b[7~\u001b[F\u001bOF\u001b[4~\u001b[8~",
+   "keys": [
+    "Home",
+    "Home",
+    "Home",
+    "Home",
+    "End",
+    "End",
+    "End",
+    "End"
+   ]
+  },
+  {
+   "name": "Insert, Delete, PageUp, PageDown",
+   "input": "\u001b[2~\u001b[3~\u001b[5~\u001b[6~",
+   "keys": [
+    "Insert",
+    "Delete",
+    "PageUp",
+    "PageDown"
+   ]
+  },
+  {
+   "name": "CSI Z is Shift+Tab",
+   "input": "\u001b[Z",
+   "keys": [
+    "Shift+Tab"
+   ]
+  },
+  {
+   "name": "xterm's modifiers on the arrows",
+   "input": "\u001b[1;2D\u001b[1;3D\u001b[1;5C\u001b[1;6D\u001b[1;9D\u001b[1;7A",
+   "keys": [
+    "Shift+ArrowLeft",
+    "Alt+ArrowLeft",
+    "Control+ArrowRight",
+    "Control+Shift+ArrowLeft",
+    "Meta+ArrowLeft",
+    "Control+Alt+ArrowUp"
+   ]
+  },
+  {
+   "name": "xterm's modifiers on Home, End and the ~ keys",
+   "input": "\u001b[1;5H\u001b[1;5F\u001b[3;5~\u001b[3;3~\u001b[5;2~",
+   "keys": [
+    "Control+Home",
+    "Control+End",
+    "Control+Delete",
+    "Alt+Delete",
+    "Shift+PageUp"
+   ]
+  },
+  {
+   "name": "modifyOtherKeys",
+   "input": "\u001b[27;5;105~\u001b[27;5;13~\u001b[27;2;13~\u001b[27;5;127~\u001b[27;3;8~\u001b[27;5;9~",
+   "keys": [
+    "Control+i",
+    "Control+Enter",
+    "Shift+Enter",
+    "Control+Backspace",
+    "Alt+Backspace",
+    "Control+Tab"
+   ]
+  },
+  {
+   "name": "the kitty protocol: Control with a letter, and Control+Shift with one",
+   "input": "\u001b[97;5u\u001b[97;6u\u001b[97:65;6u",
+   "keys": [
+    "Control+a",
+    "Control+A",
+    "Control+A"
+   ]
+  },
+  {
+   "name": "the kitty protocol: Enter, Backspace, Tab and Escape with modifiers",
+   "input": "\u001b[13;2u\u001b[127;5u\u001b[9;5u\u001b[27u\u001b[13u",
+   "keys": [
+    "Shift+Enter",
+    "Control+Backspace",
+    "Control+Tab",
+    "Escape",
+    "Enter"
+   ]
+  },
+  {
+   "name": "the kitty protocol: Super and Meta are Meta; Hyper and the locks name no modifier",
+   "input": "\u001b[97;9u\u001b[97;33u\u001b[97;17u\u001b[97;65u\u001b[97;133u",
+   "keys": [
+    "Meta+a",
+    "Meta+a",
+    "a",
+    "a",
+    "Control+a"
+   ]
+  },
+  {
+   "name": "the kitty protocol: a character with Shift is the shifted key, else the text, else the capital",
+   "input": "\u001b[97:65;2u\u001b[97;2;65u\u001b[97;2u\u001b[49:33;2u\u001b[49;2u",
+   "keys": [
+    "A",
+    "A",
+    "A",
+    "!",
+    "Shift+1"
+   ]
+  },
+  {
+   "name": "the kitty protocol: event types; a release is no key",
+   "input": "\u001b[1;5:1D\u001b[1;5:2D\u001b[1;5:3D\u001b[3;5:1~\u001b[97;1:3u",
+   "keys": [
+    "Control+ArrowLeft",
+    "Control+ArrowLeft",
+    null,
+    "Control+Delete",
+    null
+   ]
+  },
+  {
+   "name": "a sequence the table does not name is no key",
+   "input": "\u001b[200~\u001b[<0;10;5Ma",
+   "keys": [
+    null,
+    null,
+    "a"
+   ]
+  },
+  {
+   "name": "a character",
+   "key": "a",
+   "canon": "a"
+  },
+  {
+   "name": "a capital",
+   "key": "A",
+   "canon": "A"
+  },
+  {
+   "name": "Shift with a small letter is the capital",
+   "key": "Shift+a",
+   "canon": "A"
+  },
+  {
+   "name": "Shift with a capital is the capital",
+   "key": "Shift+A",
+   "canon": "A"
+  },
+  {
+   "name": "modifiers in order, Shift shown in the letter",
+   "key": "Shift+Control+a",
+   "canon": "Control+A"
+  },
+  {
+   "name": "Control+Shift+a",
+   "key": "Control+Shift+a",
+   "canon": "Control+A"
+  },
+  {
+   "name": "modifiers in order",
+   "key": "Shift+Meta+Alt+Control+Enter",
+   "canon": "Control+Alt+Meta+Shift+Enter"
+  },
+  {
+   "name": "Alt before Control",
+   "key": "Alt+Control+ArrowLeft",
+   "canon": "Control+Alt+ArrowLeft"
+  },
+  {
+   "name": "Shift that a key cannot show",
+   "key": "Shift+Enter",
+   "canon": "Shift+Enter"
+  },
+  {
+   "name": "Shift with a digit",
+   "key": "Shift+1",
+   "canon": "Shift+1"
+  },
+  {
+   "name": "Space",
+   "key": "Space",
+   "canon": "Space"
+  },
+  {
+   "name": "a space is Space",
+   "key": " ",
+   "canon": "Space"
+  },
+  {
+   "name": "Control with a space",
+   "key": "Control+ ",
+   "canon": "Control+Space"
+  },
+  {
+   "name": "Shift+Space",
+   "key": "Shift+Space",
+   "canon": "Shift+Space"
+  },
+  {
+   "name": "the plus key",
+   "key": "+",
+   "canon": "+"
+  },
+  {
+   "name": "Control with the plus key",
+   "key": "Control++",
+   "canon": "Control++"
+  },
+  {
+   "name": "Alt with =",
+   "key": "Alt+=",
+   "canon": "Alt+="
+  },
+  {
+   "name": "a named key",
+   "key": "F12",
+   "canon": "F12"
+  },
+  {
+   "name": "no key after a modifier",
+   "key": "Control+",
+   "canon": null
+  },
+  {
+   "name": "empty",
+   "key": "",
+   "canon": null
+  },
+  {
+   "name": "an unknown modifier",
+   "key": "Hyper+a",
+   "canon": null
+  },
+  {
+   "name": "modifiers are case-sensitive",
+   "key": "control+a",
+   "canon": null
+  },
+  {
+   "name": "Ctrl is not a modifier",
+   "key": "Ctrl+a",
+   "canon": null
+  },
+  {
+   "name": "a modifier twice",
+   "key": "Control+Control+a",
+   "canon": null
+  },
+  {
+   "name": "more than one character, not a name",
+   "key": "ab",
+   "canon": null
+  },
+  {
+   "name": "a name starts with a capital",
+   "key": "enter",
+   "canon": null
+  },
+  {
+   "name": "a modifier alone is a key",
+   "key": "Shift",
+   "canon": "Shift"
+  }
+ ],
+ "keymap": [
+  {
+   "name": "TerminalKeys, formatted",
+   "terminal_keys": true,
+   "format": "ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward Home=line-start Control+a=line-start End=line-end Control+e=line-end Backspace=delete-char-backward Control+h=delete-char-backward Delete=delete-char-forward Control+d=delete-char-forward Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next PageUp=page-up PageDown=page-down Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end Control+m=newline"
+  },
+  {
+   "name": "a key bound twice keeps its first place and its last action; any white space separates",
+   "parse": "Control+a=line-start  Alt+b=word-backward\tControl+a=line-end\n",
+   "format": "Control+a=line-end Alt+b=word-backward"
+  },
+  {
+   "name": "bindings a host ignores are dropped, and keys are canonical",
+   "parse": "Escape=line-start Tab=line-end Shift+Tab=line-end Control+a=frobnicate Hyper+b=line-start Control+=line-end =line-start Control+a line-start Alt+==line-start Shift+Control+a=line-end Control+b=program",
+   "format": "Alt+==line-start Control+A=line-end Control+b=program"
+  },
+  {
+   "name": "nothing",
+   "parse": "",
+   "format": ""
+  },
+  {
+   "name": "the default keymap, in an input",
+   "multiline": false,
+   "keys": [],
+   "lookup": {
+    "ArrowLeft": "char-backward",
+    "ArrowRight": "char-forward",
+    "Home": "line-start",
+    "End": "line-end",
+    "Backspace": "delete-char-backward",
+    "Delete": "delete-char-forward",
+    "Enter": "submit",
+    "ArrowUp": null,
+    "ArrowDown": null,
+    "PageUp": null,
+    "PageDown": null,
+    "a": "insert",
+    "A": "insert",
+    "Space": "insert",
+    "\u00e9": "insert",
+    "!": "insert",
+    "Shift+ArrowLeft": "char-backward",
+    "Shift+Enter": "submit",
+    "Shift+Backspace": "delete-char-backward",
+    "Control+a": null,
+    "Alt+b": null,
+    "Meta+a": null,
+    "Control+Space": null,
+    "Alt+Space": null,
+    "Tab": null,
+    "Shift+Tab": null,
+    "Escape": null,
+    "F1": null,
+    "Insert": null,
+    "Control+ArrowLeft": null
+   }
+  },
+  {
+   "name": "the default keymap, in a multi-line field",
+   "multiline": true,
+   "keys": [],
+   "lookup": {
+    "Enter": "newline",
+    "Shift+Enter": "newline",
+    "ArrowUp": "line-previous",
+    "ArrowDown": "line-next",
+    "PageUp": "page-up",
+    "PageDown": "page-down",
+    "Shift+ArrowDown": "line-next",
+    "Control+Home": null
+   }
+  },
+  {
+   "name": "TerminalKeys in an input: multi-line actions are not the field's",
+   "multiline": false,
+   "terminal_keys": true,
+   "keys": [],
+   "lookup": {
+    "Control+a": "line-start",
+    "Control+e": "line-end",
+    "Control+b": "char-backward",
+    "Control+f": "char-forward",
+    "Alt+b": "word-backward",
+    "Alt+f": "word-forward",
+    "Control+ArrowLeft": "word-backward",
+    "Alt+ArrowRight": "word-forward",
+    "Control+w": "delete-word-backward",
+    "Alt+Backspace": "delete-word-backward",
+    "Control+Backspace": "delete-word-backward",
+    "Alt+d": "delete-word-forward",
+    "Alt+Delete": "delete-word-forward",
+    "Control+Delete": "delete-word-forward",
+    "Control+h": "delete-char-backward",
+    "Control+d": "delete-char-forward",
+    "Control+u": "delete-to-line-start",
+    "Control+k": "delete-to-line-end",
+    "Control+p": null,
+    "Control+n": null,
+    "ArrowUp": null,
+    "Alt+<": null,
+    "Control+Home": null,
+    "Control+m": null,
+    "Enter": "submit",
+    "Control+Shift+ArrowLeft": "word-backward",
+    "Control+A": null,
+    "Control+v": null
+   }
+  },
+  {
+   "name": "TerminalKeys in a multi-line field",
+   "multiline": true,
+   "terminal_keys": true,
+   "keys": [],
+   "lookup": {
+    "Control+p": "line-previous",
+    "Control+n": "line-next",
+    "ArrowUp": "line-previous",
+    "PageDown": "page-down",
+    "Alt+<": "input-start",
+    "Alt+>": "input-end",
+    "Control+Home": "input-start",
+    "Control+End": "input-end",
+    "Control+m": "newline",
+    "Enter": "newline"
+   }
+  },
+  {
+   "name": "a nearer value overrides key by key; program gives a key back",
+   "multiline": false,
+   "keys": [
+    "Control+a=line-start Control+e=line-end",
+    "Control+a=program ArrowLeft=program"
+   ],
+   "lookup": {
+    "Control+a": null,
+    "ArrowLeft": null,
+    "Control+e": "line-end",
+    "ArrowRight": "char-forward"
+   }
+  },
+  {
+   "name": "a binding with Shift wins over the fallback",
+   "multiline": false,
+   "keys": [
+    "Shift+ArrowLeft=program"
+   ],
+   "lookup": {
+    "Shift+ArrowLeft": null,
+    "ArrowLeft": "char-backward",
+    "Shift+Home": "line-start"
+   }
+  },
+  {
+   "name": "a character can be bound, or given to the program",
+   "multiline": false,
+   "keys": [
+    "a=line-start x=program Space=program"
+   ],
+   "lookup": {
+    "a": "line-start",
+    "x": null,
+    "A": "insert",
+    "Space": null
+   }
+  },
+  {
+   "name": "Tab and Escape cannot be bound",
+   "multiline": false,
+   "keys": [
+    "Tab=line-end Escape=line-start Shift+Tab=line-end"
+   ],
+   "lookup": {
+    "Tab": null,
+    "Escape": null,
+    "Shift+Tab": null
+   }
+  },
+  {
+   "name": "a binding splits at its last =",
+   "multiline": false,
+   "keys": [
+    "Alt+==line-start"
+   ],
+   "lookup": {
+    "Alt+=": "line-start"
+   }
+  },
+  {
+   "name": "an action the field does not have, in an input",
+   "multiline": false,
+   "keys": [
+    "Control+j=newline Control+s=submit"
+   ],
+   "lookup": {
+    "Control+j": null,
+    "Control+s": "submit"
+   }
+  },
+  {
+   "name": "the same, in a multi-line field",
+   "multiline": true,
+   "keys": [
+    "Control+j=newline Control+s=submit Enter=submit"
+   ],
+   "lookup": {
+    "Control+j": "newline",
+    "Control+s": "submit",
+    "Enter": "submit"
+   }
+  }
+ ],
+ "edit": [
+  {
+   "name": "characters, stopping at the ends",
+   "field": {
+    "value": "abc",
+    "caret": 3
+   },
+   "steps": [
+    {
+     "do": "char-backward",
+     "caret": 2,
+     "changed": false
+    },
+    {
+     "do": "char-backward",
+     "caret": 1
+    },
+    {
+     "do": "char-backward",
+     "caret": 0
+    },
+    {
+     "do": "char-backward",
+     "caret": 0,
+     "changed": false
+    },
+    {
+     "do": "char-forward",
+     "caret": 1
+    },
+    {
+     "do": "line-end",
+     "caret": 3
+    },
+    {
+     "do": "char-forward",
+     "caret": 3
+    }
+   ]
+  },
+  {
+   "name": "words forward: over spaces, then over a word, to its end",
+   "field": {
+    "value": "foo  bar baz",
+    "caret": 0
+   },
+   "steps": [
+    {
+     "do": "word-forward",
+     "caret": 3
+    },
+    {
+     "do": "word-forward",
+     "caret": 8
+    },
+    {
+     "do": "word-forward",
+     "caret": 12
+    },
+    {
+     "do": "word-forward",
+     "caret": 12
+    }
+   ]
+  },
+  {
+   "name": "words back: over spaces, then over a word, to its start",
+   "field": {
+    "value": "foo  bar baz",
+    "caret": 12
+   },
+   "steps": [
+    {
+     "do": "word-backward",
+     "caret": 9
+    },
+    {
+     "do": "word-backward",
+     "caret": 5
+    },
+    {
+     "do": "word-backward",
+     "caret": 0
+    },
+    {
+     "do": "word-backward",
+     "caret": 0
+    }
+   ]
+  },
+  {
+   "name": "spaces at the ends",
+   "field": {
+    "value": "  foo  ",
+    "caret": 7
+   },
+   "steps": [
+    {
+     "do": "word-backward",
+     "caret": 2
+    },
+    {
+     "do": "word-backward",
+     "caret": 0
+    },
+    {
+     "do": "word-forward",
+     "caret": 5
+    },
+    {
+     "do": "word-forward",
+     "caret": 7
+    }
+   ]
+  },
+  {
+   "name": "deleting words back",
+   "field": {
+    "value": "foo bar baz",
+    "caret": 11
+   },
+   "steps": [
+    {
+     "do": "delete-word-backward",
+     "value": "foo bar ",
+     "caret": 8,
+     "changed": true
+    },
+    {
+     "do": "delete-word-backward",
+     "value": "foo ",
+     "caret": 4,
+     "changed": true
+    },
+    {
+     "do": "delete-word-backward",
+     "value": "",
+     "caret": 0,
+     "changed": true
+    },
+    {
+     "do": "delete-word-backward",
+     "value": "",
+     "caret": 0,
+     "changed": false
+    }
+   ]
+  },
+  {
+   "name": "deleting a word back keeps a space before it",
+   "field": {
+    "value": " foo",
+    "caret": 4
+   },
+   "steps": [
+    {
+     "do": "delete-word-backward",
+     "value": " ",
+     "caret": 1,
+     "changed": true
+    }
+   ]
+  },
+  {
+   "name": "deleting words forward",
+   "field": {
+    "value": "foo bar",
+    "caret": 0
+   },
+   "steps": [
+    {
+     "do": "delete-word-forward",
+     "value": " bar",
+     "caret": 0,
+     "changed": true
+    },
+    {
+     "do": "delete-word-forward",
+     "value": "",
+     "caret": 0,
+     "changed": true
+    },
+    {
+     "do": "delete-word-forward",
+     "value": "",
+     "caret": 0,
+     "changed": false
+    }
+   ]
+  },
+  {
+   "name": "deleting a word forward from its start deletes that word only",
+   "field": {
+    "value": "a  b",
+    "caret": 0
+   },
+   "steps": [
+    {
+     "do": "delete-word-forward",
+     "value": "  b",
+     "caret": 0,
+     "changed": true
+    }
+   ]
+  },
+  {
+   "name": "deleting characters",
+   "field": {
+    "value": "abc",
+    "caret": 1
+   },
+   "steps": [
+    {
+     "do": "delete-char-backward",
+     "value": "bc",
+     "caret": 0,
+     "changed": true
+    },
+    {
+     "do": "delete-char-backward",
+     "value": "bc",
+     "caret": 0,
+     "changed": false
+    },
+    {
+     "do": "delete-char-forward",
+     "value": "c",
+     "caret": 0,
+     "changed": true
+    },
+    {
+     "do": "char-forward",
+     "caret": 1
+    },
+    {
+     "do": "delete-char-forward",
+     "value": "c",
+     "caret": 1,
+     "changed": false
+    }
+   ]
+  },
+  {
+   "name": "deleting to the line's ends, in an input",
+   "field": {
+    "value": "hello world",
+    "caret": 5
+   },
+   "steps": [
+    {
+     "do": "delete-to-line-end",
+     "value": "hello",
+     "caret": 5,
+     "changed": true
+    },
+    {
+     "do": "line-start",
+     "caret": 0
+    },
+    {
+     "do": "delete-to-line-start",
+     "value": "hello",
+     "caret": 0,
+     "changed": false
+    },
+    {
+     "do": "line-end",
+     "caret": 5
+    },
+    {
+     "do": "delete-to-line-start",
+     "value": "",
+     "caret": 0,
+     "changed": true
+    }
+   ]
+  },
+  {
+   "name": "lines in a multi-line field: the caret's line only",
+   "field": {
+    "value": "one\ntwo\nthree",
+    "caret": 6,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "do": "line-start",
+     "caret": 4
+    },
+    {
+     "do": "line-end",
+     "caret": 7
+    },
+    {
+     "do": "char-backward",
+     "caret": 6
+    },
+    {
+     "do": "delete-to-line-end",
+     "value": "one\ntw\nthree",
+     "caret": 6,
+     "changed": true
+    },
+    {
+     "do": "delete-to-line-start",
+     "value": "one\n\nthree",
+     "caret": 4,
+     "changed": true
+    },
+    {
+     "do": "delete-char-backward",
+     "value": "one\nthree",
+     "caret": 3,
+     "changed": true
+    }
+   ]
+  },
+  {
+   "name": "deleting to the end of a line at its end deletes nothing",
+   "field": {
+    "value": "ab\ncd",
+    "caret": 2,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "do": "delete-to-line-end",
+     "value": "ab\ncd",
+     "caret": 2,
+     "changed": false
+    },
+    {
+     "do": "delete-char-forward",
+     "value": "abcd",
+     "caret": 2,
+     "changed": true
+    }
+   ]
+  },
+  {
+   "name": "a line break is a space to the word actions",
+   "field": {
+    "value": "one\ntwo",
+    "caret": 4,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "do": "word-backward",
+     "caret": 0
+    },
+    {
+     "do": "char-forward",
+     "caret": 1
+    },
+    {
+     "do": "char-forward",
+     "caret": 2
+    },
+    {
+     "do": "char-forward",
+     "caret": 3
+    },
+    {
+     "do": "word-forward",
+     "caret": 7
+    },
+    {
+     "do": "word-backward",
+     "caret": 4
+    },
+    {
+     "do": "delete-word-backward",
+     "value": "two",
+     "caret": 0,
+     "changed": true
+    }
+   ]
+  },
+  {
+   "name": "rows: the caret keeps its place along them through a run of moves",
+   "field": {
+    "value": "abcd\nef\nghij",
+    "caret": 3,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "do": "line-next",
+     "caret": 7
+    },
+    {
+     "do": "line-next",
+     "caret": 11
+    },
+    {
+     "do": "line-previous",
+     "caret": 7
+    },
+    {
+     "do": "line-previous",
+     "caret": 3
+    }
+   ]
+  },
+  {
+   "name": "rows: from the first row to the start, from the last to the end",
+   "field": {
+    "value": "ab\ncd",
+    "caret": 1,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "do": "line-previous",
+     "caret": 0
+    },
+    {
+     "do": "char-forward",
+     "caret": 1
+    },
+    {
+     "do": "char-forward",
+     "caret": 2
+    },
+    {
+     "do": "char-forward",
+     "caret": 3
+    },
+    {
+     "do": "char-forward",
+     "caret": 4
+    },
+    {
+     "do": "line-next",
+     "caret": 5
+    }
+   ]
+  },
+  {
+   "name": "another action ends a run of row moves",
+   "field": {
+    "value": "abcd\nef\nghij",
+    "caret": 3,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "do": "line-next",
+     "caret": 7
+    },
+    {
+     "do": "char-backward",
+     "caret": 6
+    },
+    {
+     "do": "line-next",
+     "caret": 9
+    }
+   ]
+  },
+  {
+   "name": "the ends of the value",
+   "field": {
+    "value": "ab\ncd",
+    "caret": 1,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "do": "input-end",
+     "caret": 5
+    },
+    {
+     "do": "input-start",
+     "caret": 0
+    }
+   ]
+  },
+  {
+   "name": "pages: as many rows as the field shows",
+   "field": {
+    "value": "1\n2\n3\n4\n5\n6",
+    "caret": 0,
+    "multiline": true,
+    "rows": 2
+   },
+   "steps": [
+    {
+     "do": "page-down",
+     "caret": 4
+    },
+    {
+     "do": "page-down",
+     "caret": 8
+    },
+    {
+     "do": "page-up",
+     "caret": 4
+    },
+    {
+     "do": "page-up",
+     "caret": 0
+    }
+   ]
+  },
+  {
+   "name": "pages: past the ends, to the ends",
+   "field": {
+    "value": "1\n2\n3",
+    "caret": 2,
+    "multiline": true,
+    "rows": 5
+   },
+   "steps": [
+    {
+     "do": "page-down",
+     "caret": 5
+    },
+    {
+     "do": "char-backward",
+     "caret": 4
+    },
+    {
+     "do": "page-up",
+     "caret": 0
+    }
+   ]
+  },
+  {
+   "name": "pages: one row when the field does not say",
+   "field": {
+    "value": "a\nb",
+    "caret": 0,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "do": "page-down",
+     "caret": 2
+    }
+   ]
+  },
+  {
+   "name": "a line break, and typing",
+   "field": {
+    "value": "ab",
+    "caret": 1,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "do": "newline",
+     "value": "a\nb",
+     "caret": 2,
+     "changed": true
+    },
+    {
+     "value": "a\nxyb",
+     "caret": 4,
+     "changed": true,
+     "type": "xy"
+    }
+   ]
+  },
+  {
+   "name": "typing in an input",
+   "field": {
+    "value": "ac",
+    "caret": 1
+   },
+   "steps": [
+    {
+     "value": "abc",
+     "caret": 2,
+     "changed": true,
+     "type": "b"
+    },
+    {
+     "value": "abc",
+     "caret": 2,
+     "changed": false,
+     "type": ""
+    }
+   ]
+  },
+  {
+   "name": "submit and program change nothing",
+   "field": {
+    "value": "ab",
+    "caret": 1
+   },
+   "steps": [
+    {
+     "do": "submit",
+     "value": "ab",
+     "caret": 1,
+     "changed": false
+    },
+    {
+     "do": "program",
+     "value": "ab",
+     "caret": 1,
+     "changed": false
+    }
+   ]
+  },
+  {
+   "name": "a password is one word",
+   "field": {
+    "value": "hunter two",
+    "caret": 10,
+    "password": true
+   },
+   "steps": [
+    {
+     "do": "word-backward",
+     "caret": 0
+    },
+    {
+     "do": "word-forward",
+     "caret": 10
+    },
+    {
+     "do": "line-start",
+     "caret": 0
+    },
+    {
+     "do": "char-forward",
+     "caret": 1
+    },
+    {
+     "do": "char-forward",
+     "caret": 2
+    },
+    {
+     "do": "char-forward",
+     "caret": 3
+    },
+    {
+     "do": "delete-word-backward",
+     "value": "ter two",
+     "caret": 0,
+     "changed": true
+    },
+    {
+     "do": "char-forward",
+     "caret": 1
+    },
+    {
+     "do": "delete-word-forward",
+     "value": "t",
+     "caret": 1,
+     "changed": true
+    }
+   ]
+  },
+  {
+   "name": "Unicode white space is space",
+   "field": {
+    "value": "a\u00a0b\u3000c",
+    "caret": 5
+   },
+   "steps": [
+    {
+     "do": "word-backward",
+     "caret": 4
+    },
+    {
+     "do": "word-backward",
+     "caret": 2
+    }
+   ]
+  },
+  {
+   "name": "CR LF is one character",
+   "field": {
+    "value": "a\r\nb",
+    "caret": 2,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "do": "char-backward",
+     "caret": 1
+    },
+    {
+     "do": "char-forward",
+     "caret": 2
+    },
+    {
+     "do": "delete-char-backward",
+     "value": "ab",
+     "caret": 1,
+     "changed": true
+    }
+   ]
+  },
+  {
+   "name": "a cluster is one character",
+   "field": {
+    "value": "e\u0301x",
+    "caret": 2
+   },
+   "steps": [
+    {
+     "do": "delete-char-backward",
+     "value": "e\u0301",
+     "caret": 1,
+     "changed": true
+    },
+    {
+     "do": "char-backward",
+     "caret": 0
+    },
+    {
+     "do": "delete-char-forward",
+     "value": "",
+     "caret": 0,
+     "changed": true
+    }
+   ],
+   "requires": [
+    "graphemes"
+   ]
+  },
+  {
+   "name": "an emoji sequence is one character",
+   "field": {
+    "value": "\ud83d\udc69\u200d\ud83d\udcbba",
+    "caret": 1
+   },
+   "steps": [
+    {
+     "do": "delete-char-backward",
+     "value": "a",
+     "caret": 0,
+     "changed": true
+    },
+    {
+     "value": "\ud83c\uddfa\ud83c\uddf8a",
+     "caret": 1,
+     "changed": true,
+     "type": "\ud83c\uddfa\ud83c\uddf8"
+    }
+   ],
+   "requires": [
+    "graphemes"
+   ]
+  },
+  {
+   "name": "words of clusters",
+   "field": {
+    "value": "cafe\u0301 bar",
+    "caret": 8
+   },
+   "steps": [
+    {
+     "do": "word-backward",
+     "caret": 5
+    },
+    {
+     "do": "word-backward",
+     "caret": 0
+    },
+    {
+     "do": "word-forward",
+     "caret": 4
+    }
+   ],
+   "requires": [
+    "graphemes"
    ]
   }
  ]
