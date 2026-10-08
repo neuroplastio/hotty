@@ -5336,6 +5336,111 @@
      ]
     }
    ]
+  },
+  {
+   "name": "a password input edits its value, and the program hears the value in input events, never the mask it shows",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><form id=f><input id=pin name=pin type=password value=ab data-on=input></form>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "pin",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "c",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "pin",
+       "detail": {
+        "value": "abc"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Backspace",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "pin",
+       "detail": {
+        "value": "ab"
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowLeft",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "X",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "pin",
+       "detail": {
+        "value": "aXb"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Home",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Delete",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "pin",
+       "detail": {
+        "value": "Xb"
+       }
+      }
+     ]
+    }
+   ]
   }
  ],
  "wire": [
