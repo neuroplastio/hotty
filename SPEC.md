@@ -288,6 +288,7 @@ The capabilities object:
 | `net` | the host's network policy (§7.2), from directive to sources, such as `{"img-src": ["https://example.com"]}`. Absent or empty: the host fetches nothing from the network |
 | `passthrough` | `true` when the pointer passes through the parts of a surface that take no pointer (§9.3). Absent: every window takes the pointer wherever it is |
 | `scroll` | `true` when a document can ask to scroll (`scroll`, §5.1, §5.3). Absent: nothing in a surface scrolls |
+| `steps` | `true` when a drag of an element with `data-steps` says where in the element the pointer is (§9.1). Absent: a drag's detail has no `x` or `y` |
 | `host` | optional: a name for the implementation |
 | `version` | optional, with `host`: the implementation's version, as dot-separated numbers compared one by one (`"0.0.10"` is after `"0.0.9"`) |
 
@@ -788,8 +789,8 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `input` | every edit of a control with `data-on~=input` | `{"value": …}` |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields as an object of names to values, the submitter's included |
 | `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface placed with `p=1` (§5.2), except a mouse's or a pen's press with Alt held (§9.2) and where the pointer passes through (§9.3) | `area`, the cells of the element `t` names (below); none when `t` is empty |
-| `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": …, "r": …, "keys": […]}`: the pointer's cell and the keys held (§9.1) |
-| `drag` | during a drag, the element under the pointer changed (§9.1) | the same |
+| `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": …, "r": …, "keys": […]}`: the pointer's cell and the keys held, with `x` and `y`, its step, on an element with `data-steps` (§9.1) |
+| `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element (§9.1) | the same |
 | `dragend` | the drag ended: the button released or the finger lifted, wherever the pointer is (§9.1) | the same |
 | `focus`, `blur` | the surface gains or loses the keyboard (§10); `t` is empty | none |
 | `resize` | the surface's pixel size changed without its cells changing (§5.3); `t` is empty | `{"w": …, "h": …}` in CSS pixels |
@@ -881,13 +882,17 @@ let go.
     nearest element with an `id` and `drag` in its `data-on`, from the one
     under the pointer outward, and empty where there is none, outside the
     window included. While `t` is empty, a `drag` is sent each time the
-    cell under the pointer changes instead.
+    cell under the pointer changes instead. A drag of an element with
+    steps (below) also sends a `drag` each time its step changes, `x` or
+    `y`; a move that changes both the element or cell and the step sends
+    one.
   - `dragend`, once, on the release, wherever the pointer is. `t` is as
     for `drag`.
 
-  A drag therefore costs a few events for each element it crosses, not one
-  for every move.
-- **The detail** of each is `{"c": …, "r": …, "keys": […]}`:
+  A drag therefore costs a few events for each element it crosses, and one
+  for each step, not one for every move.
+- **The detail** of each is `{"c": …, "r": …, "keys": […]}`, with `x`
+  and `y` on an element with steps (below):
   - `c` and `r` are the column and the row of the surface under the
     pointer, counted from 0 at the surface's top left cell, not its
     window's (§5.2). They go on counting outside the surface: negative
@@ -898,6 +903,29 @@ let go.
     `"alt"` and `"meta"`, in that order, empty when none is. `"alt"` is
     never in `dragstart`'s: a press with Alt held starts no drag (§9.2).
     Alt pressed later is reported, and the drag goes on.
+- **Where in the element: steps.** An element that opts in to drags may say
+  how many steps its width and its height are divided into, with
+  `data-steps="<x>"` or `data-steps="<x> <y>"`: whole numbers from 0 up,
+  `0` for none along that axis. A slider from 0 to 20 has `data-steps="20"`, a vertical
+  one `data-steps="0 20"`. Each event of a drag of it then says where in
+  it the pointer is:
+  - `x`, when the first count is not 0: the pointer's distance from the
+    left edge of the element's border box, over the box's width, times
+    the count, rounded to the nearest whole number (a half up), and
+    clamped to 0 and the count. A box with no width gives 0.
+  - `y`, when the second count is not 0: the same, from the top edge, over
+    its height.
+
+  The element is the one `dragstart` names, whatever `t` says later, and
+  its box is where the user sees it at the time, scrolled (§5.3)
+  included. The step is measured against it wherever the pointer is: over
+  another element, outside the surface, or outside the window. So a
+  slider follows a finger that slips off its track until it lifts, as a
+  browser's range input does. Its counts are the ones it has when the
+  drag starts. A value that is not one or two whole numbers gives no
+  steps. If the element leaves the document during the drag, `x` and `y`
+  stay as they last were, as they do in a `dragend` that ends a drag
+  early (below). `steps` in the capabilities (§4) says a host does this.
 - **The pointer is the surface's until the release,** or the finger until
   it lifts, as a page's `setPointerCapture` makes it an element's. Every
   move goes to the drag, wherever the pointer is: over the cells, over
@@ -926,10 +954,11 @@ let go.
     `click` reports.
   - **A touch presses when it becomes a drag,** and at that moment is a
     press as a mouse's is (Order, below): `press`, if the placement asked
-    for it, then `dragstart`, both for the cell where the touch began, then
-    everything else the press causes. If the finger is by then over
-    another element than the one `dragstart` names (or, where that names
-    none, another cell), a `drag` for where it is follows.
+    for it, then `dragstart`, both for where the touch began (its cell,
+    and its step), then everything else the press causes. If the finger
+    is by then over another element than the one `dragstart` names (or,
+    where that names none, another cell), or at another step, a `drag`
+    for where it is follows.
   - **A touch the host takes as a pan** presses nothing, and stays a pan to
     its end.
   - **A touch that lifts before going past the slop** is a tap, or a long
@@ -1526,12 +1555,14 @@ A host conforms to HOTTY version 0.1 when:
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
 The vectors check replies, error codes, every delta op, morph, context
-parsing, resources, drags, presses with Alt, `fit`, hover, `area`,
-scrolling, keymaps and the envelope, and their `keys`, `keymap` and `edit`
-sections a host's key names (§10.4), keymaps and actions (§10.2). They inspect documents and events, not pixels.
+parsing, resources, drags and their steps, presses with Alt, `fit`, hover,
+`area`, scrolling, keymaps and the envelope, and their `keys`, `keymap` and
+`edit` sections a host's key names (§10.4), keymaps and actions (§10.2).
+They inspect documents and events, not pixels.
 The vectors marked `"passthrough"` apply to a host that reports it (§9.3),
-those marked `"hover"` to a host whose `events` list it (§9.4), and those
-marked `"scroll"` to a host that reports it (§5.3).
+those marked `"hover"` to a host whose `events` list it (§9.4), those
+marked `"scroll"` to a host that reports it (§5.3), and those marked
+`"steps"` to a host that reports it (§9.1).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
@@ -1712,6 +1743,16 @@ program → CSI ? 2026 l
   - **The pointer is held,** as a browser's `setPointerCapture` holds it,
     so a drag that leaves the window still ends, and the program hears
     where.
+  - **Steps say where in an element.** A slider, a splitter or a scrubber
+    needs the pointer's place along one element, finer than a cell, and
+    still after the pointer has left it, as a browser's range input keeps
+    following. A cell cannot say it: the program does not know where the
+    element is, since the layout is the host's. Pixels would cost an event
+    for every move, so the program names the steps it can use instead. It
+    hears one event for each, and the step is already the slider's value.
+    They are measured against the element the drag started on, as
+    `offsetX` is against the element that captured the pointer, and
+    clamped, as a range input's value is.
   - **Touch only where an element opts out of panning,** because a touch
     drag scrolls (below): a surface that took every touch drag would trap
     the finger. `touch-action` is the web's switch for it, which maps,

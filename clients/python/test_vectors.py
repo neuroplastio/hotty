@@ -210,7 +210,7 @@ def event_view(e):
         "link": {"href": link[0], "url": link[1]} if link else None,
         "size": {"w": size[0], "h": size[1]} if size else None,
         "fit_rows": e.fit_rows(),
-        "drag": {"c": drag.c, "r": drag.r, "keys": drag.keys} if drag else None,
+        "drag": {"c": drag.c, "r": drag.r, "keys": drag.keys, "x": drag.x, "y": drag.y} if drag else None,
         "hover": {"c": hover.c, "r": hover.r, "out": hover.out} if hover else None,
         "area": {"c": area.c, "r": area.r, "w": area.w, "h": area.h} if area else None,
     }
@@ -228,6 +228,7 @@ def caps_view(c, want):
         "net": c.net,
         "passthrough": c.passthrough,
         "scroll": c.scroll,
+        "steps": c.steps,
         "host": c.host,
         "version": c.version,
         "drags": c.drags(),

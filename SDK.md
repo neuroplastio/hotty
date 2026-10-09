@@ -438,18 +438,19 @@ read the detail, each absent when the event does not carry it:
 | `Link()` | `href`, and `url` if present | `click` on a link |
 | `Size()` | `w` and `h`, in CSS pixels | `resize` |
 | `FitRows()` | `r` | `fit` |
-| `Drag()` | `c`, `r` and `keys` | `dragstart`, `drag`, `dragend` |
+| `Drag()` | `c`, `r` and `keys`, and the steps `x` and `y`, each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover()` | `c` and `r`, or out | `hover` |
 | `Area()` | `area`: `c`, `r`, `w` and `h`, the element's cells; absent unless all four are whole numbers | `click`, `press` |
 
-A count of cells in a detail (`FitRows`, `Drag`, `Hover` and `Area`) is a
-whole number: a JSON number with no fractional part, however it is written.
-JSON has one kind of number, so `2.0` is `2`. `2.5`, or a value that is not
-a number, leaves the accessor absent.
+A count of cells or a step in a detail (`FitRows`, `Drag`, `Hover` and
+`Area`) is a whole number: a JSON number with no fractional part, however it
+is written. JSON has one kind of number, so `2.0` is `2`. `2.5`, or a value
+that is not a number, leaves the accessor absent. A step that is not one
+leaves only that step absent, and the rest of `Drag()` stands.
 
 **`Caps`** (SPEC.md §4) has every field SPEC.md lists: `V`, `Ops`,
 `Events`, `Cell` (`w`, `h`), `Scale`, `Scheme`, `Limits`, `Net`,
-`Passthrough`, `Scroll`, `Host`, `Version`. Each field is read on its own (§2.7). It
+`Passthrough`, `Scroll`, `Steps`, `Host`, `Version`. Each field is read on its own (§2.7). It
 also answers:
 - `Supports(op)`: whether `op` is in `ops`; a host that lists no ops is
   taken to support them all;
@@ -700,7 +701,10 @@ Go: `hottytest.Host`.
   passes the host vectors' `send`, `inspect` and `key` steps. It lays
   nothing out: `r=auto` gets an estimate the test may replace, and it does
   not report `scroll`, so a key bound to a scroll action goes on as if its
-  keymap did not bind it (SPEC.md §10.2).
+  keymap did not bind it (SPEC.md §10.2). Nor can it measure where in an
+  element the pointer is: a drag of an element with `data-steps` carries
+  the steps the test gives, and the host reports `steps` when the test asks
+  it to (SPEC.md §9.1).
 - **Strict by default.** A malformed message, an `EINVAL`, or a HOTTY
   command other than the query sent to a terminal that is not a host fails
   the test. A lenient host records them instead.

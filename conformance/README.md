@@ -40,8 +40,9 @@ Each vector starts on a fresh host. A vector with `"requires"` applies only
 to a host that has what it names, and others skip it: `"passthrough"`, a
 host that reports `passthrough` (SPEC §4, §9.3); `"hover"`, a host that
 lists `hover` in `events` (§9.4); `"scroll"`, a host that reports `scroll`
-(§4, §5.3); `"touch"`, a host that takes touch (SPEC §9.1, §16). A list
-names several, all required. Its steps come in five kinds.
+(§4, §5.3); `"touch"`, a host that takes touch (SPEC §9.1, §16); `"steps"`, a
+host that reports `steps` (§4, §9.1). A list names several, all required.
+Its steps come in five kinds.
 
 **Send** `{ "send": {control}, "payload": text?, "reply": …, "events": … }`:
 the command goes to the host as the program would send it. It is

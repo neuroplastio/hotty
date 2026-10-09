@@ -413,9 +413,14 @@ class Reply:
 
 @dataclass
 class Drag:
+    """A drag's cell and keys, and its steps x and y, None where the
+    element has none (SPEC §9.1)."""
+
     c: int
     r: int
     keys: list = field(default_factory=list)
+    x: int = None
+    y: int = None
 
 
 @dataclass
@@ -509,7 +514,8 @@ class Event:
         c, r, keys = _whole(self._d.get("c")), _whole(self._d.get("r")), self._d.get("keys", [])
         if c is None or r is None:
             return None
-        return Drag(c, r, [k for k in keys if isinstance(k, str)] if isinstance(keys, list) else [])
+        keys = [k for k in keys if isinstance(k, str)] if isinstance(keys, list) else []
+        return Drag(c, r, keys, _whole(self._d.get("x")), _whole(self._d.get("y")))
 
     def area(self):
         """The cells of a click's or a press's element (SPEC §9)."""
@@ -556,6 +562,7 @@ class Caps:
         self.net = {k: [s for s in v if isinstance(s, str)] for k, v in net.items() if isinstance(v, list)}
         self.passthrough = get("passthrough", lambda v: isinstance(v, bool), False)
         self.scroll = get("scroll", lambda v: isinstance(v, bool), False)
+        self.steps = get("steps", lambda v: isinstance(v, bool), False)
         self.host = get("host", lambda v: isinstance(v, str))
         self.version = get("version", lambda v: isinstance(v, str))
 
