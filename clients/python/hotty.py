@@ -173,9 +173,19 @@ def _command(pairs, payload, default_q, n=None, q=None):
     return encode(pairs, payload)
 
 
-def query(n=1):
-    """Asks whether the terminal is a host, fenced with DA1 (SPEC §4)."""
-    return encode([("a", "q"), ("n", n)]) + "\x1b[c"
+def query(n=1, late=False):
+    """Asks whether the terminal is a host, fenced with DA1 (SPEC §4); with
+    late, a late answer is welcome."""
+    pairs = [("a", "q"), ("n", n)]
+    if late:
+        pairs.append(("late", 1))
+    return encode(pairs) + "\x1b[c"
+
+
+def withdraw_late():
+    """Withdraws a query that asked for a late answer (SPEC §4): a query
+    that wants no answer, which takes its place."""
+    return encode([("a", "q"), ("q", NO_REPLY)])
 
 
 SCROLL_VERTICAL = 1
@@ -835,10 +845,13 @@ class Detector:
     """Decides whether the terminal is a HOTTY host (SPEC §4), with time
     passed in as milliseconds. `decided` is set when the state is known,
     `done` when nothing more of the detection will arrive; `deadline` is
-    when to call `tick` next (None once done)."""
+    when to call `tick` next (None once done). With `late`, the query asks
+    for a late answer, and the first reply after the state is TEXT makes the
+    terminal a host."""
 
-    def __init__(self, n=1):
+    def __init__(self, n=1, late=False):
         self.n = n
+        self.late = late
         self.state = DETECTING
         self.caps = None
         self.decided = False
@@ -856,7 +869,7 @@ class Detector:
     def start(self, now):
         """Returns the query to send (with its DA1 fence)."""
         self._timeout = now + DETECT_TIMEOUT
-        return query(self.n)
+        return query(self.n, self.late)
 
     def _fire(self, now):
         if self.done or self._timeout is None:
@@ -891,6 +904,8 @@ class Detector:
             self.state, self.decided = NATIVE, True
             self.caps = r.caps()
             self._after = min(now + DETECT_AFTER_REPLY, self._timeout)
+        elif self.state == TEXT and self.late:
+            self.state, self.caps = NATIVE, r.caps()
         return True
 
     def end(self, now):
@@ -910,7 +925,12 @@ ACTIONS = (
     "delete-char-backward", "delete-char-forward", "delete-word-backward", "delete-word-forward",
     "delete-to-line-start", "delete-to-line-end", "line-previous", "line-next", "page-up", "page-down",
     "input-start", "input-end", "newline", "submit", "program",
+) + (
+    "scroll-up", "scroll-down", "scroll-left", "scroll-right", "scroll-page-up", "scroll-page-down",
+    "scroll-half-page-up", "scroll-half-page-down", "scroll-start", "scroll-end",
 )
+# The scroll actions, which a text field's keymap leaves out (SPEC.md §10.2).
+SCROLL_ACTIONS = frozenset(a for a in ACTIONS if a.startswith("scroll-"))
 # The actions only a multi-line field has (SPEC.md §10.2).
 MULTILINE_ACTIONS = frozenset(("line-previous", "line-next", "page-up", "page-down", "input-start", "input-end", "newline"))
 # What Lookup returns for a character the field types.
@@ -1169,6 +1189,14 @@ class Keymap:
         k = parse_key(key)
         return k is not None and self._bound(k) == "program"
 
+    def scroll(self, key):
+        """The scroll action the keymap binds the key to, or None (SPEC.md
+        §10.2): a host asks it, outside a text field, for a key the element
+        does not use."""
+        k = parse_key(key)
+        a = None if k is None else self._bound(k)
+        return a if a in SCROLL_ACTIONS else None
+
     def lookup(self, key):
         """An action, INSERT for a character the field types, or None when
         the key is not the field's."""
@@ -1184,9 +1212,8 @@ class Keymap:
         return None
 
 
-def parse_keymap(value):
-    """A data-keys value's bindings, without those a host ignores."""
-    m = Keymap()
+def _bindings(value):
+    """A data-keys value's bindings, in order, without those a host ignores."""
     for b in re.split(r"[ \t\n\f\r]+", value):
         i = b.rfind("=")
         if i < 0:
@@ -1194,13 +1221,20 @@ def parse_keymap(value):
         k, a = parse_key(b[:i]), b[i + 1:]
         if k is None or a not in ACTIONS or k in ("Tab", "Shift+Tab", "Escape"):
             continue
+        yield k, a
+
+
+def parse_keymap(value):
+    """A data-keys value's bindings, without those a host ignores."""
+    m = Keymap()
+    for k, a in _bindings(value):
         m.bind(k, a)
     return m
 
 
 def resolve(multiline, *values):
     """A field's keymap: SPEC.md's default, then each data-keys value, the
-    root's first."""
+    root's first, less their scroll actions."""
     m = Keymap(multiline)
     for k, a in (("ArrowLeft", "char-backward"), ("ArrowRight", "char-forward"), ("Home", "line-start"),
                  ("End", "line-end"), ("Backspace", "delete-char-backward"), ("Delete", "delete-char-forward"),
@@ -1208,7 +1242,9 @@ def resolve(multiline, *values):
                  ("PageDown", "page-down"), ("Enter", "newline" if multiline else "submit")):
         m.bind(k, a)
     for v in values:
-        m.update(parse_keymap(v))
+        for k, a in _bindings(v):
+            if a not in SCROLL_ACTIONS:
+                m.bind(k, a)
     return m
 
 

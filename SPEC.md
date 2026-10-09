@@ -251,6 +251,29 @@ arrives before any reply, for the reply and the DA1 behind it. A host answers
 the query before that DA1, so the wait costs a terminal that is not a host
 only that little. SDK.md sets how long.
 
+**A late answer.** What stands between the program and the terminal may not
+know yet whether there will be a host: a multiplexer running a pane with no
+terminal attached. A program that can start using HOTTY after it has fallen
+back asks for a late answer with `late=1`:
+
+```
+ESC ] 7279 ; a=q:n=1:late=1 ST   CSI c
+```
+
+- A host answers it as any query, at once.
+- What passes HOTTY through and cannot answer it yet **MAY** hold it, and
+  answer it once, with the reply a host would send, as soon as there is a
+  host. It holds one query at a time: any other `a=q` takes its place. It
+  forgets the query when the program it runs ends and on a full reset
+  (RIS).
+- The program takes such a reply, whenever it arrives, as detection finding
+  a host, and may use HOTTY from then on (§14). Without `late=1`, a reply
+  that arrives once the program has fallen back changes nothing.
+- A program that will no longer take a late answer, such as one about to
+  exit, withdraws its query with `a=q:q=2`: a query that wants no answer,
+  which takes the held one's place, so that no reply reaches whatever reads
+  the terminal after it.
+
 The capabilities object:
 
 | field | meaning |
@@ -398,9 +421,12 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
     a scrollbar takes pixels inside the rectangle, never cells: the
     footprint stays the program's.
   - The user scrolls it with a wheel, a touchpad or a touch drag over its
-    window, and with the keys a browser scrolls with while the surface has
-    the keyboard (§10), but those the focused element gives the program
-    (§10.2). Focus scrolls an element into view.
+    window, and, while the surface has the keyboard (§10), with the keys a
+    browser scrolls with and those the focused element's keymap binds to a
+    scroll action, but not those it gives the program (§10.2). A key a
+    browser scrolls with that can move nothing goes on to the program, as
+    every key the surface does not use does. Focus scrolls an element into
+    view.
   - A gesture scrolls the innermost element under the pointer that can
     still move that way. Where none can, it goes on outward, and past the
     root to the terminal, as if over the cells beneath (§9), unless CSS
@@ -425,6 +451,12 @@ A placement behaves like a kitty graphics placement:
   removed when the terminal leaves the alternate screen, and the host
   **SHOULD** delete the surface as well.
 - A full reset (RIS) deletes every surface.
+- A multiplexer that passes HOTTY through, when the program a pane runs
+  ends or it starts another in its place, **SHOULD** delete the surfaces
+  and resources that program left, and no other pane's, as a full reset in
+  that pane would. Where it keeps the pane's text on the screen, it keeps
+  the detached surfaces with it (§5.5). The next program starts a session
+  of its own, and cannot know their names.
 
 A program removes a placement and keeps its surface with `a=hide`:
 
@@ -1087,6 +1119,8 @@ sends text or a key the user remapped, is the key that input reads as.
   `a=blur`.
 - **A key the element gives the program** reaches it, whatever the element
   or the scrolling (§5.3) would do with it (below, *Keys for the program*).
+- **A key the element binds to a scroll action**, and does not use, scrolls
+  the surface's document (below, *Scrolling keys*).
 - **Every other key** reaches the program as ordinary terminal input, in the
   keyboard encoding the program has enabled. A program's own keymap therefore
   keeps working while a surface holds the keyboard.
@@ -1120,7 +1154,9 @@ with `data-on~=input`, then `change`.
 
 A text field's **keymap** binds keys to editing actions. It is the default
 keymap, then the `data-keys` attribute of each element from the document's
-root down to the field, the field's own last. Each `data-keys` overrides what
+root down to the field, the field's own last. Its bindings to scroll
+actions are left out, each where it stands, as if it were not there (below,
+*Scrolling keys*). Each `data-keys` overrides what
 came before it key by key: a binding replaces the earlier binding of its key,
 and leaves the others as they were. A program sets its keymap once, on an
 element that holds its fields, and a field that needs one key otherwise says
@@ -1131,8 +1167,9 @@ tab, line feed, form feed, carriage return), as HTML's space-separated
 tokens are. A binding is
 `key=action`, split at its last `=`: the key is named as §10.4 has it
 (`Control+a`, `Alt+ArrowLeft`, `Alt+==line-start` binds `Alt+=`), and the
-action is one of the table below. A host **MUST** ignore a binding whose key
-does not parse or whose action it does not know, and bindings of Tab,
+action is one of the table below or a scroll action (*Scrolling keys*). A
+host **MUST** ignore a binding whose key does not parse or whose action it
+does not know, and bindings of Tab,
 Shift+Tab and Escape, which keep their meaning above.
 
 The default keymap is:
@@ -1204,14 +1241,16 @@ The actions:
 A key that the focused element's keymap binds to `program` reaches the
 program, before the element uses it and before the surface scrolls with it
 (§5.3), whatever the element.
-- **Every focused element has a keymap**, read as a text field's is: the
-  `data-keys` of each element from the document's root down to it, the
-  element's own last, each overriding what came before it key by key. A
+- **Every focused element has a keymap**, read as a text field's is, but
+  with its scroll actions: the `data-keys` of each element from the
+  document's root down to it, the element's own last, each overriding what
+  came before it key by key. A
   key with Shift that is not bound is looked up again without it. Only a
   text field starts from the default keymap.
-- **Outside a text field,** `program` is the only action a keymap gives.
-  Its other bindings still override farther ones key by key, but do
-  nothing there: the element uses those keys as the table above says.
+- **Outside a text field,** a keymap gives only `program` and the scroll
+  actions (below). Its other bindings still override farther ones key by
+  key, but do nothing there: the element uses those keys as the table
+  above says.
 - **With no element focused** there is no keymap. A program that wants
   keys in a surface with nothing to focus gives an element a `tabindex`
   and focuses it.
@@ -1220,6 +1259,49 @@ So a program that works a list, a menu or a table with the arrows keeps
 them on the element that holds it. On a button in a scrolling surface,
 `data-keys="ArrowUp=program ArrowDown=program"` sends the arrows to the
 program, where they would otherwise scroll the surface.
+
+#### Scrolling keys
+
+A focused element's keymap may bind keys to scroll actions, so that the keys
+a program scrolls its cells with, such as a pager's `j` and `k`, scroll its
+surfaces where the host scrolls them (§5.3):
+
+| action | scrolls |
+| --- | --- |
+| `scroll-up`, `scroll-down` | up, or down, as far as the host scrolls with ArrowUp and ArrowDown |
+| `scroll-left`, `scroll-right` | left, or right, as far as with ArrowLeft and ArrowRight |
+| `scroll-page-up`, `scroll-page-down` | up, or down, as far as with Page Up and Page Down |
+| `scroll-half-page-up`, `scroll-half-page-down` | up, or down, by half the height of the box it scrolls (its scrollport) |
+| `scroll-start`, `scroll-end` | to the top, or the bottom, as Home and End |
+
+- **What scrolls** is the nearest element that scrolls (the root, or an
+  element whose `overflow` is `auto` or `scroll`), from the focused element
+  outward, itself included. Where it cannot move that way, the key goes
+  outward as a gesture does (§5.3), as far as `overscroll-behavior` lets
+  it, and never past the root: a key never scrolls the terminal. Where
+  nothing it may reach can move, the key is used, and does nothing, unlike
+  a key a browser scrolls with, which then goes on to the program (§5.3).
+- **Order.** A key bound to `program` is the program's (above). Any other
+  key the focused element uses (the table at the start of §10.2) stays the
+  element's: Space on a button presses it, and a character on a select
+  picks. A key the element does not use and its keymap binds to a scroll
+  action scrolls, before the surface's own scrolling keys (§5.3), and does
+  not reach the program.
+- **Along an axis the document does not scroll** (§5.1 `scroll`), a scroll
+  action does nothing, and the key goes on as if its keymap did not bind
+  it. On a host without `scroll`, and on one older than these actions,
+  which ignores them, the program hears these keys as before.
+- **A text field's keymap leaves scroll actions out.** A binding to one
+  neither acts nor overrides the bindings before it, so a field inside an
+  element that scrolls with `j` still types `j`, and a `textarea` keeps
+  `page-down` on Page Down. A field's own text follows its caret (§5.3).
+
+So a program that pages its cells with `j`, `k`, `g`, `G`, Space and `b`
+binds the same keys on the element that scrolls on a surface:
+`data-keys="j=scroll-down k=scroll-up g=scroll-start G=scroll-end
+Space=scroll-page-down Shift+Space=scroll-page-up b=scroll-page-up"`
+(Shift+Space, or it would page down as Space does). Its buttons keep Space,
+and its fields type every letter.
 
 ### 10.3 Key releases
 
@@ -1354,7 +1436,8 @@ A host **MUST** ensure that:
 ## 14. Degradation
 
 A program **SHOULD** work without a host.
-- When detection (§4) finds none, it paints its interface as terminal text,
+- When detection (§4) finds none, it paints its interface as terminal text
+  (until a late answer finds one, §4),
   and should not send HOTTY commands to a terminal that is not a host.
 - The same program can use HOTTY where it is available and text where it is
   not, with no change to how it runs.
@@ -1536,9 +1619,19 @@ program → CSI ? 2026 l
   exits, a shell would read them as typed text. Only the program knows when
   it is done with a surface, and printing a document is the common case,
   hence `d=1`. A program that crashes cannot detach. What ran it can, if it
-  knows the surfaces' names; otherwise they keep reporting until they are
-  deleted or leave the scrollback, as a crashed program can leave mouse
-  reporting on.
+  knows the surfaces' names, and a multiplexer deletes those of the
+  program a pane runs when it ends (§5.4); otherwise they keep reporting
+  until they are deleted or leave the scrollback, as a crashed program can
+  leave mouse reporting on.
+- **Why a late answer.** A multiplexer can run a pane with no terminal
+  attached: restored after a reboot, or started from a script. Detection
+  then finds no host, and a program that settled on text at its start
+  would stay text after a terminal that is a host attaches. The late
+  answer is asked for, so a program that expects no reply after its fence
+  never gets one, and it comes once, so it is not a stream of changes.
+  Terminals report what changes later in the same way, such as the colour
+  scheme (mode 2031) and the window's size (mode 2048): the program asks,
+  and hears when there is something to say.
 - **Why `press`.** A program that shows several surfaces moves its own
   selection to the one the user goes to: a dashboard selects the card
   pressed, and a multiplexer that draws its panes and tools as surfaces
@@ -1701,6 +1794,20 @@ program → CSI ? 2026 l
   in a browser stops that with script (`preventDefault`); a surface has
   none, so the document says beforehand, in the `data-keys` it already
   reads for fields.
+- **Why scrolling keys.** Pagers and viewers in the terminal (less, vim,
+  Bubble Tea's viewport, glow) share `j` and `k`, Space and `b`, `g` and
+  `G`. A program that scrolls its cells with them should scroll its
+  surfaces with the same keys, but only the host scrolls a surface
+  (§5.3), and it cannot know which keys the program scrolls with, so the
+  program says, as it does for a field's keys.
+  - **The element's own keys come first,** so bindings on an element that
+    scrolls take neither Space from the buttons in it nor a letter from
+    its selects.
+  - **A field leaves them out,** or `j` could not be typed in a field
+    inside an element that scrolls with it.
+  - **Never the terminal:** a key that reached an end and went on to
+    scroll the screen would move what the program drew around the
+    surface.
 
 ## Appendix C. Prior art
 

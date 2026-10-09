@@ -19,6 +19,23 @@
    ]
   },
   {
+   "name": "a host answers a query that asks for a late answer at once, as any query (SPEC \u00a74)",
+   "steps": [
+    {
+     "send": {
+      "a": "q",
+      "n": "5",
+      "late": "1"
+     },
+     "reply": {
+      "a": "ok",
+      "n": "5",
+      "re": "q"
+     }
+    }
+   ]
+  },
+  {
    "name": "an unknown action is EINVAL",
    "steps": [
     {
@@ -7011,6 +7028,286 @@
      ]
     }
    ]
+  },
+  {
+   "name": "a key a focused element's keymap binds to a scroll action scrolls the nearest element that can still move that way, then outward, never past the root; a key the element uses stays its own, one with nowhere to go is used and does nothing, and one along an axis the document does not scroll goes on to the program (SPEC \u00a710.2, \u00a75.3)",
+   "requires": "scroll",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}#v{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#t{height:var(--hotty-cell-h)}</style><div id=v tabindex=0 data-keys=\"j=scroll-down l=scroll-right g=scroll-start G=scroll-end Space=scroll-page-down\"><button id=b0>0</button><button id=b1>1</button><button id=b2>2</button><button id=b3>3</button><button id=b4>4</button><button id=b5>5</button></div><div id=t>t</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "v",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "G",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      0,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b4",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "G",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      0,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b5",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b5",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "j",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      0,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b1",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "x",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "l",
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "along an axis the document does not scroll, a key bound to a scroll action goes on as if it were not bound (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}#v{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#t{height:var(--hotty-cell-h)}</style><div id=v tabindex=0 data-keys=\"G=scroll-end\"><button id=b0 data-keys=\"j=scroll-down\">0</button></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "v",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "G",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b0",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "j",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "G",
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a text field's keymap leaves scroll actions out: an inherited j=scroll-down types j, and a nearer k=scroll-up leaves k to a farther program (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><div data-keys=\"k=program\"><div data-keys=\"j=scroll-down k=scroll-up\"><input id=i data-on=input></div></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "i",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "j",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "value": "j"
+       }
+      }
+     ]
+    },
+    {
+     "key": "k",
+     "terminal": true,
+     "events": []
+    }
+   ]
   }
  ],
  "wire": [
@@ -7103,6 +7400,45 @@
     },
     {
      "raw": "\u001b[c"
+    }
+   ]
+  },
+  {
+   "name": "query asking for a late answer: late=1 (SPEC \u00a74)",
+   "build": "query",
+   "args": {
+    "n": 1
+   },
+   "options": {
+    "late": true
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "q",
+       "n": "1",
+       "late": "1"
+      }
+     }
+    },
+    {
+     "raw": "\u001b[c"
+    }
+   ]
+  },
+  {
+   "name": "withdraw_late: a=q:q=2, a query that wants no answer and takes the held one's place, with no fence (SPEC \u00a74)",
+   "build": "withdraw_late",
+   "args": {},
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "q",
+       "q": "2"
+      }
+     }
     }
    ]
   },
@@ -9947,6 +10283,51 @@
    ]
   },
   {
+   "name": "with Late, the first reply after the state is text is a late answer: the terminal is a host from then on, and a second reply changes nothing (SPEC \u00a74)",
+   "late": true,
+   "steps": [
+    {
+     "at": 0,
+     "start": true,
+     "state": "detecting",
+     "deadline": 1500
+    },
+    {
+     "at": 10,
+     "da1": true,
+     "took": true,
+     "deadline": 160
+    },
+    {
+     "at": 160,
+     "tick": true,
+     "state": "text",
+     "decided": true,
+     "done": true,
+     "deadline": null
+    },
+    {
+     "at": 60000,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "took": true,
+     "state": "native",
+     "decided": true,
+     "done": true,
+     "deadline": null
+    },
+    {
+     "at": 60010,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4yIn0=\u001b\\",
+     "took": true,
+     "state": "native",
+     "done": true
+    }
+   ],
+   "caps": {
+    "v": "0.1"
+   }
+  },
+  {
    "name": "a DA1 at the grace period's end comes too late",
    "steps": [
     {
@@ -10650,7 +11031,7 @@
    }
   },
   {
-   "name": "outside a text field a keymap has no default, and only program counts: a key bound to it, or an unbound key with Shift whose key without it is; a nearer binding of the key to another action cancels it, and Escape and Tab cannot be bound (SPEC \u00a710.2)",
+   "name": "outside a text field a keymap has no default, and only program gives keys to the program: a key bound to it, or an unbound key with Shift whose key without it is; a nearer binding of the key to another action cancels it, and Escape and Tab cannot be bound (SPEC \u00a710.2)",
    "keys": [
     "ArrowDown=program End=program PageUp=program Control+n=program Escape=program Tab=program",
     "End=line-end"
@@ -10677,6 +11058,54 @@
    "program": {
     "ArrowDown": true,
     "Shift+ArrowDown": false
+   }
+  },
+  {
+   "name": "scroll actions parse, and a binding to an action no host knows is dropped (SPEC \u00a710.2)",
+   "parse": "j=scroll-down k=scroll-up h=scroll-left l=scroll-right Space=scroll-page-down b=scroll-page-up d=scroll-half-page-down u=scroll-half-page-up g=scroll-start G=scroll-end x=scroll-sideways",
+   "format": "j=scroll-down k=scroll-up h=scroll-left l=scroll-right Space=scroll-page-down b=scroll-page-up d=scroll-half-page-down u=scroll-half-page-up g=scroll-start G=scroll-end"
+  },
+  {
+   "name": "a text field's keymap leaves scroll actions out: they neither act nor override what came before, so j is typed, a farther program keeps k, and PageDown keeps page-down (SPEC \u00a710.2)",
+   "multiline": true,
+   "keys": [
+    "k=program",
+    "j=scroll-down k=scroll-up PageDown=scroll-page-down"
+   ],
+   "lookup": {
+    "j": "insert",
+    "k": null,
+    "PageDown": "page-down"
+   }
+  },
+  {
+   "name": "a field leaves a scroll binding out where it stands: in the same value, it does not override an earlier binding of its key (SPEC \u00a710.2)",
+   "multiline": false,
+   "keys": [
+    "Control+d=delete-char-forward Control+d=scroll-half-page-down"
+   ],
+   "lookup": {
+    "Control+d": "delete-char-forward"
+   }
+  },
+  {
+   "name": "outside a text field, Scroll gives the action a key is bound to, with the fallback without Shift; a nearer scroll binding takes the key from a farther program (SPEC \u00a710.2)",
+   "keys": [
+    "k=program j=program ArrowDown=scroll-up",
+    "j=scroll-down ArrowDown=scroll-down"
+   ],
+   "program": {
+    "k": true,
+    "j": false,
+    "ArrowDown": false
+   },
+   "scroll": {
+    "j": "scroll-down",
+    "k": null,
+    "ArrowDown": "scroll-down",
+    "Shift+ArrowDown": "scroll-down",
+    "Control+ArrowDown": null,
+    "x": null
    }
   }
  ],

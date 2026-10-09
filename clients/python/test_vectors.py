@@ -103,7 +103,9 @@ def build(b):
     ro = {k: o[k] for k in ("n", "q") if k in o}
     name = b["build"]
     if name == "query":
-        return hotty.query(a["n"])
+        return hotty.query(a["n"], late=o.get("late", False))
+    if name == "withdraw_late":
+        return hotty.withdraw_late()
     if name == "doc":
         return hotty.doc(a["surface"], a["html"], detached=o.get("detached", False), scroll=o.get("scroll", 0), **ro)
     if name == "place":
@@ -337,7 +339,7 @@ def run_scan(v):
 
 
 def run_detect(v):
-    det = hotty.Detector(v.get("n", 1))
+    det = hotty.Detector(v.get("n", 1), late=v.get("late", False))
     dec = hotty.Decoder()
     for i, st in enumerate(v["steps"]):
         at = st["at"]
@@ -380,12 +382,16 @@ def run_keys(v):
 
 
 def run_keymap(v):
-    if "program" in v:
+    if "program" in v or "scroll" in v:
         m = hotty.parse_keymap(" ".join(v["keys"]))
-        for key, want in v["program"].items():
+        for key, want in v.get("program", {}).items():
             got = m.program(key)
             if got != want:
                 return False, f"{key!r}: program {got!r}, want {want!r}"
+        for key, want in v.get("scroll", {}).items():
+            got = m.scroll(key)
+            if got != want:
+                return False, f"{key!r}: scroll {got!r}, want {want!r}"
         return True, ""
     if "lookup" not in v:
         got = hotty.parse_keymap(v["parse"] if "parse" in v else hotty.TERMINAL_KEYS).format()

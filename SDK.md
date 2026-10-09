@@ -226,7 +226,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 
 | builder | sends | parameters | default `q` |
 | --- | --- | --- | --- |
-| `Query` | `a=q:n=<n>`, then DA1 (`ESC [ c`) | n | none |
+| `Query` | `a=q:n=<n>`, `late=1` with the `Late` option, then DA1 (`ESC [ c`) | n | none |
 | `Doc` | `a=doc:s` and the HTML; `d=1` with the `Detached` option, `scroll` with `Scroll` | surface, html | 1 |
 | `Place` | `a=place` (§3.4.1) | surface, placement | 1 |
 | `PlaceAt` | `ESC 7`, `ESC [ <y+1> ; <x+1> H`, `Place` with `C=1`, `ESC 8` | surface, x, y, placement | 1 |
@@ -245,6 +245,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | `Focus` | `a=focus:s[:t]`; `t` only when given | surface, target | 2 |
 | `Blur` | `a=blur:s` | surface | 2 |
 | `Sync` | `CSI ? 2026 h`, the commands, `CSI ? 2026 l` (SPEC.md §6.3) | commands | — |
+| `WithdrawLate` | `a=q:q=2`: withdraws a query that asked for a late answer (SPEC.md §4) | — | — |
 
 - **`Doc` and `Place` answer errors**, since a refused document or placement
   (`EQUOTA`, `ENOENT`) is something a program must hear. Everything else
@@ -272,11 +273,14 @@ A `Placement` says where and how a surface is shown (SPEC.md §5.2):
 
 #### 3.4.2 Reply options
 
-Every builder but `Query` and `Sync` takes two options:
+Every builder but `Query`, `Sync` and `WithdrawLate` takes two options:
 - **`N(n)`** numbers the command and asks for its reply: `n=<n>`, and
   `q=0` unless the program gives `Q`.
 - **`Q(q)`** sets the quiet level. A `Q` given wins over the level `N`
   implies, whatever the order in which the program gives them.
+
+`Query` takes one option of its own, **`Late`** (`late=1`): the program
+asks for a late answer (SPEC.md §4).
 
 Each key goes out once. `Doc` also takes **`Detached`** (`d=1`) and
 **`Scroll(axes)`** (`scroll=<axes>`, SPEC.md §5.1): a bitmask of
@@ -369,7 +373,8 @@ same in every SDK and environment, and the `detect` vectors check it step
 by step.
 
 - **`Start(now)`** returns the query to send: `Query(n)`, `n` 1 unless the
-  program chooses another.
+  program chooses another, with `Late` when the program asks for a late
+  answer (SPEC.md §4).
 - **`DA1(now)`**: a DA1 answer arrived. It returns whether the answer was
   detection's. **`Reply(r, now)`**: a reply arrived; it returns whether it
   answers the query. **`Tick(now)`**: the time is now. **`End(now)`**: the
@@ -389,12 +394,14 @@ The rules, with their times:
 | the grace ends with no reply | `text`: not a host. Decided and done |
 | 1500 ms with no answer at all | `text`. Decided and done |
 | the input ends | `text` if nothing was decided. Done |
+| with `Late`, a reply that answers the query once the state is `text` | a late answer: `native`, with its capabilities. Still decided and done |
 
 - **Which inputs are detection's.** Every DA1 from the start until done is
   detection's, and the SDK layer swallows it: it answers the query's fence or
   an earlier question, and is no key. After done, a DA1 is not
   detection's. A reply that answers the query is detection's whenever it
-  arrives, even after the state is `text`; a late one changes nothing.
+  arrives, even after the state is `text`; a late one changes nothing,
+  unless the query asked for it (`Late`), and then only the first.
   Replies with another `n`, error replies, and everything else are not.
 - **Decided and done** differ only for a host: it is known to be one when
   its reply arrives, and the detection is over when nothing more of it will
@@ -463,7 +470,8 @@ also answers:
 What a text field does with a key (SPEC.md §10.2, §10.4), as data: so that a
 program that draws its fields in cells edits them as a host edits them on a
 surface, and the keymap it gives a surface is the one it uses in cells. And
-which keys any other element gives the program, for a host.
+which keys any other element gives the program, or scrolls with, for a
+host.
 
 - **`ParseKey(name)`** reads a key's name in any of the forms SPEC.md §10.4
   allows (`Shift+Control+a`, `Control+ `) and returns it in the canonical
@@ -484,7 +492,9 @@ which keys any other element gives the program, for a host.
   separated by a space.
 - **`Resolve(multiline, values…)`** builds a field's keymap: SPEC.md's
   default keymap for an `input`, or for a multi-line field, then each
-  `data-keys` value in turn, the root's first.
+  `data-keys` value in turn, the root's first. A binding to a scroll action
+  is left out where it stands, in its own value too: it neither acts nor
+  overrides an earlier binding of its key (SPEC.md §10.2).
 - **`Lookup(key)`** on a resolved keymap returns what the field does with
   the key: an action; `insert` for a character it types; or absent when the
   key is not the field's (it reaches the program, or Tab moves focus). Tab,
@@ -497,6 +507,10 @@ which keys any other element gives the program, for a host.
   with a space, the root's first, with no default keymap; a key it gives
   reaches the program before the element or a scroll uses it (SPEC.md
   §10.2, keys for the program).
+- **`Scroll(key)`** returns the scroll action a keymap binds the key to,
+  with the same fallback without Shift, or absent. A host asks it of the
+  keymap it asks `Program` of, for a key the element does not use (SPEC.md
+  §10.2, scrolling keys).
 - **`TerminalKeys`** is the SDK's keymap, the same in every SDK (§2.3): the
   keys of Bubble Tea's text input and text area (bubbles), which a program
   that edits fields in cells is likely to share. A program puts it in the
@@ -552,6 +566,11 @@ documents and exits, one that asks a question, a chart that streams. Go:
   return the first answer. It returns when the Detector is done, so that
   nothing of the detection is left for whatever reads the terminal next. A
   terminal made with `known` answers at once.
+- **A late answer.** A terminal opened with `Late` asks for one (SPEC.md
+  §4). If it comes, it goes to the event stream as the host's capabilities,
+  and `Detect()` answers with it from then on. Until it comes, `Close()`
+  withdraws the query (`WithdrawLate`), so that no answer reaches whatever
+  reads the terminal next.
 - **Requests.** `Request(build)` sends one command numbered with `N` and
   waits for its reply, 3 s at most. The number is never 1, which is the
   query's. An error reply is a reply, not an error; no reply in time is an
@@ -576,8 +595,9 @@ documents and exits, one that asks a question, a chart that streams. Go:
   environment provides, so that two runs never share a surface. Every name
   is remembered (`Surfaces()`), and `DetachAll()` detaches them all.
 - **Closing.** `Close()` gives the terminal back as it was (its mode, its
-  file). It sends nothing: what is left on the screen, and the replies not
-  read, are the program's to settle first (§2.6).
+  file). It sends nothing but a withdrawal of a late query (above): what is
+  left on the screen, and the replies not read, are the program's to
+  settle first (§2.6).
 - **Raw mode.** Calls that wait for the terminal put it in raw mode for
   themselves. A program that reads keys asks for it once.
 - **The polyfill.** `KittyGraphics()` **MAY** be provided: whether a
@@ -617,6 +637,11 @@ frameworks get their own adapter, with the same responsibilities.
 - **Modes.** `Detecting` until the Detector decides, then `Native` (a host)
   or `Text` (not one). In `Text` the Session sends nothing, and the program
   draws everything in cells.
+- **A late answer.** A Session made with `Late` asks for one (SPEC.md §4).
+  If it comes while the mode is `Text`, the mode becomes `Native`, ready is
+  sent again, and the program is asked for a layout: a program that asks
+  for a late answer draws either rendition whenever the mode says. Until
+  it comes, `Close()` withdraws the query (`WithdrawLate`).
 - **Layout.** With each frame, the program says which surfaces it wants
   where: name, rectangle on the screen, an optional clip (the part of the
   screen the surface shows in, such as a scrolling region), `Keep`, `Z`,
@@ -661,12 +686,16 @@ Go: `hottytest.Host`.
   cursor's position, the background colour, and, when asked to, the kitty
   graphics query. It tracks the alternate screen and full resets as a host
   does (SPEC.md §5.4), and keeps the cells the program printed. Made as a
-  terminal that is not a host, it answers no HOTTY command.
+  terminal that is not a host, it answers no HOTTY command, until the test
+  makes it a host, as a multiplexer's terminal attaching does: then it
+  answers a query that asked for a late answer and was not answered
+  (SPEC.md §4), and every command after.
 - **The host.** It keeps every surface's document with the delta operations
   and the morph of SPEC.md §6, answers as SPEC.md §3.6 has hosts do, and
   passes the host vectors' `send`, `inspect` and `key` steps. It lays
   nothing out: `r=auto` gets an estimate the test may replace, and it does
-  not scroll.
+  not report `scroll`, so a key bound to a scroll action goes on as if its
+  keymap did not bind it (SPEC.md §10.2).
 - **Strict by default.** A malformed message, an `EINVAL`, or a HOTTY
   command other than the query sent to a terminal that is not a host fails
   the test. A lenient host records them instead.
@@ -732,7 +761,7 @@ of more than one code point.
 | `scan` | the Scanner (§3.7) | SDKs |
 | `detect` | the Detector (§3.8) | SDKs |
 | `keys` | key names and `DecodeKeys` (§3.10, SPEC.md §10.4) | hosts and SDKs |
-| `keymap` | `ParseKeymap`, `Resolve`, `Lookup`, `Program` and `TerminalKeys` (§3.10, SPEC.md §10.2) | hosts and SDKs |
+| `keymap` | `ParseKeymap`, `Resolve`, `Lookup`, `Program`, `Scroll` and `TerminalKeys` (§3.10, SPEC.md §10.2) | hosts and SDKs |
 | `edit` | the actions on a value: a Field (§4.6) | hosts, and SDKs with a Field |
 
 An SDK conforms when it meets every **MUST** of this document and passes
@@ -785,8 +814,9 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Res`, `DelRes` | `Res`, `DelRes` | `res`, `del_res` | `res`, `del_res` | `res`, `del_res` | `res`, `delRes` |
 | `Del`, `DelAll` | `Del`, `DelAll` | `delete`, `del_all` | `del`, `del_all` | `del`, `del_all` | `del`, `delAll` |
 | `Detach`, `Focus`, `Blur`, `Sync` | the same | `detach`, `focus`, `blur`, `sync` | as Python | as Python | `detach`, `focus`, `blur`, `sync` |
+| `WithdrawLate` | `hotty.WithdrawLate` | `withdraw_late` | `withdraw_late` | `withdraw_late` | `withdrawLate` |
 | `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor }` |
-| `N`, `Q`, `Detached`, `Scroll` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)` | `n=`, `q=`, `detached=`, `scroll=` | `{ n = …, q = …, detached = …, scroll = … }` | builder methods | `{ n, q, detached, scroll }` |
+| `N`, `Q`, `Detached`, `Scroll`, `Late` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)`, `hotty.Late()` | `n=`, `q=`, `detached=`, `scroll=`, `late=` | `{ n = …, q = …, detached = …, scroll = …, late = … }` | builder methods | `{ n, q, detached, scroll, late }` |
 | `ScrollVertical`, `ScrollHorizontal` | `hotty.ScrollVertical`, `hotty.ScrollHorizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` |
 | `Decoder.Feed`, `Invalid` | `(*Decoder).Feed`, `.Invalid` | `Decoder.feed`, `.invalid` | `decoder:feed` | `Decoder::feed` | `Decoder.feed` |
 | `Scanner`, `Detector` | `Scanner`, `Detector` | `Scanner`, `Detector` | `scanner`, `detector` | `Scanner`, `Detector` | `Scanner`, `Detector` |
@@ -794,7 +824,7 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |
 | `FitRows`, `CellCSS` | `FitRows`, `CellCSS` | `fit_rows`, `cell_css` | as Python | as Python | `fitRows`, `cellCss` |
 | `ParseKey`, `DecodeKeys` | `hotty.ParseKey`, `hotty.DecodeKeys` | `parse_key`, `decode_keys` | as Python | as Python | `parseKey`, `decodeKeys` |
-| `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Program`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Program`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.program`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:program`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.program`, `.format` |
+| `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Program`, `Scroll`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Program`, `.Scroll`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.program`, `.scroll`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:program`, `:scroll`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.program`, `.scroll`, `.format` |
 | `TerminalKeys` | `hotty.TerminalKeys` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` |
 | `Field`, `Do`, `Type` | `hottyedit.Field`, `(*Field).Do`, `.Type` | `Field`, `.do`, `.type` | `field`, `:do_action` (`do` is a keyword), `:type` | `Field`, `do_action`, `type_text` | `Field`, `.do`, `.type` |
 

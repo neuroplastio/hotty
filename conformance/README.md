@@ -156,9 +156,10 @@ implements, and skips the rest:
 
 **Build** `{ "build": builder, "args": {…}, "options": {…}?, "out": [ … ] }`:
 the runner calls the builder with `args`, and with the reply options `n`
-and `q`, `detached` and `scroll` from `options`, which have no order. `sync` takes
-`args.commands`, each a `{ "build", "args", "options" }` of its own. The
-output, split into raw bytes and HOTTY sequences, must be `out`:
+and `q`, `detached`, `scroll` and `late` from `options`, which have no
+order. `sync` takes `args.commands`, each a `{ "build", "args", "options" }`
+of its own. The output, split into raw bytes and HOTTY sequences, must be
+`out`:
 - `{ "raw": text }`: bytes that are not HOTTY's, such as `PlaceAt`'s cursor
   moves, `Query`'s DA1 and `Sync`'s brackets;
 - `{ "cmd": { "control": {…}, "payload": text? } }`: one command, decoded.
@@ -218,10 +219,11 @@ holds after the stream `held` (none when absent), what `Flush` returns
   first when `terminal_keys` is true, then each of `keys`. `Lookup` of each
   key of `lookup` must return its value: an action, `"insert"`, or `null`
   when the key is not the field's;
-- `{ "keys": [ … ], "program": { key: bool } }`: an element's keymap
-  outside a text field, with no default keymap: `ParseKeymap` of `keys`
-  joined with a space, the root's first. `Program` of each key of
-  `program` must return its value.
+- `{ "keys": [ … ], "program"?: { key: bool }, "scroll"?: { key: action |
+  null } }`: an element's keymap outside a text field, with no default
+  keymap: `ParseKeymap` of `keys` joined with a space, the root's first.
+  `Program` of each key of `program`, and `Scroll` of each key of
+  `scroll`, must return its value, `null` for none.
 
 **Edit** `{ "field": { "value", "caret", "multiline"?, "password"?, "rows"?
 }, "steps": [ … ] }`: a Field (SDK.md §4.6) made from `field`, absent keys
@@ -231,8 +233,9 @@ false, or 1 for `rows`. Each step is `{ "do": action }` or `{ "type": text
 `"requires": ["graphemes"]` marks the vectors whose text has a character of
 more than one code point, other than CR LF.
 
-**Detect** `{ "n"?: n, "steps": [ … ], "caps"?: {…} }`: one Detector, with
-the query's number `n` (1 when absent). Each step happens at time `at`, in
+**Detect** `{ "n"?: n, "late"?: true, "steps": [ … ], "caps"?: {…} }`: one
+Detector, with the query's number `n` (1 when absent), asking for a late
+answer when `late` is true. Each step happens at time `at`, in
 milliseconds, and is one of `start`, `da1`, `osc` (a sequence, decoded, and
 given to `Reply`), `tick` and `end`. After each, every key the step lists
 must equal the Detector's: `took` (what `DA1` or `Reply` returned), `state`
