@@ -294,6 +294,12 @@ The capabilities object:
 
 Programs **MUST** ignore fields they do not know.
 
+The capabilities describe the host when it answers. `cell` and `scale`
+change during a session, with the terminal's zoom, its font, or the
+display it is on (§5.3). A cell's size in CSS pixels, `cell` over `scale`,
+changes only with the font, and the host then sends `resize` (§9). A
+program that keeps it asks again (`a=q`) then.
+
 ## 5. Surfaces
 
 A **surface** is one HTML document, named by the program, and at most one
@@ -361,7 +367,7 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   reply carries them (§3.5). `f` other than `1` is as if absent. A
   document's height changes after it is placed when a resource it refers to
   arrives or is replaced (§7.1), an image or font it fetched loads (§7.2), a
-  delta changes it (§6), or the cell size changes (§5.3).
+  delta changes it (§6), or a cell's size in CSS pixels changes (§5.3).
   - The placement keeps its size: the footprint is the program's (§11), and
     placing the surface again with the new rows is the program's to do.
   - A host sends at most one `fit` per surface per frame it draws, with the
@@ -434,9 +440,18 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
     `overscroll-behavior` stops it there.
   - Scrolling is local: the program hears nothing of it. A delta keeps the
     offsets (§6.2), and a new document starts at the top left.
-- When the cell size changes (a zoom or a font change), the rectangle keeps
-  its cells and changes its pixels. The host lays the document out again,
-  with no involvement from the program, and sends `resize` (§9).
+- When the cell size changes, the rectangle keeps its cells and changes
+  its pixels:
+  - **A zoom**, the user enlarging or shrinking the terminal for the
+    moment, or **a display** with another pixel density, changes how many
+    device pixels a CSS pixel is. `scale` (§4) follows, so a cell and the
+    root font keep their size in CSS pixels, and the document keeps its
+    layout, as a page in a frame does under a browser's zoom. The host
+    draws it again at the new scale, and the program hears nothing.
+  - **The terminal's font**, a new family or size in its settings,
+    changes a cell's size in CSS pixels. The host lays the document out
+    again, with no involvement from the program, and **SHOULD** send
+    `resize` (§9).
 - Pixels inside the rectangle **MAY** differ between hosts, as text does
   between fonts. The cell footprint **MUST NOT**.
 
@@ -765,8 +780,10 @@ button:enabled, input:is([type=button], [type=submit], [type=reset]):enabled {
   - `ansi-8` (bright black) is the dim grey themes give for secondary
     text: borders, buttons, placeholders and what is disabled. A disabled
     button keeps the background, so its text stays legible.
-- When the terminal's theme, font or cell size changes, the host updates the
-  stylesheet and draws every surface again.
+- When the terminal's theme or font changes, the host updates the
+  stylesheet and draws every surface again. A zoom changes neither
+  `--hotty-cell-*` nor `font-size`: the host draws every surface again at
+  the new scale (§5.3).
 
 The custom-property prefix `--hotty-` and the attribute prefix `data-hotty-`
 are reserved for this specification.
@@ -793,7 +810,7 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element (§9.1) | the same |
 | `dragend` | the drag ended: the button released or the finger lifted, wherever the pointer is (§9.1) | the same |
 | `focus`, `blur` | the surface gains or loses the keyboard (§10); `t` is empty | none |
-| `resize` | the surface's pixel size changed without its cells changing (§5.3); `t` is empty | `{"w": …, "h": …}` in CSS pixels |
+| `resize` | the surface's size in CSS pixels changed without its cells changing: the terminal's font changed (§5.3); `t` is empty | `{"w": …, "h": …}` in CSS pixels |
 | `fit` | on a placement made with `f=1` (§5.2), the rows the document needs at the placement's width changed; `t` is empty | `{"r": …}`: the rows `r=auto` would choose now |
 | `hover` | on a placement made with `v=1` (§5.2), the element the pointer is over changed, or the pointer left the window (§9.4) | `{"c": …, "r": …}`: the pointer's cell (§9.1); `{"out": true}` when it left, with `t` empty |
 
@@ -1671,6 +1688,18 @@ program → CSI ? 2026 l
   program the rows the content needs now; the program decides where they
   come from. It is opt-in so a program that never sizes by content hears
   nothing new.
+- **Why a zoom keeps the layout.** A zoom is the user's, for the moment:
+  the terminal's text grows, and a surface over it should grow with it,
+  as a kitty image placed over cells does, but drawn again so it stays
+  sharp. Growing the CSS cell instead would grow only what is sized in
+  cells or rem, and leave images, borders and gaps at their old size in
+  a bigger box. It would also lay the document out again, send `fit` and
+  `resize`, and make a cell size the program read stale. Viewers of one
+  pane in a multiplexer, each at its own zoom, would each lay it out
+  differently. A browser zooms a page in a frame the same way: the frame
+  keeps its size in CSS pixels, and its document its layout. A new font
+  is different: the cell changes in CSS pixels, and the document is laid
+  out for it.
 - **Why the host grants and the document asks.** Markup can come from
   anywhere, a file someone `cat`s included, and every fetch tells a server
   who looked and where. So only the host (its user, or the page that embeds
