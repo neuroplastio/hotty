@@ -380,6 +380,13 @@ def run_keys(v):
 
 
 def run_keymap(v):
+    if "program" in v:
+        m = hotty.parse_keymap(" ".join(v["keys"]))
+        for key, want in v["program"].items():
+            got = m.program(key)
+            if got != want:
+                return False, f"{key!r}: program {got!r}, want {want!r}"
+        return True, ""
     if "lookup" not in v:
         got = hotty.parse_keymap(v["parse"] if "parse" in v else hotty.TERMINAL_KEYS).format()
         return got == v["format"], f"{got!r}, want {v['format']!r}"

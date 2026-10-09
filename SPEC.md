@@ -399,7 +399,8 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
     footprint stays the program's.
   - The user scrolls it with a wheel, a touchpad or a touch drag over its
     window, and with the keys a browser scrolls with while the surface has
-    the keyboard (§10). Focus scrolls an element into view.
+    the keyboard (§10), but those the focused element gives the program
+    (§10.2). Focus scrolls an element into view.
   - A gesture scrolls the innermost element under the pointer that can
     still move that way. Where none can, it goes on outward, and past the
     root to the terminal, as if over the cells beneath (§9), unless CSS
@@ -751,7 +752,7 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `e` | when | detail |
 | --- | --- | --- |
 | `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `area`, the element's cells (below); with `href` and `url` for links (below), and `value` when the element has a `value` attribute |
-| `change` | a checkbox or radio button toggled; a text control, `textarea` or `select` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": …, "value": …}` for checkboxes and radio buttons, `{"value": …}` otherwise |
+| `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": …, "value": …}` for checkboxes and radio buttons, `{"value": …}` otherwise |
 | `input` | every edit of a control with `data-on~=input` | `{"value": …}` |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields as an object of names to values, the submitter's included |
 | `press` | the primary button pressed, or a tap, anywhere in the window of a surface placed with `p=1` (§5.2), except with Alt held (§9.2) and where the pointer passes through (§9.3) | `area`, the cells of the element `t` names (below); none when `t` is empty |
@@ -1081,11 +1082,39 @@ sends text or a key the user remapped, is the key that input reads as.
 - **Tab and Shift+Tab** move between the surface's focusable elements. Past
   the last one, or before the first, the surface loses the keyboard: the
   host sends `blur` and the terminal has the keyboard again.
-- **Escape** is never used by the surface. It reaches the program, which
-  decides, for instance by sending `a=blur`.
+- **Escape** is never used by the surface, except by a select's open list
+  (below). It reaches the program, which decides, for instance by sending
+  `a=blur`.
+- **A key the element gives the program** reaches it, whatever the element
+  or the scrolling (§5.3) would do with it (below, *Keys for the program*).
 - **Every other key** reaches the program as ordinary terminal input, in the
   keyboard encoding the program has enabled. A program's own keymap therefore
   keeps working while a surface holds the keyboard.
+
+#### Selects
+
+A focused `select` picks an option with its keys, as a browser's closed
+select does on Linux and Windows. Each pick is heard at once (§9): `input`,
+with `data-on~=input`, then `change`.
+- **Up and Down** pick the option before or after the picked one; **Home**
+  and **End** the first and the last.
+- **A character** picks the next option after the picked one whose label
+  starts with it, ignoring case, going round to the first. A host **MAY**
+  match several characters typed in quick succession, as browsers do.
+- **Page Up and Page Down** move further, by as much as the host likes.
+- Disabled options are passed over, and a key with no option to go to picks
+  nothing.
+
+**The list** is the host's to show or not:
+- A host **MAY** show no list. The select then works by its keys alone, and
+  Space and Enter do nothing. A program that wants a list on every host
+  draws its own: a button, and a surface at a higher z (§5.2) placed by the
+  `area` its click reports (§9).
+- A list a host shows opens as a browser's does, on a click or a key, and
+  may be drawn past the surface's rectangle, over the cells and other
+  surfaces, as a browser draws one past the page. While it is open it has
+  every key, Escape and those the keymap gives the program included, and
+  it closes on a pick, on Escape, and when the select loses focus.
 
 #### Text fields
 
@@ -1169,6 +1198,28 @@ The actions:
 - **Selecting with keys** is not in this version: with Shift, a move moves
   the caret as it does without (above).
 - **Every edit** is an edit for the `input` and `change` events (§9).
+
+#### Keys for the program
+
+A key that the focused element's keymap binds to `program` reaches the
+program, before the element uses it and before the surface scrolls with it
+(§5.3), whatever the element.
+- **Every focused element has a keymap**, read as a text field's is: the
+  `data-keys` of each element from the document's root down to it, the
+  element's own last, each overriding what came before it key by key. A
+  key with Shift that is not bound is looked up again without it. Only a
+  text field starts from the default keymap.
+- **Outside a text field,** `program` is the only action a keymap gives.
+  Its other bindings still override farther ones key by key, but do
+  nothing there: the element uses those keys as the table above says.
+- **With no element focused** there is no keymap. A program that wants
+  keys in a surface with nothing to focus gives an element a `tabindex`
+  and focuses it.
+
+So a program that works a list, a menu or a table with the arrows keeps
+them on the element that holds it. On a button in a scrolling surface,
+`data-keys="ArrowUp=program ArrowDown=program"` sends the arrows to the
+program, where they would otherwise scroll the surface.
 
 ### 10.3 Key releases
 
@@ -1633,6 +1684,23 @@ program → CSI ? 2026 l
     program's cells and its surfaces can share one implementation
     (SDK.md).
   - **No selection by keys yet:** cells have no common way to show one.
+- **Why a host may show no select list.** A select's list opens past its
+  control, and a surface is a rectangle of cells: drawn inside, a list
+  would force small surfaces to grow, and drawn outside, it is something
+  the host places over what the program placed.
+  - **Programs draw their own lists anyway,** as web apps wrap or replace
+    `<select>` with script. In HOTTY the program plays the script's part: a
+    button, and a list in a surface of its own, placed by `area`.
+  - **A closed select still works,** with keys as browsers' do, so a
+    document that has one loses nothing but the list.
+  - **A pick sends `change` at once,** as a browser's select does, rather
+    than when focus leaves it: there is nothing more to commit.
+- **Why any element can give keys to the program.** A program that works a
+  list or a table with the arrows needs them on a focused button too, and
+  in a scrolling surface the host would take them to scroll (§5.3). A page
+  in a browser stops that with script (`preventDefault`); a surface has
+  none, so the document says beforehand, in the `data-keys` it already
+  reads for fields.
 
 ## Appendix C. Prior art
 

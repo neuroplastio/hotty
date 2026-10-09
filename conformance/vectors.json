@@ -6721,6 +6721,296 @@
      ]
     }
    ]
+  },
+  {
+   "name": "a focused select picks with Up, Down, Home, End and a character, past disabled options, and each pick sends change at once; a key bound to program in its data-keys reaches the program and picks nothing (SPEC \u00a710.2, \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><select id=s><option>a<option value=bee>b<option disabled>x<option>c<option>cat</select><select id=t data-keys=\"ArrowDown=program\"><option>a<option>b</select>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "s",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "value": "bee"
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "value": "c"
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "value": "cat"
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Home",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "value": "a"
+       }
+      }
+     ]
+    },
+    {
+     "key": "c",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "value": "c"
+       }
+      }
+     ]
+    },
+    {
+     "key": "c",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "value": "cat"
+       }
+      }
+     ]
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "ArrowUp",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "value": "c"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Escape",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "b"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a key a focused button's data-keys binds to program reaches the program before the surface scrolls with it; outside a text field other actions are ignored, so a nearer binding of the key to one lets it scroll again (SPEC \u00a710.2, \u00a75.3)",
+   "requires": "scroll",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div data-keys=\"ArrowDown=program End=program\"><button id=k data-keys=\"End=line-end\">k</button></div><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "k",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": -5,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Home",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
   }
  ],
  "wire": [
@@ -10357,6 +10647,36 @@
     "Control+j": "newline",
     "Control+s": "submit",
     "Enter": "submit"
+   }
+  },
+  {
+   "name": "outside a text field a keymap has no default, and only program counts: a key bound to it, or an unbound key with Shift whose key without it is; a nearer binding of the key to another action cancels it, and Escape and Tab cannot be bound (SPEC \u00a710.2)",
+   "keys": [
+    "ArrowDown=program End=program PageUp=program Control+n=program Escape=program Tab=program",
+    "End=line-end"
+   ],
+   "program": {
+    "ArrowDown": true,
+    "Shift+ArrowDown": true,
+    "PageUp": true,
+    "Control+n": true,
+    "End": false,
+    "ArrowUp": false,
+    "Control+ArrowDown": false,
+    "Enter": false,
+    "Escape": false,
+    "Tab": false
+   }
+  },
+  {
+   "name": "a nearer binding with Shift takes that key, and leaves the key without Shift to the farther program (SPEC \u00a710.2)",
+   "keys": [
+    "ArrowDown=program",
+    "Shift+ArrowDown=line-next"
+   ],
+   "program": {
+    "ArrowDown": true,
+    "Shift+ArrowDown": false
    }
   }
  ],

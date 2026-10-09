@@ -462,7 +462,8 @@ also answers:
 
 What a text field does with a key (SPEC.md §10.2, §10.4), as data: so that a
 program that draws its fields in cells edits them as a host edits them on a
-surface, and the keymap it gives a surface is the one it uses in cells.
+surface, and the keymap it gives a surface is the one it uses in cells. And
+which keys any other element gives the program, for a host.
 
 - **`ParseKey(name)`** reads a key's name in any of the forms SPEC.md §10.4
   allows (`Shift+Control+a`, `Control+ `) and returns it in the canonical
@@ -489,6 +490,13 @@ surface, and the keymap it gives a surface is the one it uses in cells.
   key is not the field's (it reaches the program, or Tab moves focus). Tab,
   Shift+Tab and Escape are never the field's, nor a key bound to `program`
   or to an action the field does not have.
+- **`Program(key)`** says whether a keymap gives the key to the program: it
+  binds the key to `program`, or, for a key with Shift it does not bind, the
+  key without Shift. On an element that is not a text field, a host asks it
+  of the element's keymap, `ParseKeymap` of its `data-keys` values joined
+  with a space, the root's first, with no default keymap; a key it gives
+  reaches the program before the element or a scroll uses it (SPEC.md
+  §10.2, keys for the program).
 - **`TerminalKeys`** is the SDK's keymap, the same in every SDK (§2.3): the
   keys of Bubble Tea's text input and text area (bubbles), which a program
   that edits fields in cells is likely to share. A program puts it in the
@@ -656,14 +664,16 @@ Go: `hottytest.Host`.
   terminal that is not a host, it answers no HOTTY command.
 - **The host.** It keeps every surface's document with the delta operations
   and the morph of SPEC.md §6, answers as SPEC.md §3.6 has hosts do, and
-  passes the host vectors' `send` and `inspect` steps. It lays nothing out:
-  `r=auto` gets an estimate the test may replace.
+  passes the host vectors' `send`, `inspect` and `key` steps. It lays
+  nothing out: `r=auto` gets an estimate the test may replace, and it does
+  not scroll.
 - **Strict by default.** A malformed message, an `EINVAL`, or a HOTTY
   command other than the query sent to a terminal that is not a host fails
   the test. A lenient host records them instead.
-- **The user.** It plays the user: typing, clicking, filling a field,
-  checking a box, choosing an option, submitting, pressing, dragging, and
-  any event the test makes up.
+- **The user.** It plays the user: typing, pressing a key as SPEC.md §10.2
+  has a host take it, clicking, filling a field, checking a box, choosing
+  an option, submitting, pressing, dragging, and any event the test makes
+  up.
 - **Inspection.** The test reads each surface: its document, an element's
   attributes and text, the focused element, whether it is detached, and
   where it is placed.
@@ -722,7 +732,7 @@ of more than one code point.
 | `scan` | the Scanner (§3.7) | SDKs |
 | `detect` | the Detector (§3.8) | SDKs |
 | `keys` | key names and `DecodeKeys` (§3.10, SPEC.md §10.4) | hosts and SDKs |
-| `keymap` | `ParseKeymap`, `Resolve`, `Lookup` and `TerminalKeys` (§3.10, SPEC.md §10.2) | hosts and SDKs |
+| `keymap` | `ParseKeymap`, `Resolve`, `Lookup`, `Program` and `TerminalKeys` (§3.10, SPEC.md §10.2) | hosts and SDKs |
 | `edit` | the actions on a value: a Field (§4.6) | hosts, and SDKs with a Field |
 
 An SDK conforms when it meets every **MUST** of this document and passes
@@ -784,7 +794,7 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |
 | `FitRows`, `CellCSS` | `FitRows`, `CellCSS` | `fit_rows`, `cell_css` | as Python | as Python | `fitRows`, `cellCss` |
 | `ParseKey`, `DecodeKeys` | `hotty.ParseKey`, `hotty.DecodeKeys` | `parse_key`, `decode_keys` | as Python | as Python | `parseKey`, `decodeKeys` |
-| `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.format` |
+| `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Program`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Program`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.program`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:program`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.program`, `.format` |
 | `TerminalKeys` | `hotty.TerminalKeys` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` |
 | `Field`, `Do`, `Type` | `hottyedit.Field`, `(*Field).Do`, `.Type` | `Field`, `.do`, `.type` | `field`, `:do_action` (`do` is a keyword), `:type` | `Field`, `do_action`, `type_text` | `Field`, `.do`, `.type` |
 

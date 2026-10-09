@@ -1153,6 +1153,22 @@ class Keymap:
     def format(self):
         return " ".join(f"{k}={a}" for k, a in self.bindings.items())
 
+    def _bound(self, k):
+        """The action bound to canonical key k, or to k without Shift when k
+        has Shift and is not bound itself."""
+        mods, value = _split_key(k)
+        a = self.bindings.get(k)
+        if a is None and "Shift" in mods:
+            a = self.bindings.get(_key_name([m for m in mods if m != "Shift"], value))
+        return a
+
+    def program(self, key):
+        """Whether the keymap gives the key to the program (SPEC.md §10.2):
+        on an element that is not a text field, a host asks it of the
+        element's data-keys alone, before the element or a scroll uses it."""
+        k = parse_key(key)
+        return k is not None and self._bound(k) == "program"
+
     def lookup(self, key):
         """An action, INSERT for a character the field types, or None when
         the key is not the field's."""
@@ -1160,9 +1176,7 @@ class Keymap:
         if k is None or k in ("Tab", "Shift+Tab", "Escape"):
             return None
         mods, value = _split_key(k)
-        a = self.bindings.get(k)
-        if a is None and "Shift" in mods:
-            a = self.bindings.get(_key_name([m for m in mods if m != "Shift"], value))
+        a = self._bound(k)
         if a is not None:
             return None if a == "program" or (a in MULTILINE_ACTIONS and not self.multiline) else a
         if _is_char(value) and not {"Control", "Alt", "Meta"} & set(mods):

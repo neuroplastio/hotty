@@ -209,7 +209,7 @@ holds after the stream `held` (none when absent), what `Flush` returns
 - `{ "key": text, "canon": text | null }`: `ParseKey(key)` must return
   `canon`, `null` when the name does not parse.
 
-**Keymap** checks keymaps (SPEC §10.2, SDK.md §3.10), in two forms:
+**Keymap** checks keymaps (SPEC §10.2, SDK.md §3.10), in three forms:
 - `{ "parse": text, "format": text }`: `ParseKeymap(parse).Format()` must be
   `format`; with `"terminal_keys": true` and no `parse`, `TerminalKeys`
   formatted must be `format`;
@@ -217,7 +217,11 @@ holds after the stream `held` (none when absent), what `Flush` returns
   key: action | null } }`: `Resolve(multiline, …)` with `TerminalKeys`
   first when `terminal_keys` is true, then each of `keys`. `Lookup` of each
   key of `lookup` must return its value: an action, `"insert"`, or `null`
-  when the key is not the field's.
+  when the key is not the field's;
+- `{ "keys": [ … ], "program": { key: bool } }`: an element's keymap
+  outside a text field, with no default keymap: `ParseKeymap` of `keys`
+  joined with a space, the root's first. `Program` of each key of
+  `program` must return its value.
 
 **Edit** `{ "field": { "value", "caret", "multiline"?, "password"?, "rows"?
 }, "steps": [ … ] }`: a Field (SDK.md §4.6) made from `field`, absent keys
