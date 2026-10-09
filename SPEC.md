@@ -28,8 +28,8 @@ scrolls a row at a time, with a table, code and an SVG diagram in it; cards,
 images and charts scroll in a feed; and an agent's transcript, diff, approval
 and load test follow.](demo.gif)
 
-*[hotty-demo](https://github.com/neuroplastio/hotty-demo), the HOTTY website
-([hotty.neuroplast.io](https://hotty.neuroplast.io)), running in xterm.js with
+*The HOTTY website, [hotty.neuroplast.io](https://hotty.neuroplast.io),
+running in xterm.js with
 [xterm-addon-hotty](https://github.com/neuroplastio/xterm-addon-hotty), one of
 the two hosts that share no code and pass the conformance vectors. Every
 surface — the askhot questions, the charts, the table, the diagram, the cards,
