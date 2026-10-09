@@ -421,12 +421,12 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
     a scrollbar takes pixels inside the rectangle, never cells: the
     footprint stays the program's.
   - The user scrolls it with a wheel, a touchpad or a touch drag over its
-    window, and, while the surface has the keyboard (§10), with the keys a
-    browser scrolls with and those the focused element's keymap binds to a
-    scroll action, but not those it gives the program (§10.2). A key a
-    browser scrolls with that can move nothing goes on to the program, as
-    every key the surface does not use does. Focus scrolls an element into
-    view.
+    window that drags no element (§9.1), and, while the surface has the
+    keyboard (§10), with the keys a browser scrolls with and those the
+    focused element's keymap binds to a scroll action, but not those it
+    gives the program (§10.2). A key a browser scrolls with that can move
+    nothing goes on to the program, as every key the surface does not use
+    does. Focus scrolls an element into view.
   - A gesture scrolls the innermost element under the pointer that can
     still move that way. Where none can, it goes on outward, and past the
     root to the terminal, as if over the cells beneath (§9), unless CSS
@@ -787,10 +787,10 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": …, "value": …}` for checkboxes and radio buttons, `{"value": …}` otherwise |
 | `input` | every edit of a control with `data-on~=input` | `{"value": …}` |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields as an object of names to values, the submitter's included |
-| `press` | the primary button pressed, or a tap, anywhere in the window of a surface placed with `p=1` (§5.2), except with Alt held (§9.2) and where the pointer passes through (§9.3) | `area`, the cells of the element `t` names (below); none when `t` is empty |
-| `dragstart` | a mouse's or a pen's primary button pressed on an element with `data-on~=drag` (§9.1), without Alt (§9.2) | `{"c": …, "r": …, "keys": […]}`: the pointer's cell and the keys held (§9.1) |
+| `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface placed with `p=1` (§5.2), except a mouse's or a pen's press with Alt held (§9.2) and where the pointer passes through (§9.3) | `area`, the cells of the element `t` names (below); none when `t` is empty |
+| `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": …, "r": …, "keys": […]}`: the pointer's cell and the keys held (§9.1) |
 | `drag` | during a drag, the element under the pointer changed (§9.1) | the same |
-| `dragend` | the drag ended: the button released, wherever the pointer is (§9.1) | the same |
+| `dragend` | the drag ended: the button released or the finger lifted, wherever the pointer is (§9.1) | the same |
 | `focus`, `blur` | the surface gains or loses the keyboard (§10); `t` is empty | none |
 | `resize` | the surface's pixel size changed without its cells changing (§5.3); `t` is empty | `{"w": …, "h": …}` in CSS pixels |
 | `fit` | on a placement made with `f=1` (§5.2), the rows the document needs at the placement's width changed; `t` is empty | `{"r": …}`: the rows `r=auto` would choose now |
@@ -850,12 +850,12 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   - selecting text, where CSS `user-select` allows it (§11).
 - **Gestures that scroll are the terminal's,** except over a document that
   scrolls (§5.3), which takes them while it can move that way. A wheel, a
-  touchpad's scroll, or a touch drag over any other surface does what it
-  would do over the cells beneath it. That is scrollback, or on the
-  alternate screen, the program's wheel input. The host **MUST** pass them
-  on, with the position of the pointer or the finger. Taps, clicks, long
-  presses, and a mouse's or a pen's drags (§9.1) stay the surface's, unless
-  they begin with Alt held (§9.2).
+  touchpad's scroll, or a touch drag over any other surface, unless it
+  drags an element (§9.1), does what it would do over the cells beneath
+  it. That is scrollback, or on the alternate screen, the program's wheel
+  input. The host **MUST** pass them on, with the position of the pointer
+  or the finger. Taps and long presses, and clicks and drags (§9.1) that
+  do not begin with Alt held (§9.2), stay the surface's.
 - **The detail** is a JSON value, base64-encoded. Values are the program's
   (§7): an `href` is reported as the document has it.
 - **Unknown kinds.** A program **MUST** ignore an event whose kind it does
@@ -866,15 +866,17 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 
 An element opts in to drags with `drag` in its `data-on`, as it opts in to
 clicks with `click`. A **drag** is a press of a mouse's or a pen's primary
-button on such an element, the moves of the pointer while the button is
-down, and its release. A program hears through drags what a click cannot
-carry: a range dragged across a grid, a handle dragged to where it is let
-go.
+button on such an element, the moves of the pointer while the button is down,
+and its release; or a touch on such an element that does not pan (below), the
+finger's moves, and its lift. A program hears through drags what a click
+cannot carry: a range dragged across a grid, a handle dragged to where it is
+let go.
 
 - **Three events:**
-  - `dragstart`, on the press. `t` is the element that opted in: the
-    nearest one, from the pressed element outward, with `drag` in its
-    `data-on`. If it has no `id`, there is no drag.
+  - `dragstart`, on the press (a touch's once it drags, below). `t` is
+    the element that opted in: the nearest one, from the pressed element
+    outward, with `drag` in its `data-on`. If it has no `id`, there is no
+    drag.
   - `drag`, each time the element under the pointer changes. `t` is the
     nearest element with an `id` and `drag` in its `data-on`, from the one
     under the pointer outward, and empty where there is none, outside the
@@ -896,17 +898,43 @@ go.
     `"alt"` and `"meta"`, in that order, empty when none is. `"alt"` is
     never in `dragstart`'s: a press with Alt held starts no drag (§9.2).
     Alt pressed later is reported, and the drag goes on.
-- **The pointer is the surface's until the release,** as a page's
-  `setPointerCapture` makes it an element's. Every move goes to the drag,
-  wherever the pointer is: over the cells, over another surface, or outside
-  the terminal's window where the platform allows it. None of it reaches
-  anything else: no other surface, no `hover` (§9.4), and no mouse
-  reporting to the program.
+- **The pointer is the surface's until the release,** or the finger until
+  it lifts, as a page's `setPointerCapture` makes it an element's. Every
+  move goes to the drag, wherever the pointer is: over the cells, over
+  another surface, or outside the terminal's window where the platform
+  allows it. None of it reaches anything else: no other surface, no
+  `hover` (§9.4), and no mouse reporting to the program.
 - **A drag selects no text.** A press on an element that opts in starts no
   text selection, whatever its CSS, as if it had `user-select: none` (§11).
-- **Mouse and pen only.** A touch on an element that opts in does what it
-  does on any other: a touch drag scrolls (§9), and a tap is a click, which
-  only `click` reports.
+- **A touch drags only an element that opts out of panning.** A touch on an
+  element that opts in is a drag, rather than a scroll, when the
+  `touch-action` that Pointer Events determine for the touched element (its
+  own, with its ancestors' up to the nearest element that scrolls, §5.3)
+  allows no pan along the touch's first move. The host takes that move
+  once the touch has gone past its tap slop, along the larger of the two
+  deltas, a tie counting as a pan. `pan-x`, `pan-left` and `pan-right`
+  allow a horizontal pan, `pan-y`, `pan-up` and `pan-down` a vertical one,
+  and `auto` and `manipulation` both. Any other value, `none` and
+  `pinch-zoom` included, allows neither. Elsewhere `touch-action` changes
+  nothing: a touch that does not drag pans as §5.3 and §9 say.
+  - Where the value allows both pans, as the initial `auto` does, nothing
+    changes: a touch drag scrolls (§9), and a tap is a click, which only
+    `click` reports.
+  - **A touch presses when it becomes a drag,** and at that moment is a
+    press as a mouse's is (Order, below): `press`, if the placement asked
+    for it, then `dragstart`, both for the cell where the touch began, then
+    everything else the press causes. If the finger is by then over
+    another element than the one `dragstart` names (or, where that names
+    none, another cell), a `drag` for where it is follows.
+  - **A touch the host takes as a pan** presses nothing, and stays a pan to
+    its end.
+  - **A touch that lifts before going past the slop** is a tap, or a long
+    press if held past the host's long-press time. Each is what it is on
+    any other element (§9): a tap presses at its lift. A long press never
+    becomes a drag.
+  - **Alt.** A touch that begins with Alt held is never a drag. `keys` are
+    the modifier keys held on a keyboard when the finger touched, and as
+    for a mouse after.
 - **Order.** The press that starts a drag is a press like any other
   (§10.1). `press`, if the placement asked for it, comes first, then
   `dragstart`, then everything else the press causes (`change`, `blur`,
@@ -915,13 +943,18 @@ go.
   it started on (`dragend`'s `t` is `dragstart`'s), its release is the
   click it would have been without the drag: an element with `click` in its
   `data-on` as well reports `click`, after `dragend`. A drag that ends
-  anywhere else reports no `click`.
+  anywhere else reports no `click`. So does a touch's: one that lifts on
+  the element it began on reports `click` after `dragend`.
 - **What ends a drag early.** The host sends `dragend` at once, with `t`
   empty and the last cell the pointer was on, when before the release:
   - the surface's placement goes away (`a=hide`, or its line leaving the
     screen);
   - a new document replaces the surface's (`a=doc`);
-  - or the host loses the pointer.
+  - the host loses the pointer;
+  - or, in a touch's drag, a second finger touches. The surface hears
+    nothing more of the gesture until every finger lifts, and what the
+    host does with it is its own. A second finger before a touch drags
+    makes it no drag.
 
   A surface that is detached or deleted during a drag reports nothing more
   (§5.5). Nothing else ends a drag: neither a delta nor a new placement
@@ -956,7 +989,8 @@ handles it as a press on the cells beneath the surface.
 - **On macOS, Alt is Option**, whether or not the terminal makes Option
   type as Alt for keys (Ghostty's `macos-option-as-alt`, say). That setting
   is about text, and a press has none.
-- **Mouse and pen only.** A tap is a click whatever the keys held.
+- **Mouse and pen only.** A tap is a click whatever the keys held, and a
+  touch with Alt held scrolls (§9.1).
 
 ### 9.3 Where the pointer passes through
 
@@ -1034,9 +1068,10 @@ program draws itself, such as cells it lit while the pointer was over them.
   `change`, `focus`, `blur`). A window the pointer is then in, another one
   included, reports it at the pointer's next move. A press itself sends no
   `hover`.
-- **Mouse and pen.** A touch's moves scroll (§9) and hover nothing. A tap
-  is a press and a release: at its release, a host **MAY** report what it
-  landed on, as browsers leave `:hover` on what a tap touched.
+- **Mouse and pen.** A touch's moves scroll (§9), or drag (§9.1), and
+  hover nothing. At a tap's release, or the lift that ends a touch's drag,
+  a host **MAY** report what the finger was on, as browsers leave `:hover`
+  on what a tap touched.
 - **Not the keyboard's.** Focus moving, to the surface or away from it,
   changes nothing: a window reports the pointer whether or not it has the
   keyboard (§10).
@@ -1071,8 +1106,8 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
 - **Without `t`:** the surface's focused element keeps focus, or else the
   first focusable element receives it.
 - **Echo:** no `focus` event is sent for focus the program gave.
-- **A click** is a press of the primary button without Alt (§9.2), or a
-  tap.
+- **A click** is a press of the primary button without Alt (§9.2), a
+  tap, or a touch that becomes a drag (§9.1).
 - **Elements that take focus** on a click, unless they are disabled:
   - `input`, `select`, `textarea` and `button`;
   - links with an `href`, except hyperlinks (§9), which are the terminal's
@@ -1503,10 +1538,12 @@ To be tested, a host exposes a way to *inspect* an element, reporting:
 It also lets a test move a mouse's pointer to the centre of an element, or
 of a cell of a surface, press and release its primary button there, with
 modifier keys held, turn its wheel there, take the pointer out of the
-terminal's window, and press keys where the keyboard is. A host with
-`passthrough` also tells the test whether each of those reached the surface
-or passed through it, and a host with `scroll` whether a wheel or a key
-went on to the terminal.
+terminal's window, and press keys where the keyboard is. A host that takes
+touch also lets a test touch a cell of a surface with one finger, move it,
+and lift it, and tells it whether a touch went on to the terminal. A host
+with `passthrough` also tells the test whether each of those reached the
+surface or passed through it, and a host with `scroll` whether a wheel or
+a key went on to the terminal.
 
 This is a test interface, not part of the wire protocol.
 
@@ -1671,8 +1708,13 @@ program → CSI ? 2026 l
   - **The pointer is held,** as a browser's `setPointerCapture` holds it,
     so a drag that leaves the window still ends, and the program hears
     where.
-  - **Mouse and pen only,** because a touch drag scrolls (below): a surface
-    that took touch drags would trap the finger. A tap is still a click.
+  - **Touch only where an element opts out of panning,** because a touch
+    drag scrolls (below): a surface that took every touch drag would trap
+    the finger. `touch-action` is the web's switch for it, which maps,
+    sliders and canvases already use, so the trap is per element and only
+    over its area, a swipe the element still allows scrolls, and a second
+    finger always gives the gesture back to the host. A tap is still a
+    click.
   - **No text selection,** because one gesture cannot select both text and
     cells.
   - **In a browser's order:** the press is reported before the focus moves,

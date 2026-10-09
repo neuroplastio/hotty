@@ -3448,6 +3448,216 @@
    ]
   },
   {
+   "name": "a touch drags an element that opts in where its touch-action allows no pan along the touch's first move, and presses only then; it is a click where it began; a touch that pans presses nothing and goes on to the terminal, and a tap presses at its lift (SPEC \u00a79.1)",
+   "requires": "touch",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(10*var(--hotty-cell-w))}#h{touch-action:pan-y}</style><div id=h data-on=\"drag click\">h</div><div id=n data-on=drag>n</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "12",
+      "r": "2",
+      "p": "1",
+      "q": "2"
+     }
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "touch": "move",
+     "s": "x",
+     "at": [
+      6,
+      0
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 10,
+         "h": 1
+        }
+       }
+      },
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "touch": "move",
+     "s": "x",
+     "at": [
+      6,
+      1
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "n",
+       "detail": {
+        "c": 6,
+        "r": 1,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "touch": "move",
+     "s": "x",
+     "at": [
+      3,
+      0
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "c": 3,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "touch": "up",
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "c": 3,
+        "r": 0,
+        "keys": []
+       }
+      },
+      {
+       "e": "click",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 10,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "touch": "move",
+     "s": "x",
+     "at": [
+      1,
+      1
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "touch": "up",
+     "events": []
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      1,
+      1
+     ],
+     "events": []
+    },
+    {
+     "touch": "move",
+     "s": "x",
+     "at": [
+      6,
+      1
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "touch": "up",
+     "events": []
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      2,
+      1
+     ],
+     "events": []
+    },
+    {
+     "touch": "up",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "n",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 1,
+         "w": 10,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "a press with Alt takes the pointer from the window: out, and no hover until the release",
    "requires": "hover",
    "steps": [

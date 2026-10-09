@@ -40,8 +40,8 @@ Each vector starts on a fresh host. A vector with `"requires"` applies only
 to a host that has what it names, and others skip it: `"passthrough"`, a
 host that reports `passthrough` (SPEC §4, §9.3); `"hover"`, a host that
 lists `hover` in `events` (§9.4); `"scroll"`, a host that reports `scroll`
-(§4, §5.3). A list names several, all required. Its steps come in four
-kinds.
+(§4, §5.3); `"touch"`, a host that takes touch (SPEC §9.1, §16). A list
+names several, all required. Its steps come in five kinds.
 
 **Send** `{ "send": {control}, "payload": text?, "reply": …, "events": … }`:
 the command goes to the host as the program would send it. It is
@@ -99,6 +99,17 @@ checked).
   with the event's control, and `detail`, when present, with its JSON body
   (equal as JSON values; `null` when the event has none). Absent: events
   are not checked.
+
+**Touch** `{ "touch": "down" | "move" | "up", "s": surface, "at": …,
+"keys": [ … ], "terminal": …, "events": [ … ] }`: one finger, as the user
+would touch the terminal (SPEC §9.1, §16). `"down"` touches surface `s` at
+`at`, a cell `[c, r]` as for a pointer step; `"move"` moves the finger to
+`at`, in moves of a runner's choosing, along the straight line from where
+it was, so it passes the host's tap slop in that line's direction; `"up"`
+lifts it. `"keys"` are the modifier keys held, as for a pointer step.
+`"terminal"`, for a move: `true` if the touch went on to the terminal as a
+scroll (SPEC §9), `false` if the surface took it; absent, not checked.
+`"events"` as for a pointer step: what the step makes the host send.
 
 **Key** `{ "key": name, "keys": [ … ], "terminal": …, "events": [ … ] }`: a
 key pressed and released where the keyboard is (SPEC §10): on the surface
