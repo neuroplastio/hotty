@@ -1,0 +1,26 @@
+<!-- Tests: inline SVG icons drawn with currentColor take the colour their element has: from a parent, a custom property, a class on the svg, fill on the svg inherited by its paths, and stroke. Each row is the same icon. What changes after load (a delta, :hover, :focus) a static page cannot show; hotty-blitz checks it in tests/svg.rs. -->
+<style>
+  :root { --accent: var(--hotty-ansi-2); }
+  body { padding: 8px 16px; font: 14px sans-serif; color: var(--hotty-fg); }
+  .row { display: flex; gap: 16px; align-items: center; margin: 6px 0; }
+  .row span { width: 22ch; }
+  .red { color: var(--hotty-ansi-1); }
+  .accent { color: var(--accent); }
+  svg.blue { color: var(--hotty-ansi-4); }
+  .muted { color: var(--hotty-ansi-8); }
+</style>
+<div class="row red"><span>from its parent</span>
+  <svg width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2 15 9h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/></svg>
+</div>
+<div class="row accent"><span>a custom property</span>
+  <svg width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2 15 9h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/></svg>
+</div>
+<div class="row red"><span>a class on the svg</span>
+  <svg class="blue" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2 15 9h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/></svg>
+</div>
+<div class="row accent"><span>fill on the svg</span>
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 15 9h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/></svg>
+</div>
+<div class="row muted"><span>stroke</span>
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 15 9h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/></svg>
+</div>
