@@ -568,7 +568,8 @@ documents and exits, one that asks a question, a chart that streams. Go:
   terminal made with `known` answers at once.
 - **A late answer.** A terminal opened with `Late` asks for one (SPEC.md
   §4). If it comes, it goes to the event stream as the host's capabilities,
-  and `Detect()` answers with it from then on. Until it comes, `Close()`
+  and `Detect()` answers with it from then on. Until it comes, the
+  terminal stays in raw mode, or the answer would be echoed, and `Close()`
   withdraws the query (`WithdrawLate`), so that no answer reaches whatever
   reads the terminal next.
 - **Requests.** `Request(build)` sends one command numbered with `N` and
@@ -621,6 +622,9 @@ its terminator; a plugin writes to the terminal with `nvim_ui_send`. There:
 - **The terminal can change.** An editor can attach another UI, or come
   back from suspension; the SDK layer detects again, and sends documents
   again, when the environment says so.
+- **A late answer is the environment's**, since detection is: one query
+  asks for it for every session, and it is withdrawn while a shell has the
+  terminal (on exit and suspension).
 - **What the environment lacks, the SDK lacks**: CPR, `LineStart`, `Print`
   and raw mode may not exist. Surface names take a prefix the program
   supplies.
@@ -637,11 +641,12 @@ frameworks get their own adapter, with the same responsibilities.
 - **Modes.** `Detecting` until the Detector decides, then `Native` (a host)
   or `Text` (not one). In `Text` the Session sends nothing, and the program
   draws everything in cells.
-- **A late answer.** A Session made with `Late` asks for one (SPEC.md §4).
-  If it comes while the mode is `Text`, the mode becomes `Native`, ready is
-  sent again, and the program is asked for a layout: a program that asks
-  for a late answer draws either rendition whenever the mode says. Until
-  it comes, `Close()` withdraws the query (`WithdrawLate`).
+- **A late answer.** A Session made with `Late` asks for one (SPEC.md §4),
+  through its terminal when the terminal detects. If it comes while the
+  mode is `Text`, the mode becomes `Native`, ready is sent again, and then
+  the program is asked for a layout: a program that asks for a late answer
+  draws either rendition whenever the mode says. Until it comes, `Close()`
+  withdraws the query (`WithdrawLate`).
 - **Layout.** With each frame, the program says which surfaces it wants
   where: name, rectangle on the screen, an optional clip (the part of the
   screen the surface shows in, such as a scrolling region), `Keep`, `Z`,

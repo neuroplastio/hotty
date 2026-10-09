@@ -272,7 +272,7 @@ ESC ] 7279 ; a=q:n=1:late=1 ST   CSI c
 - A program that will no longer take a late answer, such as one about to
   exit, withdraws its query with `a=q:q=2`: a query that wants no answer,
   which takes the held one's place, so that no reply reaches whatever reads
-  the terminal after it.
+  the terminal after it. A host answers it with nothing, as `q=2` says.
 
 The capabilities object:
 
@@ -1294,7 +1294,9 @@ surfaces where the host scrolls them (§5.3):
 - **A text field's keymap leaves scroll actions out.** A binding to one
   neither acts nor overrides the bindings before it, so a field inside an
   element that scrolls with `j` still types `j`, and a `textarea` keeps
-  `page-down` on Page Down. A field's own text follows its caret (§5.3).
+  `page-down` on Page Down. A farther binding of the key still holds: under
+  `j=program` on the root, `j` in that field reaches the program. A field's
+  own text follows its caret (§5.3).
 
 So a program that pages its cells with `j`, `k`, `g`, `G`, Space and `b`
 binds the same keys on the element that scrolls on a surface:
