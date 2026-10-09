@@ -908,15 +908,19 @@ let go.
   text selection, whatever its CSS, as if it had `user-select: none` (§11).
 - **A touch drags only an element that opts out of panning.** A touch on an
   element that opts in is a drag, rather than a scroll, when the
-  `touch-action` that Pointer Events determine for the touched element (its
-  own, with its ancestors' up to the nearest element that scrolls, §5.3)
-  allows no pan along the touch's first move. The host takes that move
-  once the touch has gone past its tap slop, along the larger of the two
-  deltas, a tie counting as a pan. `pan-x`, `pan-left` and `pan-right`
-  allow a horizontal pan, `pan-y`, `pan-up` and `pan-down` a vertical one,
-  and `auto` and `manipulation` both. Any other value, `none` and
-  `pinch-zoom` included, allows neither. Elsewhere `touch-action` changes
-  nothing: a touch that does not drag pans as §5.3 and §9 say.
+  `touch-action` that Pointer Events determine for the touched element
+  allows no pan along the touch's first move. That value is the touched
+  element's own, with its ancestors', up to and including the nearest
+  element that scrolls (§5.3), as the document's CSS sets them: what a host
+  sets for its own handling of touch does not count. The host takes the
+  first move once the touch has gone past its tap slop, along the larger of
+  the two deltas, a tie counting as a pan. `pan-x` allows a horizontal pan,
+  `pan-y` a vertical one, and `auto` and `manipulation` both; `pan-left`
+  and `pan-right`, or `pan-up` and `pan-down`, count as their axis where
+  the host's CSS engine parses them, which not every engine does. Any
+  other value, `none` and `pinch-zoom` included, allows neither. Elsewhere
+  `touch-action` changes nothing: a touch that does not drag pans as §5.3
+  and §9 say.
   - Where the value allows both pans, as the initial `auto` does, nothing
     changes: a touch drag scrolls (§9), and a tap is a click, which only
     `click` reports.

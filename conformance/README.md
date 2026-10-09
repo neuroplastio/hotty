@@ -105,7 +105,9 @@ checked).
 would touch the terminal (SPEC §9.1, §16). `"down"` touches surface `s` at
 `at`, a cell `[c, r]` as for a pointer step; `"move"` moves the finger to
 `at`, in moves of a runner's choosing, along the straight line from where
-it was, so it passes the host's tap slop in that line's direction; `"up"`
+it was, so it passes the host's tap slop in that line's direction (the
+vectors move along a row or a column, so where the finger enters an
+element does not depend on those moves); `"up"`
 lifts it. `"keys"` are the modifier keys held, as for a pointer step.
 `"terminal"`, for a move: `true` if the touch went on to the terminal as a
 scroll (SPEC §9), `false` if the surface took it; absent, not checked.
