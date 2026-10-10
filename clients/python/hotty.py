@@ -931,7 +931,7 @@ ACTIONS = (
     "char-backward", "char-forward", "word-backward", "word-forward", "line-start", "line-end",
     "delete-char-backward", "delete-char-forward", "delete-word-backward", "delete-word-forward",
     "delete-to-line-start", "delete-to-line-end", "line-previous", "line-next", "page-up", "page-down",
-    "input-start", "input-end", "newline", "submit", "program",
+    "input-start", "input-end", "select-all", "newline", "submit", "program",
 ) + (
     "scroll-up", "scroll-down", "scroll-left", "scroll-right", "scroll-page-up", "scroll-page-down",
     "scroll-half-page-up", "scroll-half-page-down", "scroll-start", "scroll-end",
@@ -939,16 +939,22 @@ ACTIONS = (
 # The scroll actions, which a text field's keymap leaves out (SPEC.md §10.2).
 SCROLL_ACTIONS = frozenset(a for a in ACTIONS if a.startswith("scroll-"))
 # The actions only a multi-line field has (SPEC.md §10.2).
-MULTILINE_ACTIONS = frozenset(("line-previous", "line-next", "page-up", "page-down", "input-start", "input-end", "newline"))
+MULTILINE_ACTIONS = frozenset(("line-previous", "line-next", "page-up", "page-down", "newline"))
+# The moves, which select with Shift (SPEC.md §10.2).
+MOVES = frozenset(("char-backward", "char-forward", "word-backward", "word-forward", "line-start", "line-end",
+                   "line-previous", "line-next", "page-up", "page-down", "input-start", "input-end"))
+# The moves that go back or up, which start from a selection's start.
+_BACK = frozenset(("char-backward", "word-backward", "line-start", "line-previous", "page-up", "input-start"))
 # What Lookup returns for a character the field types.
 INSERT = "insert"
 
-# The SDK's keymap (SDK.md §3.10): Bubble Tea's text input and text area.
+# The SDK's keymap (SDK.md §3.10): Bubble Tea's text input and text area, but
+# Control+a selects all.
 TERMINAL_KEYS = " ".join((
     "ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward",
     "Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward",
     "Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward",
-    "Home=line-start Control+a=line-start End=line-end Control+e=line-end",
+    "Home=line-start End=line-end Control+e=line-end",
     "Backspace=delete-char-backward Control+h=delete-char-backward",
     "Delete=delete-char-forward Control+d=delete-char-forward",
     "Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward",
@@ -957,6 +963,7 @@ TERMINAL_KEYS = " ".join((
     "ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next",
     "PageUp=page-up PageDown=page-down",
     "Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end",
+    "Control+a=select-all",
     "Control+m=newline",
 ))
 
@@ -1218,6 +1225,12 @@ class Keymap:
             return INSERT
         return None
 
+    def selects(self, key):
+        """Whether the field selects with the key (SPEC.md §10.2): it looks
+        up a move, and its name has Shift. The field then extends with it."""
+        k = parse_key(key)
+        return k is not None and self.lookup(k) in MOVES and "Shift" in _split_key(k)[0]
+
 
 def _bindings(value):
     """A data-keys value's bindings, in order, without those a host ignores."""
@@ -1243,10 +1256,15 @@ def resolve(multiline, *values):
     """A field's keymap: SPEC.md's default, then each data-keys value, the
     root's first, less their scroll actions."""
     m = Keymap(multiline)
-    for k, a in (("ArrowLeft", "char-backward"), ("ArrowRight", "char-forward"), ("Home", "line-start"),
-                 ("End", "line-end"), ("Backspace", "delete-char-backward"), ("Delete", "delete-char-forward"),
+    for k, a in (("ArrowLeft", "char-backward"), ("ArrowRight", "char-forward"),
+                 ("Control+ArrowLeft", "word-backward"), ("Control+ArrowRight", "word-forward"),
+                 ("Alt+ArrowLeft", "word-backward"), ("Alt+ArrowRight", "word-forward"),
+                 ("Home", "line-start"), ("End", "line-end"), ("Control+Home", "input-start"), ("Control+End", "input-end"),
+                 ("Backspace", "delete-char-backward"), ("Delete", "delete-char-forward"),
+                 ("Control+Backspace", "delete-word-backward"), ("Control+Delete", "delete-word-forward"),
+                 ("Alt+Backspace", "delete-word-backward"), ("Alt+Delete", "delete-word-forward"),
                  ("ArrowUp", "line-previous"), ("ArrowDown", "line-next"), ("PageUp", "page-up"),
-                 ("PageDown", "page-down"), ("Enter", "newline" if multiline else "submit")):
+                 ("PageDown", "page-down"), ("Control+a", "select-all"), ("Enter", "newline" if multiline else "submit")):
         m.bind(k, a)
     for v in values:
         for k, a in _bindings(v):
@@ -1269,16 +1287,32 @@ def _break(c):
 
 
 class Field:
-    """A text field's value and caret, edited by SPEC.md §10.2's actions. The
-    caret counts characters (`chars`)."""
+    """A text field's value, caret and selection, edited by SPEC.md §10.2's
+    actions. The caret counts characters (`chars`). The selection runs from
+    `anchor` to the caret; nothing is selected when `anchor` is None or at
+    the caret."""
 
-    def __init__(self, value="", caret=None, multiline=False, password=False, rows=1):
+    def __init__(self, value="", caret=None, multiline=False, password=False, rows=1, anchor=None):
         self.value = value
         self.caret = len(chars(value)) if caret is None else caret
         self.multiline = multiline
         self.password = password
         self.rows = rows
+        self.anchor = anchor
         self._goal = None
+
+    def selection(self):
+        """The selection's start and end, equal when nothing is selected."""
+        n = len(chars(self.value))
+        p = min(max(self.caret, 0), n)
+        a = p if self.anchor is None else min(max(self.anchor, 0), n)
+        return min(a, p), max(a, p)
+
+    def select(self, anchor, caret):
+        """Selects from anchor to caret; select(p, p) puts the caret at p with
+        nothing selected."""
+        self.caret = caret
+        self.anchor = None if anchor == caret else anchor
 
     def _lines(self, c):
         """The start and end of each line."""
@@ -1329,7 +1363,18 @@ class Field:
         return True
 
     def do(self, action):
-        """Does an action; returns whether the value changed."""
+        """Does an action; returns whether the value changed. A selection comes
+        first: a delete deletes it, a move starts from its start going back
+        and from its end otherwise, and ends it."""
+        return self._act(action, False)
+
+    def extend(self, action):
+        """Does a move as Shift does it: the anchor stays, or is set at the
+        caret, and the caret moves from where it is. An action that is not a
+        move is do's."""
+        return self._act(action, action in MOVES)
+
+    def _act(self, action, extend):
         c = chars(self.value)
         p = min(max(self.caret, 0), len(c))
         rows = action in ("line-previous", "line-next", "page-up", "page-down")
@@ -1337,6 +1382,26 @@ class Field:
             self._goal = None
         if action in MULTILINE_ACTIONS and not self.multiline:
             return False
+        lo, hi = self.selection()
+        if action == "select-all":
+            self.anchor, self.caret = 0, len(c)
+            return False
+        if action == "newline":
+            return self.type("\n")
+        if extend:
+            if self.anchor is None:
+                self.anchor = p
+        elif lo < hi and action in MOVES:
+            self.anchor = None
+            p = lo if action in _BACK else hi
+            if action in ("char-backward", "char-forward"):
+                self.caret = p
+                return False
+        elif lo < hi and action.startswith("delete-"):
+            self.anchor = None
+            return self._delete(c, lo, hi)
+        elif lo == hi:
+            self.anchor = None
         lines = self._lines(c)
         s, e = next((s, e) for s, e in lines if s <= p <= e)
         move = {
@@ -1355,6 +1420,8 @@ class Field:
         }.get(action)
         if move is not None:
             self.caret = move()
+            if self.anchor == self.caret:
+                self.anchor = None
             return False
         span = {
             "delete-char-backward": (max(p - 1, 0), p),
@@ -1367,19 +1434,19 @@ class Field:
         if span is not None:
             self.caret = p
             return self._delete(c, *span)
-        if action == "newline":
-            return self.type("\n")
         return False
 
     def type(self, text):
-        """Types text at the caret; returns whether the value changed."""
+        """Types text in place of the selection, or at the caret; returns
+        whether the value changed."""
         self._goal = None
         if not text:
             return False
         c = chars(self.value)
-        p = min(max(self.caret, 0), len(c))
-        before = "".join(c[:p]) + text
-        self.value = before + "".join(c[p:])
+        lo, hi = self.selection()
+        self.anchor = None
+        before = "".join(c[:lo]) + text
+        self.value = before + "".join(c[hi:])
         self.caret = len(chars(before))
         return True
 

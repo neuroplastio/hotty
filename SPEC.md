@@ -1272,19 +1272,30 @@ The default keymap is:
 | key | action |
 | --- | --- |
 | ArrowLeft, ArrowRight | `char-backward`, `char-forward` |
+| Control+ArrowLeft, Control+ArrowRight; Alt+ArrowLeft, Alt+ArrowRight | `word-backward`, `word-forward` |
 | Home, End | `line-start`, `line-end` |
+| Control+Home, Control+End | `input-start`, `input-end` |
 | Backspace, Delete | `delete-char-backward`, `delete-char-forward` |
+| Control+Backspace, Control+Delete; Alt+Backspace, Alt+Delete | `delete-word-backward`, `delete-word-forward` |
 | ArrowUp, ArrowDown | `line-previous`, `line-next` |
 | PageUp, PageDown | `page-up`, `page-down` |
+| Control+a | `select-all` |
 | Enter | `submit` in an `input`, `newline` in a multi-line field |
+
+These are a text field's keys in a browser, with macOS's Option as Alt, and
+Shift selects with each move (below). A program that wants one of them
+binds it to `program`. A key the program's keyboard encoding does not tell
+from another reaches the field as that one (§10.4): in the legacy encoding
+a terminal may send Control+Backspace as `0x08`, which is Control+h.
 
 A key goes to the field's keymap:
 - **Bound:** the field does the action. A key bound to `program`, or to an
   action the field does not have (a multi-line one in an `input`), reaches
   the program.
 - **Not bound, with Shift:** the key is looked up again without Shift, so
-  Shift+ArrowLeft does what ArrowLeft does. A character shows Shift in
-  itself (`A`, §10.4), so this concerns the other keys.
+  Shift+ArrowLeft does what ArrowLeft does, and selects (below). A
+  character shows Shift in itself (`A`, §10.4), so this concerns the other
+  keys.
 - **Not bound, a printable character** without Control, Alt and Meta: the
   field types it at the caret.
 - **Otherwise** the key reaches the program.
@@ -1305,7 +1316,8 @@ The actions:
 | `delete-to-line-start`, `delete-to-line-end` | deletes from the start of the caret's line to the caret, or from the caret to the end of its line |
 | `line-previous`, `line-next` † | moves the caret to the row above, or below, as near as it can to the place along the row where a run of these moves began; from the first row to the start of the value, from the last to its end |
 | `page-up`, `page-down` † | moves the caret as many rows up, or down, as the field shows, the same way |
-| `input-start`, `input-end` † | moves the caret to the start, or the end, of the value |
+| `input-start`, `input-end` | moves the caret to the start, or the end, of the value |
+| `select-all` | selects the whole value: the anchor at its start, the caret at its end |
 | `newline` † | types a line break |
 | `submit` | submits the field's form, as Enter does in a text `input` (§9 `submit`) |
 | `program` | nothing: the key reaches the program |
@@ -1322,13 +1334,22 @@ The actions:
   several rows.
 - **A password field** (`type=password`) is one word: the word actions move
   to, or delete to, the start or the end of the value.
-- **A selection**, which the user makes with the pointer, comes first:
-  typing replaces it, and a delete action deletes it and nothing else. A
-  move starts from its start when it goes back or up, and from its end
-  otherwise, and the selection goes; `char-backward` and `char-forward`
-  stop there.
-- **Selecting with keys** is not in this version: with Shift, a move moves
-  the caret as it does without (above).
+- **A selection** runs from its anchor, the end where it began, to the
+  caret. The user makes one with the pointer, with Shift (below) or with
+  `select-all`. It comes first: typing replaces it, and a delete action
+  deletes it and nothing else. A move without Shift starts from its start
+  when it goes back or up, and from its end otherwise, and the selection
+  goes; `char-backward` and `char-forward` stop there.
+- **Shift selects.** The moves are `char-backward`, `char-forward`,
+  `word-backward`, `word-forward`, `line-start`, `line-end`,
+  `line-previous`, `line-next`, `page-up`, `page-down`, `input-start` and
+  `input-end`. A move done by a key whose name has Shift (§10.4), bound
+  with Shift or looked up without it, moves the caret from where it is and
+  keeps the anchor, which is where the caret was if nothing was selected.
+  Shift+ArrowLeft selects the character before the caret.
+  Control+Shift+ArrowRight, Shift+End and, in a `textarea`,
+  Shift+ArrowDown go on by a word, to the line's end and by a row. When the
+  caret comes back to the anchor, nothing is selected.
 - **Every edit** is an edit for the `input` and `change` events (§9).
 
 #### Keys for the program
@@ -1899,13 +1920,22 @@ program → CSI ? 2026 l
     same in cells and on a surface.
   - **Inherited,** because a program has one keymap and many fields: it is
     set once, and overridden where a field differs.
-  - **A small default,** the keys a field used before keymaps, so that a
-    program that names none loses none of its own.
+  - **A default with a GUI field's keys,** Shift selecting included:
+    people's hands know them from every text field, whatever draws it. The
+    default takes few of the program's keys: those of a terminal's line
+    editor are mostly Control and Alt with a letter, and the one it does
+    take, Control+a, readline's line start, is also Home. A program that
+    needs one binds it to `program`.
   - **Readline's actions,** with the words and lines of Bubble Tea's text
     input and text area. Terminal programs share them, more or less, so a
     program's cells and its surfaces can share one implementation
     (SDK.md).
-  - **No selection by keys yet:** cells have no common way to show one.
+  - **Selection by Shift and `select-all`, from the anchor,** as GUI fields
+    select. A program that draws a field in cells shows a selection as it
+    shows a selected row, and an SDK's field keeps one (SDK.md §4.6).
+  - **No clipboard or undo actions yet.** Their GUI keys are the
+    terminal's own: Control+c interrupts, Control+v quotes the next key
+    and Control+z suspends.
 - **Why a host may show no select list.** A select's list opens past its
   control, and a surface is a rectangle of cells: drawn inside, a list
   would force small surfaces to grow, and drawn outside, it is something

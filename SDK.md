@@ -501,6 +501,10 @@ host.
   key is not the field's (it reaches the program, or Tab moves focus). Tab,
   Shift+Tab and Escape are never the field's, nor a key bound to `program`
   or to an action the field does not have.
+- **`Selects(key)`** says whether the field selects with the key (SPEC.md
+  §10.2, Shift selects): `Lookup` returns a move for it, and its canonical
+  name has `Shift` (`Shift+ArrowLeft`, `Control+Shift+End`, not `Alt+<`).
+  A field then does the move with `Extend` (§4.6).
 - **`Program(key)`** says whether a keymap gives the key to the program: it
   binds the key to `program`, or, for a key with Shift it does not bind, the
   key without Shift. On an element that is not a text field, a host asks it
@@ -514,7 +518,9 @@ host.
   §10.2, scrolling keys).
 - **`TerminalKeys`** is the SDK's keymap, the same in every SDK (§2.3): the
   keys of Bubble Tea's text input and text area (bubbles), which a program
-  that edits fields in cells is likely to share. A program puts it in the
+  that edits fields in cells is likely to share, but for Control+a, which
+  selects all, as in a GUI field and SPEC.md's default keymap (Home still
+  goes to the line's start). A program puts it in the
   `data-keys` of an element that holds its fields, and gives its cells
   rendition the same keymap, `Resolve(multiline, TerminalKeys)`.
 
@@ -523,7 +529,7 @@ host.
   | `char-backward`, `char-forward` | ArrowLeft, Control+b; ArrowRight, Control+f |
   | `word-backward` | Alt+ArrowLeft, Control+ArrowLeft, Alt+b |
   | `word-forward` | Alt+ArrowRight, Control+ArrowRight, Alt+f |
-  | `line-start`, `line-end` | Home, Control+a; End, Control+e |
+  | `line-start`, `line-end` | Home; End, Control+e |
   | `delete-char-backward` | Backspace, Control+h |
   | `delete-char-forward` | Delete, Control+d |
   | `delete-word-backward` | Alt+Backspace, Control+w, Control+Backspace |
@@ -532,6 +538,7 @@ host.
   | `line-previous`, `line-next` | ArrowUp, Control+p; ArrowDown, Control+n |
   | `page-up`, `page-down` | PageUp; PageDown |
   | `input-start`, `input-end` | Alt+<, Control+Home; Alt+>, Control+End |
+  | `select-all` | Control+a |
   | `newline` | Control+m |
 
   It leaves Enter to SPEC.md's default (`submit` in an `input`, `newline`
@@ -730,23 +737,40 @@ relay does will be specified here, with its own vectors.
 
 ### 4.6 Field
 
-A text field's value and caret, edited as SPEC.md §10.2's actions edit them,
+A text field's value, caret and selection, edited as SPEC.md §10.2's actions edit them,
 for a program that draws its fields in cells (the second rendition, §2.5).
 Go: `hottyedit.Field`, a module of its own for its grapheme segmentation.
 
 - **The field.** `Value`, `Caret` (a count of characters, grapheme
-  clusters, from the start), `Multiline`, `Password`, and `Rows`, the rows
-  it shows (1 when absent), for `page-up` and `page-down`.
+  clusters, from the start), `Anchor`, `Multiline`, `Password`, and
+  `Rows`, the rows it shows (1 when absent), for `page-up` and
+  `page-down`.
+- **The selection** runs from `Anchor`, the end where it began, to the
+  caret (SPEC.md §10.2). Nothing is selected when `Anchor` is absent or at
+  the caret. `Selection()` returns its start and end, equal when nothing
+  is selected, for the rendition to draw. `Select(anchor, caret)` sets
+  both, for a selection the user makes with the pointer, and
+  `Select(p, p)` puts the caret at `p` with nothing selected. Go keeps the
+  anchor behind `Anchor()` and `Select`, since a `Field` literal's zero
+  anchor would select.
 - **Rows are lines.** A field in cells does not wrap: each line is a row,
   and the place along it is a count of characters. A rendition that wraps
   moves the caret between its rows itself.
 - **`Do(action)`** does an action, and reports whether the value changed,
-  so the program knows when to report an `input`. `submit` and `program`
-  are the program's, and change nothing. A run of `line-previous`,
-  `line-next`, `page-up` and `page-down` keeps the place along the row it
+  so the program knows when to report an `input`. A selection comes first,
+  as SPEC.md §10.2 says: a delete deletes it, a move starts from its start
+  or its end and ends it, and `select-all` selects the whole value.
+  `submit` and `program` are the program's, and change nothing.
+- **`Extend(action)`** does a move as Shift does it (SPEC.md §10.2): the
+  anchor stays, or is set where the caret is, and the caret moves from
+  where it is. An action that is not a move is `Do`'s.
+- **A run of row moves,** `line-previous`, `line-next`, `page-up` and
+  `page-down`, with `Do` or `Extend`, keeps the place along the row it
   started from; any other action, or typing, ends it.
-- **`Type(text)`** types text at the caret.
-- **A selection** is the host's (SPEC.md §10.2): a Field has none.
+- **`Type(text)`** types text at the caret, in place of the selection.
+- **`Key(keymap, key)`**, where an SDK has it, does what the keymap says
+  of the key: types it, does its action, or, when `Selects(key)`, extends
+  with it.
 
 An SDK whose language has no grapheme segmentation **MAY** count code
 points instead, CR LF still one, and says so (§5.3); it then skips the

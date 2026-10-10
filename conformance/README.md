@@ -232,18 +232,22 @@ holds after the stream `held` (none when absent), what `Flush` returns
   key: action | null } }`: `Resolve(multiline, …)` with `TerminalKeys`
   first when `terminal_keys` is true, then each of `keys`. `Lookup` of each
   key of `lookup` must return its value: an action, `"insert"`, or `null`
-  when the key is not the field's;
+  when the key is not the field's. `Selects` of each key of `selects`, if
+  there is one, must return its value;
 - `{ "keys": [ … ], "program"?: { key: bool }, "scroll"?: { key: action |
   null } }`: an element's keymap outside a text field, with no default
   keymap: `ParseKeymap` of `keys` joined with a space, the root's first.
   `Program` of each key of `program`, and `Scroll` of each key of
   `scroll`, must return its value, `null` for none.
 
-**Edit** `{ "field": { "value", "caret", "multiline"?, "password"?, "rows"?
-}, "steps": [ … ] }`: a Field (SDK.md §4.6) made from `field`, absent keys
-false, or 1 for `rows`. Each step is `{ "do": action }` or `{ "type": text
-}`, and after it every key the step lists must equal the Field's: `value`,
-`caret` (in characters), and `changed`, what `Do` or `Type` returned.
+**Edit** `{ "field": { "value", "caret", "anchor"?, "multiline"?,
+"password"?, "rows"? }, "steps": [ … ] }`: a Field (SDK.md §4.6) made from
+`field`, absent keys false, 1 for `rows`, and nothing selected when there is
+no `anchor`. Each step is `{ "do": action }`, `{ "extend": action }`,
+`{ "type": text }` or `{ "select": [anchor, caret] }`, and after it every
+key the step lists must equal the Field's: `value`, `caret` and `anchor` (in
+characters; with nothing selected, the anchor is the caret), and `changed`,
+what `Do`, `Extend` or `Type` returned (false for `select`).
 `"requires": ["graphemes"]` marks the vectors whose text has a character of
 more than one code point, other than CR LF.
 

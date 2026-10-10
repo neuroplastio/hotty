@@ -6516,7 +6516,7 @@
    ]
   },
   {
-   "name": "with no data-keys, a text input uses the default keymap only: keys with Control or Alt reach the program, and Shift+ArrowLeft moves the caret as ArrowLeft does (SPEC \u00a710.2)",
+   "name": "with no data-keys, a text input uses the default keymap only: a browser field's keys, Shift selecting with a move and Control+a selecting all; Control and Alt keys it does not bind reach the program (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -6587,31 +6587,7 @@
      ]
     },
     {
-     "key": "a",
-     "keys": [
-      "ctrl"
-     ],
-     "terminal": true,
-     "events": []
-    },
-    {
      "key": "e",
-     "keys": [
-      "ctrl"
-     ],
-     "terminal": true,
-     "events": []
-    },
-    {
-     "key": "ArrowLeft",
-     "keys": [
-      "alt"
-     ],
-     "terminal": true,
-     "events": []
-    },
-    {
-     "key": "ArrowLeft",
      "keys": [
       "ctrl"
      ],
@@ -6627,17 +6603,9 @@
      "events": []
     },
     {
-     "key": "Backspace",
-     "keys": [
-      "alt"
-     ],
-     "terminal": true,
-     "events": []
-    },
-    {
      "key": "ArrowLeft",
      "keys": [
-      "shift"
+      "ctrl"
      ],
      "terminal": false,
      "events": []
@@ -6651,7 +6619,92 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abxc"
+        "value": "xabc"
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowRight",
+     "keys": [
+      "alt"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "ArrowLeft",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "ArrowLeft",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "y",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "xay"
+       }
+      }
+     ]
+    },
+    {
+     "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "z",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "z"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Home",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Backspace",
+     "keys": [
+      "alt"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": ""
        }
       }
      ]
@@ -6964,7 +7017,7 @@
    ]
   },
   {
-   "name": "a key with Shift that no binding names does what the key does without it; a binding that names it with Shift wins (SPEC \u00a710.2)",
+   "name": "a key with Shift that no binding names does what the key does without it, selecting as it moves; a binding that names it with Shift wins (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -7022,7 +7075,7 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "xabc"
+        "value": "x"
        }
       }
      ]
@@ -7377,7 +7430,7 @@
    ]
   },
   {
-   "name": "SDK.md's TerminalKeys as data-keys: Control+ArrowLeft and Alt+ArrowRight move by words, Alt+Backspace and Control+Delete delete them, Control+Home and Control+End go to the ends of a textarea's value (SPEC \u00a710.2, SDK.md \u00a73.10)",
+   "name": "SDK.md's TerminalKeys as data-keys: Control+ArrowLeft and Alt+ArrowRight move by words, Alt+Backspace and Control+Delete delete them, Control+Home and Control+End go to the ends of a textarea's value, and Control+a selects all (SPEC \u00a710.2, SDK.md \u00a73.10)",
    "steps": [
     {
      "send": {
@@ -7385,7 +7438,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys=\"ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward Home=line-start Control+a=line-start End=line-end Control+e=line-end Backspace=delete-char-backward Control+h=delete-char-backward Delete=delete-char-forward Control+d=delete-char-forward Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next PageUp=page-up PageDown=page-down Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end Control+m=newline\"><textarea id=t data-on=input cols=24 rows=3>one two\nthree four</textarea></div>"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys=\"ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward Home=line-start End=line-end Control+e=line-end Backspace=delete-char-backward Control+h=delete-char-backward Delete=delete-char-forward Control+d=delete-char-forward Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next PageUp=page-up PageDown=page-down Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end Control+a=select-all Control+m=newline\"><textarea id=t data-on=input cols=24 rows=3>one two\nthree four</textarea></div>"
     },
     {
      "send": {
@@ -7506,6 +7559,28 @@
        "t": "t",
        "detail": {
         "value": " \nfour"
+       }
+      }
+     ]
+    },
+    {
+     "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Z",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "Z"
        }
       }
      ]
@@ -11746,7 +11821,7 @@
   {
    "name": "TerminalKeys, formatted",
    "terminal_keys": true,
-   "format": "ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward Home=line-start Control+a=line-start End=line-end Control+e=line-end Backspace=delete-char-backward Control+h=delete-char-backward Delete=delete-char-forward Control+d=delete-char-forward Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next PageUp=page-up PageDown=page-down Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end Control+m=newline"
+   "format": "ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward Home=line-start End=line-end Control+e=line-end Backspace=delete-char-backward Control+h=delete-char-backward Delete=delete-char-forward Control+d=delete-char-forward Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next PageUp=page-up PageDown=page-down Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end Control+a=select-all Control+m=newline"
   },
   {
    "name": "a key bound twice keeps its first place and its last action; ASCII white space separates, other white space does not",
@@ -11759,12 +11834,17 @@
    "format": "Alt+==line-start Control+A=line-end Control+b=program"
   },
   {
+   "name": "select-all is an action",
+   "parse": "Control+a=select-all Alt+a=select-all",
+   "format": "Control+a=select-all Alt+a=select-all"
+  },
+  {
    "name": "nothing",
    "parse": "",
    "format": ""
   },
   {
-   "name": "the default keymap, in an input",
+   "name": "the default keymap, in an input: a browser field's keys, and Shift selects with a move (SPEC \u00a710.2)",
    "multiline": false,
    "keys": [],
    "lookup": {
@@ -11787,7 +11867,7 @@
     "Shift+ArrowLeft": "char-backward",
     "Shift+Enter": "submit",
     "Shift+Backspace": "delete-char-backward",
-    "Control+a": null,
+    "Control+a": "select-all",
     "Alt+b": null,
     "Meta+a": null,
     "Control+Space": null,
@@ -11797,7 +11877,39 @@
     "Escape": null,
     "F1": null,
     "Insert": null,
-    "Control+ArrowLeft": null
+    "Control+ArrowLeft": "word-backward",
+    "Alt+ArrowLeft": "word-backward",
+    "Control+ArrowRight": "word-forward",
+    "Alt+ArrowRight": "word-forward",
+    "Control+Backspace": "delete-word-backward",
+    "Alt+Backspace": "delete-word-backward",
+    "Control+Delete": "delete-word-forward",
+    "Alt+Delete": "delete-word-forward",
+    "Control+Home": "input-start",
+    "Control+End": "input-end",
+    "Control+Shift+ArrowLeft": "word-backward",
+    "Shift+End": "line-end",
+    "Control+Shift+Home": "input-start",
+    "Control+h": null,
+    "Control+A": null,
+    "Shift+ArrowUp": null
+   },
+   "selects": {
+    "Shift+ArrowLeft": true,
+    "ArrowLeft": false,
+    "Control+Shift+ArrowRight": true,
+    "Alt+Shift+ArrowLeft": true,
+    "Shift+Home": true,
+    "Shift+End": true,
+    "Control+Shift+End": true,
+    "Shift+Backspace": false,
+    "Control+Shift+Delete": false,
+    "Shift+Enter": false,
+    "Shift+ArrowUp": false,
+    "Shift+PageDown": false,
+    "Control+A": false,
+    "A": false,
+    "Shift+Tab": false
    }
   },
   {
@@ -11812,7 +11924,17 @@
     "PageUp": "page-up",
     "PageDown": "page-down",
     "Shift+ArrowDown": "line-next",
-    "Control+Home": null
+    "Control+Home": "input-start",
+    "Control+End": "input-end",
+    "Control+a": "select-all",
+    "Shift+PageUp": "page-up"
+   },
+   "selects": {
+    "Shift+ArrowDown": true,
+    "Shift+ArrowUp": true,
+    "Shift+PageUp": true,
+    "Control+Shift+Home": true,
+    "Shift+Enter": false
    }
   },
   {
@@ -11821,7 +11943,7 @@
    "terminal_keys": true,
    "keys": [],
    "lookup": {
-    "Control+a": "line-start",
+    "Control+a": "select-all",
     "Control+e": "line-end",
     "Control+b": "char-backward",
     "Control+f": "char-forward",
@@ -11842,13 +11964,20 @@
     "Control+p": null,
     "Control+n": null,
     "ArrowUp": null,
-    "Alt+<": null,
-    "Control+Home": null,
+    "Alt+<": "input-start",
+    "Control+Home": "input-start",
     "Control+m": null,
     "Enter": "submit",
     "Control+Shift+ArrowLeft": "word-backward",
     "Control+A": null,
     "Control+v": null
+   },
+   "selects": {
+    "Control+Shift+ArrowLeft": true,
+    "Shift+Home": true,
+    "Control+B": false,
+    "Alt+<": false,
+    "Shift+ArrowUp": false
    }
   },
   {
@@ -11893,6 +12022,29 @@
     "Shift+ArrowLeft": null,
     "ArrowLeft": "char-backward",
     "Shift+Home": "line-start"
+   },
+   "selects": {
+    "Shift+ArrowLeft": false,
+    "Shift+Home": true
+   }
+  },
+  {
+   "name": "a move bound with Shift selects as one looked up without it; a key without Shift does not, whatever its action (SPEC \u00a710.2)",
+   "multiline": false,
+   "keys": [
+    "Shift+ArrowUp=line-start Control+e=input-end Shift+Delete=delete-word-forward"
+   ],
+   "lookup": {
+    "Shift+ArrowUp": "line-start",
+    "Control+e": "input-end",
+    "Control+E": null,
+    "Shift+Delete": "delete-word-forward"
+   },
+   "selects": {
+    "Shift+ArrowUp": true,
+    "Control+e": false,
+    "Control+E": false,
+    "Shift+Delete": false
    }
   },
   {
@@ -12727,6 +12879,297 @@
      "value": "ab",
      "caret": 1,
      "changed": true
+    }
+   ]
+  },
+  {
+   "name": "Shift selects as it moves, from the caret; back at the anchor, nothing is selected",
+   "field": {
+    "value": "foo bar",
+    "caret": 4
+   },
+   "steps": [
+    {
+     "extend": "char-forward",
+     "caret": 5,
+     "anchor": 4,
+     "changed": false
+    },
+    {
+     "extend": "char-forward",
+     "caret": 6,
+     "anchor": 4
+    },
+    {
+     "extend": "char-backward",
+     "caret": 5,
+     "anchor": 4
+    },
+    {
+     "extend": "char-backward",
+     "caret": 4,
+     "anchor": 4
+    },
+    {
+     "extend": "char-backward",
+     "caret": 3,
+     "anchor": 4
+    },
+    {
+     "extend": "word-backward",
+     "caret": 0,
+     "anchor": 4,
+     "value": "foo bar"
+    }
+   ]
+  },
+  {
+   "name": "a move without Shift ends a selection, from its start going back and its end going on; a character move stops there",
+   "field": {
+    "value": "foo bar baz",
+    "caret": 8,
+    "anchor": 4
+   },
+   "steps": [
+    {
+     "do": "char-backward",
+     "caret": 4,
+     "anchor": 4
+    },
+    {
+     "select": [
+      4,
+      8
+     ],
+     "caret": 8,
+     "anchor": 4
+    },
+    {
+     "do": "char-forward",
+     "caret": 8,
+     "anchor": 8
+    },
+    {
+     "select": [
+      8,
+      4
+     ],
+     "caret": 4,
+     "anchor": 8
+    },
+    {
+     "do": "word-forward",
+     "caret": 11,
+     "anchor": 11
+    },
+    {
+     "select": [
+      4,
+      8
+     ]
+    },
+    {
+     "do": "word-backward",
+     "caret": 0,
+     "anchor": 0
+    },
+    {
+     "select": [
+      0,
+      3
+     ]
+    },
+    {
+     "do": "line-end",
+     "caret": 11,
+     "anchor": 11
+    },
+    {
+     "select": [
+      5,
+      5
+     ],
+     "caret": 5,
+     "anchor": 5
+    }
+   ]
+  },
+  {
+   "name": "a selection comes first: typing replaces it, and a delete deletes it and nothing else",
+   "field": {
+    "value": "foo bar baz",
+    "caret": 7,
+    "anchor": 4
+   },
+   "steps": [
+    {
+     "type": "qux",
+     "value": "foo qux baz",
+     "caret": 7,
+     "anchor": 7,
+     "changed": true
+    },
+    {
+     "select": [
+      4,
+      7
+     ]
+    },
+    {
+     "do": "delete-word-backward",
+     "value": "foo  baz",
+     "caret": 4,
+     "anchor": 4,
+     "changed": true
+    },
+    {
+     "select": [
+      3,
+      0
+     ]
+    },
+    {
+     "do": "delete-char-forward",
+     "value": "  baz",
+     "caret": 0,
+     "anchor": 0,
+     "changed": true
+    },
+    {
+     "do": "delete-char-backward",
+     "value": "  baz",
+     "caret": 0,
+     "changed": false
+    }
+   ]
+  },
+  {
+   "name": "select-all: the anchor at the start, the caret at the end; Shift goes on from the caret",
+   "field": {
+    "value": "foo bar",
+    "caret": 2
+   },
+   "steps": [
+    {
+     "do": "select-all",
+     "caret": 7,
+     "anchor": 0,
+     "changed": false
+    },
+    {
+     "extend": "word-backward",
+     "caret": 4,
+     "anchor": 0
+    },
+    {
+     "do": "select-all",
+     "caret": 7,
+     "anchor": 0
+    },
+    {
+     "type": "x",
+     "value": "x",
+     "caret": 1,
+     "anchor": 1
+    },
+    {
+     "do": "delete-char-backward",
+     "value": "",
+     "caret": 0
+    },
+    {
+     "do": "select-all",
+     "caret": 0,
+     "anchor": 0,
+     "changed": false
+    }
+   ]
+  },
+  {
+   "name": "rows with Shift keep their place along the rows and the anchor; a row move without Shift then starts from the selection's start going up",
+   "field": {
+    "value": "abcd\nab\nabcd",
+    "caret": 3,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "extend": "line-next",
+     "caret": 7,
+     "anchor": 3
+    },
+    {
+     "extend": "line-next",
+     "caret": 11,
+     "anchor": 3
+    },
+    {
+     "extend": "line-previous",
+     "caret": 7,
+     "anchor": 3
+    },
+    {
+     "do": "line-previous",
+     "caret": 0,
+     "anchor": 0
+    }
+   ]
+  },
+  {
+   "name": "in an input: input-start and input-end, and row moves are not the field's, with Shift or without; a password is one word",
+   "field": {
+    "value": "secret pass",
+    "caret": 3,
+    "password": true
+   },
+   "steps": [
+    {
+     "extend": "word-forward",
+     "caret": 11,
+     "anchor": 3
+    },
+    {
+     "extend": "input-start",
+     "caret": 0,
+     "anchor": 3
+    },
+    {
+     "extend": "line-next",
+     "caret": 0,
+     "anchor": 3,
+     "changed": false
+    },
+    {
+     "do": "input-end",
+     "caret": 11,
+     "anchor": 11
+    },
+    {
+     "do": "input-start",
+     "caret": 0,
+     "anchor": 0
+    }
+   ]
+  },
+  {
+   "name": "Extend does an action that is not a move as Do does",
+   "field": {
+    "value": "foo bar",
+    "caret": 7,
+    "anchor": 4
+   },
+   "steps": [
+    {
+     "extend": "delete-char-backward",
+     "value": "foo ",
+     "caret": 4,
+     "anchor": 4,
+     "changed": true
+    },
+    {
+     "extend": "select-all",
+     "caret": 4,
+     "anchor": 0
     }
    ]
   },

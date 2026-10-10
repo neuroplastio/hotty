@@ -403,18 +403,34 @@ def run_keymap(v):
         got = m.lookup(key)
         if got != want:
             return False, f"{key!r}: {got!r}, want {want!r}"
+    for key, want in v.get("selects", {}).items():
+        got = m.selects(key)
+        if got != want:
+            return False, f"{key!r}: selects {got!r}, want {want!r}"
     return True, ""
 
 
 def run_edit(v):
     f = v["field"]
-    fld = hotty.Field(f["value"], f["caret"], f.get("multiline", False), f.get("password", False), f.get("rows", 1))
+    fld = hotty.Field(f["value"], f["caret"], f.get("multiline", False), f.get("password", False), f.get("rows", 1),
+                      f.get("anchor"))
     for i, st in enumerate(v["steps"]):
-        changed = fld.do(st["do"]) if "do" in st else fld.type(st["type"])
-        got = {"value": fld.value, "caret": fld.caret, "changed": changed}
-        for k in ("value", "caret", "changed"):
+        changed = False
+        if "do" in st:
+            changed = fld.do(st["do"])
+        elif "extend" in st:
+            changed = fld.extend(st["extend"])
+        elif "select" in st:
+            fld.select(*st["select"])
+        else:
+            changed = fld.type(st["type"])
+        # Nothing selected is an anchor at the caret (SDK.md §4.6).
+        anchor = fld.caret if fld.anchor is None else fld.anchor
+        got = {"value": fld.value, "caret": fld.caret, "anchor": anchor, "changed": changed}
+        for k in ("value", "caret", "anchor", "changed"):
             if k in st and got[k] != st[k]:
-                return False, f"step {i} ({st.get('do', st.get('type'))!r}): {k} {got[k]!r}, want {st[k]!r}"
+                what = st.get("do", st.get("extend", st.get("select", st.get("type"))))
+                return False, f"step {i} ({what!r}): {k} {got[k]!r}, want {st[k]!r}"
     return True, ""
 
 
