@@ -13116,6 +13116,33 @@
    ]
   },
   {
+   "name": "Select ends a run of row moves: the next one keeps the place along the row it starts from",
+   "field": {
+    "value": "abcd\nab\nabcd",
+    "caret": 3,
+    "multiline": true
+   },
+   "steps": [
+    {
+     "do": "line-next",
+     "caret": 7
+    },
+    {
+     "select": [
+      5,
+      5
+     ],
+     "caret": 5,
+     "anchor": 5
+    },
+    {
+     "do": "line-next",
+     "caret": 8,
+     "anchor": 8
+    }
+   ]
+  },
+  {
    "name": "in an input: input-start and input-end, and row moves are not the field's, with Shift or without; a password is one word",
    "field": {
     "value": "secret pass",

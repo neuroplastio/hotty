@@ -1310,7 +1310,8 @@ class Field:
 
     def select(self, anchor, caret):
         """Selects from anchor to caret; select(p, p) puts the caret at p with
-        nothing selected."""
+        nothing selected. It ends a run of row moves."""
+        self._goal = None
         self.caret = caret
         self.anchor = None if anchor == caret else anchor
 

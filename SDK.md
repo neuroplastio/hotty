@@ -767,7 +767,7 @@ grapheme segmentation.
   where it is. An action that is not a move is `Do`'s.
 - **A run of row moves,** `line-previous`, `line-next`, `page-up` and
   `page-down`, with `Do` or `Extend`, keeps the place along the row it
-  started from; any other action, or typing, ends it.
+  started from; any other action, typing, or `Select` ends it.
 - **`Type(text)`** types text at the caret, in place of the selection.
 - **`Key(keymap, key)`**, where an SDK has it, does what the keymap says
   of the key: types it, does its action, or, when `Selects(key)`, extends
