@@ -29,12 +29,19 @@ too little.
 ## Format
 
 ```
-{ "version": "0.1",
+{ "version": "0.2",
   "vectors": [ { "name": …, "steps": [ step, … ] } ],
   "wire":    [ { "name": …, "stream": …, "commands": [ … ], "invalid": n } ],
   "build":   [ … ], "encode": [ … ], "decode": [ … ], "scan": [ … ],
   "detect":  [ … ] }
 ```
+
+**Numbers.** A number in a body has a type (SPEC §3.3). In this file, a
+number written with a fraction or an exponent (`720.0`) is a float, and
+any other an int, so `{"w": 720.0}` is not matched by an int 720. A host's
+runner reads the file keeping the two apart: Python's `json` does, Go's
+with `UseNumber`, Rust's `serde_json` (`is_f64`), and JavaScript's
+`JSON.parse` with a reviver that reads the source text.
 
 Each vector starts on a fresh host. A vector with `"requires"` applies only
 to a host that has what it names, and others skip it: `"passthrough"`, a
@@ -51,7 +58,7 @@ base64-encoded and chunked as needed, and the payload is UTF-8.
 - `"reply": null`: the command must produce no reply.
 - `"reply": {…}`: the first reply (`a=ok` or `a=err`) must match. Every key
   but `code` and `detail` is compared with the reply's control; `code` and
-  `detail` with the JSON body of an `a=err`.
+  `detail` with the body of an `a=err`.
 - `"events"`: the events the command makes the host send, as for a pointer
   step (below). Some follow the command by a frame or a load (`fit`, SPEC
   §5.2), so a runner waits for them, and then a frame or two more to see
@@ -97,9 +104,9 @@ checked).
   checked.
 - `"events"`: every event (`a=ev`) the step makes the host send, in order,
   and nothing more. Each is compared as a reply is: every key but `detail`
-  with the event's control, and `detail`, when present, with its JSON body
-  (equal as JSON values; `null` when the event has none). Absent: events
-  are not checked.
+  with the event's control, and `detail`, when present, with its body,
+  decoded: equal as values, each of its type (Numbers, above), and `null`
+  when the event has none. Absent: events are not checked.
 
 **Touch** `{ "touch": "down" | "move" | "up", "s": surface, "at": …,
 "keys": [ … ], "terminal": …, "events": [ … ] }`: one finger, as the user
@@ -156,11 +163,10 @@ implements, and skips the rest:
 | `requires` | what it names |
 | --- | --- |
 | `place.hover` | `Placement.Hover` (`v=1`) |
-| `event.hover` | `Event.Hover()` |
+| `event.hover` | `Event.Hover` |
 | `caps.passthrough`, `caps.version`, `caps.scroll` | those fields of `Caps` |
 | `doc.scroll` | `Doc`'s `Scroll` option (`scroll=<axes>`) |
-| `event.area` | `Event.Area()` |
-| `caps.lenient` | a capability field of an unexpected type is ignored (SDK.md §2.7) |
+| `event.area` | `Event.Area` |
 | `caps.drag-kinds` | `Sends` answers for `dragstart` and `dragend` as for `drag` (SPEC §4) |
 | `options.unordered` | a `q` given wins over the `q` that `n` implies, whatever their order |
 | `decode.abort-count` | a malformed message that aborts a chunked one counts twice (SPEC §3.7) |
@@ -189,8 +195,9 @@ each one's control (between `ESC ] 7279 ;` and `;`) and base64 length must
 match. Every case must also decode back to the payload, with the control's
 keys in order, but `m` and `o`, which are Encode's (SDK.md §3.3).
 
-**Decode** `{ "seqs": [ text, … ], "results": [ … ], "invalid": n,
-"messages": [ … ] }`: each sequence goes to one Decoder's `Feed`, in order.
+**Decode** `{ "seqs": [ text, … ], "bodies"?: [ … ], "results": [ … ],
+"invalid": n, "messages": [ … ] }`: each sequence goes to one Decoder's
+`Feed`, in order.
 `results` are its results (`not_hotty`, `partial`, `complete`, `invalid`),
 and `invalid` its count after the last. `messages` are the complete ones,
 in order:
@@ -203,9 +210,23 @@ in order:
   `c`, `r` and `out`);
 - `caps`: `Caps`'s fields, and its answers: `supports` and `sends` map an
   argument to the answer, `drags`, `hovers`, `light`, `cell_css` with `w`
-  and `h`.
+  and `h`. `null`: the reply carries none, as when its body does not
+  decode.
 
 Only the keys listed are checked. Numbers compare as numbers.
+
+A host's body in the sequences is msgpack in base64, which no one reads,
+so `bodies` shows them as JSON (Numbers, above), one for each sequence:
+- the body of the message the sequence starts, its maps in their order;
+- `null` where the sequence starts no message, or one with no body;
+- `{"hex": …}` for bytes the script below does not write: a body that is
+  not one msgpack value, or one in another of its types' forms than the
+  smallest (an int wider than it needs, a float of 32 bits).
+
+Runners ignore it. `scripts/bodies.py` writes the base64 in `seqs` from
+it, splitting a chunked body where its chunks split it before, and with
+`--check` fails when the two differ. The vector about base64 itself
+writes its sequences by hand, and has no `bodies`.
 
 **Scan** `{ "stream": text, "segments": [ … ], "held"?: text, "flush"?: [
 … ], "invalid"?: n }`: the stream goes to a Scanner, which looks for DA1
@@ -255,7 +276,8 @@ more than one code point, other than CR LF.
 Detector, with the query's number `n` (1 when absent), asking for a late
 answer when `late` is true. Each step happens at time `at`, in
 milliseconds, and is one of `start`, `da1`, `osc` (a sequence, decoded, and
-given to `Reply`), `tick` and `end`. After each, every key the step lists
+given to `Reply`; its `body` shows the body, as a Decode vector's `bodies`
+do, and runners ignore it), `tick` and `end`. After each, every key the step lists
 must equal the Detector's: `took` (what `DA1` or `Reply` returned), `state`
 (`detecting`, `native`, `text`), `decided`, `done`, and `deadline` (`null`
 when there is none). `caps` is checked against the capabilities at the

@@ -4,7 +4,8 @@ No dependencies. It has the two layers SDK.md describes:
 
 - The wire layer does no I/O: `encode` and the command builders (`doc`,
   `place`, `set_text`, …) return escape sequences as strings, a `Decoder`
-  turns the OSC sequences a program reads back into messages, a `Scanner`
+  turns the OSC sequences a program reads back into messages, `unpack`
+  reads their msgpack bodies, a `Scanner`
   cuts them out of a byte stream, a `Detector` decides whether the terminal
   is a host, and `Reply`, `Event` and `Caps` read what the host said.
 - `Hotty` does the I/O for the examples: it writes commands to stdout and
@@ -16,10 +17,11 @@ import base64
 import binascii
 import contextlib
 import dataclasses
-import json
+import datetime
 import os
 import re
 import select
+import struct
 import sys
 import termios
 import time
@@ -34,7 +36,7 @@ OSC_NUMBER = NUMBER  # the name this client had first
 CHUNK = 4096
 MAX_SIZE = 1000
 MAX_NAME = 64
-VERSION = "0.1"
+VERSION = "0.2"
 COMPRESS_FROM = 256
 SCAN_MAX = 64 << 10
 
@@ -357,13 +359,16 @@ class Message:
         return self.control.get(k, default)
 
     @property
-    def json(self):
+    def body(self):
+        """The body, a msgpack map (SPEC §3.3), or None when there is none,
+        or it is not one map that decodes."""
         if not self.payload:
             return None
         try:
-            return json.loads(self.payload)
+            v = unpack(self.payload)
         except ValueError:
             return None
+        return v if isinstance(v, dict) else None
 
     def reply(self):
         """The message as a reply, or None if it is not one."""
@@ -396,15 +401,17 @@ class Reply:
         self.rows = _int(m["r"])
         self.code = self.detail = None
         if not self.ok:
-            body = m.json if isinstance(m.json, dict) else {}
-            self.code = body.get("code") if isinstance(body.get("code"), str) else None
-            self.detail = body.get("detail") if isinstance(body.get("detail"), str) else None
+            body = _typed_body(m, _ERROR) or {}
+            self.code = body.get("code")
+            self.detail = body.get("detail")
 
     def caps(self):
-        """The capabilities a reply to a query carries, or None."""
+        """The capabilities a reply to a query carries, or None when it
+        carries none, or they do not decode."""
         if not self.ok or self.re != "q":
             return None
-        return Caps(self.message.json if isinstance(self.message.json, dict) else {})
+        body = _typed_body(self.message, _CAPS)
+        return Caps(body) if body is not None else None
 
     def err(self):
         """The reply as an error: None when ok."""
@@ -441,130 +448,161 @@ class Area:
     h: int
 
 
-def _is_int(v):
-    return isinstance(v, int) and not isinstance(v, bool)
+# The types of a body's fields (SPEC §3.3): a type's name, a list of one
+# type (an array of it), or a dict: a map's fields by name, or under "*" the
+# type of each value of a map keyed by strings. A field not named is not
+# checked, as one a program does not know is ignored (SDK.md §2.7).
+_IS = {
+    "int": lambda v: isinstance(v, int) and not isinstance(v, bool),
+    "float": lambda v: isinstance(v, float),
+    "str": lambda v: isinstance(v, str),
+    "bool": lambda v: isinstance(v, bool),
+}
 
 
-def _whole(v):
-    """A count of cells: a number with no fractional part, 2.0 as 2
-    (SDK.md §3.9); None for anything else."""
-    if isinstance(v, bool) or not isinstance(v, (int, float)):
-        return None
-    if isinstance(v, float):
-        return int(v) if v.is_integer() else None
-    return v
+def _typed(v, t):
+    if isinstance(t, str):
+        return _IS[t](v)
+    if isinstance(t, list):
+        return isinstance(v, list) and all(_typed(x, t[0]) for x in v)
+    if not isinstance(v, dict):
+        return False
+    if "*" in t:
+        return all(isinstance(k, str) and _typed(x, t["*"]) for k, x in v.items())
+    return all(_typed(v[k], f) for k, f in t.items() if k in v)
 
 
-def _is_num(v):
-    return isinstance(v, (int, float)) and not isinstance(v, bool)
+def _typed_body(m, t):
+    """m's body when each field it has that t names is of its type; None
+    when it does not decode (SDK.md §3.9)."""
+    b = m.body
+    return b if b is not None and _typed(b, t) else None
+
+
+_ERROR = {"code": "str", "detail": "str"}
+_CAPS = {
+    "v": "str",
+    "ops": ["str"],
+    "events": ["str"],
+    "cell": {"w": "int", "h": "int"},
+    "scale": "float",
+    "scheme": "str",
+    "limits": {"*": "int"},
+    "net": {"*": ["str"]},
+    "passthrough": "bool",
+    "scroll": "bool",
+    "steps": "bool",
+    "host": "str",
+    "version": "str",
+}
+_AREA = {"c": "int", "r": "int", "w": "int", "h": "int"}
+_DRAG = {"c": "int", "r": "int", "keys": ["str"], "x": "int", "y": "int"}
+# Each kind's detail (SPEC §9); a kind not here carries none a program reads.
+_DETAIL = {
+    EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA},
+    EVENT_PRESS: {"area": _AREA},
+    EVENT_CHANGE: {"checked": "bool", "value": "str"},
+    EVENT_INPUT: {"value": "str"},
+    EVENT_SUBMIT: {"*": "str"},
+    EVENT_RESIZE: {"w": "float", "h": "float"},
+    EVENT_FIT: {"r": "int"},
+    EVENT_DRAG_START: _DRAG,
+    EVENT_DRAG: _DRAG,
+    EVENT_DRAG_END: _DRAG,
+    EVENT_HOVER: {"c": "int", "r": "int", "out": "bool"},
+}
 
 
 class Event:
-    """What the user did in a surface (SPEC §9). The detail's accessors
-    return None where the event does not carry it."""
+    """What the user did in a surface (SPEC §9). The detail is read by the
+    event's kind (SDK.md §3.9), and its accessors return None where the
+    event does not carry it, or its detail does not decode."""
 
     def __init__(self, m):
         self.message = m
         self.surface = m["s"]
         self.kind = m["e"]
         self.target = m["t"] or ""
-        d = m.json
-        self._d = d if isinstance(d, dict) else {}
+        t = _DETAIL.get(self.kind)
+        self._body = _typed_body(m, t) if t else None
+        self._d = self._body or {}
 
     def value(self):
-        v = self._d.get("value")
-        return v if isinstance(v, str) else None
+        if self.kind not in (EVENT_CLICK, EVENT_CHANGE, EVENT_INPUT):
+            return None
+        return self._d.get("value")
 
     def checked(self):
-        v = self._d.get("checked")
-        return v if isinstance(v, bool) else None
+        return self._d.get("checked") if self.kind == EVENT_CHANGE else None
 
     def fields(self):
-        """A submit's fields by name: a value that is not a string as its
-        JSON, a null left out."""
-        if self.kind != EVENT_SUBMIT:
+        """A submit's fields by name."""
+        if self.kind != EVENT_SUBMIT or self._body is None:
             return None
-        return {
-            k: v if isinstance(v, str) else json.dumps(v, separators=(",", ":"))
-            for k, v in self._d.items()
-            if v is not None
-        }
+        return dict(self._body)
 
     def link(self):
         """(href, url) of a link's click; url is None when there is none."""
         href = self._d.get("href")
-        if self.kind != EVENT_CLICK or not isinstance(href, str):
+        if self.kind != EVENT_CLICK or href is None:
             return None
-        url = self._d.get("url")
-        return href, url if isinstance(url, str) else None
+        return href, self._d.get("url")
 
     def size(self):
         w, h = self._d.get("w"), self._d.get("h")
-        if self.kind != EVENT_RESIZE or not (_is_num(w) and _is_num(h)):
+        if self.kind != EVENT_RESIZE or w is None or h is None:
             return None
         return w, h
 
     def fit_rows(self):
-        r = _whole(self._d.get("r"))
-        return r if self.kind == EVENT_FIT else None
+        return self._d.get("r") if self.kind == EVENT_FIT else None
 
     def drag(self):
         if self.kind not in (EVENT_DRAG_START, EVENT_DRAG, EVENT_DRAG_END):
             return None
-        c, r, keys = _whole(self._d.get("c")), _whole(self._d.get("r")), self._d.get("keys", [])
+        c, r = self._d.get("c"), self._d.get("r")
         if c is None or r is None:
             return None
-        keys = [k for k in keys if isinstance(k, str)] if isinstance(keys, list) else []
-        return Drag(c, r, keys, _whole(self._d.get("x")), _whole(self._d.get("y")))
+        return Drag(c, r, list(self._d.get("keys", [])), self._d.get("x"), self._d.get("y"))
 
     def area(self):
         """The cells of a click's or a press's element (SPEC §9)."""
-        if self.kind not in (EVENT_CLICK, EVENT_PRESS):
+        a = self._d.get("area") if self.kind in (EVENT_CLICK, EVENT_PRESS) else None
+        if a is None or any(k not in a for k in "crwh"):
             return None
-        a = self._d.get("area")
-        cells = [_whole(a.get(k)) for k in "crwh"] if isinstance(a, dict) else [None]
-        if None in cells:
-            return None
-        return Area(*cells)
+        return Area(a["c"], a["r"], a["w"], a["h"])
 
     def hover(self):
         if self.kind != EVENT_HOVER:
             return None
         if self._d.get("out") is True:
             return Hover(out=True)
-        c, r = _whole(self._d.get("c")), _whole(self._d.get("r"))
+        c, r = self._d.get("c"), self._d.get("r")
         if c is None or r is None:
             return None
         return Hover(c, r)
 
 
 class Caps:
-    """What a host says about itself (SPEC §4). A field of an unexpected type
-    is ignored, as one the program does not know would be."""
+    """What a host says about itself (SPEC §4), from a body whose fields
+    have their types (Reply.caps)."""
 
     def __init__(self, d):
         self.raw = d
-
-        def get(k, ok, default=None):
-            v = d.get(k)
-            return v if ok(v) else default
-
-        self.v = get("v", lambda v: isinstance(v, str), "")
-        self.ops = [o for o in get("ops", lambda v: isinstance(v, list), []) if isinstance(o, str)]
-        self.events = [e for e in get("events", lambda v: isinstance(v, list), []) if isinstance(e, str)]
-        cell = get("cell", lambda v: isinstance(v, dict), {})
-        self.cell = (cell["w"], cell["h"]) if _is_num(cell.get("w")) and _is_num(cell.get("h")) else None
-        self.scale = get("scale", _is_num)
-        self.scheme = get("scheme", lambda v: isinstance(v, str), "")
-        limits = get("limits", lambda v: isinstance(v, dict), {})
-        self.limits = {k: v for k, v in limits.items() if _is_int(v)}
-        net = get("net", lambda v: isinstance(v, dict), {})
-        self.net = {k: [s for s in v if isinstance(s, str)] for k, v in net.items() if isinstance(v, list)}
-        self.passthrough = get("passthrough", lambda v: isinstance(v, bool), False)
-        self.scroll = get("scroll", lambda v: isinstance(v, bool), False)
-        self.steps = get("steps", lambda v: isinstance(v, bool), False)
-        self.host = get("host", lambda v: isinstance(v, str))
-        self.version = get("version", lambda v: isinstance(v, str))
+        self.v = d.get("v", "")
+        self.ops = d.get("ops", [])
+        self.events = d.get("events", [])
+        cell = d.get("cell", {})
+        self.cell = (cell["w"], cell["h"]) if "w" in cell and "h" in cell else None
+        self.scale = d.get("scale")
+        self.scheme = d.get("scheme", "")
+        self.limits = d.get("limits", {})
+        self.net = d.get("net", {})
+        self.passthrough = d.get("passthrough", False)
+        self.scroll = d.get("scroll", False)
+        self.steps = d.get("steps", False)
+        self.host = d.get("host")
+        self.version = d.get("version")
 
     def supports(self, op):
         """Whether the host supports a delta op; one that lists none, all."""
@@ -594,6 +632,112 @@ class Caps:
         if self.cell is None or self.cell[0] <= 0 or self.cell[1] <= 0:
             return 9, 18
         return self.cell[0] / s, self.cell[1] / s
+
+
+# --- msgpack (SPEC §3.3, SDK.md §3.9) ----------------------------------------
+
+# How deep a body may nest: its map is the first level.
+MAX_DEPTH = 32
+
+_EPOCH = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
+_FIXED = {0xCA: ">f", 0xCB: ">d", 0xCC: ">B", 0xCD: ">H", 0xCE: ">I", 0xCF: ">Q",
+          0xD0: ">b", 0xD1: ">h", 0xD2: ">i", 0xD3: ">q"}
+_SIZED = {0xC4: ("bin", ">B"), 0xC5: ("bin", ">H"), 0xC6: ("bin", ">I"),
+          0xC7: ("ext", ">B"), 0xC8: ("ext", ">H"), 0xC9: ("ext", ">I"),
+          0xD9: ("str", ">B"), 0xDA: ("str", ">H"), 0xDB: ("str", ">I"),
+          0xDC: ("array", ">H"), 0xDD: ("array", ">I"), 0xDE: ("map", ">H"), 0xDF: ("map", ">I")}
+_FIXEXT = {0xD4: 1, 0xD5: 2, 0xD6: 4, 0xD7: 8, 0xD8: 16}
+
+
+def unpack(data):
+    """The one msgpack value in data, as plain values: a map is a dict, an
+    array a list, str a str, bin bytes, a timestamp (extension -1) an aware
+    UTC datetime, and any other extension None. ValueError when data is not
+    one value, or nests more than MAX_DEPTH deep."""
+    data = memoryview(data)
+    v, i = _unpack(data, 0, 0)
+    if i != len(data):
+        raise ValueError("msgpack: bytes after the value")
+    return v
+
+
+def _take(m, i, n):
+    if i + n > len(m):
+        raise ValueError("msgpack: cut short")
+    return m[i : i + n], i + n
+
+
+def _unpack(m, i, depth):
+    b, i = _take(m, i, 1)
+    c = b[0]
+    if c <= 0x7F:
+        return c, i
+    if c >= 0xE0:
+        return c - 0x100, i
+    if c == 0xC0:
+        return None, i
+    if c in (0xC2, 0xC3):
+        return c == 0xC3, i
+    if c in _FIXED:
+        f = struct.Struct(_FIXED[c])
+        b, i = _take(m, i, f.size)
+        return f.unpack(b)[0], i
+    if c <= 0x8F:
+        kind, n = "map", c & 0x0F
+    elif c <= 0x9F:
+        kind, n = "array", c & 0x0F
+    elif c <= 0xBF:
+        kind, n = "str", c & 0x1F
+    elif c in _SIZED:
+        kind, f = _SIZED[c]
+        f = struct.Struct(f)
+        b, i = _take(m, i, f.size)
+        n = f.unpack(b)[0]
+    elif c in _FIXEXT:
+        kind, n = "ext", _FIXEXT[c]
+    else:
+        raise ValueError(f"msgpack: no type starts with 0x{c:02x}")
+    if kind == "ext":
+        b, i = _take(m, i, 1)
+        code = b[0] - 0x100 if b[0] > 0x7F else b[0]
+        b, i = _take(m, i, n)
+        return (_timestamp(bytes(b)) if code == -1 else None), i
+    if kind in ("str", "bin"):
+        b, i = _take(m, i, n)
+        return (str(b, "utf-8") if kind == "str" else bytes(b)), i
+    if depth == MAX_DEPTH:
+        raise ValueError("msgpack: nested too deep")
+    if n > len(m) - i:  # each takes a byte at least
+        raise ValueError("msgpack: cut short")
+    if kind == "array":
+        out = []
+        for _ in range(n):
+            v, i = _unpack(m, i, depth + 1)
+            out.append(v)
+        return out, i
+    out = {}
+    for _ in range(n):
+        k, i = _unpack(m, i, depth + 1)
+        try:
+            out[k], i = _unpack(m, i, depth + 1)
+        except TypeError:
+            raise ValueError("msgpack: a map key that is not a value") from None
+    return out, i
+
+
+def _timestamp(b):
+    if len(b) == 4:
+        s, ns = struct.unpack(">I", b)[0], 0
+    elif len(b) == 8:
+        x = struct.unpack(">Q", b)[0]
+        s, ns = x & 0x3_FFFF_FFFF, x >> 34
+    elif len(b) == 12:
+        ns, s = struct.unpack(">Iq", b)
+    else:
+        raise ValueError("msgpack: a timestamp of %d bytes" % len(b))
+    if ns > 999_999_999:
+        raise ValueError("msgpack: a timestamp's nanoseconds over a second")
+    return _EPOCH + datetime.timedelta(seconds=s, microseconds=ns // 1000)
 
 
 # --- decoding (SDK.md §3.6) --------------------------------------------------

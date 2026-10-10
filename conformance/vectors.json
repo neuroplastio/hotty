@@ -1,6 +1,6 @@
 {
- "version": "0.1",
- "protocol": "SPEC.md version 0.1",
+ "version": "0.2",
+ "protocol": "SPEC.md version 0.2",
  "vectors": [
   {
    "name": "a=q answers ok and echoes n",
@@ -9538,12 +9538,34 @@
   {
    "name": "error replies carry the code, and the detail when there is one",
    "seqs": [
-    "\u001b]7279;a=err:re=frob;eyJjb2RlIjoiRUlOVkFMIn0=\u001b\\",
-    "\u001b]7279;a=err:n=3:s=x:re=delta;eyJjb2RlIjoiRU5PVEFSR0VUIiwiZGV0YWlsIjoibm9wZSJ9\u001b\\",
-    "\u001b]7279;a=err:s=gone:re=place;eyJjb2RlIjoiRU5PRU5UIn0=\u001b\\",
-    "\u001b]7279;a=err:s=x:re=focus;eyJjb2RlIjoiRURFVEFDSEVEIn0=\u001b\\",
-    "\u001b]7279;a=err:s=y:re=doc;eyJjb2RlIjoiRVFVT1RBIiwiZGV0YWlsIjoic3VyZmFjZXMifQ==\u001b\\",
-    "\u001b]7279;a=err:s=y:re=doc;eyJjb2RlIjoiRUJVREdFVCJ9\u001b\\"
+    "\u001b]7279;a=err:re=frob;gaRjb2RlpkVJTlZBTA==\u001b\\",
+    "\u001b]7279;a=err:n=3:s=x:re=delta;gqRjb2RlqUVOT1RBUkdFVKZkZXRhaWykbm9wZQ==\u001b\\",
+    "\u001b]7279;a=err:s=gone:re=place;gaRjb2RlpkVOT0VOVA==\u001b\\",
+    "\u001b]7279;a=err:s=x:re=focus;gaRjb2RlqUVERVRBQ0hFRA==\u001b\\",
+    "\u001b]7279;a=err:s=y:re=doc;gqRjb2RlpkVRVU9UQaZkZXRhaWyoc3VyZmFjZXM=\u001b\\",
+    "\u001b]7279;a=err:s=y:re=doc;gaRjb2Rlp0VCVURHRVQ=\u001b\\"
+   ],
+   "bodies": [
+    {
+     "code": "EINVAL"
+    },
+    {
+     "code": "ENOTARGET",
+     "detail": "nope"
+    },
+    {
+     "code": "ENOENT"
+    },
+    {
+     "code": "EDETACHED"
+    },
+    {
+     "code": "EQUOTA",
+     "detail": "surfaces"
+    },
+    {
+     "code": "EBUDGET"
+    }
    ],
    "results": [
     "complete",
@@ -9632,7 +9654,40 @@
   {
    "name": "the reply to q carries the capabilities",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIiwib3BzIjpbIm1vcnBoIiwiaW5uZXIiLCJ0ZXh0IiwidmFyIl0sImV2ZW50cyI6WyJjbGljayIsImNoYW5nZSIsImRyYWciLCJmaXQiXSwiY2VsbCI6eyJ3IjoxNiwiaCI6MzJ9LCJzY2FsZSI6Miwic2NoZW1lIjoibGlnaHQiLCJsaW1pdHMiOnsic3VyZmFjZXMiOjY0LCJyZXNvdXJjZXMiOjE2Nzc3MjE2fSwibmV0Ijp7ImltZy1zcmMiOlsiaHR0cHM6Ly9leGFtcGxlLmNvbSJdfSwiaG9zdCI6IngifQ==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;iaF2ozAuMqNvcHOUpW1vcnBopWlubmVypHRleHSjdmFypmV2ZW50c5SlY2xpY2umY2hhbmdlpGRyYWejZml0pGNlbGyCoXcQoWggpXNjYWxly0AAAAAAAAAApnNjaGVtZaVsaWdodKZsaW1pdHOCqHN1cmZhY2VzQKlyZXNvdXJjZXPOAQAAAKNuZXSBp2ltZy1zcmORs2h0dHBzOi8vZXhhbXBsZS5jb22kaG9zdKF4\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2",
+     "ops": [
+      "morph",
+      "inner",
+      "text",
+      "var"
+     ],
+     "events": [
+      "click",
+      "change",
+      "drag",
+      "fit"
+     ],
+     "cell": {
+      "w": 16,
+      "h": 32
+     },
+     "scale": 2.0,
+     "scheme": "light",
+     "limits": {
+      "surfaces": 64,
+      "resources": 16777216
+     },
+     "net": {
+      "img-src": [
+       "https://example.com"
+      ]
+     },
+     "host": "x"
+    }
    ],
    "results": [
     "complete"
@@ -9651,7 +9706,7 @@
       "n": 1
      },
      "caps": {
-      "v": "0.1",
+      "v": "0.2",
       "ops": [
        "morph",
        "inner",
@@ -9668,7 +9723,7 @@
        "w": 16,
        "h": 32
       },
-      "scale": 2,
+      "scale": 2.0,
       "scheme": "light",
       "limits": {
        "surfaces": 64,
@@ -9703,11 +9758,20 @@
   },
   {
    "name": "drag in events stands for dragstart, drag and dragend (SPEC \u00a74)",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqZldmVudHOSpWNsaWNrpGRyYWc=\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2",
+     "events": [
+      "click",
+      "drag"
+     ]
+    }
+   ],
    "requires": [
     "caps.drag-kinds"
-   ],
-   "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIiwiZXZlbnRzIjpbImNsaWNrIiwiZHJhZyJdfQ==\u001b\\"
    ],
    "results": [
     "complete"
@@ -9734,8 +9798,23 @@
   {
    "name": "steps says a drag of an element with data-steps carries where in it the pointer is (SPEC \u00a74, \u00a79.1); absent, it does not",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIiwiZXZlbnRzIjpbImRyYWciXSwic3RlcHMiOnRydWV9\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;eyJ2IjoiMC4xIiwiZXZlbnRzIjpbImRyYWciXX0=\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;g6F2ozAuMqZldmVudHORpGRyYWelc3RlcHPD\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuMqZldmVudHORpGRyYWc=\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2",
+     "events": [
+      "drag"
+     ],
+     "steps": true
+    },
+    {
+     "v": "0.2",
+     "events": [
+      "drag"
+     ]
+    }
    ],
    "results": [
     "complete",
@@ -9770,8 +9849,23 @@
   {
    "name": "a host that lists no ops supports them all, and no events sends them all, but neither drags nor hover; no cell is 9x18",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;eyJ2IjoiMC4xIiwiZXZlbnRzIjpbImhvdmVyIl0sImNlbGwiOnsidyI6MjAsImgiOjQwfX0=\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;g6F2ozAuMqZldmVudHORpWhvdmVypGNlbGyCoXcUoWgo\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2"
+    },
+    {
+     "v": "0.2",
+     "events": [
+      "hover"
+     ],
+     "cell": {
+      "w": 20,
+      "h": 40
+     }
+    }
    ],
    "results": [
     "complete",
@@ -9826,12 +9920,20 @@
   },
   {
    "name": "capabilities: passthrough, and the host's version",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuMqtwYXNzdGhyb3VnaMOkaG9zdKtob3R0eS1ibGl0eqd2ZXJzaW9upjAuMC4xMA==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2",
+     "passthrough": true,
+     "host": "hotty-blitz",
+     "version": "0.0.10"
+    }
+   ],
    "requires": [
     "caps.passthrough",
     "caps.version"
-   ],
-   "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIiwicGFzc3Rocm91Z2giOnRydWUsImhvc3QiOiJob3R0eS1ibGl0eiIsInZlcnNpb24iOiIwLjAuMTAifQ==\u001b\\"
    ],
    "results": [
     "complete"
@@ -9845,7 +9947,7 @@
       "re": "q"
      },
      "caps": {
-      "v": "0.1",
+      "v": "0.2",
       "passthrough": true,
       "host": "hotty-blitz",
       "version": "0.0.10"
@@ -9854,12 +9956,67 @@
    ]
   },
   {
-   "name": "a capability field of an unexpected type is ignored, and the rest are read",
-   "requires": [
-    "caps.lenient"
-   ],
+   "name": "a capability of another type: the capabilities do not decode, and the reply stands (SDK.md \u00a73.9)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIiwibGltaXRzIjp7InN1cmZhY2VzIjoibWFueSIsInJlc291cmNlcyI6MTAwfSwiZXZlbnRzIjpbImNsaWNrIiwzXSwic2NhbGUiOiIyIiwiZnV0dXJlIjp7IngiOjF9fQ==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqVzY2FsZaEy\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuMqZldmVudHOSpWNsaWNrAw==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2",
+     "scale": "2"
+    },
+    {
+     "v": "0.2",
+     "events": [
+      "click",
+      3
+     ]
+    }
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 1
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 2
+     },
+     "caps": null
+    }
+   ]
+  },
+  {
+   "name": "fields a reader does not know are skipped, whatever their type (SDK.md \u00a72.7)",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;haF2ozAuMqZmdXR1cmWBoXiUActABAAAAAAAAMPAoWLEAgD/oXTW/wAAAACmc2Nyb2xsww==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "hex": "85a176a3302e32a666757475726581a1789401cb4004000000000000c3c0a162c40200ffa174d6ff00000000a67363726f6c6cc3"
+    }
    ],
    "results": [
     "complete"
@@ -9873,14 +10030,8 @@
       "re": "q"
      },
      "caps": {
-      "v": "0.1",
-      "limits": {
-       "resources": 100
-      },
-      "events": [
-       "click"
-      ],
-      "scale": null
+      "v": "0.2",
+      "scroll": true
      }
     }
    ]
@@ -9888,8 +10039,14 @@
   {
    "name": "click: the value of the element, if it has one",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=click:t=ok;eyJ2YWx1ZSI6InllcyJ9\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=ok;gaV2YWx1ZaN5ZXM=\u001b\\",
     "\u001b]7279;a=ev:s=f:e=click:t=go\u001b\\"
+   ],
+   "bodies": [
+    {
+     "value": "yes"
+    },
+    null
    ],
    "results": [
     "complete",
@@ -9940,8 +10097,17 @@
   {
    "name": "click on a link: href and url, t empty; url absent when there is none",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=click:t=;eyJocmVmIjoiL2RvY3MiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tL2RvY3MifQ==\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=click:t=;eyJocmVmIjoiI3RvcCJ9\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=click:t=;gqRocmVmpS9kb2Nzo3VybLhodHRwczovL2V4YW1wbGUuY29tL2RvY3M=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=;gaRocmVmpCN0b3A=\u001b\\"
+   ],
+   "bodies": [
+    {
+     "href": "/docs",
+     "url": "https://example.com/docs"
+    },
+    {
+     "href": "#top"
+    }
    ],
    "results": [
     "complete",
@@ -9998,10 +10164,26 @@
   {
    "name": "change, input and submit",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=change:t=agree;eyJjaGVja2VkIjp0cnVlLCJ2YWx1ZSI6Im9uIn0=\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=change:t=name;eyJ2YWx1ZSI6IkFkYSJ9\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=input:t=q;eyJ2YWx1ZSI6ImFiIn0=\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=submit:t=form;eyJuYW1lIjoiQWRhIiwicGxhbiI6InBybyJ9\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=change:t=agree;gqdjaGVja2Vkw6V2YWx1ZaJvbg==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=change:t=name;gaV2YWx1ZaNBZGE=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=input:t=q;gaV2YWx1ZaJhYg==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=submit:t=form;gqRuYW1lo0FkYaRwbGFuo3Bybw==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "checked": true,
+     "value": "on"
+    },
+    {
+     "value": "Ada"
+    },
+    {
+     "value": "ab"
+    },
+    {
+     "name": "Ada",
+     "plan": "pro"
+    }
    ],
    "results": [
     "complete",
@@ -10090,9 +10272,15 @@
    ]
   },
   {
-   "name": "a submit's field that is not a string is its JSON, and a null is left out",
+   "name": "a submit's field that is not a string: the detail does not decode, and the event stands",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=submit:t=form;eyJuYW1lIjoiQWRhIiwibiI6Mywib2siOnRydWUsIngiOm51bGx9\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=submit:t=form;gqRuYW1lo0FkYaFuAw==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "name": "Ada",
+     "n": 3
+    }
    ],
    "results": [
     "complete"
@@ -10107,19 +10295,9 @@
       "t": "form"
      },
      "event": {
-      "value": null,
-      "checked": null,
-      "link": null,
-      "size": null,
-      "fit_rows": null,
-      "drag": null,
       "kind": "submit",
       "target": "form",
-      "fields": {
-       "name": "Ada",
-       "n": "3",
-       "ok": "true"
-      }
+      "fields": null
      }
     }
    ]
@@ -10198,8 +10376,17 @@
   {
    "name": "resize carries the size in CSS pixels; fit the rows",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=resize:t=;eyJ3IjozMjAuNSwiaCI6NDh9\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=fit:t=;eyJyIjo3fQ==\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=resize:t=;gqF3y0B0CAAAAAAAoWjLQEgAAAAAAAA=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=fit:t=;gaFyBw==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "w": 320.5,
+     "h": 48.0
+    },
+    {
+     "r": 7
+    }
    ],
    "results": [
     "complete",
@@ -10220,7 +10407,7 @@
       "link": null,
       "size": {
        "w": 320.5,
-       "h": 48
+       "h": 48.0
       },
       "fit_rows": null,
       "drag": null,
@@ -10249,9 +10436,31 @@
   {
    "name": "drags carry the cell and the keys held",
    "seqs": [
-    "\u001b]7279;a=ev:s=g:e=dragstart:t=c1;eyJjIjoxLCJyIjowLCJrZXlzIjpbXX0=\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=drag:t=;eyJjIjotMiwiciI6NSwia2V5cyI6WyJzaGlmdCIsImFsdCJdfQ==\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=dragend:t=c4;eyJjIjo0LCJyIjowLCJrZXlzIjpbImN0cmwiXX0=\u001b\\"
+    "\u001b]7279;a=ev:s=g:e=dragstart:t=c1;g6FjAaFyAKRrZXlzkA==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag:t=;g6Fj/qFyBaRrZXlzkqVzaGlmdKNhbHQ=\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=dragend:t=c4;g6FjBKFyAKRrZXlzkaRjdHJs\u001b\\"
+   ],
+   "bodies": [
+    {
+     "c": 1,
+     "r": 0,
+     "keys": []
+    },
+    {
+     "c": -2,
+     "r": 5,
+     "keys": [
+      "shift",
+      "alt"
+     ]
+    },
+    {
+     "c": 4,
+     "r": 0,
+     "keys": [
+      "ctrl"
+     ]
+    }
    ],
    "results": [
     "complete",
@@ -10334,14 +10543,45 @@
    ]
   },
   {
-   "name": "a count of cells may be written 2.0, which is 2; 2.5 is not one",
+   "name": "a number of cells sent as a float: the detail does not decode, and the event stands",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=fit:t=;eyJyIjo3LjB9\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=fit:t=;eyJyIjo3LjV9\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=drag:t=;eyJjIjoxLjAsInIiOi0yLjAsImtleXMiOltdfQ==\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=drag:t=;eyJjIjoxLjUsInIiOjAsImtleXMiOltdfQ==\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=fit:t=;gaFyy0AcAAAAAAAA\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag:t=;g6Fjyz/wAAAAAAAAoXLLwAAAAAAAAACka2V5c5A=\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=hover:t=c1;gqFjy0AIAAAAAAAAoXLLP/AAAAAAAAA=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=env;gqV2YWx1ZadzdGFnaW5npGFyZWGEoWPLQAAAAAAAAAChcssAAAAAAAAAAKF3y0AoAAAAAAAAoWjLP/AAAAAAAAA=\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=dragend:t=;hKFjAqFyAKRrZXlzkKF4y0AEAAAAAAAA\u001b\\"
+   ],
+   "bodies": [
+    {
+     "r": 7.0
+    },
+    {
+     "c": 1.0,
+     "r": -2.0,
+     "keys": []
+    },
+    {
+     "c": 3.0,
+     "r": 1.0
+    },
+    {
+     "value": "staging",
+     "area": {
+      "c": 2.0,
+      "r": 0.0,
+      "w": 12.0,
+      "h": 1.0
+     }
+    },
+    {
+     "c": 2,
+     "r": 0,
+     "keys": [],
+     "x": 2.5
+    }
    ],
    "results": [
+    "complete",
     "complete",
     "complete",
     "complete",
@@ -10349,18 +10589,6 @@
    ],
    "invalid": 0,
    "messages": [
-    {
-     "control": {
-      "a": "ev",
-      "s": "f",
-      "e": "fit",
-      "t": ""
-     },
-     "event": {
-      "kind": "fit",
-      "fit_rows": 7
-     }
-    },
     {
      "control": {
       "a": "ev",
@@ -10382,34 +10610,57 @@
      },
      "event": {
       "kind": "drag",
-      "drag": {
-       "c": 1,
-       "r": -2,
-       "keys": []
-      }
+      "drag": null
      }
     },
     {
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "drag",
+      "e": "hover",
+      "t": "c1"
+     },
+     "event": {
+      "kind": "hover",
+      "target": "c1",
+      "hover": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "env"
+     },
+     "event": {
+      "kind": "click",
+      "target": "env",
+      "value": null,
+      "area": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "dragend",
       "t": ""
      },
      "event": {
-      "kind": "drag",
+      "kind": "dragend",
       "drag": null
      }
     }
    ]
   },
   {
-   "name": "a drag of an element with steps carries x and y, 0 a step like any other; one the detail leaves out, or that is not a whole number, is absent, and the rest of the drag stands (SPEC \u00a79.1)",
+   "name": "a drag of an element with steps carries x and y, 0 a step like any other; one the detail leaves out is absent (SPEC \u00a79.1)",
    "seqs": [
-    "\u001b]7279;a=ev:s=g:e=dragstart:t=track;eyJjIjo0LCJyIjowLCJrZXlzIjpbXSwieCI6MX0=\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=drag:t=;eyJjIjoxLCJyIjoyLCJrZXlzIjpbXSwieCI6MCwieSI6NH0=\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=drag:t=pad;eyJjIjoyLCJyIjowLCJrZXlzIjpbInNoaWZ0Il0sInkiOjN9\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=dragend:t=;eyJjIjoyLCJyIjowLCJrZXlzIjpbXSwieCI6Mi41LCJ5IjozLjB9\u001b\\"
+    "\u001b]7279;a=ev:s=g:e=dragstart:t=track;hKFjBKFyAKRrZXlzkKF4AQ==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag:t=;haFjAaFyAqRrZXlzkKF4AKF5BA==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag:t=pad;hKFjAqFyAKRrZXlzkaVzaGlmdKF5Aw==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=dragend:t=;hKFjAqFyAKRrZXlzkKF5Aw==\u001b\\"
    ],
    "results": [
     "complete",
@@ -10497,16 +10748,54 @@
       }
      }
     }
+   ],
+   "bodies": [
+    {
+     "c": 4,
+     "r": 0,
+     "keys": [],
+     "x": 1
+    },
+    {
+     "c": 1,
+     "r": 2,
+     "keys": [],
+     "x": 0,
+     "y": 4
+    },
+    {
+     "c": 2,
+     "r": 0,
+     "keys": [
+      "shift"
+     ],
+     "y": 3
+    },
+    {
+     "c": 2,
+     "r": 0,
+     "keys": [],
+     "y": 3
+    }
    ]
   },
   {
    "name": "hover carries the cell, or out",
+   "seqs": [
+    "\u001b]7279;a=ev:s=g:e=hover:t=c1;gqFjA6FyAQ==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=hover:t=;gaNvdXTD\u001b\\"
+   ],
+   "bodies": [
+    {
+     "c": 3,
+     "r": 1
+    },
+    {
+     "out": true
+    }
+   ],
    "requires": [
     "event.hover"
-   ],
-   "seqs": [
-    "\u001b]7279;a=ev:s=g:e=hover:t=c1;eyJjIjozLCJyIjoxfQ==\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=hover:t=;eyJvdXQiOnRydWV9\u001b\\"
    ],
    "results": [
     "complete",
@@ -10551,56 +10840,14 @@
    ]
   },
   {
-   "name": "hover's cell may be written 3.0, which is 3; 3.5 is not one",
-   "requires": [
-    "event.hover"
-   ],
-   "seqs": [
-    "\u001b]7279;a=ev:s=g:e=hover:t=c1;eyJjIjozLjAsInIiOjEuMH0=\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=hover:t=c1;eyJjIjozLjUsInIiOjF9\u001b\\"
-   ],
-   "results": [
-    "complete",
-    "complete"
-   ],
-   "invalid": 0,
-   "messages": [
-    {
-     "control": {
-      "a": "ev",
-      "s": "g",
-      "e": "hover",
-      "t": "c1"
-     },
-     "event": {
-      "kind": "hover",
-      "target": "c1",
-      "hover": {
-       "c": 3,
-       "r": 1,
-       "out": false
-      }
-     }
-    },
-    {
-     "control": {
-      "a": "ev",
-      "s": "g",
-      "e": "hover",
-      "t": "c1"
-     },
-     "event": {
-      "kind": "hover",
-      "target": "c1",
-      "hover": null
-     }
-    }
-   ]
-  },
-  {
    "name": "an event of a kind the program does not know is an event all the same",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=zoom:t=map;eyJ6IjoyfQ==\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=zoom:t=map;gaF6Ag==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "z": 2
+    }
    ],
    "results": [
     "complete"
@@ -10662,8 +10909,14 @@
   {
    "name": "chunks are joined before their base64 is decoded, wherever they split it",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;eyJuYW\u001b\\",
-    "\u001b]7279;m=0;1lIjoiQSJ9\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;gaRuYW\u001b\\",
+    "\u001b]7279;m=0;1loUE=\u001b\\"
+   ],
+   "bodies": [
+    {
+     "name": "A"
+    },
+    null
    ],
    "results": [
     "partial",
@@ -10697,9 +10950,16 @@
   {
    "name": "another OSC between chunks does not interrupt them",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;eyJuYW\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;gaRuYW\u001b\\",
     "\u001b]11;?\u0007",
-    "\u001b]7279;m=0;1lIjoiQSJ9\u001b\\"
+    "\u001b]7279;m=0;1loUE=\u001b\\"
+   ],
+   "bodies": [
+    {
+     "name": "A"
+    },
+    null,
+    null
    ],
    "results": [
     "partial",
@@ -10733,8 +10993,14 @@
   {
    "name": "a message that interrupts a chunked one aborts it, and is decoded as usual",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;eyJuYW\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;gaRuYW\u001b\\",
     "\u001b]7279;a=ok:n=5:re=del\u001b\\"
+   ],
+   "bodies": [
+    {
+     "name": "A"
+    },
+    null
    ],
    "results": [
     "partial",
@@ -10758,12 +11024,18 @@
   },
   {
    "name": "a malformed message that interrupts a chunked one makes two malformed messages (SPEC \u00a73.7)",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;gaRuYW\u001b\\",
+    "\u001b]7279;a=ok:bad key=1\u001b\\"
+   ],
+   "bodies": [
+    {
+     "name": "A"
+    },
+    null
+   ],
    "requires": [
     "decode.abort-count"
-   ],
-   "seqs": [
-    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;eyJuYW\u001b\\",
-    "\u001b]7279;a=ok:bad key=1\u001b\\"
    ],
    "results": [
     "partial",
@@ -10813,9 +11085,9 @@
   {
    "name": "base64 without padding, and with whitespace, decodes; stray bytes are malformed",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=input:t=x;eyJ2YWx1ZSI6ImEifQ\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=input:t=x;eyJ2YWx1 ZSI6ImEifQ==\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=input:t=x;eyJ2!!\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=input:t=x;gaV2YWx1ZaJhYg\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=input:t=x;gaV2YWx1 ZaJhYg==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=input:t=x;gaV2!!\u001b\\"
    ],
    "results": [
     "complete",
@@ -10832,7 +11104,7 @@
       "t": "x"
      },
      "event": {
-      "value": "a",
+      "value": "ab",
       "checked": null,
       "link": null,
       "size": null,
@@ -10849,7 +11121,7 @@
       "t": "x"
      },
      "event": {
-      "value": "a",
+      "value": "ab",
       "checked": null,
       "link": null,
       "size": null,
@@ -10891,19 +11163,17 @@
    "messages": []
   },
   {
-   "name": "click and press carry the element's area; another kind's, or one missing a field, is not read",
+   "name": "click and press carry the element's area; another kind's is not read",
    "requires": [
     "event.area"
    ],
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=click:t=env;eyJ2YWx1ZSI6InN0YWdpbmciLCJhcmVhIjp7ImMiOjIsInIiOjAsInciOjEyLCJoIjoxfX0=\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=press:t=title;eyJhcmVhIjp7ImMiOi0xLCJyIjozLCJ3Ijo1LCJoIjoyfX0=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=env;gqV2YWx1ZadzdGFnaW5npGFyZWGEoWMCoXIAoXcMoWgB\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press:t=title;gaRhcmVhhKFj/6FyA6F3BaFoAg==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=press:t=\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=change:t=env;eyJ2YWx1ZSI6InByb2R1Y3Rpb24iLCJhcmVhIjp7ImMiOjIsInIiOjAsInciOjEyLCJoIjoxfX0=\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=click:t=go;eyJhcmVhIjp7ImMiOjEsInIiOjAsImgiOjF9fQ==\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=change:t=env;gqV2YWx1Zapwcm9kdWN0aW9upGFyZWGEoWMCoXIAoXcMoWgB\u001b\\"
    ],
    "results": [
-    "complete",
     "complete",
     "complete",
     "complete",
@@ -10974,78 +11244,55 @@
       "value": "production",
       "area": null
      }
-    },
-    {
-     "control": {
-      "a": "ev",
-      "s": "f",
-      "e": "click",
-      "t": "go"
-     },
-     "event": {
-      "kind": "click",
-      "target": "go",
-      "area": null
-     }
     }
-   ]
-  },
-  {
-   "name": "an area may be written 2.0, which is 2; one with 5.5 in it is not read",
-   "requires": [
-    "event.area"
    ],
-   "seqs": [
-    "\u001b]7279;a=ev:s=f:e=click:t=env;eyJhcmVhIjp7ImMiOjIuMCwiciI6MC4wLCJ3IjoxMi4wLCJoIjoxLjB9fQ==\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=press:t=title;eyJhcmVhIjp7ImMiOjEsInIiOjAsInciOjUuNSwiaCI6MX19\u001b\\"
-   ],
-   "results": [
-    "complete",
-    "complete"
-   ],
-   "invalid": 0,
-   "messages": [
+   "bodies": [
     {
-     "control": {
-      "a": "ev",
-      "s": "f",
-      "e": "click",
-      "t": "env"
-     },
-     "event": {
-      "kind": "click",
-      "target": "env",
-      "area": {
-       "c": 2,
-       "r": 0,
-       "w": 12,
-       "h": 1
-      }
+     "value": "staging",
+     "area": {
+      "c": 2,
+      "r": 0,
+      "w": 12,
+      "h": 1
      }
     },
     {
-     "control": {
-      "a": "ev",
-      "s": "f",
-      "e": "press",
-      "t": "title"
-     },
-     "event": {
-      "kind": "press",
-      "target": "title",
-      "area": null
+     "area": {
+      "c": -1,
+      "r": 3,
+      "w": 5,
+      "h": 2
+     }
+    },
+    null,
+    {
+     "value": "production",
+     "area": {
+      "c": 2,
+      "r": 0,
+      "w": 12,
+      "h": 1
      }
     }
    ]
   },
   {
    "name": "capabilities: scroll, false when absent",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqZzY3JvbGzD\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMg==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2",
+     "scroll": true
+    },
+    {
+     "v": "0.2"
+    }
+   ],
    "requires": [
     "caps.scroll"
-   ],
-   "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIiwic2Nyb2xsIjp0cnVlfQ==\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;eyJ2IjoiMC4xIn0=\u001b\\"
    ],
    "results": [
     "complete",
@@ -11060,7 +11307,7 @@
       "re": "q"
      },
      "caps": {
-      "v": "0.1",
+      "v": "0.2",
       "scroll": true
      }
     },
@@ -11071,8 +11318,373 @@
       "re": "q"
      },
      "caps": {
-      "v": "0.1",
+      "v": "0.2",
       "scroll": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "a body is one msgpack map: another value, a map cut short, or bytes after it, do not decode, and the message stands",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=click:t=ok;kaN5ZXM=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=ok;gaV2YWx1ZaN5ZXPA\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=ok;gaV2YWx1ZQ==\u001b\\",
+    "\u001b]7279;a=err:n=3:re=frob;gqRjb2RlpkVJTlZBTA==\u001b\\"
+   ],
+   "bodies": [
+    [
+     "yes"
+    ],
+    {
+     "hex": "81a576616c7565a3796573c0"
+    },
+    {
+     "hex": "81a576616c7565"
+    },
+    {
+     "hex": "82a4636f6465a645494e56414c"
+    }
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "ok"
+     },
+     "event": {
+      "kind": "click",
+      "target": "ok",
+      "value": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "ok"
+     },
+     "event": {
+      "kind": "click",
+      "target": "ok",
+      "value": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "ok"
+     },
+     "event": {
+      "kind": "click",
+      "target": "ok",
+      "value": null
+     }
+    },
+    {
+     "control": {
+      "a": "err",
+      "n": "3",
+      "re": "frob"
+     },
+     "reply": {
+      "ok": false,
+      "re": "frob",
+      "n": 3,
+      "code": null,
+      "detail": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "a body nested more than 32 levels deep does not decode, the body's map being the first (SDK.md \u00a73.9)",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=click:t=ok;gqV2YWx1ZaN5ZXOheJGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZA=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=ok;gqV2YWx1ZaN5ZXOheJGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGQ\u001b\\"
+   ],
+   "bodies": [
+    {
+     "value": "yes",
+     "x": [
+      [
+       [
+        [
+         [
+          [
+           [
+            [
+             [
+              [
+               [
+                [
+                 [
+                  [
+                   [
+                    [
+                     [
+                      [
+                       [
+                        [
+                         [
+                          [
+                           [
+                            [
+                             [
+                              [
+                               [
+                                [
+                                 [
+                                  [
+                                   []
+                                  ]
+                                 ]
+                                ]
+                               ]
+                              ]
+                             ]
+                            ]
+                           ]
+                          ]
+                         ]
+                        ]
+                       ]
+                      ]
+                     ]
+                    ]
+                   ]
+                  ]
+                 ]
+                ]
+               ]
+              ]
+             ]
+            ]
+           ]
+          ]
+         ]
+        ]
+       ]
+      ]
+     ]
+    },
+    {
+     "value": "yes",
+     "x": [
+      [
+       [
+        [
+         [
+          [
+           [
+            [
+             [
+              [
+               [
+                [
+                 [
+                  [
+                   [
+                    [
+                     [
+                      [
+                       [
+                        [
+                         [
+                          [
+                           [
+                            [
+                             [
+                              [
+                               [
+                                [
+                                 [
+                                  [
+                                   [
+                                    []
+                                   ]
+                                  ]
+                                 ]
+                                ]
+                               ]
+                              ]
+                             ]
+                            ]
+                           ]
+                          ]
+                         ]
+                        ]
+                       ]
+                      ]
+                     ]
+                    ]
+                   ]
+                  ]
+                 ]
+                ]
+               ]
+              ]
+             ]
+            ]
+           ]
+          ]
+         ]
+        ]
+       ]
+      ]
+     ]
+    }
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "ok"
+     },
+     "event": {
+      "kind": "click",
+      "value": "yes"
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "ok"
+     },
+     "event": {
+      "kind": "click",
+      "value": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "any of msgpack's forms of a type is that type: ints of any size, a float of 32 bits, long strings, arrays and maps (SPEC \u00a73.3)",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=fit:t=;gaFyzQAH\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag:t=;g6Fj0f/+oXLMBaRrZXlz3AAB2QVzaGlmdA==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=resize:t=;gqF3ykOgQAChaMtASAAAAAAAAA==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=input:t=q;gaV2YWx1ZdoAAmFi\u001b\\",
+    "\u001b]7279;a=ok:n=1:re=q;3gACoXbbAAAAAzAuMqVzY2FsZcpAAAAA\u001b\\"
+   ],
+   "bodies": [
+    {
+     "hex": "81a172cd0007"
+    },
+    {
+     "hex": "83a163d1fffea172cc05a46b657973dc0001d9057368696674"
+    },
+    {
+     "hex": "82a177ca43a04000a168cb4048000000000000"
+    },
+    {
+     "hex": "81a576616c7565da00026162"
+    },
+    {
+     "hex": "de0002a176db00000003302e32a57363616c65ca40000000"
+    }
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "fit",
+      "t": ""
+     },
+     "event": {
+      "kind": "fit",
+      "fit_rows": 7
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "drag",
+      "t": ""
+     },
+     "event": {
+      "kind": "drag",
+      "drag": {
+       "c": -2,
+       "r": 5,
+       "keys": [
+        "shift"
+       ]
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "resize",
+      "t": ""
+     },
+     "event": {
+      "kind": "resize",
+      "size": {
+       "w": 320.5,
+       "h": 48.0
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "input",
+      "t": "q"
+     },
+     "event": {
+      "kind": "input",
+      "value": "ab"
+     }
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 1
+     },
+     "caps": {
+      "v": "0.2",
+      "scale": 2.0
      }
     }
    ]
@@ -11210,7 +11822,10 @@
     },
     {
      "at": 20,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "body": {
+      "v": "0.2"
+     },
      "took": true,
      "state": "native",
      "decided": true,
@@ -11232,7 +11847,7 @@
     }
    ],
    "caps": {
-    "v": "0.1"
+    "v": "0.2"
    }
   },
   {
@@ -11281,7 +11896,10 @@
     },
     {
      "at": 40,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "body": {
+      "v": "0.2"
+     },
      "took": true,
      "state": "native",
      "deadline": 340
@@ -11325,13 +11943,19 @@
     },
     {
      "at": 10,
-     "osc": "\u001b]7279;a=ok:n=2:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMg==\u001b\\",
+     "body": {
+      "v": "0.2"
+     },
      "took": false,
      "state": "detecting"
     },
     {
      "at": 12,
-     "osc": "\u001b]7279;a=err:n=1:re=q;eyJjb2RlIjoiRUlOVkFMIn0=\u001b\\",
+     "osc": "\u001b]7279;a=err:n=1:re=q;gaRjb2RlpkVJTlZBTA==\u001b\\",
+     "body": {
+      "code": "EINVAL"
+     },
      "took": false,
      "state": "detecting"
     },
@@ -11357,7 +11981,10 @@
     },
     {
      "at": 100,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "body": {
+      "v": "0.2"
+     },
      "took": true,
      "state": "native",
      "deadline": 400
@@ -11385,7 +12012,10 @@
     },
     {
      "at": 1400,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "body": {
+      "v": "0.2"
+     },
      "took": true,
      "deadline": 1500
     },
@@ -11410,7 +12040,10 @@
     },
     {
      "at": 200,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "body": {
+      "v": "0.2"
+     },
      "took": true,
      "state": "text",
      "done": true
@@ -11443,7 +12076,10 @@
     },
     {
      "at": 60000,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "body": {
+      "v": "0.2"
+     },
      "took": true,
      "state": "native",
      "decided": true,
@@ -11452,14 +12088,17 @@
     },
     {
      "at": 60010,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4yIn0=\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "body": {
+      "v": "0.2"
+     },
      "took": true,
      "state": "native",
      "done": true
     }
    ],
    "caps": {
-    "v": "0.1"
+    "v": "0.2"
    }
   },
   {
@@ -11510,7 +12149,10 @@
     },
     {
      "at": 10,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "body": {
+      "v": "0.2"
+     },
      "took": true
     },
     {

@@ -63,10 +63,11 @@ are to be interpreted as in SPEC.md §2.
 - **The wire layer is pure.** It **MUST NOT** do I/O, start threads, or read
   a clock: where it needs the time (the Detector, §3.8), the caller passes
   it in. Given the same input, it returns the same output.
-- **It depends on the language's standard library only**, and on base64 and
-  zlib where that library lacks them. zlib is needed only to compress what a
-  program sends, which is optional (§3.3); a host never compresses what it
-  sends (SPEC.md §3.3).
+- **It depends on the language's standard library only**, and on base64,
+  zlib and msgpack where that library lacks them. msgpack is needed only to
+  read what a host sends (SPEC.md §3.3). zlib is needed only to compress
+  what a program sends, which is optional (§3.3); a host never compresses
+  what it sends (SPEC.md §3.3).
 - **The SDK layer is built on the wire layer's public interface**, so a
   program that needs something the SDK layer does not do can do it from the
   same parts.
@@ -87,6 +88,11 @@ are to be interpreted as in SPEC.md §2.
   result type. What they carry (a code and a detail, §3.9) is canonical.
 - **Absence takes the language's form**: Go's zero value and `ok`, Python's
   `None`, Lua's `nil`, Rust's `Option`. The vectors write it `null`.
+- **Data takes the language's form**: what a message or a control holds
+  (§3.2, §3.9) is a field or an accessor, and a question about it
+  (`Supports`) a method or a function. hotty-go's are plain structs with
+  no methods but what its codec generates: a field (`ev.Value`), and a
+  function beside the type (`hotty.Supports(caps, op)`).
 
 ### 2.3 Shared defaults
 
@@ -134,9 +140,9 @@ As SPEC.md §15 has programs do:
   nothing;
 - an event of a kind it does not know is an event all the same: its kind is
   reported as it came;
-- capability fields it does not know are ignored, and so is a known field
-  of an unexpected type. Reading the capabilities **MUST NOT** fail because
-  of one field.
+- fields it does not know, in the capabilities or a detail, are ignored.
+  Reading a message **MUST NOT** fail because of its body: a body that
+  does not decode leaves absent what it would have filled (§3.9).
 
 ### 2.8 Environments
 
@@ -172,7 +178,7 @@ An SDK **MUST** provide every component of this section.
 | `Chunk` | 4096, the most base64 bytes in one sequence |
 | `MaxSize` | 1000, the most columns or rows of a surface |
 | `MaxName` | 64, the longest surface name |
-| `Version` | `"0.1"`, the protocol version the SDK implements |
+| `Version` | `"0.2"`, the protocol version the SDK implements |
 
 And these sets, each value under its canonical name:
 - **event kinds**: `click`, `change`, `input`, `submit`, `press`, `focus`,
@@ -413,55 +419,66 @@ The rules, with their times:
 A decoded **`Message`** has its control (a map of keys to values) and its
 payload (bytes). It reads as a reply or as an event.
 
+**The body** (SPEC.md §3.3) is decoded when the reply or event is read, each
+field as its type.
+- Fields the SDK does not know are ignored (§2.7).
+- An int further than 2^53 − 1 from zero (SPEC.md §3.3) does not decode in
+  an SDK whose numbers are doubles, rather than being rounded.
+- A body nested more than 32 levels deep does not decode. An SDK stops
+  reading there, so that no body can exhaust its stack: TinyGo's is 64 KB,
+  and a few hundred levels crash it.
+- A body that does not decode leaves absent everything it would have
+  filled, and the rest of the message stands. That is a body that is not
+  one msgpack map, or one with a field the SDK knows holding another type.
+  What it fills is the capabilities, an error's code and detail, or what an
+  event's detail carries.
+
 **`Reply`** (SPEC.md §3.6), when the action is `ok` or `err`:
 
-| field | from |
+| name | from |
 | --- | --- |
 | `OK` | `a=ok` |
 | `Re` | `re`: the action answered |
 | `N` | `n`, as a number; absent when the command had none |
 | `Surface` | `s`; absent when the command named none |
 | `Cols`, `Rows` | `c` and `r`, as numbers, in a reply to `place` |
-| `Code`, `Detail` | the error's JSON body, when not OK |
-| `Caps()` | the capabilities, in an ok reply to `q` |
-| `Err()` | the reply as an error, carrying `Code` and `Detail`; none when OK |
+| `Code`, `Detail` | the error's body, when not OK |
+| `Caps` | the capabilities, the body of an ok reply to `q` |
+| `Err` | the reply as an error, carrying `Code` and `Detail`; none when OK |
 
 **`Event`** (SPEC.md §9), when the action is `ev`: `Surface`, `Kind` (as it
-came, known or not) and `Target` (`t`, empty when empty), and accessors that
-read the detail, each absent when the event does not carry it:
+came, known or not), `Target` (`t`, empty when empty), and what the detail
+carries, each absent when the event does not carry it:
 
-| accessor | returns | for |
+| name | holds | for |
 | --- | --- | --- |
-| `Value()` | the detail's `value`, a string | `click`, `change`, `input` |
-| `Checked()` | the detail's `checked`, a boolean | `change` |
-| `Fields()` | the detail's values, by name: a string as it is, any other value as its JSON, a null left out | `submit` |
-| `Link()` | `href`, and `url` if present | `click` on a link |
-| `Size()` | `w` and `h`, in CSS pixels | `resize` |
-| `FitRows()` | `r` | `fit` |
-| `Drag()` | `c`, `r` and `keys`, and the steps `x` and `y`, each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
-| `Hover()` | `c` and `r`, or out | `hover` |
-| `Area()` | `area`: `c`, `r`, `w` and `h`, the element's cells; absent unless all four are whole numbers | `click`, `press` |
+| `Value` | `value`, a string | `click`, `change`, `input` |
+| `Checked` | `checked`, a boolean | `change` |
+| `Fields` | the detail: names to values | `submit` |
+| `Link` | `href`, and `url` if present | `click` on a link |
+| `Size` | `w` and `h`, in CSS pixels | `resize` |
+| `FitRows` | `r` | `fit` |
+| `Drag` | `c`, `r` and `keys`, and the steps `x` and `y`, each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
+| `Hover` | `c` and `r`, or `out` | `hover` |
+| `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press` |
 
-A count of cells or a step in a detail (`FitRows`, `Drag`, `Hover` and
-`Area`) is a whole number: a JSON number with no fractional part, however it
-is written. JSON has one kind of number, so `2.0` is `2`. `2.5`, or a value
-that is not a number, leaves the accessor absent. A step that is not one
-leaves only that step absent, and the rest of `Drag()` stands.
+The detail is read by the event's kind, so a form field named `value` is in
+`Fields` and nowhere else. An event of a kind the SDK does not know carries
+none of these, and its payload is in its message.
 
 **`Caps`** (SPEC.md §4) has every field SPEC.md lists: `V`, `Ops`,
 `Events`, `Cell` (`w`, `h`), `Scale`, `Scheme`, `Limits`, `Net`,
-`Passthrough`, `Scroll`, `Steps`, `Host`, `Version`. Each field is read on its own (§2.7). It
-also answers:
+`Passthrough`, `Scroll`, `Steps`, `Host`, `Version`. It also answers:
 - `Supports(op)`: whether `op` is in `ops`; a host that lists no ops is
   taken to support them all;
 - `Sends(kind)`: whether the host sends `kind`; `drag` stands for the three
   drag kinds (SPEC.md §4); a host that lists no events is taken to send
   them all;
-- `Drags()` and `Hovers()`: whether `drag` and `hover` are in `events`. A
-  host that lists no events is taken to send neither, since both came after
-  the first hosts: a program offers another way to do what they do;
-- `Light()`: the scheme is `light`;
-- `CellCSS()`: a cell's size in CSS pixels, `Cell` divided by `Scale` (1
+- `Drags` and `Hovers`: whether `drag` and `hover` are in `events`. A host
+  that lists no events is taken to send neither, since both came after the
+  first hosts: a program offers another way to do what they do;
+- `Light`: the scheme is `light`;
+- `CellCSS`: a cell's size in CSS pixels, `Cell` divided by `Scale` (1
   when absent), and a usual 9 × 18 when the host gave no cell.
 
 **An error** carries `Code` and `Detail`, and its message names both.
@@ -857,6 +874,9 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Holding`, `InSequence` | `(*Scanner).Holding`, `.InSequence` | `Scanner.holding`, `.in_sequence` | `scanner:holding`, `:in_sequence` | `Scanner::holding`, `::in_sequence` | `Scanner.holding`, `.inSequence` |
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |
 | `FitRows`, `CellCSS` | `FitRows`, `CellCSS` | `fit_rows`, `cell_css` | as Python | as Python | `fitRows`, `cellCss` |
+| a message as a `Reply` or an `Event`, `Err` | `hotty.ReplyOf(m)`, `hotty.EventOf(m)`, `hotty.Err(r)` | `m.reply()`, `m.event()`, `r.err()` | `m:reply()`, `m:event()`, `r:err()` | methods | `m.reply()`, `m.event()`, `r.err()` |
+| `Supports`, `Sends`, `Drags`, `Hovers`, `Light`, `CellCSS` | `hotty.Supports(c, op)`, …, `hotty.CellCSS(c)` | `c.supports(op)`, … | `c:supports(op)`, … | methods | `c.supports(op)`, … |
+| a control's `get` and `with` | `hotty.Get(ctl, k)`, `hotty.With(ctl, k, v)` | the SDK's own | the SDK's own | the SDK's own | the SDK's own |
 | `ParseKey`, `DecodeKeys` | `hotty.ParseKey`, `hotty.DecodeKeys` | `parse_key`, `decode_keys` | as Python | as Python | `parseKey`, `decodeKeys` |
 | `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Program`, `Scroll`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Program`, `.Scroll`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.program`, `.scroll`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:program`, `:scroll`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.program`, `.scroll`, `.format` |
 | `TerminalKeys` | `hotty.TerminalKeys` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` |
@@ -895,6 +915,10 @@ In the vectors, every name is in snake case: `place_at`, `keep_cursor`,
   framework's, and wants its surfaces' fields to edit the same. Bubble
   Tea's is the one the reference SDK's programs have; one keymap shared by
   every SDK keeps a program the same in every language (§2.3).
+- **Why a body decodes whole or not at all.** A codec generated from the
+  types (Go's msgp, Rust's serde) stops at the first field of the wrong
+  type. A rule every SDK can keep is the one such a codec keeps, and a
+  host that sends a wrong type fails the vectors instead.
 - **Why presentation is out.** HOTTY carries any HTML. How one program
   presents its content is that program's choice, and an SDK that builds
   documents would make it for every program, in each language differently.

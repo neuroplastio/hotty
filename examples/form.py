@@ -91,7 +91,7 @@ def main():
                 for m in msgs:
                     if m["a"] != "ev":
                         continue
-                    detail = m.json
+                    detail = m.body
                     record("event", e=m["e"], t=m["t"], detail=detail)
                     e = m["e"]
                     if e == "change":

@@ -1,6 +1,6 @@
 # HOTTY — HTML Over The TTY
 
-    Version:  0.1
+    Version:  0.2
     Status:   Draft. Versions 0.x may change incompatibly (§15).
     Licence:  CC BY 4.0 (this document); the conformance vectors are
               Apache-2.0.
@@ -160,6 +160,24 @@ alphabet).
 - An empty body is sent as nothing, and the `;` before it may then be
   omitted.
 - Text bodies (markup, delta values) are UTF-8.
+- **A host's bodies are msgpack**
+  ([MessagePack](https://github.com/msgpack/msgpack/blob/master/spec.md)).
+  The body of a reply (§3.6, §4) or an event (§9) is one msgpack map, with
+  nothing after it. What a program sends is not msgpack: documents, deltas
+  and resources are text or bytes.
+- **Each field has a type.** This document shows a body as JSON with types
+  in place of values: `{"c": int, "keys": [str]}` is a map with an int
+  `c` and an array of strings `keys`, and `{str: int}` a map from strings
+  to ints. The types are `int`, `float`, `str` and `bool`.
+  - A host **MUST** send each field as its type. A field it has nothing
+    for is left out, not sent as nil.
+  - An int is at most 2^53 − 1 from zero either way, so that a reader
+    whose numbers are doubles (JavaScript, Lua 5.1) holds it exactly.
+  - Any of msgpack's forms of a type is that type: an int of any size,
+    signed or not, a float of 32 or 64 bits, a string, an array or a map
+    of any length.
+  - A time, in a field that carries one, is msgpack's timestamp
+    (extension type −1). No field of this version carries one.
 
 ### 3.4 Chunks
 
@@ -200,7 +218,7 @@ ESC ] 7279 ; a=ok|err [:n=<n>] [:s=<s>] :re=<action> [:<more>] [; <payload>] ST
   answered.
 - `a=ok` replies to `place` carry `c` and `r` (§5.2); the reply to `q`
   carries the capabilities (§4).
-- `a=err` carries a JSON body `{"code": …, "detail": …}`. The codes:
+- `a=err` carries the body `{"code": str, "detail": str}`. The codes:
 
 | code | when |
 | --- | --- |
@@ -239,7 +257,7 @@ ESC ] 7279 ; a=q:n=1 ST   CSI c
 Every terminal answers DA1. A host answers the query first:
 
 ```
-ESC ] 7279 ; a=ok:n=1:re=q ; <base64 JSON> ST
+ESC ] 7279 ; a=ok:n=1:re=q ; <base64 msgpack> ST
 ```
 
 If the DA1 answer arrives with no HOTTY reply before it, there is no host. The
@@ -274,23 +292,23 @@ ESC ] 7279 ; a=q:n=1:late=1 ST   CSI c
   which takes the held one's place, so that no reply reaches whatever reads
   the terminal after it. A host answers it with nothing, as `q=2` says.
 
-The capabilities object:
+The capabilities, the body of that reply, are a map of these fields (§3.3):
 
-| field | meaning |
-| --- | --- |
-| `v` | the HOTTY version the host implements, as a string: `"0.1"` for this document |
-| `ops` | the delta ops it supports (§6) |
-| `events` | the event kinds it can send (§9). `drag` stands for `dragstart`, `drag` and `dragend` (§9.1) |
-| `cell` | `{"w": …, "h": …}`: the cell size in device pixels |
-| `scale` | device pixels per CSS pixel |
-| `scheme` | `"dark"` or `"light"`: the terminal's colour scheme |
-| `limits` | the host's limits (§13), such as `{"resources": <bytes>, "surfaces": <count>}` |
-| `net` | the host's network policy (§7.2), from directive to sources, such as `{"img-src": ["https://example.com"]}`. Absent or empty: the host fetches nothing from the network |
-| `passthrough` | `true` when the pointer passes through the parts of a surface that take no pointer (§9.3). Absent: every window takes the pointer wherever it is |
-| `scroll` | `true` when a document can ask to scroll (`scroll`, §5.1, §5.3). Absent: nothing in a surface scrolls |
-| `steps` | `true` when a drag of an element with `data-steps` says where in the element the pointer is (§9.1). Absent: a drag's detail has no `x` or `y` |
-| `host` | optional: a name for the implementation |
-| `version` | optional, with `host`: the implementation's version, as dot-separated numbers compared one by one (`"0.0.10"` is after `"0.0.9"`) |
+| field | type | meaning |
+| --- | --- | --- |
+| `v` | str | the HOTTY version the host implements: `"0.2"` for this document |
+| `ops` | [str] | the delta ops it supports (§6) |
+| `events` | [str] | the event kinds it can send (§9). `drag` stands for `dragstart`, `drag` and `dragend` (§9.1) |
+| `cell` | `{"w": int, "h": int}` | the cell size in device pixels |
+| `scale` | float | device pixels per CSS pixel |
+| `scheme` | str | `"dark"` or `"light"`: the terminal's colour scheme |
+| `limits` | `{str: int}` | the host's limits (§13), such as `{"resources": <bytes>, "surfaces": <count>}` |
+| `net` | `{str: [str]}` | the host's network policy (§7.2), from directive to sources, such as `{"img-src": ["https://example.com"]}`. Absent or empty: the host fetches nothing from the network |
+| `passthrough` | bool | `true` when the pointer passes through the parts of a surface that take no pointer (§9.3). Absent: every window takes the pointer wherever it is |
+| `scroll` | bool | `true` when a document can ask to scroll (`scroll`, §5.1, §5.3). Absent: nothing in a surface scrolls |
+| `steps` | bool | `true` when a drag of an element with `data-steps` says where in the element the pointer is (§9.1). Absent: a drag's detail has no `x` or `y` |
+| `host` | str | optional: a name for the implementation |
+| `version` | str | optional, with `host`: the implementation's version, as dot-separated numbers compared one by one (`"0.0.10"` is after `"0.0.9"`) |
 
 Programs **MUST** ignore fields they do not know.
 
@@ -791,7 +809,7 @@ are reserved for this specification.
 ## 9. Events
 
 ```
-ESC ] 7279 ; a=ev:s=<name>:e=<kind>:t=<element id> [; <base64 JSON detail>] ST
+ESC ] 7279 ; a=ev:s=<name>:e=<kind>:t=<element id> [; <base64 msgpack detail>] ST
 ```
 
 The host reports what the user did. Events are not replies: they are sent
@@ -801,26 +819,26 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 
 | `e` | when | detail |
 | --- | --- | --- |
-| `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `area`, the element's cells (below); with `href` and `url` for links (below), and `value` when the element has a `value` attribute |
-| `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": …, "value": …}` for checkboxes and radio buttons, `{"value": …}` otherwise |
-| `input` | every edit of a control with `data-on~=input` | `{"value": …}` |
-| `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields as an object of names to values, the submitter's included |
-| `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface placed with `p=1` (§5.2), except a mouse's or a pen's press with Alt held (§9.2) and where the pointer passes through (§9.3) | `area`, the cells of the element `t` names (below); none when `t` is empty |
-| `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": …, "r": …, "keys": […]}`: the pointer's cell and the keys held, with `x` and `y`, its step, on an element with `data-steps` (§9.1) |
+| `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `{"area": area}`, the element's cells (below); with `"href": str` and `"url": str` for links (below), and `"value": str` when the element has a `value` attribute |
+| `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": bool, "value": str}` for checkboxes and radio buttons, `{"value": str}` otherwise |
+| `input` | every edit of a control with `data-on~=input` | `{"value": str}` |
+| `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields, `{str: str}` from names to values, the submitter's included |
+| `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface placed with `p=1` (§5.2), except a mouse's or a pen's press with Alt held (§9.2) and where the pointer passes through (§9.3) | `{"area": area}`, the cells of the element `t` names (below); none when `t` is empty |
+| `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": int, "r": int, "keys": [str]}`: the pointer's cell and the keys held, with `"x": int` and `"y": int`, its step, on an element with `data-steps` (§9.1) |
 | `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element (§9.1) | the same |
 | `dragend` | the drag ended: the button released or the finger lifted, wherever the pointer is (§9.1) | the same |
 | `focus` | the user focuses an element: the surface gains the keyboard, or its focus moves to another of its elements (§10.1); `t` names the element focused | none |
 | `blur` | the surface loses the keyboard (§10); `t` is empty | none |
-| `resize` | the surface's size in CSS pixels changed without its cells changing: the terminal's font changed (§5.3); `t` is empty | `{"w": …, "h": …}` in CSS pixels |
-| `fit` | on a placement made with `f=1` (§5.2), the rows the document needs at the placement's width changed; `t` is empty | `{"r": …}`: the rows `r=auto` would choose now |
-| `hover` | on a placement made with `v=1` (§5.2), the element the pointer is over changed, or the pointer left the window (§9.4) | `{"c": …, "r": …}`: the pointer's cell (§9.1); `{"out": true}` when it left, with `t` empty |
+| `resize` | the surface's size in CSS pixels changed without its cells changing: the terminal's font changed (§5.3); `t` is empty | `{"w": float, "h": float}` in CSS pixels |
+| `fit` | on a placement made with `f=1` (§5.2), the rows the document needs at the placement's width changed; `t` is empty | `{"r": int}`: the rows `r=auto` would choose now |
+| `hover` | on a placement made with `v=1` (§5.2), the element the pointer is over changed, or the pointer left the window (§9.4) | `{"c": int, "r": int}`: the pointer's cell (§9.1); `{"out": bool}`, `true`, when it left, with `t` empty |
 
 - **The element that reports** a `click` is the nearest one, from the target
   of the click outward, that is one of those kinds. If it has no `id`,
   nothing is reported: the id is the program's handle. A link is the
   exception: its `href` is the handle, and `t` is then empty.
 - **Where the element is.** A `click`'s and a `press`'s `area` is
-  `{"c": …, "r": …, "w": …, "h": …}`: the cells the element's border box
+  `{"c": int, "r": int, "w": int, "h": int}`: the cells the element's border box
   covers as the user sees it, scrolled (§5.3) included. `c` and `r` are the
   first column and row it touches, counted from 0 at the surface's top left
   cell as a drag's are (§9.1), and `w` and `h` the columns and rows it
@@ -875,8 +893,8 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   input. The host **MUST** pass them on, with the position of the pointer
   or the finger. Taps and long presses, and clicks and drags (§9.1) that
   do not begin with Alt held (§9.2), stay the surface's.
-- **The detail** is a JSON value, base64-encoded. Values are the program's
-  (§7): an `href` is reported as the document has it.
+- **The detail** is a msgpack map (§3.3), base64-encoded. Values are the
+  program's (§7): an `href` is reported as the document has it.
 - **Unknown kinds.** A program **MUST** ignore an event whose kind it does
   not know: later versions add kinds (§15). The capabilities list the kinds
   a host sends (`events`, §4).
@@ -909,8 +927,8 @@ let go.
 
   A drag therefore costs a few events for each element it crosses, and one
   for each step, not one for every move.
-- **The detail** of each is `{"c": …, "r": …, "keys": […]}`, with `x`
-  and `y` on an element with steps (below):
+- **The detail** of each is `{"c": int, "r": int, "keys": [str]}`, with
+  `"x": int` and `"y": int` on an element with steps (below):
   - `c` and `r` are the column and the row of the surface under the
     pointer, counted from 0 at the surface's top left cell, not its
     window's (§5.2). They go on counting outside the surface: negative
@@ -1090,7 +1108,7 @@ program draws itself, such as cells it lit while the pointer was over them.
 - **Over the window.** `hover` is sent each time the element the pointer
   is over changes. `t` is the nearest element with an `id`, from the one
   under the pointer outward (the innermost one `:hover` matches), and
-  empty where none has an id. The detail is `{"c": …, "r": …}`, the cell
+  empty where none has an id. The detail is `{"c": int, "r": int}`, the cell
   of the surface under the pointer, counted as for drags (§9.1): from the
   surface's top left cell, not its window's.
 - **Out.** `hover` with `t` empty and the detail `{"out": true}` is sent
@@ -1606,6 +1624,9 @@ the text of §11.
   major version, and additions that old hosts and programs can ignore get a
   new minor version. **Until 1.0, any minor version may break the previous
   one**: versions 0.x are drafts.
+- **A field keeps its type,** from 0.2 on: a version that needs another type
+  for it adds a field under a new name. A reader then never meets a field
+  it knows with a type it does not.
 - A host **MUST** ignore control keys it does not know. An unknown action or
   delta op is `EINVAL`. A program **MUST** ignore event kinds (§9) and
   capability fields (§4) it does not know.
@@ -1625,7 +1646,7 @@ the text of §11.
 
 ## 16. Conformance
 
-A host conforms to HOTTY version 0.1 when:
+A host conforms to HOTTY version 0.2 when:
 - it meets every **MUST** of this document;
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
@@ -1729,9 +1750,20 @@ program → CSI ? 2026 l
   reads 8-bit controls takes for ST, and ends the sequence there. Neovim's
   input parser is one. An id cut to `_` is a smaller loss than an event cut
   in two.
-- **Why hosts do not compress.** Replies and events are small, and zlib is
-  the one dependency a program would need only to read them. Programs keep
-  it for what they send, where documents are large.
+- **Why msgpack, inside the base64.** A host's bodies were JSON until 0.2.
+  - JSON has one kind of number, so a count of cells written `2.0` had to
+    be read as `2`, and every SDK carried that rule. msgpack keeps ints
+    and floats apart, and has a type for time.
+  - Where a language has a codec generated from types (Go's msgp, Rust's
+    serde), it reads a body, and no one writes a reader by hand. Where it
+    has none, a decoder is under 200 lines.
+  - Its maps are keyed by name, as JSON's are, so a version adds a field
+    that an older reader ignores (§15).
+  - It stays inside the base64, since its bytes include ST and BEL.
+  - What a program sends stays text: a document is HTML.
+- **Why hosts do not compress.** Replies and events are small, and zlib
+  would be a second dependency a program needs only to read them.
+  Programs keep it for what they send, where documents are large.
 - **Why ids and deltas.**
   - Addressing by id keeps a delta's effect predictable, and makes an update
     cost what it changes.

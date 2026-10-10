@@ -20,7 +20,6 @@ FEATURES = {
     "event.hover",
     "caps.passthrough",
     "caps.version",
-    "caps.lenient",
     "caps.drag-kinds",
     "options.unordered",
     "doc.scroll",
@@ -286,6 +285,10 @@ def run_decode(v):
                 return ok, why
         if "caps" in want:
             c = m.reply().caps() if m.reply() else None
+            if want["caps"] is None:
+                if c is not None:
+                    return False, "caps, want none"
+                continue
             if c is None:
                 return False, "no caps"
             ok, why = match(caps_view(c, want["caps"]), want["caps"], "caps")
