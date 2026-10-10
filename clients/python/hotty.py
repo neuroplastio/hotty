@@ -28,6 +28,7 @@ import time
 import tty
 import zlib
 from dataclasses import dataclass, field
+from typing import NamedTuple
 
 # --- constants (SDK.md §3.1) ------------------------------------------------
 
@@ -638,8 +639,24 @@ class Caps:
 
 # How deep a body may nest: its map is the first level.
 MAX_DEPTH = 32
+MAX_INT = 2**53 - 1
 
 _EPOCH = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
+
+
+class Timestamp(NamedTuple):
+    """A time, as msgpack's timestamp has it (extension -1, SPEC.md §3.3):
+    seconds since 1970-01-01T00:00:00Z, and nanoseconds into the second."""
+
+    sec: int
+    nsec: int = 0
+
+    def to_datetime(self):
+        """As an aware UTC datetime, which keeps microseconds. OverflowError
+        outside datetime's years, 1 to 9999."""
+        return _EPOCH + datetime.timedelta(seconds=self.sec, microseconds=self.nsec // 1000)
+
+
 _FIXED = {0xCA: ">f", 0xCB: ">d", 0xCC: ">B", 0xCD: ">H", 0xCE: ">I", 0xCF: ">Q",
           0xD0: ">b", 0xD1: ">h", 0xD2: ">i", 0xD3: ">q"}
 _SIZED = {0xC4: ("bin", ">B"), 0xC5: ("bin", ">H"), 0xC6: ("bin", ">I"),
@@ -651,9 +668,12 @@ _FIXEXT = {0xD4: 1, 0xD5: 2, 0xD6: 4, 0xD7: 8, 0xD8: 16}
 
 def unpack(data):
     """The one msgpack value in data, as plain values: a map is a dict, an
-    array a list, str a str, bin bytes, a timestamp (extension -1) an aware
-    UTC datetime, and any other extension None. ValueError when data is not
-    one value, or nests more than MAX_DEPTH deep."""
+    array a list, str a str, bin bytes, a timestamp (extension -1) a
+    Timestamp, and any other extension None. ValueError when data is not
+    one value, or nests more than MAX_DEPTH deep, or holds what no host
+    sends (SPEC.md §3.3): a nil, a key that is not a str, a str that is not
+    UTF-8, an int further than MAX_INT from zero, or a timestamp msgpack
+    does not define."""
     data = memoryview(data)
     v, i = _unpack(data, 0, 0)
     if i != len(data):
@@ -675,13 +695,16 @@ def _unpack(m, i, depth):
     if c >= 0xE0:
         return c - 0x100, i
     if c == 0xC0:
-        return None, i
+        raise ValueError("msgpack: a nil")
     if c in (0xC2, 0xC3):
         return c == 0xC3, i
     if c in _FIXED:
         f = struct.Struct(_FIXED[c])
         b, i = _take(m, i, f.size)
-        return f.unpack(b)[0], i
+        v = f.unpack(b)[0]
+        if isinstance(v, int) and abs(v) > MAX_INT:
+            raise ValueError("msgpack: an int further than 2^53 - 1 from zero")
+        return v, i
     if c <= 0x8F:
         kind, n = "map", c & 0x0F
     elif c <= 0x9F:
@@ -717,11 +740,10 @@ def _unpack(m, i, depth):
         return out, i
     out = {}
     for _ in range(n):
+        if i < len(m) and not (0xA0 <= m[i] <= 0xBF or 0xD9 <= m[i] <= 0xDB):
+            raise ValueError("msgpack: a map key that is not a str")
         k, i = _unpack(m, i, depth + 1)
-        try:
-            out[k], i = _unpack(m, i, depth + 1)
-        except TypeError:
-            raise ValueError("msgpack: a map key that is not a value") from None
+        out[k], i = _unpack(m, i, depth + 1)
     return out, i
 
 
@@ -733,11 +755,13 @@ def _timestamp(b):
         s, ns = x & 0x3_FFFF_FFFF, x >> 34
     elif len(b) == 12:
         ns, s = struct.unpack(">Iq", b)
+        if abs(s) > MAX_INT:
+            raise ValueError("msgpack: a timestamp further than 2^53 - 1 seconds from 1970")
     else:
         raise ValueError("msgpack: a timestamp of %d bytes" % len(b))
     if ns > 999_999_999:
         raise ValueError("msgpack: a timestamp's nanoseconds over a second")
-    return _EPOCH + datetime.timedelta(seconds=s, microseconds=ns // 1000)
+    return Timestamp(s, ns)
 
 
 # --- decoding (SDK.md §3.6) --------------------------------------------------

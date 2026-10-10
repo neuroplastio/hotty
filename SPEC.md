@@ -173,11 +173,17 @@ alphabet).
     for is left out, not sent as nil.
   - An int is at most 2^53 − 1 from zero either way, so that a reader
     whose numbers are doubles (JavaScript, Lua 5.1) holds it exactly.
+  - A body holds no nil, and its maps are keyed by strings. A string is
+    UTF-8.
   - Any of msgpack's forms of a type is that type: an int of any size,
     signed or not, a float of 32 or 64 bits, a string, an array or a map
     of any length.
   - A time, in a field that carries one, is msgpack's timestamp
-    (extension type −1). No field of this version carries one.
+    (extension type −1): 4, 8 or 12 bytes, its seconds at most 2^53 − 1
+    from 1970 and its nanoseconds under a second. No field of this version
+    carries one.
+  - A body that breaks any of these, anywhere in it, in a field a reader
+    knows or not, does not decode (SDK.md §3.9).
 
 ### 3.4 Chunks
 
@@ -941,9 +947,9 @@ let go.
     Alt pressed later is reported, and the drag goes on.
 - **Where in the element: steps.** An element that opts in to drags may say
   how many steps its width and its height are divided into, with
-  `data-steps="<x>"` or `data-steps="<x> <y>"`: whole numbers from 0 up,
-  `0` for none along that axis. A slider from 0 to 20 has `data-steps="20"`, a vertical
-  one `data-steps="0 20"`. Each event of a drag of it then says where in
+  `data-steps="<x>"` or `data-steps="<x> <y>"`: whole numbers from 0 to
+  2^53 − 1 (§3.3), `0` for none along that axis. A slider from 0 to 20
+  has `data-steps="20"`, a vertical one `data-steps="0 20"`. Each event of a drag of it then says where in
   it the pointer is:
   - `x`, when the first count is not 0: the pointer's distance from the
     left edge of the element's border box, over the box's width, times
@@ -958,9 +964,9 @@ let go.
   another element, outside the surface, or outside the window. So a
   slider follows a finger that slips off its track until it lifts, as a
   browser's range input does. Its counts are the ones it has when the
-  drag starts. A value that is not one or two whole numbers gives no
-  steps. If the element leaves the document during the drag, `x` and `y`
-  stay as they last were, as they do in a `dragend` that ends a drag
+  drag starts. A value that is not one or two whole numbers in that range
+  gives no steps. If the element leaves the document during the drag, `x`
+  and `y` stay as they last were, as they do in a `dragend` that ends a drag
   early (below). `steps` in the capabilities (§4) says a host does this.
 - **The pointer is the surface's until the release,** or the finger until
   it lifts, as a page's `setPointerCapture` makes it an element's. Every

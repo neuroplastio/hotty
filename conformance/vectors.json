@@ -19,6 +19,50 @@
    ]
   },
   {
+   "name": "the capabilities are each of their type, a float a float even when whole (SPEC \u00a73.3, \u00a74)",
+   "steps": [
+    {
+     "send": {
+      "a": "q",
+      "n": "1"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "q",
+      "n": "1",
+      "types": {
+       "v": "str",
+       "ops": [
+        "str"
+       ],
+       "events": [
+        "str"
+       ],
+       "cell": {
+        "w": "int",
+        "h": "int"
+       },
+       "scale": "float",
+       "scheme": "str",
+       "limits": {
+        "*": "int"
+       },
+       "net": {
+        "*": [
+         "str"
+        ]
+       },
+       "passthrough": "bool",
+       "scroll": "bool",
+       "steps": "bool",
+       "host": "str",
+       "version": "str"
+      }
+     }
+    }
+   ]
+  },
+  {
    "name": "a host answers a query that asks for a late answer at once, as any query (SPEC \u00a74)",
    "steps": [
     {
@@ -10009,13 +10053,13 @@
    ]
   },
   {
-   "name": "fields a reader does not know are skipped, whatever their type (SDK.md \u00a72.7)",
+   "name": "fields a reader does not know are skipped, whatever their type: an array, a float, bin, a time, an extension no one defines (SDK.md \u00a72.7)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;haF2ozAuMqZmdXR1cmWBoXiUActABAAAAAAAAMPAoWLEAgD/oXTW/wAAAACmc2Nyb2xsww==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;haF2ozAuMqZmdXR1cmWBoXiUActABAAAAAAAAMPUBQChYsQCAP+hdNb/AAAAAKZzY3JvbGzD\u001b\\"
    ],
    "bodies": [
     {
-     "hex": "85a176a3302e32a666757475726581a1789401cb4004000000000000c3c0a162c40200ffa174d6ff00000000a67363726f6c6cc3"
+     "hex": "85a176a3302e32a666757475726581a1789401cb4004000000000000c3d40500a162c40200ffa174d6ff00000000a67363726f6c6cc3"
     }
    ],
    "results": [
@@ -11575,6 +11619,313 @@
      "event": {
       "kind": "click",
       "value": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "a body that holds, anywhere, what no host sends does not decode: a nil, a key that is not a string, a string that is not UTF-8, an int past 2^53 \u2212 1, a timestamp of another size, nanoseconds of a whole second, or seconds past 2^53 \u2212 1 (SDK.md \u00a73.9)",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;g6F2ozAuMqZmdXR1cmXApnNjcm9sbMM=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuMqVzY2FsZcA=\u001b\\",
+    "\u001b]7279;a=ok:n=3:re=q;g6F2ozAuMqZmdXR1cmWBAaFhpnNjcm9sbMM=\u001b\\",
+    "\u001b]7279;a=ok:n=4:re=q;g6F2ozAuMqZmdXR1cmWBxAF4oWGmc2Nyb2xsww==\u001b\\",
+    "\u001b]7279;a=ok:n=5:re=q;g6F2ozAuMgGhYaZzY3JvbGzD\u001b\\",
+    "\u001b]7279;a=ok:n=6:re=q;g6F2ozAuMqZmdXR1cmWiwyimc2Nyb2xsww==\u001b\\",
+    "\u001b]7279;a=ok:n=7:re=q;g6F2ozAuMqZmdXR1cmWj7aCApnNjcm9sbMM=\u001b\\",
+    "\u001b]7279;a=ok:n=8:re=q;g6F2ozAuMqLDKKFhpnNjcm9sbMM=\u001b\\",
+    "\u001b]7279;a=ok:n=9:re=q;g6F2ozAuMqZmdXR1cmXPACAAAAAAAACmc2Nyb2xsww==\u001b\\",
+    "\u001b]7279;a=ok:n=10:re=q;g6F2ozAuMqZmdXR1cmXT/+AAAAAAAACmc2Nyb2xsww==\u001b\\",
+    "\u001b]7279;a=ok:n=11:re=q;g6F2ozAuMqZmdXR1cmWSzwAf////////0//gAAAAAAABpnNjcm9sbMM=\u001b\\",
+    "\u001b]7279;a=ok:n=12:re=q;g6F2ozAuMqZmdXR1cmXV/wAApnNjcm9sbMM=\u001b\\",
+    "\u001b]7279;a=ok:n=13:re=q;g6F2ozAuMqZmdXR1cmXX/+5rKAAAAAAApnNjcm9sbMM=\u001b\\",
+    "\u001b]7279;a=ok:n=14:re=q;g6F2ozAuMqZmdXR1cmXHDP8AAAAAACAAAAAAAACmc2Nyb2xsww==\u001b\\",
+    "\u001b]7279;a=ok:n=15:re=q;g6F2ozAuMqZmdXR1cmXHDP87msn/AAAAAAAAAACmc2Nyb2xsww==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=change:t=box;gqdjaGVja2VkwKV2YWx1ZaFh\u001b\\"
+   ],
+   "bodies": [
+    {
+     "hex": "83a176a3302e32a6667574757265c0a67363726f6c6cc3"
+    },
+    {
+     "hex": "82a176a3302e32a57363616c65c0"
+    },
+    {
+     "hex": "83a176a3302e32a66675747572658101a161a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e32a666757475726581c40178a161a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e3201a161a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e32a6667574757265a2c328a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e32a6667574757265a3eda080a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e32a2c328a161a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e32a6667574757265cf0020000000000000a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e32a6667574757265d3ffe0000000000000a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e32a666757475726592cf001fffffffffffffd3ffe0000000000001a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e32a6667574757265d5ff0000a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e32a6667574757265d7ffee6b280000000000a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e32a6667574757265c70cff000000000020000000000000a67363726f6c6cc3"
+    },
+    {
+     "hex": "83a176a3302e32a6667574757265c70cff3b9ac9ff0000000000000000a67363726f6c6cc3"
+    },
+    {
+     "hex": "82a7636865636b6564c0a576616c7565a161"
+    }
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 1
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 2
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "3",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 3
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "4",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 4
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "5",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 5
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "6",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 6
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "7",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 7
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "8",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 8
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "9",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 9
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "10",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 10
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "11",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 11
+     },
+     "caps": {
+      "v": "0.2",
+      "scroll": true
+     }
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "12",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 12
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "13",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 13
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "14",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 14
+     },
+     "caps": null
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "15",
+      "re": "q"
+     },
+     "reply": {
+      "ok": true,
+      "re": "q",
+      "n": 15
+     },
+     "caps": {
+      "v": "0.2",
+      "scroll": true
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "change",
+      "t": "box"
+     },
+     "event": {
+      "kind": "change",
+      "target": "box",
+      "value": null,
+      "checked": null
      }
     }
    ]

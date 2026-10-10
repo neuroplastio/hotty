@@ -421,17 +421,23 @@ payload (bytes). It reads as a reply or as an event.
 
 **The body** (SPEC.md §3.3) is decoded when the reply or event is read, each
 field as its type.
-- Fields the SDK does not know are ignored (§2.7).
-- An int further than 2^53 − 1 from zero (SPEC.md §3.3) does not decode in
-  an SDK whose numbers are doubles, rather than being rounded.
+- Fields the SDK does not know are ignored (§2.7), whatever their type.
 - A body nested more than 32 levels deep does not decode. An SDK stops
   reading there, so that no body can exhaust its stack: TinyGo's is 64 KB,
   and a few hundred levels crash it.
+- Nor does a body that holds, anywhere in it, a field the SDK knows or
+  not, what SPEC.md §3.3 has no host send: a nil, a map key that is not a
+  string, a string that is not UTF-8, an int further than 2^53 − 1 from
+  zero, or a timestamp of another size, with a second's nanoseconds or
+  more, or with seconds further than 2^53 − 1 from 1970. Each is checked
+  as the body is read, in every SDK alike, so a body decodes in all of
+  them or in none: an int past 2^53 − 1 is not rounded where numbers are
+  doubles, nor kept where they are not.
 - A body that does not decode leaves absent everything it would have
   filled, and the rest of the message stands. That is a body that is not
-  one msgpack map, or one with a field the SDK knows holding another type.
-  What it fills is the capabilities, an error's code and detail, or what an
-  event's detail carries.
+  one msgpack map, one that breaks a rule above, or one with a field the
+  SDK knows holding another type. What it fills is the capabilities, an
+  error's code and detail, or what an event's detail carries.
 
 **`Reply`** (SPEC.md §3.6), when the action is `ok` or `err`:
 

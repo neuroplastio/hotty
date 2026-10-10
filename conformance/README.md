@@ -57,8 +57,13 @@ base64-encoded and chunked as needed, and the payload is UTF-8.
 - `"reply"` absent: replies are not checked.
 - `"reply": null`: the command must produce no reply.
 - `"reply": {…}`: the first reply (`a=ok` or `a=err`) must match. Every key
-  but `code` and `detail` is compared with the reply's control; `code` and
-  `detail` with the body of an `a=err`.
+  but `code`, `detail` and `types` is compared with the reply's control;
+  `code` and `detail` with the body of an `a=err`. `types` gives the type of
+  each field of the body (SPEC §3.3): `"int"`, `"float"`, `"str"`, `"bool"`,
+  `[T]` an array of T, `{"name": T, …}` a map with those fields, and
+  `{"*": T}` a map of any names to T. The body must decode (SDK.md §3.9) and
+  each field it has be of its type; a field it lacks, or one `types` does
+  not name, is not checked.
 - `"events"`: the events the command makes the host send, as for a pointer
   step (below). Some follow the command by a frame or a load (`fit`, SPEC
   §5.2), so a runner waits for them, and then a frame or two more to see
@@ -220,8 +225,9 @@ so `bodies` shows them as JSON (Numbers, above), one for each sequence:
 - the body of the message the sequence starts, its maps in their order;
 - `null` where the sequence starts no message, or one with no body;
 - `{"hex": …}` for bytes the script below does not write: a body that is
-  not one msgpack value, or one in another of its types' forms than the
-  smallest (an int wider than it needs, a float of 32 bits).
+  not one msgpack value, one in another of its types' forms than the
+  smallest (an int wider than it needs, a float of 32 bits), or one holding
+  what no host sends (a nil, a key that is not a string, an extension).
 
 Runners ignore it. `scripts/bodies.py` writes the base64 in `seqs` from
 it, splitting a chunked body where its chunks split it before, and with
