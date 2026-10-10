@@ -1264,7 +1264,11 @@ def resolve(multiline, *values):
                  ("Control+Backspace", "delete-word-backward"), ("Control+Delete", "delete-word-forward"),
                  ("Alt+Backspace", "delete-word-backward"), ("Alt+Delete", "delete-word-forward"),
                  ("ArrowUp", "line-previous"), ("ArrowDown", "line-next"), ("PageUp", "page-up"),
-                 ("PageDown", "page-down"), ("Control+a", "select-all"), ("Enter", "newline" if multiline else "submit")):
+                 ("PageDown", "page-down"), ("Control+a", "select-all"),
+                 ("Meta+ArrowLeft", "line-start"), ("Meta+ArrowRight", "line-end"),
+                 ("Meta+ArrowUp", "input-start"), ("Meta+ArrowDown", "input-end"),
+                 ("Meta+Backspace", "delete-to-line-start"), ("Meta+a", "select-all"),
+                 ("Enter", "newline" if multiline else "submit")):
         m.bind(k, a)
     for v in values:
         for k, a in _bindings(v):

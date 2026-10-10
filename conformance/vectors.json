@@ -6712,6 +6712,143 @@
    ]
   },
   {
+   "name": "a key is offered as pressed first: Control+Backspace deletes a word, Command (Meta) with the arrows goes to the line's ends and with Shift selects, Command+a selects all and Command+Backspace deletes to the line's start (SPEC \u00a710.2, \u00a710.4)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t data-on=input value=\"one two\">"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "End",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Backspace",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "one "
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowLeft",
+     "keys": [
+      "meta"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "xone "
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowRight",
+     "keys": [
+      "meta",
+      "shift"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "y",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "xy"
+       }
+      }
+     ]
+    },
+    {
+     "key": "a",
+     "keys": [
+      "meta"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "z",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "z"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Backspace",
+     "keys": [
+      "meta"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": ""
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "data-keys on an ancestor binds keys to actions in the fields under it: Control+a and Control+e to the line's ends, Alt+b and Alt+f by words, Control+w and Alt+d delete words, Control+u and Control+k to the line's ends; an unbound Control key still reaches the program (SPEC \u00a710.2)",
    "steps": [
     {
@@ -11844,7 +11981,7 @@
    "format": ""
   },
   {
-   "name": "the default keymap, in an input: a browser field's keys, and Shift selects with a move (SPEC \u00a710.2)",
+   "name": "the default keymap, in an input: a browser field's keys, macOS's Command ones as Meta, and Shift selects with a move (SPEC \u00a710.2)",
    "multiline": false,
    "keys": [],
    "lookup": {
@@ -11869,7 +12006,7 @@
     "Shift+Backspace": "delete-char-backward",
     "Control+a": "select-all",
     "Alt+b": null,
-    "Meta+a": null,
+    "Meta+a": "select-all",
     "Control+Space": null,
     "Alt+Space": null,
     "Tab": null,
@@ -11892,7 +12029,14 @@
     "Control+Shift+Home": "input-start",
     "Control+h": null,
     "Control+A": null,
-    "Shift+ArrowUp": null
+    "Shift+ArrowUp": null,
+    "Meta+A": null,
+    "Meta+ArrowLeft": "line-start",
+    "Meta+ArrowRight": "line-end",
+    "Meta+ArrowUp": "input-start",
+    "Meta+ArrowDown": "input-end",
+    "Meta+Backspace": "delete-to-line-start",
+    "Meta+Shift+ArrowLeft": "line-start"
    },
    "selects": {
     "Shift+ArrowLeft": true,
@@ -11909,7 +12053,11 @@
     "Shift+PageDown": false,
     "Control+A": false,
     "A": false,
-    "Shift+Tab": false
+    "Shift+Tab": false,
+    "Meta+Shift+ArrowLeft": true,
+    "Meta+Shift+ArrowUp": true,
+    "Meta+Backspace": false,
+    "Meta+a": false
    }
   },
   {
@@ -11927,7 +12075,10 @@
     "Control+Home": "input-start",
     "Control+End": "input-end",
     "Control+a": "select-all",
-    "Shift+PageUp": "page-up"
+    "Shift+PageUp": "page-up",
+    "Meta+ArrowUp": "input-start",
+    "Meta+ArrowDown": "input-end",
+    "Meta+ArrowLeft": "line-start"
    },
    "selects": {
     "Shift+ArrowDown": true,

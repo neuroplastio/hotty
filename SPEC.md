@@ -1194,9 +1194,11 @@ sent.
 ### 10.2 Keys
 
 While a surface has the keyboard, each key either goes to its focused element
-or reaches the program. A host names the key as the program would read it
-(§10.4). A key the terminal turns into other input, such as a binding that
-sends text or a key the user remapped, is the key that input reads as.
+or reaches the program. The surface is offered the key as the user pressed
+it, before the terminal's own shortcuts, and then, if it does not use it,
+as the program would read it (§10.4). A key the terminal turns into
+other input, such as a binding that sends text or a key the user remapped,
+is offered the second time as the key that input reads as.
 
 | focused element | keys it uses |
 | --- | --- |
@@ -1280,13 +1282,19 @@ The default keymap is:
 | ArrowUp, ArrowDown | `line-previous`, `line-next` |
 | PageUp, PageDown | `page-up`, `page-down` |
 | Control+a | `select-all` |
+| Meta+ArrowLeft, Meta+ArrowRight | `line-start`, `line-end` |
+| Meta+ArrowUp, Meta+ArrowDown | `input-start`, `input-end` |
+| Meta+Backspace | `delete-to-line-start` |
+| Meta+a | `select-all` |
 | Enter | `submit` in an `input`, `newline` in a multi-line field |
 
-These are a text field's keys in a browser, with macOS's Option as Alt, and
-Shift selects with each move (below). A program that wants one of them
-binds it to `program`. A key the program's keyboard encoding does not tell
-from another reaches the field as that one (§10.4): in the legacy encoding
-a terminal may send Control+Backspace as `0x08`, which is Control+h.
+These are a text field's keys in a browser: on Linux and Windows, and on
+macOS, whose Command key is Meta and Option key Alt (§10.4). Shift selects
+with each move (below). A program that wants one of them binds it to
+`program`. A host that sees only what the program would read (§10.4) can
+offer a key only as that: in the legacy encoding a terminal may send
+Control+Backspace as `0x08`, which is Control+h, and a macOS terminal sends
+Command+ArrowLeft as `0x01`, which is Control+a.
 
 A key goes to the field's keymap:
 - **Bound:** the field does the action. A key bound to `program`, or to an
@@ -1447,12 +1455,30 @@ each followed by `+`: `a`, `A`, `Enter`, `ArrowLeft`, `Control+a`,
 - **`Space`** is the space bar's key value, a space, written so that it can
   stand in a list (`Control+Space`). `+` is the plus key (`Control++`).
 
-A host names a key from what the terminal would send the program for it: the
-bytes of the keyboard encoding the program has set (legacy, xterm's
-`modifyOtherKeys`, or the kitty keyboard protocol), after the terminal's own
-bindings, read as this table says. A host that receives keys in another form
-names them so that the names are the same. Input that is several keys (a
-binding that sends text) is each of them in turn.
+A host offers a surface that has the keyboard each key at most twice
+(§10.2). The surface uses a key that its focused element uses, Tab and
+Shift+Tab, which move focus, and a key it scrolls with (§5.3):
+- **As pressed, first.** A host that sees the key the user pressed (a
+  terminal emulator, a browser) offers it before the terminal's own
+  shortcuts and before the bindings that translate keys, named from the key
+  itself: the modifiers held, with the platform's command key (Command on
+  macOS, Super or the Windows key elsewhere) as Meta, and the key's value.
+  It does so for the keys that type no text: a key that is not a character
+  (`ArrowLeft`, `Home`, `Backspace`, `Enter`), and a character with Control
+  or Meta. Typing goes only the second way, through the platform's input
+  methods. If the surface uses the key, it is the surface's, and the
+  terminal does nothing with it, not even a shortcut bound to it. A host
+  **MAY** keep keys it reserves for itself, as a browser keeps Control+t.
+- **As the program would read it, otherwise.** A key the surface does not
+  use goes on as it would with no surface: the terminal's shortcuts take
+  the keys they bind, and the rest is what the terminal would send the
+  program, the bytes of the keyboard encoding the program has set (legacy,
+  xterm's `modifyOtherKeys`, or the kitty keyboard protocol) after the
+  terminal's own bindings. The host names it from those bytes, read as
+  this table says, and offers it. Input that is several keys (a binding
+  that sends text) is each of them in turn. A host that has only those
+  bytes, such as one that runs as a program in a terminal, offers keys
+  this way alone.
 
 | input | key |
 | --- | --- |
@@ -1914,10 +1940,16 @@ program → CSI ? 2026 l
   edit the same: the same keys, the same moves. The host cannot know which
   keys the program binds, so the program says, in `data-keys`, and what it
   does not give the field stays its own.
-  - **Named as the program reads them,** not as the platform does. The
-    terminal's bindings and the user's remapping decide what the program
-    reads (macOS terminals send Control+e for Cmd+→), and only that is the
-    same in cells and on a surface.
+  - **Offered as pressed first, then as the program reads them.** A
+    focused field on a surface is a GUI control, and gets the keys a GUI
+    field gets, before the terminal's shortcuts, as a page gets them
+    before a browser's. The terminal's translations exist for programs in
+    cells: a macOS terminal sends Control+a for Command+ArrowLeft, which a
+    field would read as select all. What the field does not use goes on as
+    before, so the terminal's shortcuts keep their keys elsewhere, and the
+    user's remapping still reaches the program and the field as bytes. In
+    cells a program reads only bytes, and Command+ArrowLeft stays
+    Control+a there.
   - **Inherited,** because a program has one keymap and many fields: it is
     set once, and overridden where a field differs.
   - **A default with a GUI field's keys,** Shift selecting included:
