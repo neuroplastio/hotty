@@ -809,7 +809,8 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": …, "r": …, "keys": […]}`: the pointer's cell and the keys held, with `x` and `y`, its step, on an element with `data-steps` (§9.1) |
 | `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element (§9.1) | the same |
 | `dragend` | the drag ended: the button released or the finger lifted, wherever the pointer is (§9.1) | the same |
-| `focus`, `blur` | the surface gains or loses the keyboard (§10); `t` is empty | none |
+| `focus` | the user focuses an element: the surface gains the keyboard, or its focus moves to another of its elements (§10.1); `t` names the element focused | none |
+| `blur` | the surface loses the keyboard (§10); `t` is empty | none |
 | `resize` | the surface's size in CSS pixels changed without its cells changing: the terminal's font changed (§5.3); `t` is empty | `{"w": …, "h": …}` in CSS pixels |
 | `fit` | on a placement made with `f=1` (§5.2), the rows the document needs at the placement's width changed; `t` is empty | `{"r": …}`: the rows `r=auto` would choose now |
 | `hover` | on a placement made with `v=1` (§5.2), the element the pointer is over changed, or the pointer left the window (§9.4) | `{"c": …, "r": …}`: the pointer's cell (§9.1); `{"out": true}` when it left, with `t` empty |
@@ -1156,6 +1157,14 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
 - **Without `t`:** the surface's focused element keeps focus, or else the
   first focusable element receives it.
 - **Echo:** no `focus` event is sent for focus the program gave.
+- **The host says where the user puts focus.** Each time the user focuses
+  an element of a surface, by a click or with Tab (§10.2), whether the
+  surface had the keyboard or not, the host sends `focus`. Its `t` is the
+  id of the nearest element that has one, from the focused element
+  outward, and empty if none has. So a program knows which element the
+  keys it is given come from (§10.2, *Keys for the program*). The `change`
+  that focus leaving a text control commits comes first, and a click's
+  `press` before both (§9).
 - **A click** is a press of the primary button without Alt (§9.2), a
   tap, or a touch that becomes a drag (§9.1).
 - **Elements that take focus** on a click, unless they are disabled:
@@ -1196,9 +1205,10 @@ sends text or a key the user remapped, is the key that input reads as.
 | `select` | printable characters, Space, Up, Down, Home, End, Page Up, Page Down, Enter, unmodified or with Shift only |
 | `button`, `a`, `summary`, checkbox, radio button | Space and Enter, unmodified or with Shift only |
 
-- **Tab and Shift+Tab** move between the surface's focusable elements. Past
-  the last one, or before the first, the surface loses the keyboard: the
-  host sends `blur` and the terminal has the keyboard again.
+- **Tab and Shift+Tab** move between the surface's focusable elements, and
+  the host sends `focus` for the one they move to (§10.1). Past the last
+  one, or before the first, the surface loses the keyboard: the host sends
+  `blur` and the terminal has the keyboard again.
 - **Escape** is never used by the surface, except by a select's open list
   (below). It reaches the program, which decides, for instance by sending
   `a=blur`.
@@ -1325,7 +1335,8 @@ The actions:
 
 A key that the focused element's keymap binds to `program` reaches the
 program, before the element uses it and before the surface scrolls with it
-(§5.3), whatever the element.
+(§5.3), whatever the element. It reaches it as terminal input, which names
+no element: the last `focus` does (§10.1), or the program's own `a=focus`.
 - **Every focused element has a keymap**, read as a text field's is, but
   with its scroll actions: the `data-keys` of each element from the
   document's root down to it, the element's own last, each overriding what
@@ -1912,6 +1923,18 @@ program → CSI ? 2026 l
   in a browser stops that with script (`preventDefault`); a surface has
   none, so the document says beforehand, in the `data-keys` it already
   reads for fields.
+- **Why `focus` names the element.** Those keys reach the program as
+  terminal input, which names no element, and Tab moves focus inside the
+  host. A program with a field and a list could not tell which one the
+  arrows came from, after a Tab, and acted on the one it last knew. A
+  browser's `focusin` names its target in the same way.
+  - **The keys stay input,** so the program reads them in the encoding
+    it enabled and with its own keymap, as every other key. An event per
+    key would carry a second encoding of them.
+  - **Every move, not only the first,** because the surface keeps the
+    keyboard while focus moves inside it. A program that only wanted to
+    know the surface has the keyboard reads the first `focus` after a
+    `blur`, as before.
 - **Why scrolling keys.** Pagers and viewers in the terminal (less, vim,
   Bubble Tea's viewport, glow) share `j` and `k`, Space and `b`, `g` and
   `G`. A program that scrolls its cells with them should scroll its

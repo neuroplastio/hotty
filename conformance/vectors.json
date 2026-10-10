@@ -4635,7 +4635,13 @@
     },
     {
      "key": "Tab",
-     "events": []
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": ""
+      }
+     ]
     },
     {
      "key": "Enter",
@@ -6348,6 +6354,168 @@
    ]
   },
   {
+   "name": "the user moving focus sends focus naming the element focused, or the nearest one outward with an id: on a click, on Tab and Shift+Tab, after the change it commits; focus the program gives sends none, and Tab past the last sends blur (SPEC \u00a710.1, \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,div,button{display:block;box-sizing:border-box;margin:0;padding:0;border:0;font:inherit;width:calc(8*var(--hotty-cell-w));height:var(--hotty-cell-h)}</style><input id=a><div id=list tabindex=0 data-keys=\"ArrowDown=program\">list</div><div id=w><button>ok</button></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a"
+    },
+    {
+     "pointer": "down",
+     "s": "x",
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "a"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "s": "x",
+     "events": []
+    },
+    {
+     "key": "B",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "B"
+       }
+      },
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "list"
+      }
+     ]
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "w"
+      }
+     ]
+    },
+    {
+     "key": "Tab",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "list"
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      2
+     ]
+    },
+    {
+     "pointer": "down",
+     "s": "x",
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "w"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "s": "x",
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "blur",
+       "s": "x",
+       "t": ""
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a"
+    },
+    {
+     "pointer": "down",
+     "s": "x",
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "a"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "s": "x",
+     "events": []
+    }
+   ]
+  },
+  {
    "name": "with no data-keys, a text input uses the default keymap only: keys with Control or Alt reach the program, and Shift+ArrowLeft moves the caret as ArrowLeft does (SPEC \u00a710.2)",
    "steps": [
     {
@@ -7681,7 +7849,13 @@
     },
     {
      "pointer": "down",
-     "events": []
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "b4"
+      }
+     ]
     },
     {
      "pointer": "up",
@@ -7717,7 +7891,13 @@
     },
     {
      "pointer": "down",
-     "events": []
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "b5"
+      }
+     ]
     },
     {
      "pointer": "up",
@@ -7777,7 +7957,13 @@
     },
     {
      "pointer": "down",
-     "events": []
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "b1"
+      }
+     ]
     },
     {
      "pointer": "up",
