@@ -737,9 +737,10 @@ relay does will be specified here, with its own vectors.
 
 ### 4.6 Field
 
-A text field's value, caret and selection, edited as SPEC.md §10.2's actions edit them,
-for a program that draws its fields in cells (the second rendition, §2.5).
-Go: `hottyedit.Field`, a module of its own for its grapheme segmentation.
+A text field's value, caret and selection, edited as SPEC.md §10.2's actions
+edit them, for a program that draws its fields in cells (the second
+rendition, §2.5). Go: `hottyedit.Field`, a module of its own for its
+grapheme segmentation.
 
 - **The field.** `Value`, `Caret` (a count of characters, grapheme
   clusters, from the start), `Anchor`, `Multiline`, `Password`, and

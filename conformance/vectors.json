@@ -6927,7 +6927,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t data-on=input value=ab data-keys=\"Escape=line-start Tab=line-end Control+a=frobnicate Hyper+b=line-start Control+=line-end Alt+==line-start\">"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t data-on=input value=ab data-keys=\"Escape=line-start Tab=line-end Control+e=frobnicate Hyper+b=line-start Control+=line-end Alt+==line-start\">"
     },
     {
      "send": {
@@ -6958,7 +6958,7 @@
      "events": []
     },
     {
-     "key": "a",
+     "key": "e",
      "keys": [
       "ctrl"
      ],
@@ -7083,7 +7083,7 @@
    ]
   },
   {
-   "name": "a multi-line action reaches the program from an input, and moves the caret in a textarea: by rows, keeping its place along them, and to the ends of the value (SPEC \u00a710.2)",
+   "name": "a multi-line action reaches the program from an input, and moves the caret in a textarea: by rows, keeping its place along them, and to the ends of the value, which an input goes to as well (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -7129,7 +7129,7 @@
      "keys": [
       "alt"
      ],
-     "terminal": true,
+     "terminal": false,
      "events": []
     },
     {
