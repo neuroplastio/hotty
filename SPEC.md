@@ -234,6 +234,7 @@ ESC ] 7279 ; a=ok|err [:n=<n>] [:s=<s>] :re=<action> [:<more>] [; <payload>] ST
 | `EDETACHED` | the surface is detached (§5.5) |
 | `EQUOTA` | over one of the host's limits (§13) |
 | `EBUDGET` | the host gave up on work that exceeded its time budget (§13) |
+| `EVERSION` | a query (§4) lists no version the host speaks, or none at all. The detail is the versions the host speaks, comma-separated |
 
 Replies travel on the program's input, interleaved with whatever the user
 types. A program that does not want them sends `q=2`.
@@ -257,7 +258,7 @@ A program finds out whether it has a host by sending a query, then Primary
 Device Attributes as a fence:
 
 ```
-ESC ] 7279 ; a=q:n=1 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.2 ST   CSI c
 ```
 
 Every terminal answers DA1. A host answers the query first:
@@ -268,6 +269,22 @@ ESC ] 7279 ; a=ok:n=1:re=q ; <base64 msgpack> ST
 
 If the DA1 answer arrives with no HOTTY reply before it, there is no host. The
 program **SHOULD** then fall back (§14).
+
+**Versions.** `v` lists the HOTTY versions the program speaks,
+comma-separated: `v=0.2` for this document, and one day perhaps
+`v=0.2,0.3`. A version is `major.minor`, two numbers written without
+leading zeros, and versions compare as those numbers, the major first.
+- A host answers in the highest version it shares with the program: `a=ok`,
+  with that version's capabilities, whose `v` names it. It speaks that
+  version from then on.
+- A host that shares none, or gets a query with no `v`, answers `a=err`
+  with `EVERSION` (§3.6), the versions it speaks, comma-separated, as the
+  detail.
+- A program **MUST** take as no host a terminal that answers its query with
+  an error, or with capabilities that do not decode (§3.3) or whose `v` it
+  did not list, and fall back (§14). A program and a host of different
+  versions, which may read each other's messages differently, then never
+  meet.
 
 A DA1 answer may belong to a question asked earlier, by the program or by
 whatever ran before it. A program **MAY** wait a little after a DA1 that
@@ -281,7 +298,7 @@ terminal attached. A program that can start using HOTTY after it has fallen
 back asks for a late answer with `late=1`:
 
 ```
-ESC ] 7279 ; a=q:n=1:late=1 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.2:late=1 ST   CSI c
 ```
 
 - A host answers it as any query, at once.
@@ -291,8 +308,9 @@ ESC ] 7279 ; a=q:n=1:late=1 ST   CSI c
   forgets the query when the program it runs ends and on a full reset
   (RIS).
 - The program takes such a reply, whenever it arrives, as detection finding
-  a host, and may use HOTTY from then on (§14). Without `late=1`, a reply
-  that arrives once the program has fallen back changes nothing.
+  a host, if it is one the program can use (Versions, above), and may use
+  HOTTY from then on (§14). Without `late=1`, a reply that arrives once the
+  program has fallen back changes nothing.
 - A program that will no longer take a late answer, such as one about to
   exit, withdraws its query with `a=q:q=2`: a query that wants no answer,
   which takes the held one's place, so that no reply reaches whatever reads
@@ -302,7 +320,7 @@ The capabilities, the body of that reply, are a map of these fields (§3.3):
 
 | field | type | meaning |
 | --- | --- | --- |
-| `v` | str | the HOTTY version the host implements: `"0.2"` for this document |
+| `v` | str | the HOTTY version the host answers in (Versions, above): `"0.2"` for this document |
 | `ops` | [str] | the delta ops it supports (§6) |
 | `events` | [str] | the event kinds it can send (§9). `drag` stands for `dragstart`, `drag` and `dragend` (§9.1) |
 | `cell` | `{"w": int, "h": int}` | the cell size in device pixels |
@@ -1605,9 +1623,9 @@ A host **MUST** ensure that:
 ## 14. Degradation
 
 A program **SHOULD** work without a host.
-- When detection (§4) finds none, it paints its interface as terminal text
-  (until a late answer finds one, §4),
-  and should not send HOTTY commands to a terminal that is not a host.
+- When detection (§4) finds none it can use, it paints its interface as
+  terminal text (until a late answer finds one, §4), and should not send
+  HOTTY commands to a terminal that is not a host.
 - The same program can use HOTTY where it is available and text where it is
   not, with no change to how it runs.
 
@@ -1630,6 +1648,11 @@ the text of §11.
   major version, and additions that old hosts and programs can ignore get a
   new minor version. **Until 1.0, any minor version may break the previous
   one**: versions 0.x are drafts.
+- **A program and a host agree on a version** before either reads the
+  other (§4): the program's query lists the versions it speaks, and the host
+  answers in the highest it speaks too, or with `EVERSION`. With none in
+  common, the program falls back (§14). A host or a program **MAY** speak
+  several versions.
 - **A field keeps its type,** from 0.2 on: a version that needs another type
   for it adds a field under a new name. A reader then never meets a field
   it knows with a type it does not.
@@ -1696,8 +1719,8 @@ fields (SDK.md §4.6).
 Detection (payload shortened):
 
 ```
-program → ESC ] 7279 ; a=q:n=1 ST  CSI c
-host    → ESC ] 7279 ; a=ok:n=1:re=q ; eyJ2IjoiMC4xIiwib3BzIjpb… ST  CSI ? 62 ; 22 c
+program → ESC ] 7279 ; a=q:n=1:v=0.2 ST  CSI c
+host    → ESC ] 7279 ; a=ok:n=1:re=q ; hqF2ozAuMqNvcHOcpW1vcnBo… ST  CSI ? 62 ; 22 c
 ```
 
 A card placed below the prompt, then a delta and an event:
@@ -1831,6 +1854,12 @@ program → CSI ? 2026 l
   Terminals report what changes later in the same way, such as the colour
   scheme (mode 2031) and the window's size (mode 2048): the program asks,
   and hears when there is something to say.
+- **Why the query names versions.** Until 1.0 a version may change how
+  bodies are read, as 0.2 did (§3.3), and a program that took a reply in a
+  version it does not speak for a host would read nothing right. The
+  capabilities alone cannot tell it, since a program may not be able to
+  read them. The host, which reads the query whatever its version, decides,
+  and an error is the one answer every version takes as no host.
 - **Why `press`.** A program that shows several surfaces moves its own
   selection to the one the user goes to: a dashboard selects the card
   pressed, and a multiplexer that draws its panes and tools as surfaces

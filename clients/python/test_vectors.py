@@ -366,6 +366,8 @@ def run_detect(v):
                 return False, f"step {i} (at {at}): {k} = {got[k]!r}, want {st[k]!r}"
     if "caps" in v:
         c = det.caps
+        if v["caps"] is None:
+            return (True, "") if c is None else (False, f"caps {c!r}, want none")
         if c is None:
             return False, "no caps"
         ok, why = match({"v": c.v}, v["caps"], "caps")

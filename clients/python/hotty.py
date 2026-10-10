@@ -61,6 +61,7 @@ ENOTARGET = "ENOTARGET"
 EDETACHED = "EDETACHED"
 EQUOTA = "EQUOTA"
 EBUDGET = "EBUDGET"
+EVERSION = "EVERSION"
 
 OPS = ("morph", "inner", "replace", "append", "prepend", "before", "after", "remove", "attr", "unattr", "text", "var")
 
@@ -177,9 +178,9 @@ def _command(pairs, payload, default_q, n=None, q=None):
 
 
 def query(n=1, late=False):
-    """Asks whether the terminal is a host, fenced with DA1 (SPEC §4); with
-    late, a late answer is welcome."""
-    pairs = [("a", "q"), ("n", n)]
+    """Asks whether the terminal is a host that speaks VERSION, fenced
+    with DA1 (SPEC §4); with late, a late answer is welcome."""
+    pairs = [("a", "q"), ("n", n), ("v", VERSION)]
     if late:
         pairs.append(("late", 1))
     return encode(pairs) + "\x1b[c"
@@ -1022,9 +1023,11 @@ class Detector:
     """Decides whether the terminal is a HOTTY host (SPEC §4), with time
     passed in as milliseconds. `decided` is set when the state is known,
     `done` when nothing more of the detection will arrive; `deadline` is
-    when to call `tick` next (None once done). With `late`, the query asks
-    for a late answer, and the first reply after the state is TEXT makes the
-    terminal a host."""
+    when to call `tick` next (None once done). A reply to the query makes
+    the terminal a host when its capabilities decode and name VERSION, and
+    any other reply to it, an error included, leaves it TEXT. With `late`,
+    the query asks for a late answer, and the first reply after the state
+    is TEXT that makes the terminal a host does."""
 
     def __init__(self, n=1, late=False):
         self.n = n
@@ -1075,14 +1078,16 @@ class Detector:
     def reply(self, r, now):
         """A reply arrived. Returns whether it answers the query."""
         self._fire(now)
-        if not (r.ok and r.re == "q" and r.n == self.n):
+        if not (r.re == "q" and r.n == self.n):
             return False
+        caps = r.caps()
+        host = caps is not None and caps.v == VERSION
         if self.state == DETECTING:
-            self.state, self.decided = NATIVE, True
-            self.caps = r.caps()
+            self.state, self.decided = (NATIVE, True) if host else (TEXT, True)
+            self.caps = caps if host else None
             self._after = min(now + DETECT_AFTER_REPLY, self._timeout)
-        elif self.state == TEXT and self.late:
-            self.state, self.caps = NATIVE, r.caps()
+        elif self.state == TEXT and self.late and host:
+            self.state, self.caps = NATIVE, caps
         return True
 
     def end(self, now):
@@ -1757,8 +1762,8 @@ class Hotty:
         return messages, other
 
     def query(self, timeout=None):
-        """Is there a HOTTY host? Returns its capabilities (the JSON object),
-        or None. Reads until detection is done (SDK.md §3.8), and leaves
+        """Is there a HOTTY host that speaks VERSION? Returns its
+        capabilities (their body, decoded), or None. Reads until detection is done (SDK.md §3.8), and leaves
         everything that is not detection's in the buffer, for take()."""
         now = lambda: time.monotonic() * 1000  # noqa: E731
         det = Detector(1)
@@ -1797,6 +1802,5 @@ class Hotty:
         self.buffer = rest + sc.holding + pending + self.buffer
         if det.state != NATIVE:
             return None
-        r = det.caps
-        self.caps = r
-        return r.raw if r is not None else {}
+        self.caps = det.caps
+        return det.caps.raw

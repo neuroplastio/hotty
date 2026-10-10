@@ -178,14 +178,14 @@ An SDK **MUST** provide every component of this section.
 | `Chunk` | 4096, the most base64 bytes in one sequence |
 | `MaxSize` | 1000, the most columns or rows of a surface |
 | `MaxName` | 64, the longest surface name |
-| `Version` | `"0.2"`, the protocol version the SDK implements |
+| `Version` | `"0.2"`, the protocol version the SDK speaks, which its query lists (SPEC.md §4) |
 
 And these sets, each value under its canonical name:
 - **event kinds**: `click`, `change`, `input`, `submit`, `press`, `focus`,
   `blur`, `resize`, `fit`, `hover`, `dragstart`, `drag`, `dragend`
   (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
-  `EBUDGET` (SPEC.md §3.6);
+  `EBUDGET`, `EVERSION` (SPEC.md §3.6);
 - **delta ops**: `morph`, `inner`, `replace`, `append`, `prepend`, `before`,
   `after`, `remove`, `attr`, `unattr`, `text`, `var` (SPEC.md §6.1);
 - **quiet levels**: `ReplyAlways` 0, `ReplyOnError` 1, `NoReply` 2
@@ -232,7 +232,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 
 | builder | sends | parameters | default `q` |
 | --- | --- | --- | --- |
-| `Query` | `a=q:n=<n>`, `late=1` with the `Late` option, then DA1 (`ESC [ c`) | n | none |
+| `Query` | `a=q:n=<n>:v=<Version>`, `late=1` with the `Late` option, then DA1 (`ESC [ c`) | n | none |
 | `Doc` | `a=doc:s` and the HTML; `d=1` with the `Detached` option, `scroll` with `Scroll` | surface, html | 1 |
 | `Place` | `a=place` (§3.4.1) | surface, placement | 1 |
 | `PlaceAt` | `ESC 7`, `ESC [ <y+1> ; <x+1> H`, `Place` with `C=1`, `ESC 8` | surface, x, y, placement | 1 |
@@ -395,23 +395,25 @@ The rules, with their times:
 
 | rule | |
 | --- | --- |
-| a reply that answers the query (`a=ok`, `re=q`, the query's `n`) | the terminal is a host: `native`, decided, with its capabilities. Done when the DA1 behind it arrives, or 300 ms after the reply, or at 1500 ms, whichever comes first |
-| a DA1 before any reply | it may answer a question asked before the query (SPEC.md §4). It opens a grace of 150 ms: a reply within it still makes the terminal a host |
+| a reply that answers the query (`re=q`, the query's `n`): `a=ok`, its capabilities decoding (§3.9), their `V` the SDK's `Version` | the terminal is a host: `native`, decided, with its capabilities. Done when the DA1 behind it arrives, or 300 ms after the reply, or at 1500 ms, whichever comes first |
+| any other reply that answers the query: an error (`EVERSION`, or another), or capabilities that do not decode or name another version | the terminal is no host the program can use (SPEC.md §4): `text`, decided. Done as for a host's reply |
+| a DA1 before any reply | it may answer a question asked before the query (SPEC.md §4). It opens a grace of 150 ms: a reply within it still answers the query |
 | the grace ends with no reply | `text`: not a host. Decided and done |
 | 1500 ms with no answer at all | `text`. Decided and done |
 | the input ends | `text` if nothing was decided. Done |
-| with `Late`, a reply that answers the query once the state is `text` | a late answer: `native`, with its capabilities. Still decided and done |
+| with `Late`, a reply that answers the query once the state is `text`, and makes the terminal a host (the first rule) | a late answer: `native`, with its capabilities. Still decided and done |
 
 - **Which inputs are detection's.** Every DA1 from the start until done is
   detection's, and the SDK layer swallows it: it answers the query's fence or
   an earlier question, and is no key. After done, a DA1 is not
-  detection's. A reply that answers the query is detection's whenever it
-  arrives, even after the state is `text`; a late one changes nothing,
-  unless the query asked for it (`Late`), and then only the first.
-  Replies with another `n`, error replies, and everything else are not.
-- **Decided and done** differ only for a host: it is known to be one when
-  its reply arrives, and the detection is over when nothing more of it will
-  arrive. A program that must not wait, such as a framework's adapter
+  detection's. A reply that answers the query, `a=ok` or `a=err`, is
+  detection's whenever it arrives, even after the state is `text`; a late
+  one changes nothing, unless the query asked for it (`Late`), and then
+  only the first that makes the terminal a host. Replies with another `n`,
+  and everything else, are not.
+- **Decided and done** differ only when the terminal answers the query:
+  whether it is a host the program can use is known when its reply
+  arrives, and the detection is over when nothing more of it will arrive. A program that must not wait, such as a framework's adapter
   (§4.3), acts when decided; one that hands the terminal on, when done.
 
 ### 3.9 Messages

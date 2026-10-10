@@ -8,7 +8,8 @@
     {
      "send": {
       "a": "q",
-      "n": "7"
+      "n": "7",
+      "v": "0.2"
      },
      "reply": {
       "a": "ok",
@@ -19,12 +20,144 @@
    ]
   },
   {
-   "name": "the capabilities are each of their type, a float a float even when whole (SPEC \u00a73.3, \u00a74)",
+   "name": "a host answers a query in the highest version it shares with the program, whatever the order the query lists them in, and its capabilities name it (SPEC \u00a74)",
+   "steps": [
+    {
+     "send": {
+      "a": "q",
+      "n": "1",
+      "v": "0.2,99.0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "q",
+      "n": "1",
+      "body": {
+       "v": "0.2"
+      }
+     }
+    },
+    {
+     "send": {
+      "a": "q",
+      "n": "2",
+      "v": "99.0,0.2"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "q",
+      "n": "2",
+      "body": {
+       "v": "0.2"
+      }
+     }
+    },
+    {
+     "send": {
+      "a": "q",
+      "n": "3",
+      "v": "0.1,0.2"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "q",
+      "n": "3",
+      "body": {
+       "v": "0.2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "a query that lists no version the host speaks, or none at all, is EVERSION, its detail the versions the host speaks; a query that wants no answer gets none (SPEC \u00a73.6, \u00a74)",
    "steps": [
     {
      "send": {
       "a": "q",
       "n": "1"
+     },
+     "reply": {
+      "a": "err",
+      "re": "q",
+      "n": "1",
+      "code": "EVERSION",
+      "detail": "0.2"
+     }
+    },
+    {
+     "send": {
+      "a": "q",
+      "n": "2",
+      "v": "0.1"
+     },
+     "reply": {
+      "a": "err",
+      "re": "q",
+      "n": "2",
+      "code": "EVERSION",
+      "detail": "0.2"
+     }
+    },
+    {
+     "send": {
+      "a": "q",
+      "n": "3",
+      "v": "99.0"
+     },
+     "reply": {
+      "a": "err",
+      "re": "q",
+      "n": "3",
+      "code": "EVERSION",
+      "detail": "0.2"
+     }
+    },
+    {
+     "send": {
+      "a": "q",
+      "n": "4",
+      "v": "0.20"
+     },
+     "reply": {
+      "a": "err",
+      "re": "q",
+      "n": "4",
+      "code": "EVERSION",
+      "detail": "0.2"
+     }
+    },
+    {
+     "send": {
+      "a": "q",
+      "n": "5",
+      "v": ""
+     },
+     "reply": {
+      "a": "err",
+      "re": "q",
+      "n": "5",
+      "code": "EVERSION",
+      "detail": "0.2"
+     }
+    },
+    {
+     "send": {
+      "a": "q",
+      "q": "2"
+     },
+     "reply": null
+    }
+   ]
+  },
+  {
+   "name": "the capabilities are each of their type, a float a float even when whole (SPEC \u00a73.3, \u00a74)",
+   "steps": [
+    {
+     "send": {
+      "a": "q",
+      "n": "1",
+      "v": "0.2"
      },
      "reply": {
       "a": "ok",
@@ -69,6 +202,7 @@
      "send": {
       "a": "q",
       "n": "5",
+      "v": "0.2",
       "late": "1"
      },
      "reply": {
@@ -8441,7 +8575,8 @@
      "cmd": {
       "control": {
        "a": "q",
-       "n": "1"
+       "n": "1",
+       "v": "0.2"
       }
      }
     },
@@ -8465,6 +8600,7 @@
       "control": {
        "a": "q",
        "n": "1",
+       "v": "0.2",
        "late": "1"
       }
      }
@@ -12536,7 +12672,7 @@
    ]
   },
   {
-   "name": "a reply with another n, or an error, is not detection's",
+   "name": "a reply with another n, ok or an error, is not detection's",
    "steps": [
     {
      "at": 0,
@@ -12553,7 +12689,7 @@
     },
     {
      "at": 12,
-     "osc": "\u001b]7279;a=err:n=1:re=q;gaRjb2RlpkVJTlZBTA==\u001b\\",
+     "osc": "\u001b]7279;a=err:n=2:re=q;gaRjb2RlpkVJTlZBTA==\u001b\\",
      "body": {
       "code": "EINVAL"
      },
@@ -12572,6 +12708,219 @@
      "state": "text"
     }
    ]
+  },
+  {
+   "name": "an error that answers the query, such as EVERSION: a host this program cannot use, text at once, and done when the DA1 behind it arrives (SPEC \u00a74)",
+   "steps": [
+    {
+     "at": 0,
+     "start": true,
+     "state": "detecting",
+     "decided": false,
+     "done": false,
+     "deadline": 1500
+    },
+    {
+     "at": 20,
+     "osc": "\u001b]7279;a=err:n=1:re=q;gqRjb2RlqEVWRVJTSU9OpmRldGFpbKMwLjM=\u001b\\",
+     "body": {
+      "code": "EVERSION",
+      "detail": "0.3"
+     },
+     "took": true,
+     "state": "text",
+     "decided": true,
+     "done": false,
+     "deadline": 320
+    },
+    {
+     "at": 25,
+     "da1": true,
+     "took": true,
+     "state": "text",
+     "done": true,
+     "deadline": null
+    },
+    {
+     "at": 30,
+     "da1": true,
+     "took": false
+    }
+   ],
+   "caps": null
+  },
+  {
+   "name": "an error of another code that answers the query is no host either, and with no DA1 behind it, done 300 ms later",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 20,
+     "osc": "\u001b]7279;a=err:n=1:re=q;gaRjb2RlpkVJTlZBTA==\u001b\\",
+     "body": {
+      "code": "EINVAL"
+     },
+     "took": true,
+     "state": "text",
+     "decided": true,
+     "done": false,
+     "deadline": 320
+    },
+    {
+     "at": 320,
+     "tick": true,
+     "state": "text",
+     "done": true,
+     "deadline": null
+    }
+   ],
+   "caps": null
+  },
+  {
+   "name": "capabilities that do not decode, such as a 0.1 host's JSON: text (SPEC \u00a74)",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 20,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;eyJ2IjoiMC4xIn0=\u001b\\",
+     "body": {
+      "hex": "7b2276223a22302e31227d"
+     },
+     "took": true,
+     "state": "text",
+     "decided": true,
+     "done": false,
+     "deadline": 320
+    },
+    {
+     "at": 25,
+     "da1": true,
+     "took": true,
+     "done": true
+    }
+   ],
+   "caps": null
+  },
+  {
+   "name": "capabilities that name a version the SDK does not speak: text (SPEC \u00a74)",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 20,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMQ==\u001b\\",
+     "body": {
+      "v": "0.1"
+     },
+     "took": true,
+     "state": "text",
+     "decided": true,
+     "done": false
+    },
+    {
+     "at": 25,
+     "da1": true,
+     "took": true,
+     "done": true
+    }
+   ],
+   "caps": null
+  },
+  {
+   "name": "capabilities that name no version: text (SPEC \u00a74)",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 20,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaNvcHORpW1vcnBo\u001b\\",
+     "body": {
+      "ops": [
+       "morph"
+      ]
+     },
+     "took": true,
+     "state": "text",
+     "decided": true,
+     "done": false
+    },
+    {
+     "at": 25,
+     "da1": true,
+     "took": true,
+     "done": true
+    }
+   ],
+   "caps": null
+  },
+  {
+   "name": "with Late, a late reply that is an error or names another version changes nothing; the first that makes the terminal a host is the late answer (SPEC \u00a74)",
+   "late": true,
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 10,
+     "da1": true,
+     "took": true,
+     "deadline": 160
+    },
+    {
+     "at": 160,
+     "tick": true,
+     "state": "text",
+     "decided": true,
+     "done": true,
+     "deadline": null
+    },
+    {
+     "at": 60000,
+     "osc": "\u001b]7279;a=err:n=1:re=q;gqRjb2RlqEVWRVJTSU9OpmRldGFpbKMwLjM=\u001b\\",
+     "body": {
+      "code": "EVERSION",
+      "detail": "0.3"
+     },
+     "took": true,
+     "state": "text",
+     "done": true
+    },
+    {
+     "at": 60010,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMQ==\u001b\\",
+     "body": {
+      "v": "0.1"
+     },
+     "took": true,
+     "state": "text",
+     "done": true
+    },
+    {
+     "at": 60020,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "body": {
+      "v": "0.2"
+     },
+     "took": true,
+     "state": "native",
+     "decided": true,
+     "done": true,
+     "deadline": null
+    }
+   ],
+   "caps": {
+    "v": "0.2"
+   }
   },
   {
    "name": "a reply with no DA1 behind it: done 300 ms later",

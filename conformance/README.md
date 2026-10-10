@@ -57,8 +57,10 @@ base64-encoded and chunked as needed, and the payload is UTF-8.
 - `"reply"` absent: replies are not checked.
 - `"reply": null`: the command must produce no reply.
 - `"reply": {…}`: the first reply (`a=ok` or `a=err`) must match. Every key
-  but `code`, `detail` and `types` is compared with the reply's control;
-  `code` and `detail` with the body of an `a=err`. `types` gives the type of
+  but `code`, `detail`, `body` and `types` is compared with the reply's
+  control; `code` and `detail` with the body of an `a=err`. `body` gives
+  fields the body of an `a=ok` must have, equal as values (Numbers, above);
+  fields it does not name are not checked. `types` gives the type of
   each field of the body (SPEC §3.3): `"int"`, `"float"`, `"str"`, `"bool"`,
   `[T]` an array of T, `{"name": T, …}` a map with those fields, and
   `{"*": T}` a map of any names to T. The body must decode (SDK.md §3.9) and
@@ -287,4 +289,5 @@ do, and runners ignore it), `tick` and `end`. After each, every key the step lis
 must equal the Detector's: `took` (what `DA1` or `Reply` returned), `state`
 (`detecting`, `native`, `text`), `decided`, `done`, and `deadline` (`null`
 when there is none). `caps` is checked against the capabilities at the
-end.
+end; `null`: there are none, as when the terminal is no host the program
+can use.
