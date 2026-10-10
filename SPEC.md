@@ -173,8 +173,8 @@ alphabet).
     for is left out, not sent as nil.
   - An int is at most 2^53 − 1 from zero either way, so that a reader
     whose numbers are doubles (JavaScript, Lua 5.1) holds it exactly.
-  - A body holds no nil, and its maps are keyed by strings. A string is
-    UTF-8.
+  - A body holds no nil, and its maps are keyed by strings, each given
+    once. A string is UTF-8.
   - Any of msgpack's forms of a type is that type: an int of any size,
     signed or not, a float of 32 or 64 bits, a string, an array or a map
     of any length.

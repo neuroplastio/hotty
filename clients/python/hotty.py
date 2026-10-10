@@ -671,8 +671,8 @@ def unpack(data):
     array a list, str a str, bin bytes, a timestamp (extension -1) a
     Timestamp, and any other extension None. ValueError when data is not
     one value, or nests more than MAX_DEPTH deep, or holds what no host
-    sends (SPEC.md §3.3): a nil, a key that is not a str, a str that is not
-    UTF-8, an int further than MAX_INT from zero, or a timestamp msgpack
+    sends (SPEC.md §3.3): a nil, a key that is not a str or is given twice
+    in one map, a str that is not UTF-8, an int further than MAX_INT from zero, or a timestamp msgpack
     does not define."""
     data = memoryview(data)
     v, i = _unpack(data, 0, 0)
@@ -743,6 +743,8 @@ def _unpack(m, i, depth):
         if i < len(m) and not (0xA0 <= m[i] <= 0xBF or 0xD9 <= m[i] <= 0xDB):
             raise ValueError("msgpack: a map key that is not a str")
         k, i = _unpack(m, i, depth + 1)
+        if k in out:
+            raise ValueError("msgpack: a key given twice")
         out[k], i = _unpack(m, i, depth + 1)
     return out, i
 

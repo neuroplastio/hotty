@@ -427,7 +427,8 @@ field as its type.
   and a few hundred levels crash it.
 - Nor does a body that holds, anywhere in it, a field the SDK knows or
   not, what SPEC.md §3.3 has no host send: a nil, a map key that is not a
-  string, a string that is not UTF-8, an int further than 2^53 − 1 from
+  string, a key given twice in one map (keys compared as the strings they
+  are, whatever their form), a string that is not UTF-8, an int further than 2^53 − 1 from
   zero, or a timestamp of another size, with a second's nanoseconds or
   more, or with seconds further than 2^53 − 1 from 1970. Each is checked
   as the body is read, in every SDK alike, so a body decodes in all of
