@@ -255,7 +255,11 @@ def caps_view(c, want):
 def match(got, want, path):
     for k, w in want.items():
         g = got.get(k)
-        if isinstance(w, dict) and isinstance(g, dict):
+        if k == "areas" and path.endswith(".view"):
+            # Compared whole (conformance/README.md, Decode).
+            if g != w:
+                return False, f"{path}.{k} = {g!r}, want {w!r}"
+        elif isinstance(w, dict) and isinstance(g, dict):
             ok, why = match(g, w, f"{path}.{k}")
             if not ok:
                 return ok, why

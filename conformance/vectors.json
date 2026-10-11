@@ -12037,6 +12037,99 @@
    ]
   },
   {
+   "name": "a view's area that lacks a field leaves its element out; with no in, no element is in view, and with no end, the end is not shown",
+   "requires": [
+    "event.view"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ev:s=g:e=view:t=;gqJpboKhYYOhYwChcgChdwShYoShYwChcgGhdwShaAGjZW5kwg==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=view:t=;gaNlbmTD\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=view:t=;gA==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "in": {
+      "a": {
+       "c": 0,
+       "r": 0,
+       "w": 4
+      },
+      "b": {
+       "c": 0,
+       "r": 1,
+       "w": 4,
+       "h": 1
+      }
+     },
+     "end": false
+    },
+    {
+     "end": true
+    },
+    {}
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "view",
+      "t": ""
+     },
+     "event": {
+      "kind": "view",
+      "view": {
+       "areas": {
+        "b": {
+         "c": 0,
+         "r": 1,
+         "w": 4,
+         "h": 1
+        }
+       },
+       "at_end": false
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "view",
+      "t": ""
+     },
+     "event": {
+      "kind": "view",
+      "view": {
+       "areas": {},
+       "at_end": true
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "view",
+      "t": ""
+     },
+     "event": {
+      "kind": "view",
+      "view": {
+       "areas": {},
+       "at_end": false
+      }
+     }
+    }
+   ]
+  },
+  {
    "name": "an event of a kind the program does not know is an event all the same",
    "seqs": [
     "\u001b]7279;a=ev:s=f:e=zoom:t=map;gaF6Ag==\u001b\\"

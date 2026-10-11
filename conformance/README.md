@@ -224,7 +224,9 @@ in order:
   with `w` and `h`. `null`: the reply carries none, as when its body does
   not decode.
 
-Only the keys listed are checked. Numbers compare as numbers.
+Only the keys listed are checked, but `view`'s `areas`, which is compared
+whole: the same ids, each with the same area. Numbers compare as
+numbers.
 
 A host's body in the sequences is msgpack in base64, which no one reads,
 so `bodies` shows them as JSON (Numbers, above), one for each sequence:
