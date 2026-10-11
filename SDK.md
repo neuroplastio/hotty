@@ -1,6 +1,6 @@
 # HOTTY SDKs
 
-    Version:  0.1, with SPEC.md 0.1
+    Version:  0.2, with SPEC.md 0.2
     Status:   Draft. It changes with SPEC.md (§15 there).
     Licence:  CC BY 4.0
 
@@ -731,7 +731,9 @@ Go: `hottytest.Host`.
   (SPEC.md §4), and every command after.
 - **The host.** It keeps every surface's document with the delta operations
   and the morph of SPEC.md §6, answers as SPEC.md §3.6 has hosts do, and
-  passes the host vectors' `send`, `inspect` and `key` steps. It lays
+  passes the host vectors' `send`, `inspect` and `key` steps. It speaks
+  the SDK's `Version` only: it answers a query that lists it with its
+  capabilities, and any other with `EVERSION` (SPEC.md §4). It lays
   nothing out: `r=auto` gets an estimate the test may replace, and it does
   not report `scroll`, so a key bound to a scroll action goes on as if its
   keymap did not bind it (SPEC.md §10.2). Nor can it measure where in an
@@ -931,3 +933,37 @@ In the vectors, every name is in snake case: `place_at`, `keep_cursor`,
 - **Why presentation is out.** HOTTY carries any HTML. How one program
   presents its content is that program's choice, and an SDK that builds
   documents would make it for every program, in each language differently.
+
+## Appendix C. Moving from 0.1
+
+Informative. HOTTY 0.2 broke 0.1 (SPEC.md §15): a host's bodies are msgpack
+(§3.9), and a query lists the versions the program speaks (§3.8). A program
+ported by renaming what no longer compiles can still be wrong. These are the
+mistakes ports made:
+
+- **A link is `Link`, not a field.** A 0.1 SDK that read any detail as a
+  map of strings let a program find a clicked link's href among the fields.
+  In 0.2, `Fields` holds a submit's fields and nothing else, and a click on a
+  link carries `Link` (`href`, and `url`). Code that still looks in `Fields`
+  compiles, and every link click goes nowhere.
+- **Read the event's fields, never its detail.** A detail is msgpack: code
+  that parses it as JSON, as 0.1's bodies were, reads nothing, and every
+  field it fills is zero (a box always unchecked). `Value`, `Checked`,
+  `Fields`, `Link`, `Size`, `FitRows`, `Drag`, `Hover` and `Area` are the
+  detail, read by the event's kind. The detail's bytes are for a relay to
+  pass on.
+- **A fake host answers in 0.2.** A test that plays the host must answer a
+  query that lists `0.2` with msgpack capabilities whose `v` is `"0.2"`.
+  Anything else, a 0.1 test's JSON capabilities among it, is no host to the
+  Detector, and the program under test draws in cells. An SDK's test host
+  (§4.4) writes such a reply.
+- **The capabilities come whole or not at all.** A reply whose body does not
+  decode, or names another version, gives no capabilities, not empty ones:
+  a program that took any reply for a host now falls back.
+- **An error answering the query is detection's.** The SDK layer swallows
+  it, as it swallows the DA1 behind it. A program that logged replies sees
+  no error from a host of another version.
+- **What a host sends is typed.** A host writes each field as its type: a
+  float as a float even when whole (`scale: 2.0`, a resize's `w` and `h`),
+  never a nil, and answers a query by its versions (`EVERSION`).
+

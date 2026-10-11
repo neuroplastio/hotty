@@ -46,8 +46,10 @@ HOTTY is designed around four constraints:
 
 ## Status
 
-**Version 0.1, a draft.** Versions 0.x may change incompatibly (§15 of the
-[spec](SPEC.md)). Two implementations that share no code pass the conformance
+**Version 0.2, a draft.** Versions 0.x may change incompatibly (§15 of the
+[spec](SPEC.md)), and 0.2 breaks 0.1: a host's bodies are msgpack, and a
+query lists the versions the program speaks. [`CHANGES.md`](CHANGES.md) says
+what changed and how to port. Two implementations that share no code pass the conformance
 vectors: [hotty-blitz](https://github.com/neuroplastio/hotty-blitz), a renderer
 with a C ABI and a polyfill for terminals that show images, and
 [xterm-addon-hotty](https://github.com/neuroplastio/xterm-addon-hotty), for
@@ -91,6 +93,7 @@ browser through xterm-addon-hotty or natively in hottyterm.
 | --- | --- |
 | [`SPEC.md`](SPEC.md) | the protocol |
 | [`SDK.md`](SDK.md) | what a library that speaks HOTTY for programs provides, in any language: its components, options, defaults and names |
+| [`CHANGES.md`](CHANGES.md) | what each version changed, and how to port to it |
 | [`conformance/`](conformance/) | the conformance vectors: what a host and an SDK must do, as data |
 | [`corpus/`](corpus/) | pages that exercise the HTML and CSS a surface is expected to handle |
 | [`examples/`](examples/) | programs that speak HOTTY: a card, a dashboard, a form, a large grid, a game |
