@@ -51,6 +51,7 @@ EVENT_BLUR = "blur"
 EVENT_RESIZE = "resize"
 EVENT_FIT = "fit"
 EVENT_HOVER = "hover"
+EVENT_VIEW = "view"
 EVENT_DRAG_START = "dragstart"
 EVENT_DRAG = "drag"
 EVENT_DRAG_END = "dragend"
@@ -63,7 +64,7 @@ EQUOTA = "EQUOTA"
 EBUDGET = "EBUDGET"
 EVERSION = "EVERSION"
 
-OPS = ("morph", "inner", "replace", "append", "prepend", "before", "after", "remove", "attr", "unattr", "text", "var")
+OPS = ("morph", "inner", "replace", "append", "prepend", "before", "after", "remove", "attr", "unattr", "text", "var", "reveal")
 
 REPLY_ALWAYS = 0
 REPLY_ON_ERROR = 1
@@ -296,6 +297,12 @@ def morph_to(surface, target, html, n=None, q=None):
     return delta(surface, "morph", target, "", html, n, q)
 
 
+def reveal(surface, target, where="", n=None, q=None):
+    """Scrolls the target into view (SPEC §6.1): where is "start" or "end",
+    or empty for as little as brings it into view."""
+    return delta(surface, "reveal", target, "", where, n, q)
+
+
 def res(id, mime, data, n=None, q=None):
     """Sends a resource that documents refer to as cid:<id> (SPEC §7.1)."""
     return _command([("a", "res"), ("id", id), ("type", mime)], data, NO_REPLY, n, q)
@@ -450,6 +457,15 @@ class Area:
     h: int
 
 
+@dataclass
+class View:
+    """The elements in view by id, with their cells, and whether the
+    document shows its end (SPEC §9.5)."""
+
+    areas: dict = field(default_factory=dict)
+    at_end: bool = False
+
+
 # The types of a body's fields (SPEC §3.3): a type's name, a list of one
 # type (an array of it), or a dict: a map's fields by name, or under "*" the
 # type of each value of a map keyed by strings. A field not named is not
@@ -512,6 +528,7 @@ _DETAIL = {
     EVENT_DRAG: _DRAG,
     EVENT_DRAG_END: _DRAG,
     EVENT_HOVER: {"c": "int", "r": "int", "out": "bool"},
+    EVENT_VIEW: {"in": {"*": _AREA}, "end": "bool"},
 }
 
 
@@ -584,6 +601,17 @@ class Event:
             return None
         return Hover(c, r)
 
+    def view(self):
+        """What a view reports: an element whose area lacks a field is left
+        out."""
+        if self.kind != EVENT_VIEW or self._body is None:
+            return None
+        areas = {}
+        for id, a in self._d.get("in", {}).items():
+            if all(k in a for k in "crwh"):
+                areas[id] = Area(a["c"], a["r"], a["w"], a["h"])
+        return View(areas, self._d.get("end", False))
+
 
 class Caps:
     """What a host says about itself (SPEC §4), from a body whose fields
@@ -623,6 +651,10 @@ class Caps:
     def hovers(self):
         """Whether the host lists hover: a host that lists no kinds does not."""
         return EVENT_HOVER in self.events
+
+    def views(self):
+        """Whether the host lists view: a host that lists no kinds does not."""
+        return EVENT_VIEW in self.events
 
     def light(self):
         return self.scheme == "light"
@@ -1691,6 +1723,9 @@ class Hotty:
 
     def attr(self, surface, target, name, value):
         self.write(set_attr(surface, target, name, value))
+
+    def reveal(self, surface, target, where=""):
+        self.write(reveal(surface, target, where))
 
     def res(self, name, mime, data, quiet=NO_REPLY):
         self.write(res(name, mime, data, q=quiet))

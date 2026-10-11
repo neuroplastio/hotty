@@ -480,7 +480,9 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
     still move that way. Where none can, it goes on outward, and past the
     root to the terminal, as if over the cells beneath (§9), unless CSS
     `overscroll-behavior` stops it there.
-  - Scrolling is local: the program hears nothing of it. A delta keeps the
+  - Scrolling is local: the program hears of it only where it asks, which
+    elements are in view (§9.5), and moves it only by focus (§10.1) or by
+    bringing an element into view (`reveal`, §6.1). A delta keeps the
     offsets (§6.2), and a new document starts at the top left.
 - When the cell size changes, the rectangle keeps its cells and changes
   its pixels:
@@ -610,6 +612,7 @@ Deltas change one surface's document, addressing elements by id.
 | `unattr` | none | remove the target's attribute `k` |
 | `text` | UTF-8 text | replace the target's children with one text node |
 | `var` | a value | set the custom property `--k` on the target (a `k` that already starts with `--` is used as is) |
+| `reveal` | `start`, `end`, or none | scroll the target into view (below) |
 
 - **Missing arguments:** `t` is required except for `morph`, and `k` for
   `attr`, `unattr` and `var`. A missing one is `EINVAL`, and an unknown op is
@@ -620,6 +623,17 @@ Deltas change one surface's document, addressing elements by id.
   parse as they would in place.
 - **The cheap path:** `var` and `text` are the deltas that change every
   frame (a bar's width, a clock). A host **SHOULD** make them cheap.
+- **Reveal** changes no node. It scrolls each box that holds the target,
+  the innermost first and the document's root last, so that the target's
+  border box is in view: its top at the top of each box with `start`, its
+  bottom at the bottom with `end`, and with no payload, by as little as
+  brings it into view, as a browser's `scrollIntoView` does with
+  `block: "nearest"`. Across, it always scrolls as little as it can. It
+  scrolls only what scrolls (§5.3): in a document that asked for no
+  scrolling, it moves nothing. It moves neither focus nor the keyboard
+  (§10), and sends no event of its own: elements that report whether they
+  are in view report it as after any scroll (§9.5). Another payload is
+  `EINVAL`.
 
 ### 6.2 Morph
 
@@ -856,21 +870,22 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `resize` | the surface's size in CSS pixels changed without its cells changing: the terminal's font changed (§5.3); `t` is empty | `{"w": float, "h": float}` in CSS pixels |
 | `fit` | on a placement made with `f=1` (§5.2), the rows the document needs at the placement's width changed; `t` is empty | `{"r": int}`: the rows `r=auto` would choose now |
 | `hover` | on a placement made with `v=1` (§5.2), the element the pointer is over changed, or the pointer left the window (§9.4) | `{"c": int, "r": int}`: the pointer's cell (§9.1); `{"out": bool}`, `true`, when it left, with `t` empty |
+| `view` | which elements with `data-on~=view` are in view, or where they are, changed, or whether the document shows its end (§9.5); `t` is empty | `{"in": {str: area}, "end": bool}`: each element in view by its id, with its cells (below) |
 
 - **The element that reports** a `click` is the nearest one, from the target
   of the click outward, that is one of those kinds. If it has no `id`,
   nothing is reported: the id is the program's handle. A link is the
   exception: its `href` is the handle, and `t` is then empty.
-- **Where the element is.** A `click`'s and a `press`'s `area` is
-  `{"c": int, "r": int, "w": int, "h": int}`: the cells the element's border box
-  covers as the user sees it, scrolled (§5.3) included. `c` and `r` are the
-  first column and row it touches, counted from 0 at the surface's top left
-  cell as a drag's are (§9.1), and `w` and `h` the columns and rows it
-  spans. An element partly clipped or scrolled away reports its whole
-  area, so `c` and `r` may be negative or past the surface. A click from
-  the keyboard carries it too. A program places what belongs next to the
-  element by it, as a browser places a select's list or a menu by its
-  control.
+- **Where the element is.** A `click`'s and a `press`'s `area`, and each
+  of a `view`'s, is `{"c": int, "r": int, "w": int, "h": int}`: the cells
+  the element's border box covers as the user sees it, scrolled (§5.3)
+  included. `c` and `r` are the first column and row it touches, counted
+  from 0 at the surface's top left cell as a drag's are (§9.1), and `w` and
+  `h` the columns and rows it spans. An element partly clipped or scrolled
+  away reports its whole area, so `c` and `r` may be negative or past the
+  surface. A click from the keyboard carries it too. A program places what
+  belongs next to the element by it, as a browser places a select's list
+  or a menu by its control.
 - **A press** is reported whatever it lands on: a control, an element with
   a handler, plain text, or empty space. `t` is the id of the nearest
   element that has one, from the pressed element outward, and empty if
@@ -1183,6 +1198,41 @@ program draws itself, such as cells it lit while the pointer was over them.
   never hears that the pointer has left for a surface, and does not keep a
   state of its own that waits for it: it clears it on the next thing it
   hears instead, a key or a press.
+
+### 9.5 View
+
+Scrolling is local (§5.3). A program that marks elements with
+`data-on~=view` hears which of them are in view, as a browser's
+`IntersectionObserver` tells a page: to mark the section a reader is in, as
+a table of contents does, or to fetch what comes into view.
+
+- **In view.** An element with `view` in its `data-on` and an `id` is in
+  view while some of its border box is shown: inside the window (§5.2), and
+  neither scrolled away nor clipped by a box that holds it (§5.3). One that
+  is not rendered (`display: none`, `visibility: hidden`) is not in view,
+  and one without an `id` is never reported.
+- **The event.** `view`, with `t` empty, carries `{"in": {str: area},
+  "end": bool}`: each element in view, by its id, with its area as a
+  click's (§9), the whole of it however little is shown; and `end`,
+  `true` when the document's root is scrolled as far down as it goes, as
+  a root that does not scroll down always is. It names every element in
+  view, not what changed.
+- **When.** A host sends `view` once the document is laid out in a
+  placement, and then each time what it would carry changes: an element
+  comes into view or leaves it, an area changes, or `end` does. A scroll
+  changes the areas as it moves, so while one moves, a gesture with its
+  momentum or a smooth scroll, the host waits for it to come to rest and
+  sends one `view` then. Otherwise it sends at most one per surface per
+  frame it draws, with the layout drawn in it. A document with no element
+  that asks sends none.
+- **Lifetime.** It belongs to the placement, as `fit` does (§5.2): a
+  placement the host does not draw, scrolled out of view (§5.4), hears of
+  a change once it is drawn again; hiding the surface stops it; placing it
+  again sends one as the first. A new document sends one once it is laid
+  out. A detached surface sends none (§5.5).
+- **Detection.** `view` in `events` (§4). Where it is absent, a program
+  that needs to know what is shown draws that part in cells, or takes the
+  element it last brought into view (`reveal`, §6.1) as the one shown.
 
 ## 10. Keyboard and focus
 
@@ -1681,13 +1731,15 @@ A host conforms to HOTTY version 0.2 when:
 
 The vectors check replies, error codes, every delta op, morph, context
 parsing, resources, drags and their steps, presses with Alt, `fit`, hover,
-`area`, scrolling, keymaps and the envelope, and their `keys`, `keymap` and
-`edit` sections a host's key names (§10.4), keymaps and actions (§10.2).
+`area`, scrolling, `reveal` and `view`, keymaps and the envelope, and their
+`keys`, `keymap` and `edit` sections a host's key names (§10.4), keymaps
+and actions (§10.2).
 They inspect documents and events, not pixels.
 The vectors marked `"passthrough"` apply to a host that reports it (§9.3),
 those marked `"hover"` to a host whose `events` list it (§9.4), those
-marked `"scroll"` to a host that reports it (§5.3), and those marked
-`"steps"` to a host that reports it (§9.1).
+marked `"scroll"` to a host that reports it (§5.3), those marked
+`"steps"` to a host that reports it (§9.1), and those marked `"view"` to
+a host whose `events` list it (§9.5).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
@@ -2078,6 +2130,21 @@ program → CSI ? 2026 l
   - **Never the terminal:** a key that reached an end and went on to
     scroll the screen would move what the program drew around the
     surface.
+- **Why `reveal` and `view`.** Scrolling is local (§5.3), so a program
+  could neither follow the reader nor take them somewhere: a table of
+  contents beside a document marks the section in view and jumps to one
+  on a click, and a long list fetches what comes into view.
+  - **Elements opt in,** as they do for clicks: most documents scroll
+    with nothing to tell, and a report on every scroll would fill the
+    program's input as unasked replies would (§3.5). So the host also
+    waits for a scroll to rest.
+  - **Every element in view, with its whole area,** so the program keeps
+    no state of its own to follow changes, and places what it draws by an
+    element as it does by a clicked one (`area`).
+  - **`reveal` moves no focus.** Focus already scrolls (§10.1), and taking
+    it would move the keyboard from where the user is. Its payload names
+    the alignments a reader needs, those of `scrollIntoView`; across,
+    where nothing is read in order, as little as it can.
 
 ## Appendix C. Prior art
 

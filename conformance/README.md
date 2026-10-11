@@ -48,7 +48,8 @@ to a host that has what it names, and others skip it: `"passthrough"`, a
 host that reports `passthrough` (SPEC §4, §9.3); `"hover"`, a host that
 lists `hover` in `events` (§9.4); `"scroll"`, a host that reports `scroll`
 (§4, §5.3); `"touch"`, a host that takes touch (SPEC §9.1, §16); `"steps"`, a
-host that reports `steps` (§4, §9.1). A list names several, all required.
+host that reports `steps` (§4, §9.1); `"view"`, a host that lists `view` in
+`events` (§9.5). A list names several, all required.
 Its steps come in five kinds.
 
 **Send** `{ "send": {control}, "payload": text?, "reply": …, "events": … }`:
@@ -174,6 +175,9 @@ implements, and skips the rest:
 | `caps.passthrough`, `caps.version`, `caps.scroll` | those fields of `Caps` |
 | `doc.scroll` | `Doc`'s `Scroll` option (`scroll=<axes>`) |
 | `event.area` | `Event.Area` |
+| `event.view` | `Event.View` |
+| `caps.views` | `Caps`'s `Views` |
+| `reveal` | the `Reveal` builder |
 | `caps.drag-kinds` | `Sends` answers for `dragstart` and `dragend` as for `drag` (SPEC §4) |
 | `options.unordered` | a `q` given wins over the `q` that `n` implies, whatever their order |
 | `decode.abort-count` | a malformed message that aborts a chunked one counts twice (SPEC §3.7) |
@@ -214,11 +218,11 @@ in order:
 - `event`: `Event`'s fields and accessors (`surface`, `kind`, `target`,
   `value`, `checked`, `fields`, `link` with `href` and `url`, `size` with
   `w` and `h`, `fit_rows`, `drag` with `c`, `r` and `keys`, `hover` with
-  `c`, `r` and `out`);
+  `c`, `r` and `out`, `view` with `areas` and `at_end`);
 - `caps`: `Caps`'s fields, and its answers: `supports` and `sends` map an
-  argument to the answer, `drags`, `hovers`, `light`, `cell_css` with `w`
-  and `h`. `null`: the reply carries none, as when its body does not
-  decode.
+  argument to the answer, `drags`, `hovers`, `views`, `light`, `cell_css`
+  with `w` and `h`. `null`: the reply carries none, as when its body does
+  not decode.
 
 Only the keys listed are checked. Numbers compare as numbers.
 

@@ -182,12 +182,13 @@ An SDK **MUST** provide every component of this section.
 
 And these sets, each value under its canonical name:
 - **event kinds**: `click`, `change`, `input`, `submit`, `press`, `focus`,
-  `blur`, `resize`, `fit`, `hover`, `dragstart`, `drag`, `dragend`
+  `blur`, `resize`, `fit`, `hover`, `view`, `dragstart`, `drag`, `dragend`
   (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
   `EBUDGET`, `EVERSION` (SPEC.md §3.6);
 - **delta ops**: `morph`, `inner`, `replace`, `append`, `prepend`, `before`,
-  `after`, `remove`, `attr`, `unattr`, `text`, `var` (SPEC.md §6.1);
+  `after`, `remove`, `attr`, `unattr`, `text`, `var`, `reveal` (SPEC.md
+  §6.1);
 - **quiet levels**: `ReplyAlways` 0, `ReplyOnError` 1, `NoReply` 2
   (SPEC.md §3.5).
 
@@ -243,6 +244,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | `SetAttr` | `Delta` with `op=attr`, `k` the name | surface, target, name, value | 2 |
 | `RemoveAttr` | `Delta` with `op=unattr`, `k` the name, no payload | surface, target, name | 2 |
 | `MorphTo` | `Delta` with `op=morph` | surface, target, html | 2 |
+| `Reveal` | `Delta` with `op=reveal`, the payload `where`: `start`, `end`, or empty for the nearest (SPEC.md §6.1) | surface, target, where | 2 |
 | `Res` | `a=res:id:type` and the data | id, mime, data | 2 |
 | `DelRes` | `a=del:id` | id | 2 |
 | `Del` | `a=del:s` | surface | 2 |
@@ -470,6 +472,7 @@ carries, each absent when the event does not carry it:
 | `Drag` | `c`, `r` and `keys`, and the steps `x` and `y`, each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover` | `c` and `r`, or `out` | `hover` |
 | `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press` |
+| `View` | `Areas`, from `in`: each id in view to its cells as `Area` holds them; and `AtEnd`, from `end` (SPEC.md §9.5) | `view` |
 
 The detail is read by the event's kind, so a form field named `value` is in
 `Fields` and nowhere else. An event of a kind the SDK does not know carries
@@ -483,9 +486,10 @@ none of these, and its payload is in its message.
 - `Sends(kind)`: whether the host sends `kind`; `drag` stands for the three
   drag kinds (SPEC.md §4); a host that lists no events is taken to send
   them all;
-- `Drags` and `Hovers`: whether `drag` and `hover` are in `events`. A host
-  that lists no events is taken to send neither, since both came after the
-  first hosts: a program offers another way to do what they do;
+- `Drags`, `Hovers` and `Views`: whether `drag`, `hover` and `view` are in
+  `events`. A host that lists no events is taken to send none of them,
+  since they came after the first hosts: a program offers another way to
+  do what they do;
 - `Light`: the scheme is `light`;
 - `CellCSS`: a cell's size in CSS pixels, `Cell` divided by `Scale` (1
   when absent), and a usual 9 × 18 when the host gave no cell.
@@ -872,7 +876,7 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Doc` | `Doc` | `doc` | `doc` | `doc` | `doc` |
 | `Place`, `PlaceAt` | `Place`, `PlaceAt` | `place`, `place_at` | `place`, `place_at` | `place`, `place_at` | `place`, `placeAt` |
 | `Hide`, `Delta` | `Hide`, `Delta` | `hide`, `delta` | `hide`, `delta` | `hide`, `delta` | `hide`, `delta` |
-| `SetText`, `SetVar`, `SetAttr`, `RemoveAttr`, `MorphTo` | the same | `set_text`, `set_var`, `set_attr`, `remove_attr`, `morph_to` | as Python | as Python | `setText`, `setVar`, `setAttr`, `removeAttr`, `morphTo` |
+| `SetText`, `SetVar`, `SetAttr`, `RemoveAttr`, `MorphTo`, `Reveal` | the same | `set_text`, `set_var`, `set_attr`, `remove_attr`, `morph_to`, `reveal` | as Python | as Python | `setText`, `setVar`, `setAttr`, `removeAttr`, `morphTo`, `reveal` |
 | `Res`, `DelRes` | `Res`, `DelRes` | `res`, `del_res` | `res`, `del_res` | `res`, `del_res` | `res`, `delRes` |
 | `Del`, `DelAll` | `Del`, `DelAll` | `delete`, `del_all` | `del`, `del_all` | `del`, `del_all` | `del`, `delAll` |
 | `Detach`, `Focus`, `Blur`, `Sync` | the same | `detach`, `focus`, `blur`, `sync` | as Python | as Python | `detach`, `focus`, `blur`, `sync` |
@@ -886,7 +890,7 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |
 | `FitRows`, `CellCSS` | `FitRows`, `CellCSS` | `fit_rows`, `cell_css` | as Python | as Python | `fitRows`, `cellCss` |
 | a message as a `Reply` or an `Event`, `Err` | `hotty.ReplyOf(m)`, `hotty.EventOf(m)`, `hotty.Err(r)` | `m.reply()`, `m.event()`, `r.err()` | `m:reply()`, `m:event()`, `r:err()` | methods | `m.reply()`, `m.event()`, `r.err()` |
-| `Supports`, `Sends`, `Drags`, `Hovers`, `Light`, `CellCSS` | `hotty.Supports(c, op)`, …, `hotty.CellCSS(c)` | `c.supports(op)`, … | `c:supports(op)`, … | methods | `c.supports(op)`, … |
+| `Supports`, `Sends`, `Drags`, `Hovers`, `Views`, `Light`, `CellCSS` | `hotty.Supports(c, op)`, …, `hotty.CellCSS(c)` | `c.supports(op)`, … | `c:supports(op)`, … | methods | `c.supports(op)`, … |
 | a control's `get` and `with` | `hotty.Get(ctl, k)`, `hotty.With(ctl, k, v)` | the SDK's own | the SDK's own | the SDK's own | the SDK's own |
 | `ParseKey`, `DecodeKeys` | `hotty.ParseKey`, `hotty.DecodeKeys` | `parse_key`, `decode_keys` | as Python | as Python | `parseKey`, `decodeKeys` |
 | `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Program`, `Scroll`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Program`, `.Scroll`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.program`, `.scroll`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:program`, `:scroll`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.program`, `.scroll`, `.format` |

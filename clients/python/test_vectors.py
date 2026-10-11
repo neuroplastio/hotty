@@ -24,6 +24,9 @@ FEATURES = {
     "options.unordered",
     "doc.scroll",
     "event.area",
+    "event.view",
+    "caps.views",
+    "reveal",
     "caps.scroll",
     "decode.abort-count",
     "decode.unterminated",
@@ -122,6 +125,7 @@ def build(b):
         "set_attr": lambda: hotty.set_attr(a["surface"], a["target"], a["name"], a["value"], **ro),
         "remove_attr": lambda: hotty.remove_attr(a["surface"], a["target"], a["name"], **ro),
         "morph_to": lambda: hotty.morph_to(a["surface"], a["target"], a["html"], **ro),
+        "reveal": lambda: hotty.reveal(a["surface"], a["target"], a.get("where", ""), **ro),
         "res": lambda: hotty.res(a["id"], a["mime"], a["data"], **ro),
         "del_res": lambda: hotty.del_res(a["id"], **ro),
         "del": lambda: hotty.delete(a["surface"], **ro),
@@ -199,6 +203,7 @@ def event_view(e):
     drag = e.drag()
     hover = e.hover()
     area = e.area()
+    view = e.view()
     return {
         "surface": e.surface,
         "kind": e.kind,
@@ -212,6 +217,12 @@ def event_view(e):
         "drag": {"c": drag.c, "r": drag.r, "keys": drag.keys, "x": drag.x, "y": drag.y} if drag else None,
         "hover": {"c": hover.c, "r": hover.r, "out": hover.out} if hover else None,
         "area": {"c": area.c, "r": area.r, "w": area.w, "h": area.h} if area else None,
+        "view": {
+            "areas": {k: {"c": a.c, "r": a.r, "w": a.w, "h": a.h} for k, a in view.areas.items()},
+            "at_end": view.at_end,
+        }
+        if view
+        else None,
     }
 
 
@@ -232,6 +243,7 @@ def caps_view(c, want):
         "version": c.version,
         "drags": c.drags(),
         "hovers": c.hovers(),
+        "views": c.views(),
         "light": c.light(),
         "cell_css": dict(zip("wh", c.cell_css())),
     }

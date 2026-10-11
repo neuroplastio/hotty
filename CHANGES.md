@@ -27,6 +27,24 @@ a70065f and with xterm-addon-hotty 0.1.0-next.8.
   speaks. A 0.1 program on a 0.2 host, and a 0.2 program on a 0.1 host,
   each find no host and draw in cells.
 
+### Added within 0.2
+
+What follows came after the first 0.2 hosts, and keeps the version: a host
+that lacks it says so in its capabilities.
+
+- **`reveal`** (SPEC.md §6.1), a delta that scrolls an element into view:
+  its top to the top with `start`, its bottom to the bottom with `end`,
+  and by as little as it takes with neither. It moves no focus. A program
+  asks `Supports(c, "reveal")`.
+- **`view`** (SPEC.md §9.5), an event: the elements with `data-on~=view`
+  and an id that are in view, each with its area, and whether the
+  document shows its end. A host sends it once the document is laid out,
+  then on each change, once a scroll comes to rest. A program asks
+  `Views(c)`.
+
+Each SDK has the builder `Reveal`, the event's `View` (`Areas` and `AtEnd`,
+from `in` and `end`), and `Views`.
+
 ### Porting
 
 A port that compiles can still be wrong. SDK.md Appendix C lists what ports

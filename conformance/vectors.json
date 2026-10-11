@@ -330,6 +330,83 @@
    ]
   },
   {
+   "name": "reveal: a missing target is ENOTARGET with the id as detail, and a payload other than start, end or none is EINVAL; a surface not placed scrolls nothing and answers ok (SPEC \u00a76.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=a>a</p>"
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "nope"
+     },
+     "reply": {
+      "a": "err",
+      "code": "ENOTARGET",
+      "detail": "nope"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "a"
+     },
+     "payload": "middle",
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "a"
+     },
+     "payload": "START",
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "a"
+     },
+     "payload": "start",
+     "reply": {
+      "a": "ok",
+      "re": "delta"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "a"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "delta"
+     }
+    }
+   ]
+  },
+  {
    "name": "q=1 answers only errors; q=2 never answers",
    "steps": [
     {
@@ -4579,6 +4656,320 @@
    ]
   },
   {
+   "name": "view: once placed, a document hears which of its elements with data-on~=view and an id are in view, each by its id with its whole area, and whether it shows its end; then only what changes; hiding stops it, placing again sends one first, and a new document with none that asks sends none (SPEC \u00a79.5)",
+   "requires": "view",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=a data-on=view>a</div><div id=b>b</div><div data-on=view>c</div><div id=d data-on=view>d</div><div id=e data-on=view style=display:none>e</div><div id=f data-on=view>f</div>",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "a": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         },
+         "d": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "text",
+      "t": "a",
+      "q": "2"
+     },
+     "payload": "A",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "remove",
+      "t": "b",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "a": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         },
+         "d": {
+          "c": 0,
+          "r": 2,
+          "w": 4,
+          "h": 1
+         },
+         "f": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "unattr",
+      "t": "e",
+      "k": "style",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "a": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         },
+         "d": {
+          "c": 0,
+          "r": 2,
+          "w": 4,
+          "h": 1
+         },
+         "e": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "hide",
+      "s": "x",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "remove",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "d": {
+          "c": 0,
+          "r": 1,
+          "w": 4,
+          "h": 1
+         },
+         "e": {
+          "c": 0,
+          "r": 2,
+          "w": 4,
+          "h": 1
+         },
+         "f": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=a>a</div>",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=b>b</div><div id=z data-on=\"click view\">z</div>",
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "z": {
+          "c": 0,
+          "r": 1,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "an element is in view while some of it is shown in the placement's window, and its area is the whole of it, counted from the surface's top left cell (SPEC \u00a79.5)",
+   "requires": "view",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#t{height:calc(3*var(--hotty-cell-h))}</style><div id=a data-on=view>a</div><div id=b data-on=view>b</div><div id=t data-on=view>t</div><div id=z data-on=view>z</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "6",
+      "y": "1",
+      "h": "2",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "b": {
+          "c": 0,
+          "r": 1,
+          "w": 4,
+          "h": 1
+         },
+         "t": {
+          "c": 0,
+          "r": 2,
+          "w": 4,
+          "h": 3
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "6",
+      "y": "3",
+      "h": "3",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "t": {
+          "c": 0,
+          "r": 2,
+          "w": 4,
+          "h": 3
+         },
+         "z": {
+          "c": 0,
+          "r": 5,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "click and press report area: the cells the element's border box covers, from the surface's top left cell; a press with no id has none",
    "steps": [
     {
@@ -5939,6 +6330,406 @@
        }
       }
      ]
+    }
+   ]
+  },
+  {
+   "name": "reveal scrolls the target into view: start puts its top at the top, end its bottom at the bottom, and none moves it as little as brings it into view, so not at all when it is in view; view then reports where the elements are, and end once the root is scrolled as far down as it goes (SPEC \u00a76.1, \u00a79.5)",
+   "requires": [
+    "scroll",
+    "view"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=a data-on=view>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e data-on=view>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div><div id=i>i</div><div id=j data-on=view>j</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "a": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "e",
+      "q": "2"
+     },
+     "payload": "start",
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "e": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "e",
+      "q": "2"
+     },
+     "payload": "end",
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "e": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "e",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "j",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "j": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "e",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "e": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "a",
+      "q": "2"
+     },
+     "payload": "start",
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "a": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "reveal scrolls each box that holds the target, the innermost first and the root last; an element a box clips is not in view (SPEC \u00a76.1, \u00a79.5)",
+   "requires": [
+    "scroll",
+    "view"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#box{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}</style><div id=a data-on=view>a</div><div id=b>b</div><div id=c>c</div><div id=box><div id=i1>i1</div><div id=i2>i2</div><div id=i3 data-on=view>i3</div><div id=i4>i4</div></div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "a": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "i3",
+      "q": "2"
+     },
+     "payload": "start",
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "i3": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "a",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "a": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         },
+         "i3": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "i3",
+      "q": "2"
+     },
+     "payload": "end",
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "i3": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "in a document that asked for no scrolling, reveal moves nothing (SPEC \u00a76.1)",
+   "requires": "view",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=a data-on=view>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div><div id=i>i</div><div id=j data-on=view>j</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": "",
+       "detail": {
+        "in": {
+         "a": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "j",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "j",
+      "q": "2"
+     },
+     "payload": "start",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "op": "reveal",
+      "t": "j",
+      "q": "2"
+     },
+     "payload": "end",
+     "events": []
     }
    ]
   },
@@ -9120,6 +9911,57 @@
    ]
   },
   {
+   "name": "reveal is op=reveal, where in the payload: start or end",
+   "requires": [
+    "reveal"
+   ],
+   "build": "reveal",
+   "args": {
+    "surface": "x",
+    "target": "s3",
+    "where": "start"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "delta",
+       "s": "x",
+       "op": "reveal",
+       "t": "s3",
+       "q": "2"
+      },
+      "payload": "start"
+     }
+    }
+   ]
+  },
+  {
+   "name": "reveal with no where sends no payload: as little as brings it into view",
+   "requires": [
+    "reveal"
+   ],
+   "build": "reveal",
+   "args": {
+    "surface": "x",
+    "target": "s3"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "delta",
+       "s": "x",
+       "op": "reveal",
+       "t": "s3",
+       "q": "2"
+      },
+      "payload": ""
+     }
+    }
+   ]
+  },
+  {
    "name": "res carries its id and MIME type",
    "build": "res",
    "args": {
@@ -11020,6 +11862,181 @@
    ]
   },
   {
+   "name": "view carries each element in view by its id, with its area, and whether the document shows its end; another kind's is not read",
+   "requires": [
+    "event.view"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ev:s=g:e=view:t=;gqJpboKiczGEoWMAoXL+oXcooWgFonMyhKFjAKFyA6F3KKFoAqNlbmTC\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=view:t=;gqJpboCjZW5kww==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=click:t=s1;gaRhcmVhhKFjAKFyAKF3BKFoAQ==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "in": {
+      "s1": {
+       "c": 0,
+       "r": -2,
+       "w": 40,
+       "h": 5
+      },
+      "s2": {
+       "c": 0,
+       "r": 3,
+       "w": 40,
+       "h": 2
+      }
+     },
+     "end": false
+    },
+    {
+     "in": {},
+     "end": true
+    },
+    {
+     "area": {
+      "c": 0,
+      "r": 0,
+      "w": 4,
+      "h": 1
+     }
+    }
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "view",
+      "t": ""
+     },
+     "event": {
+      "kind": "view",
+      "target": "",
+      "view": {
+       "areas": {
+        "s1": {
+         "c": 0,
+         "r": -2,
+         "w": 40,
+         "h": 5
+        },
+        "s2": {
+         "c": 0,
+         "r": 3,
+         "w": 40,
+         "h": 2
+        }
+       },
+       "at_end": false
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "view",
+      "t": ""
+     },
+     "event": {
+      "kind": "view",
+      "target": "",
+      "view": {
+       "areas": {},
+       "at_end": true
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "click",
+      "t": "s1"
+     },
+     "event": {
+      "kind": "click",
+      "target": "s1",
+      "view": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "a view with an area that is not one does not decode, and the event stands: a cell sent as a float, or the areas as an array",
+   "requires": [
+    "event.view"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ev:s=g:e=view:t=;gqJpboGiczGEoWMAoXLLP/AAAAAAAAChdwShaAGjZW5kwg==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=view:t=;gqJpbpGEoWMAoXIAoXcEoWgBo2VuZMM=\u001b\\"
+   ],
+   "bodies": [
+    {
+     "in": {
+      "s1": {
+       "c": 0,
+       "r": 1.0,
+       "w": 4,
+       "h": 1
+      }
+     },
+     "end": false
+    },
+    {
+     "in": [
+      {
+       "c": 0,
+       "r": 0,
+       "w": 4,
+       "h": 1
+      }
+     ],
+     "end": true
+    }
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "view",
+      "t": ""
+     },
+     "event": {
+      "kind": "view",
+      "target": "",
+      "view": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "view",
+      "t": ""
+     },
+     "event": {
+      "kind": "view",
+      "target": "",
+      "view": null
+     }
+    }
+   ]
+  },
+  {
    "name": "an event of a kind the program does not know is an event all the same",
    "seqs": [
     "\u001b]7279;a=ev:s=f:e=zoom:t=map;gaF6Ag==\u001b\\"
@@ -11500,6 +12517,63 @@
      "caps": {
       "v": "0.2",
       "scroll": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "view in events: the host reports what is in view; one that lists no events is taken to send view but not to report it",
+   "requires": [
+    "caps.views"
+   ],
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqZldmVudHOSpWNsaWNrpHZpZXc=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMg==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2",
+     "events": [
+      "click",
+      "view"
+     ]
+    },
+    {
+     "v": "0.2"
+    }
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "caps": {
+      "sends": {
+       "view": true,
+       "hover": false
+      },
+      "views": true,
+      "hovers": false
+     }
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "q"
+     },
+     "caps": {
+      "sends": {
+       "view": true
+      },
+      "views": false
      }
     }
    ]
