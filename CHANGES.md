@@ -41,6 +41,11 @@ that lacks it says so in its capabilities.
   document shows its end. A host sends it once the document is laid out,
   then on each change, once a scroll comes to rest. A program asks
   `Views(c)`.
+- **`limits.message`** (SPEC.md §13): a host may limit the decoded size of
+  one reassembled message and reports it under `limits` (§4). Past it a
+  message is malformed (§3.7), not `EQUOTA`; a host that reports none
+  enforces none, and one with a limit accepts at least 1 MiB decoded. A
+  resource is one message, so this limit also caps the largest resource.
 
 Each SDK has the builder `Reveal`, the event's `View` (`Areas` and `AtEnd`,
 from `in` and `end`), and `Views`.

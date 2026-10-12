@@ -198,8 +198,9 @@ into chunks of at most 4096 payload bytes each:
   **MUST** discard that message and process the new one normally.
 - Other output (terminal text, other escape sequences) may appear between
   chunks.
-- A host **MAY** limit the size of a reassembled message. It **SHOULD** accept
-  at least 1 MiB decoded.
+- A host **MAY** limit the size of a reassembled message, decoded: what
+  base64 and zlib leave. It reports a limit it enforces as
+  `limits.message` (§13). It **SHOULD** accept at least 1 MiB decoded.
 
 ### 3.5 Common keys
 
@@ -244,6 +245,7 @@ types. A program that does not want them sends `q=2`.
 A malformed message:
 - a control that does not parse;
 - a payload that is not valid base64 or zlib;
+- a message past the host's limit (§13), which aborts it (§3.4);
 - an aborted chunked message.
 
 Each counts once: a malformed message that arrives before the last chunk of
@@ -326,7 +328,7 @@ The capabilities, the body of that reply, are a map of these fields (§3.3):
 | `cell` | `{"w": int, "h": int}` | the cell size in device pixels |
 | `scale` | float | device pixels per CSS pixel |
 | `scheme` | str | `"dark"` or `"light"`: the terminal's colour scheme |
-| `limits` | `{str: int}` | the host's limits (§13), such as `{"resources": <bytes>, "surfaces": <count>}` |
+| `limits` | `{str: int}` | the host's limits (§13), such as `{"resources": <bytes>, "surfaces": <count>, "message": <bytes>}` |
 | `net` | `{str: [str]}` | the host's network policy (§7.2), from directive to sources, such as `{"img-src": ["https://example.com"]}`. Absent or empty: the host fetches nothing from the network |
 | `passthrough` | bool | `true` when the pointer passes through the parts of a surface that take no pointer (§9.3). Absent: every window takes the pointer wherever it is |
 | `scroll` | bool | `true` when a document can ask to scroll (`scroll`, §5.1, §5.3). Absent: nothing in a surface scrolls |
@@ -717,7 +719,8 @@ stylesheet shared by several surfaces, an image, a font.
   resolved when it arrives. A placement made with `f=1` hears whether that
   changed the document's height (§5.2).
 - **Quota:** the host reports its quota under `limits.resources`. A resource
-  that would exceed it is refused with `EQUOTA`.
+  that would exceed it is refused with `EQUOTA`. A resource is one message,
+  so `limits.message` (§13) also caps the largest resource the host takes.
 - **The program's values stand:** a host that rewrites references in order
   to load them (to `blob:` URLs, say) **MUST** still treat the attribute as
   having the program's value: in morphs, in `inspect` (§16), and in event
@@ -1666,6 +1669,12 @@ A host **MUST** ensure that:
 - A host reports its limits under `limits` (§4) and refuses commands that
   would exceed them with `EQUOTA`. Hidden surfaces (§5.4) count: a program
   that keeps many deletes the ones it needs least.
+- A host reports a message-size limit as `limits.message`: the most bytes it
+  accepts for one reassembled message, decoded: what base64 and zlib leave
+  (§3.4). A host that reports none enforces none; one with a limit accepts
+  at least 1 MiB decoded. A message past the limit is malformed (§3.7), not
+  `EQUOTA`. A resource is one message (§7.1), so this limit also caps how
+  large a resource the host takes.
 - Rendering must not stall the terminal. A host **MAY** abandon a render
   that exceeds its time budget and report `EBUDGET`: pathological CSS such
   as huge blurs, deep nesting, or enormous documents.
