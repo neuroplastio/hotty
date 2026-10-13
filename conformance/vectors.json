@@ -9674,6 +9674,129 @@
      ]
     }
    ]
+  },
+  {
+   "name": "a click that a drag ending where it began reports carries the count as any other: a double click on an element that opts in to drags and clicks is two drags, the second click with count 2 (SPEC \u00a79, \u00a79.1)",
+   "requires": [
+    "count"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{display:block;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w));font-style:normal}</style><i id=row data-on=\"drag click\">row</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "row",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "row",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      },
+      {
+       "e": "click",
+       "s": "x",
+       "t": "row",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "count": 2,
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "row",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "count": 2,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "row",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      },
+      {
+       "e": "click",
+       "s": "x",
+       "t": "row",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        },
+        "count": 2
+       }
+      }
+     ]
+    }
+   ]
   }
  ],
  "wire": [
