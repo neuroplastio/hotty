@@ -480,6 +480,7 @@ carries, each absent when the event does not carry it:
 | `Drag` | `c`, `r` and `keys`, and the steps `x` and `y`, each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover` | `c` and `r`, or `out` | `hover` |
 | `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press` |
+| `Count` | `count`: the click's place in its run of clicks (SPEC.md §9), 2 for the second click of a double click; 1 for a click whose detail has none | `click` |
 | `View` | `Areas`, from `in`: each id in view to its cells as `Area` holds them, leaving out one whose area lacks a field, and none when `in` is absent; and `AtEnd`, from `end`, false when absent (SPEC.md §9.5) | `view` |
 
 The detail is read by the event's kind, so a form field named `value` is in
@@ -488,7 +489,7 @@ none of these, and its payload is in its message.
 
 **`Caps`** (SPEC.md §4) has every field SPEC.md lists: `V`, `Ops`,
 `Events`, `Cell` (`w`, `h`), `Scale`, `Scheme`, `Limits`, `Net`,
-`Passthrough`, `Scroll`, `Steps`, `Host`, `Version`. It also answers:
+`Passthrough`, `Scroll`, `Steps`, `Count`, `Host`, `Version`. It also answers:
 - `Supports(op)`: whether `op` is in `ops`; a host that lists no ops is
   taken to support them all;
 - `Sends(kind)`: whether the host sends `kind`; `drag` stands for the three
@@ -962,7 +963,7 @@ mistakes ports made:
 - **Read the event's fields, never its detail.** A detail is msgpack: code
   that parses it as JSON, as 0.1's bodies were, reads nothing, and every
   field it fills is zero (a box always unchecked). `Value`, `Checked`,
-  `Fields`, `Link`, `Size`, `FitRows`, `Drag`, `Hover` and `Area` are the
+  `Fields`, `Link`, `Size`, `FitRows`, `Drag`, `Hover`, `Area` and `Count` are the
   detail, read by the event's kind. The detail's bytes are for a relay to
   pass on.
 - **A fake host answers in 0.2.** A test that plays the host must answer a

@@ -30,6 +30,7 @@ FEATURES = {
     "caps.scroll",
     "decode.abort-count",
     "decode.max",
+    "event.count",
     "decode.unterminated",
     "scanner.da1",
 }
@@ -218,6 +219,7 @@ def event_view(e):
         "drag": {"c": drag.c, "r": drag.r, "keys": drag.keys, "x": drag.x, "y": drag.y} if drag else None,
         "hover": {"c": hover.c, "r": hover.r, "out": hover.out} if hover else None,
         "area": {"c": area.c, "r": area.r, "w": area.w, "h": area.h} if area else None,
+        "count": e.count(),
         "view": {
             "areas": {k: {"c": a.c, "r": a.r, "w": a.w, "h": a.h} for k, a in view.areas.items()},
             "at_end": view.at_end,
@@ -240,6 +242,7 @@ def caps_view(c, want):
         "passthrough": c.passthrough,
         "scroll": c.scroll,
         "steps": c.steps,
+        "count": c.count,
         "host": c.host,
         "version": c.version,
         "drags": c.drags(),

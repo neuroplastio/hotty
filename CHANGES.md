@@ -50,8 +50,15 @@ that lacks it says so in its capabilities.
   from its host the same way: each SDK's Decoder takes `Max`, 16 MiB by
   default (SDK.md §3.6).
 
+- **A click's `count`** (SPEC.md §9): a click that quickly follows another
+  on the same element carries its place in that run, 2 for the second
+  click of a double click, as the platform counts them by the user's own
+  settings. Every click of a run is reported. A host that counts reports
+  `count: true` in its capabilities.
+
 Each SDK has the builder `Reveal`, the event's `View` (`Areas` and `AtEnd`,
-from `in` and `end`), and `Views`.
+from `in` and `end`), `Views`, the event's `Count`, and the capabilities'
+`Count`.
 
 ### Porting
 

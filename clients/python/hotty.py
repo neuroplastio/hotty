@@ -510,6 +510,7 @@ _CAPS = {
     "passthrough": "bool",
     "scroll": "bool",
     "steps": "bool",
+    "count": "bool",
     "host": "str",
     "version": "str",
 }
@@ -517,7 +518,7 @@ _AREA = {"c": "int", "r": "int", "w": "int", "h": "int"}
 _DRAG = {"c": "int", "r": "int", "keys": ["str"], "x": "int", "y": "int"}
 # Each kind's detail (SPEC §9); a kind not here carries none a program reads.
 _DETAIL = {
-    EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA},
+    EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA, "count": "int"},
     EVENT_PRESS: {"area": _AREA},
     EVENT_CHANGE: {"checked": "bool", "value": "str"},
     EVENT_INPUT: {"value": "str"},
@@ -584,6 +585,13 @@ class Event:
             return None
         return Drag(c, r, list(self._d.get("keys", [])), self._d.get("x"), self._d.get("y"))
 
+    def count(self):
+        """A click's place in its run of clicks (SPEC §9): 2 for the second
+        click of a double click; 1 for a click whose detail has none."""
+        if self.kind != EVENT_CLICK:
+            return None
+        return self._d.get("count") or 1
+
     def area(self):
         """The cells of a click's or a press's element (SPEC §9)."""
         a = self._d.get("area") if self.kind in (EVENT_CLICK, EVENT_PRESS) else None
@@ -631,6 +639,7 @@ class Caps:
         self.passthrough = d.get("passthrough", False)
         self.scroll = d.get("scroll", False)
         self.steps = d.get("steps", False)
+        self.count = d.get("count", False)
         self.host = d.get("host")
         self.version = d.get("version")
 

@@ -337,6 +337,7 @@ The capabilities, the body of that reply, are a map of these fields (§3.3):
 | `passthrough` | bool | `true` when the pointer passes through the parts of a surface that take no pointer (§9.3). Absent: every window takes the pointer wherever it is |
 | `scroll` | bool | `true` when a document can ask to scroll (`scroll`, §5.1, §5.3). Absent: nothing in a surface scrolls |
 | `steps` | bool | `true` when a drag of an element with `data-steps` says where in the element the pointer is (§9.1). Absent: a drag's detail has no `x` or `y` |
+| `count` | bool | `true` when a repeated click carries its `count` (§9). Absent: every click reads as the first of its run, and a program offers another way to do what a double click would |
 | `host` | str | optional: a name for the implementation |
 | `version` | str | optional, with `host`: the implementation's version, as dot-separated numbers compared one by one (`"0.0.10"` is after `"0.0.9"`) |
 
@@ -864,7 +865,7 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 
 | `e` | when | detail |
 | --- | --- | --- |
-| `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `{"area": area}`, the element's cells (below); with `"href": str` and `"url": str` for links (below), and `"value": str` when the element has a `value` attribute |
+| `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `{"area": area}`, the element's cells (below); with `"href": str` and `"url": str` for links (below), `"value": str` when the element has a `value` attribute, and `"count": int` for a repeated click (below) |
 | `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": bool, "value": str}` for checkboxes and radio buttons, `{"value": str}` otherwise |
 | `input` | every edit of a control with `data-on~=input` | `{"value": str}` |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields, `{str: str}` from names to values, the submitter's included |
@@ -893,6 +894,16 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   surface. A click from the keyboard carries it too. A program places what
   belongs next to the element by it, as a browser places a select's list
   or a menu by its control.
+- **Repeated clicks.** A click that quickly follows another on the same
+  element carries `count`: its place in that run of clicks, 2 for the
+  second click of a double click, 3 for the third of a triple click. The
+  host counts as its platform does, by the user's own settings for how
+  quickly and how close together the clicks come, and not by a time of
+  its own. Every click of a run is reported: a double click is a `click`,
+  then a `click` with `"count": 2`. A click on another element, or on
+  another surface, starts a new run. A click without `count` is the first
+  of its run, and so is every click from the keyboard. A host that counts
+  clicks reports `count` (§4).
 - **A press** is reported whatever it lands on: a control, an element with
   a handler, plain text, or empty space. `t` is the id of the nearest
   element that has one, from the pressed element outward, and empty if

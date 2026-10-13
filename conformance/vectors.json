@@ -9280,6 +9280,161 @@
      "events": []
     }
    ]
+  },
+  {
+   "name": "a click carries the platform's count, kept to one element: a double click is a click, then a click with count 2, and a run that moves to another element starts again there (SPEC \u00a79)",
+   "requires": [
+    "count"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{position:absolute;top:0;height:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w));text-align:center;font-style:normal}</style><i id=a data-on=click style=\"left:0\">A</i><i id=b data-on=click style=\"left:calc(3*var(--hotty-cell-w))\">B</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "count": 2,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "count": 2,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "count": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "count": 3,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "count": 3,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "area": {
+         "c": 3,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "count": 4,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "count": 4,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "area": {
+         "c": 3,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "count": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "area": {
+         "c": 3,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
   }
  ],
  "wire": [
@@ -13699,6 +13854,146 @@
    ],
    "requires": [
     "decode.max"
+   ]
+  },
+  {
+   "name": "a click's count is its place in a run of clicks: 1 when the detail has none, and none for another kind (SPEC \u00a79)",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=click:t=open;gaRhcmVhhKFjAqFyA6F3BqFoAQ==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=open;gqRhcmVhhKFjAqFyA6F3BqFoAaVjb3VudAI=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=change:t=name;gqV2YWx1ZaF4pWNvdW50Ag==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "area": {
+      "c": 2,
+      "r": 3,
+      "w": 6,
+      "h": 1
+     }
+    },
+    {
+     "area": {
+      "c": 2,
+      "r": 3,
+      "w": 6,
+      "h": 1
+     },
+     "count": 2
+    },
+    {
+     "value": "x",
+     "count": 2
+    }
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "open"
+     },
+     "event": {
+      "kind": "click",
+      "target": "open",
+      "area": {
+       "c": 2,
+       "r": 3,
+       "w": 6,
+       "h": 1
+      },
+      "count": 1
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "open"
+     },
+     "event": {
+      "kind": "click",
+      "target": "open",
+      "area": {
+       "c": 2,
+       "r": 3,
+       "w": 6,
+       "h": 1
+      },
+      "count": 2
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "change",
+      "t": "name"
+     },
+     "event": {
+      "kind": "change",
+      "target": "name",
+      "value": "x",
+      "count": null
+     }
+    }
+   ],
+   "requires": [
+    "event.count"
+   ]
+  },
+  {
+   "name": "count says a repeated click carries its count (SPEC \u00a74, \u00a79); absent, it does not",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqVjb3VudMM=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMg==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2",
+     "count": true
+    },
+    {
+     "v": "0.2"
+    }
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "caps": {
+      "count": true
+     }
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "q"
+     },
+     "caps": {
+      "count": false
+     }
+    }
+   ],
+   "requires": [
+    "event.count"
    ]
   }
  ],

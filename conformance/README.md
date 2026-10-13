@@ -49,7 +49,8 @@ host that reports `passthrough` (SPEC §4, §9.3); `"hover"`, a host that
 lists `hover` in `events` (§9.4); `"scroll"`, a host that reports `scroll`
 (§4, §5.3); `"touch"`, a host that takes touch (SPEC §9.1, §16); `"steps"`, a
 host that reports `steps` (§4, §9.1); `"view"`, a host that lists `view` in
-`events` (§9.5). A list names several, all required.
+`events` (§9.5); `"count"`, a host that reports `count` (§4, §9). A list
+names several, all required.
 Its steps come in five kinds.
 
 **Send** `{ "send": {control}, "payload": text?, "reply": …, "events": … }`:
@@ -104,6 +105,10 @@ checked).
 - `"leave"` takes the pointer out of the terminal's window.
 - `"keys"`: the modifier keys held during the step (`shift`, `ctrl`, `alt`,
   `meta`); none when absent.
+- `"count"`, for `"down"` and `"up"`: the platform's count of this press
+  and its release in a run of clicks, as an OS hands it over with them
+  (macOS's `clickCount`, GTK's `n_press`, the DOM's `detail`); 1 when
+  absent. A runner gives it to the host as the host's platform would.
 - `"through"`: `true` if the step passes through the surface (SPEC §9.3),
   `false` if the surface gets it. Absent: not checked.
 - `"terminal"`, for a wheel: `true` if the gesture went on to the terminal,
@@ -176,6 +181,7 @@ implements, and skips the rest:
 | `doc.scroll` | `Doc`'s `Scroll` option (`scroll=<axes>`) |
 | `event.area` | `Event.Area` |
 | `event.view` | `Event.View` |
+| `event.count` | `Event.Count`, and the capabilities' `Count` |
 | `caps.views` | `Caps`'s `Views` |
 | `reveal` | the `Reveal` builder |
 | `caps.drag-kinds` | `Sends` answers for `dragstart` and `dragend` as for `drag` (SPEC §4) |
