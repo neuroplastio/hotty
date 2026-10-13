@@ -1602,7 +1602,8 @@ Shift+Tab, which move focus, and a key it scrolls with (§5.3):
   or Meta. Typing goes only the second way, through the platform's input
   methods. If the surface uses the key, it is the surface's, and the
   terminal does nothing with it, not even a shortcut bound to it. A host
-  **MAY** keep keys it reserves for itself, as a browser keeps Control+t.
+  **MAY** keep keys it reserves for itself, as a browser keeps Control+t,
+  and keeps its copy keys while something is selected (§11).
 - **As the program would read it, otherwise.** A key the surface does not
   use goes on as it would with no surface: the terminal's shortcuts take
   the keys they bind, and the rest is what the terminal would send the
@@ -1652,8 +1653,23 @@ Shift+Tab, which move focus, and a key it scrolls with (§5.3):
 A surface is drawn as pixels, but it is never only pixels: the host holds its
 document, and therefore its text.
 
-- **Selecting and copying** inside a surface **SHOULD** copy the selected
-  text of the document.
+- **Selecting** in a surface selects the text of its document, as in a
+  browser: from a press, by dragging; a word, with a double click; a
+  block, with a triple click. A text field selects with its keys too
+  (§10.2). Where the platform has a primary selection, as X11 and Wayland
+  do, a host **SHOULD** put the text there once it is selected, as
+  browsers do.
+- **There is one selection,** the terminal's on its cells or a surface's.
+  A press anywhere else, on the cells or on another surface, drops a
+  surface's, and a press on a surface drops the terminal's.
+- **Copying.** A host's copy keys **SHOULD** copy the selected text to the
+  clipboard, and leave it selected: Control+c and Meta+c (Command+c on
+  macOS), unless its user changes them, and any copy keys of its own. A
+  focused text field's selection is the one copied, and a password
+  field's never is; otherwise the document's is. While something is
+  selected, a copy key is the host's: neither the surface nor the program
+  hears it (§10.4). With nothing selected, it goes where it would:
+  Control+c interrupts the program.
 - **`user-select: none`** is the document's to set, as in a browser. A host
   **MUST NOT** start a selection on an element whose `user-select` is
   `none` (its used value, CSS UI 4: the elements inside one with `auto`
@@ -2132,9 +2148,12 @@ program → CSI ? 2026 l
   - **Selection by Shift and `select-all`, from the anchor,** as GUI fields
     select. A program that draws a field in cells shows a selection as it
     shows a selected row, and an SDK's field keeps one (SDK.md §4.6).
-  - **No clipboard or undo actions yet.** Their GUI keys are the
-    terminal's own: Control+c interrupts, Control+v quotes the next key
-    and Control+z suspends.
+  - **Copying is the host's,** with a browser's keys: the selection is
+    the host's (§11), and Control+c and Command+c copy in every GUI. Only
+    while something is selected, so that Control+c still interrupts
+    without a selection, as a terminal's user expects. Pasting and undo
+    have no keys yet: Control+v quotes the next key and Control+z
+    suspends.
 - **Why a host may show no select list.** A select's list opens past its
   control, and a surface is a rectangle of cells: drawn inside, a list
   would force small surfaces to grow, and drawn outside, it is something

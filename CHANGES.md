@@ -61,6 +61,13 @@ that lacks it says so in its capabilities.
   where in it the pointer is, `tx` and `ty`, and a `drag` goes out when that
   step changes: a row with `"0 1"` splits into halves, a folder with `"0 2"`
   into before, into and after. A host that does both reports `drop: true`.
+- **Copying** (SPEC.md §11): a host copies what is selected in a surface
+  with Control+c and Meta+c (Command+c), and its user can change the keys.
+  While something is selected the key is the host's and no program hears
+  it; with nothing selected, Control+c still interrupts. A double click
+  selects a word, a triple click a block, and Linux hosts put a selection
+  in the primary selection. There is one selection across the host. No
+  wire change and no capability: a program cannot tell.
 
 Each SDK has the builder `Reveal`, the event's `View` (`Areas` and `AtEnd`,
 from `in` and `end`), `Views`, the event's `Count`, the drag's `tx` and
