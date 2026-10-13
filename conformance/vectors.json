@@ -13592,6 +13592,114 @@
      }
     }
    ]
+  },
+  {
+   "name": "a message that decodes to more than the Decoder's max is malformed; one of max bytes is not (SDK.md \u00a73.6)",
+   "max": 4,
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=res;YWJjZGU=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=res;YWJjZA==\u001b\\"
+   ],
+   "results": [
+    "invalid",
+    "complete"
+   ],
+   "invalid": 1,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "res"
+     }
+    }
+   ],
+   "requires": [
+    "decode.max"
+   ]
+  },
+  {
+   "name": "zlib that inflates past max is malformed, and inflating stops there (SDK.md \u00a73.6)",
+   "max": 4095,
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=res:o=z;eNrtwQENAAAAwqD3T20PBxQAAABwbg//AAE=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=res:o=z;eNrtwQENAAAAwqD3T20PBxQAAADwbhAAAAE=\u001b\\"
+   ],
+   "results": [
+    "complete",
+    "invalid"
+   ],
+   "invalid": 1,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "res"
+     }
+    }
+   ],
+   "requires": [
+    "decode.max"
+   ]
+  },
+  {
+   "name": "a chunked message past max is malformed once: its further chunks are dropped, up to its last, and the next message decodes (SPEC \u00a73.4, SDK.md \u00a73.6)",
+   "max": 8,
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=res:m=1;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\u001b\\",
+    "\u001b]7279;m=1;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\u001b\\",
+    "\u001b]7279;m=1;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\u001b\\",
+    "\u001b]7279;m=0;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=res\u001b\\"
+   ],
+   "results": [
+    "partial",
+    "partial",
+    "partial",
+    "invalid",
+    "complete"
+   ],
+   "invalid": 1,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "res"
+     }
+    }
+   ],
+   "requires": [
+    "decode.max"
+   ]
+  },
+  {
+   "name": "a chunked message past max that another interrupts is counted once (SDK.md \u00a73.6)",
+   "max": 8,
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=res:m=1;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\u001b\\",
+    "\u001b]7279;m=1;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=res\u001b\\"
+   ],
+   "results": [
+    "partial",
+    "partial",
+    "complete"
+   ],
+   "invalid": 1,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "res"
+     }
+    }
+   ],
+   "requires": [
+    "decode.max"
+   ]
   }
  ],
  "scan": [

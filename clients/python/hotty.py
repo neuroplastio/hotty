@@ -833,13 +833,28 @@ def _b64decode(s):
         return None
 
 
+DEFAULT_MAX = 16 << 20
+
+
+def _encoded_max(n):
+    """The most base64 a message of n decoded bytes takes, zlib's overhead
+    included."""
+    return -(-(n + n // 256 + 64) // 3) * 4
+
+
 class Decoder:
     """Turns OSC sequences into messages, joining chunked ones (SPEC §3.4).
-    `invalid` counts the malformed messages dropped (SPEC §3.7)."""
+    `invalid` counts the malformed messages dropped (SPEC §3.7). `max` is the
+    most bytes one message decodes to, 0 for DEFAULT_MAX: past it a message
+    is malformed, and its further chunks are dropped (SDK.md §3.6)."""
 
-    def __init__(self):
+    def __init__(self, max=0):
         self.invalid = 0
-        self._pending = None  # (control, [base64 pieces])
+        self.max = max
+        self._pending = None  # [control, [base64 pieces], size, over]
+
+    def _max(self):
+        return self.max if self.max > 0 else DEFAULT_MAX
 
     def feed(self, seq):
         """Takes one OSC sequence, ESC ] … with or without its terminator.
@@ -867,37 +882,59 @@ class Decoder:
         if "m" in ctl and set(ctl) <= {"m", "q"}:
             if self._pending is None or ctl["m"] not in ("0", "1"):
                 return self._bad()
-            self._pending[1].append(b64)
+            p = self._add(b64)
             if ctl["m"] == "1":
                 return PARTIAL, None
-            ctl, pieces = self._pending
             self._pending = None
-            return self._finish(ctl, "".join(pieces))
-        if self._pending is not None:
-            self._pending = None
-            self.invalid += 1
+            if p[3]:
+                return INVALID, None
+            return self._finish(p[0], "".join(p[1]))
+        self._abort()
         if ctl.get("m") == "1":
-            self._pending = (ctl, [b64])
+            self._pending = [ctl, [], 0, False]
+            self._add(b64)
             return PARTIAL, None
         if "m" in ctl and ctl["m"] != "0":
             return self._bad()
         return self._finish(ctl, b64)
 
-    def _bad(self):
+    def _add(self, b64):
+        """Adds a chunk's base64 to the message in progress: past max, the
+        message is over, counted once, and holds nothing more."""
+        p = self._pending
+        if not p[3]:
+            p[2] += len(b64)
+            if p[2] > _encoded_max(self._max()):
+                p[1], p[3] = [], True
+                self.invalid += 1
+            else:
+                p[1].append(b64)
+        return p
+
+    def _abort(self):
+        """Drops the message in progress, counted unless it was over."""
         if self._pending is not None:
+            if not self._pending[3]:
+                self.invalid += 1
             self._pending = None
-            self.invalid += 1
+
+    def _bad(self):
+        self._abort()
         self.invalid += 1
         return INVALID, None
 
     def _finish(self, ctl, b64):
-        payload = _b64decode(b64)
-        if payload is None:
+        n = self._max()
+        payload = _b64decode(b64) if len(b64) <= _encoded_max(n) else None
+        if payload is None or len(payload) > n and ctl.get("o") != "z":
             self.invalid += 1
             return INVALID, None
         if ctl.get("o") == "z":
             try:
-                payload = zlib.decompress(payload)
+                z = zlib.decompressobj()
+                payload = z.decompress(payload, n + 1)
+                if len(payload) > n or not z.eof:
+                    raise zlib.error("past max, or cut short")
             except zlib.error:
                 self.invalid += 1
                 return INVALID, None

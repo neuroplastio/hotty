@@ -29,6 +29,7 @@ FEATURES = {
     "reveal",
     "caps.scroll",
     "decode.abort-count",
+    "decode.max",
     "decode.unterminated",
     "scanner.da1",
 }
@@ -269,7 +270,7 @@ def match(got, want, path):
 
 
 def run_decode(v):
-    dec = hotty.Decoder()
+    dec = hotty.Decoder(v.get("max", 0))
     results, msgs = [], []
     for s in v["seqs"]:
         result, m = dec.feed(s.encode())

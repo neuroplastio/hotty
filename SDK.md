@@ -179,6 +179,7 @@ An SDK **MUST** provide every component of this section.
 | `MaxSize` | 1000, the most columns or rows of a surface |
 | `MaxName` | 64, the longest surface name |
 | `Version` | `"0.2"`, the protocol version the SDK speaks, which its query lists (SPEC.md §4) |
+| `DefaultMax` | 16777216 (16 MiB), the most bytes a Decoder decodes one message to unless its `Max` says otherwise (§3.6) |
 
 And these sets, each value under its canonical name:
 - **event kinds**: `click`, `change`, `input`, `submit`, `press`, `focus`,
@@ -336,6 +337,13 @@ ones. A new Decoder is ready to use.
 - **The message** has the control without `m` and `o`, and the payload as
   bytes.
 - **`Invalid`** counts the malformed messages dropped so far.
+- **`Max`** is the most bytes one message decodes to, after base64 and
+  zlib; 0 is `DefaultMax`. Past it the message is `invalid`, counted once
+  (SPEC.md §3.4, §3.7): a chunked one holds no more base64 than `Max` bytes
+  could take, zlib's overhead included, and its further chunks are dropped
+  up to its last, which reports `invalid` without counting again. Zlib
+  stops inflating past `Max`. A host that decodes with a Decoder reports
+  its `Max` as `limits.message` (SPEC.md §13).
 
 ### 3.7 Scanner
 
@@ -884,7 +892,8 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor }` |
 | `N`, `Q`, `Detached`, `Scroll`, `Late` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)`, `hotty.Late()` | `n=`, `q=`, `detached=`, `scroll=`, `late=` | `{ n = …, q = …, detached = …, scroll = …, late = … }` | builder methods | `{ n, q, detached, scroll, late }` |
 | `ScrollVertical`, `ScrollHorizontal` | `hotty.ScrollVertical`, `hotty.ScrollHorizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` |
-| `Decoder.Feed`, `Invalid` | `(*Decoder).Feed`, `.Invalid` | `Decoder.feed`, `.invalid` | `decoder:feed` | `Decoder::feed` | `Decoder.feed` |
+| `Decoder.Feed`, `Invalid`, `Max` | `(*Decoder).Feed`, `.Invalid`, `.Max` | `Decoder.feed`, `.invalid`, `.max` | `decoder:feed`, `.invalid`, `hotty.decoder({ max = … })` | `Decoder::feed`, `.invalid`, `.max` | `Decoder.feed`, `.invalid`, `.max` |
+| `DefaultMax` | `hotty.DefaultMax` | `DEFAULT_MAX` | `DEFAULT_MAX` | `DEFAULT_MAX` | `DEFAULT_MAX` |
 | `Scanner`, `Detector` | `Scanner`, `Detector` | `Scanner`, `Detector` | `scanner`, `detector` | `Scanner`, `Detector` | `Scanner`, `Detector` |
 | `Holding`, `InSequence` | `(*Scanner).Holding`, `.InSequence` | `Scanner.holding`, `.in_sequence` | `scanner:holding`, `:in_sequence` | `Scanner::holding`, `::in_sequence` | `Scanner.holding`, `.inSequence` |
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |

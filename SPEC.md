@@ -201,6 +201,10 @@ into chunks of at most 4096 payload bytes each:
 - A host **MAY** limit the size of a reassembled message, decoded: what
   base64 and zlib leave. It reports a limit it enforces as
   `limits.message` (§13). It **SHOULD** accept at least 1 MiB decoded.
+  Past its limit, it drops the message and its further chunks, up to the
+  last.
+- A program **MAY** limit the messages it decodes from its host the same
+  way.
 
 ### 3.5 Common keys
 
@@ -245,7 +249,7 @@ types. A program that does not want them sends `q=2`.
 A malformed message:
 - a control that does not parse;
 - a payload that is not valid base64 or zlib;
-- a message past the host's limit (§13), which aborts it (§3.4);
+- a message past the host's limit (§3.4, §13);
 - an aborted chunked message.
 
 Each counts once: a malformed message that arrives before the last chunk of
@@ -1670,11 +1674,11 @@ A host **MUST** ensure that:
   would exceed them with `EQUOTA`. Hidden surfaces (§5.4) count: a program
   that keeps many deletes the ones it needs least.
 - A host reports a message-size limit as `limits.message`: the most bytes it
-  accepts for one reassembled message, decoded: what base64 and zlib leave
-  (§3.4). A host that reports none enforces none; one with a limit accepts
-  at least 1 MiB decoded. A message past the limit is malformed (§3.7), not
-  `EQUOTA`. A resource is one message (§7.1), so this limit also caps how
-  large a resource the host takes.
+  accepts for one reassembled message, decoded (§3.4). A host that reports
+  none enforces none; one with a limit **SHOULD** accept at least 1 MiB. A
+  message past the limit is malformed (§3.7), not `EQUOTA`. A resource is
+  one message (§7.1), so this limit also caps how large a resource the host
+  takes.
 - Rendering must not stall the terminal. A host **MAY** abandon a render
   that exceeds its time budget and report `EBUDGET`: pathological CSS such
   as huge blurs, deep nesting, or enormous documents.

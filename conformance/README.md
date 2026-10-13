@@ -182,6 +182,7 @@ implements, and skips the rest:
 | `options.unordered` | a `q` given wins over the `q` that `n` implies, whatever their order |
 | `decode.abort-count` | a malformed message that aborts a chunked one counts twice (SPEC §3.7) |
 | `decode.unterminated` | `Feed` takes a sequence without its terminator |
+| `decode.max` | `Decoder.Max`: past it a message is malformed, counted once, and its further chunks dropped (SDK.md §3.6) |
 | `scanner.da1` | the Scanner's `da1` segments |
 | `graphemes` | text is split into grapheme clusters (UAX #29), not code points (SDK.md §4.6) |
 
@@ -206,9 +207,10 @@ each one's control (between `ESC ] 7279 ;` and `;`) and base64 length must
 match. Every case must also decode back to the payload, with the control's
 keys in order, but `m` and `o`, which are Encode's (SDK.md §3.3).
 
-**Decode** `{ "seqs": [ text, … ], "bodies"?: [ … ], "results": [ … ],
-"invalid": n, "messages": [ … ] }`: each sequence goes to one Decoder's
-`Feed`, in order.
+**Decode** `{ "seqs": [ text, … ], "bodies"?: [ … ], "max"?: n,
+"results": [ … ], "invalid": n, "messages": [ … ] }`: each sequence goes to
+one Decoder's `Feed`, in order. `max`, when present, is the Decoder's `Max`
+(SDK.md §3.6).
 `results` are its results (`not_hotty`, `partial`, `complete`, `invalid`),
 and `invalid` its count after the last. `messages` are the complete ones,
 in order:
