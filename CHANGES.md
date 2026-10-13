@@ -55,10 +55,16 @@ that lacks it says so in its capabilities.
   click of a double click, as the platform counts them by the user's own
   settings. Every click of a run is reported. A host that counts reports
   `count: true` in its capabilities.
+- **Drops** (SPEC.md §9.1): an element with `drop` in its `data-on` can be
+  where a drag goes, `t`, without being dragged, and keeps its text
+  selection. When such a `t` has `data-steps`, `drag` and `dragend` say
+  where in it the pointer is, `tx` and `ty`, and a `drag` goes out when that
+  step changes: a row with `"0 1"` splits into halves, a folder with `"0 2"`
+  into before, into and after. A host that does both reports `drop: true`.
 
 Each SDK has the builder `Reveal`, the event's `View` (`Areas` and `AtEnd`,
-from `in` and `end`), `Views`, the event's `Count`, and the capabilities'
-`Count`.
+from `in` and `end`), `Views`, the event's `Count`, the drag's `tx` and
+`ty`, and the capabilities' `Count` and `Drop`.
 
 ### Porting
 

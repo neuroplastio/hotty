@@ -429,14 +429,16 @@ class Reply:
 
 @dataclass
 class Drag:
-    """A drag's cell and keys, and its steps x and y, None where the
-    element has none (SPEC §9.1)."""
+    """A drag's cell and keys, its steps x and y in the element dragged,
+    and tx and ty in t, each None where the detail has none (SPEC §9.1)."""
 
     c: int
     r: int
     keys: list = field(default_factory=list)
     x: int = None
     y: int = None
+    tx: int = None
+    ty: int = None
 
 
 @dataclass
@@ -510,12 +512,13 @@ _CAPS = {
     "passthrough": "bool",
     "scroll": "bool",
     "steps": "bool",
+    "drop": "bool",
     "count": "bool",
     "host": "str",
     "version": "str",
 }
 _AREA = {"c": "int", "r": "int", "w": "int", "h": "int"}
-_DRAG = {"c": "int", "r": "int", "keys": ["str"], "x": "int", "y": "int"}
+_DRAG = {"c": "int", "r": "int", "keys": ["str"], "x": "int", "y": "int", "tx": "int", "ty": "int"}
 # Each kind's detail (SPEC §9); a kind not here carries none a program reads.
 _DETAIL = {
     EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA, "count": "int"},
@@ -583,7 +586,8 @@ class Event:
         c, r = self._d.get("c"), self._d.get("r")
         if c is None or r is None:
             return None
-        return Drag(c, r, list(self._d.get("keys", [])), self._d.get("x"), self._d.get("y"))
+        d = self._d
+        return Drag(c, r, list(d.get("keys", [])), d.get("x"), d.get("y"), d.get("tx"), d.get("ty"))
 
     def count(self):
         """A click's place in its run of clicks (SPEC §9): 2 for the second
@@ -639,6 +643,7 @@ class Caps:
         self.passthrough = d.get("passthrough", False)
         self.scroll = d.get("scroll", False)
         self.steps = d.get("steps", False)
+        self.drop = d.get("drop", False)
         self.count = d.get("count", False)
         self.host = d.get("host")
         self.version = d.get("version")

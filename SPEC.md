@@ -337,6 +337,7 @@ The capabilities, the body of that reply, are a map of these fields (§3.3):
 | `passthrough` | bool | `true` when the pointer passes through the parts of a surface that take no pointer (§9.3). Absent: every window takes the pointer wherever it is |
 | `scroll` | bool | `true` when a document can ask to scroll (`scroll`, §5.1, §5.3). Absent: nothing in a surface scrolls |
 | `steps` | bool | `true` when a drag of an element with `data-steps` says where in the element the pointer is (§9.1). Absent: a drag's detail has no `x` or `y` |
+| `drop` | bool | `true` when an element with `drop` in its `data-on` can be where a drag goes without being dragged, and a drag says where in it the pointer is when it has `data-steps` (§9.1). Absent: only an element that opts in to drags is ever `t`, and a drag's detail has no `tx` or `ty` |
 | `count` | bool | `true` when a repeated click carries its `count` (§9). Absent: every click reads as the first of its run, and a program offers another way to do what a double click would |
 | `host` | str | optional: a name for the implementation |
 | `version` | str | optional, with `host`: the implementation's version, as dot-separated numbers compared one by one (`"0.0.10"` is after `"0.0.9"`) |
@@ -871,8 +872,8 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields, `{str: str}` from names to values, the submitter's included |
 | `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface placed with `p=1` (§5.2), except a mouse's or a pen's press with Alt held (§9.2) and where the pointer passes through (§9.3) | `{"area": area}`, the cells of the element `t` names (below); none when `t` is empty |
 | `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": int, "r": int, "keys": [str]}`: the pointer's cell and the keys held, with `"x": int` and `"y": int`, its step, on an element with `data-steps` (§9.1) |
-| `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element (§9.1) | the same |
-| `dragend` | the drag ended: the button released or the finger lifted, wherever the pointer is (§9.1) | the same |
+| `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element or in `t` (§9.1) | the same, with `"tx": int` and `"ty": int`, the step in `t`, where `t` has `drop` in its `data-on` and `data-steps` (§9.1) |
+| `dragend` | the drag ended: the button released or the finger lifted, wherever the pointer is (§9.1) | as for `drag` |
 | `focus` | the user focuses an element: the surface gains the keyboard, or its focus moves to another of its elements (§10.1); `t` names the element focused | none |
 | `blur` | the surface loses the keyboard (§10); `t` is empty | none |
 | `resize` | the surface's size in CSS pixels changed without its cells changing: the terminal's font changed (§5.3); `t` is empty | `{"w": float, "h": float}` in CSS pixels |
@@ -964,7 +965,8 @@ button on such an element, the moves of the pointer while the button is down,
 and its release; or a touch on such an element that does not pan (below), the
 finger's moves, and its lift. A program hears through drags what a click
 cannot carry: a range dragged across a grid, a handle dragged to where it is
-let go.
+let go. An element that is only a place to drop on opts in with `drop`
+(below): a drag can go to it, and it is never dragged itself.
 
 - **Three events:**
   - `dragstart`, on the press (a touch's once it drags, below). `t` is
@@ -972,20 +974,22 @@ let go.
     outward, with `drag` in its `data-on`. If it has no `id`, there is no
     drag.
   - `drag`, each time the element under the pointer changes. `t` is the
-    nearest element with an `id` and `drag` in its `data-on`, from the one
-    under the pointer outward, and empty where there is none, outside the
-    window included. While `t` is empty, a `drag` is sent each time the
-    cell under the pointer changes instead. A drag of an element with
-    steps (below) also sends a `drag` each time its step changes, `x` or
-    `y`; a move that changes both the element or cell and the step sends
-    one.
+    nearest element with an `id` and `drag` or `drop` in its `data-on`,
+    from the one under the pointer outward, and empty where there is none,
+    outside the window included. While `t` is empty, a `drag` is sent each
+    time the cell under the pointer changes instead. A `drag` is also sent
+    each time a step (below) changes: `x` or `y` in the element dragged,
+    `tx` or `ty` in `t`. A move that changes several of these, the element
+    or the cell included, sends one.
   - `dragend`, once, on the release, wherever the pointer is. `t` is as
     for `drag`.
 
   A drag therefore costs a few events for each element it crosses, and one
   for each step, not one for every move.
 - **The detail** of each is `{"c": int, "r": int, "keys": [str]}`, with
-  `"x": int` and `"y": int` on an element with steps (below):
+  `"x": int` and `"y": int` on an element with steps, and in `drag` and
+  `dragend`, `"tx": int` and `"ty": int` where `t` is a drop target with
+  steps (below):
   - `c` and `r` are the column and the row of the surface under the
     pointer, counted from 0 at the surface's top left cell, not its
     window's (§5.2). They go on counting outside the surface: negative
@@ -996,8 +1000,8 @@ let go.
     `"alt"` and `"meta"`, in that order, empty when none is. `"alt"` is
     never in `dragstart`'s: a press with Alt held starts no drag (§9.2).
     Alt pressed later is reported, and the drag goes on.
-- **Where in the element: steps.** An element that opts in to drags may say
-  how many steps its width and its height are divided into, with
+- **Where in the element: steps.** An element that opts in to drags, or to
+  drops, may say how many steps its width and its height are divided into, with
   `data-steps="<x>"` or `data-steps="<x> <y>"`: whole numbers from 0 to
   2^53 − 1 (§3.3), `0` for none along that axis. A slider from 0 to 20
   has `data-steps="20"`, a vertical one `data-steps="0 20"`. Each event of a drag of it then says where in
@@ -1019,6 +1023,24 @@ let go.
   gives no steps. If the element leaves the document during the drag, `x`
   and `y` stay as they last were, as they do in a `dragend` that ends a drag
   early (below). `steps` in the capabilities (§4) says a host does this.
+- **Where in the target.** When `t` has `drop` in its `data-on` (below)
+  and steps, `drag` and `dragend` also say where in `t` the pointer is:
+  `tx` and `ty`, measured against `t`'s border box as `x` and `y` are
+  against the dragged element's, by the counts `t` has at that moment. So
+  a list splits a row with `data-on="drag drop"` and `data-steps="0 1"`
+  into halves, for an item to land before or after it, and a tree splits a
+  folder with `data-steps="0 2"` into before, into and after: a quarter, a
+  half and a quarter. Where `t` is empty, has no `drop` or has no steps,
+  there is no `tx` or `ty`, so a slider's drag over itself carries only
+  `x`; a `dragend` that ends a drag early (below) has none either. `drop`
+  in the capabilities (§4) says a host does this.
+- **A place to drop on.** An element with `drop` in its `data-on` and an
+  `id` can be `t` without being dragged. A press on it starts no drag of it
+  (one of an element around it that opts in to drags starts as before), and
+  its text can be selected as any other's (§11). An element with both is
+  dragged and dropped on. `drop` in the capabilities (§4) says a host does
+  this; where it is absent, only an element that opts in to drags is ever
+  `t`, and a program offers another way to do what a drop would.
 - **The pointer is the surface's until the release,** or the finger until
   it lifts, as a page's `setPointerCapture` makes it an element's. Every
   move goes to the drag, wherever the pointer is: over the cells, over
@@ -1066,8 +1088,10 @@ let go.
   `dragstart`, then everything else the press causes (`change`, `blur`,
   `focus`). On the release, `dragend` comes before any `click`.
 - **A drag is a click only where it began.** When it ends on the element
-  it started on (`dragend`'s `t` is `dragstart`'s), its release is the
-  click it would have been without the drag: an element with `click` in its
+  it started on (the nearest element with an `id` and `drag` in its
+  `data-on`, from the one under the pointer outward, is `dragstart`'s `t`;
+  without `drop`, that is `dragend`'s `t`), its release is the click it
+  would have been without the drag: an element with `click` in its
   `data-on` as well reports `click`, after `dragend`. A drag that ends
   anywhere else reports no `click`. So does a touch's: one that lifts on
   the element it began on reports `click` after `dragend`.
@@ -1762,8 +1786,8 @@ They inspect documents and events, not pixels.
 The vectors marked `"passthrough"` apply to a host that reports it (§9.3),
 those marked `"hover"` to a host whose `events` list it (§9.4), those
 marked `"scroll"` to a host that reports it (§5.3), those marked
-`"steps"` to a host that reports it (§9.1), and those marked `"view"` to
-a host whose `events` list it (§9.5).
+`"steps"`, `"drop"` or `"count"` to a host that reports it (§9.1, §9),
+and those marked `"view"` to a host whose `events` list it (§9.5).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;

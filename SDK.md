@@ -477,7 +477,7 @@ carries, each absent when the event does not carry it:
 | `Link` | `href`, and `url` if present | `click` on a link |
 | `Size` | `w` and `h`, in CSS pixels | `resize` |
 | `FitRows` | `r` | `fit` |
-| `Drag` | `c`, `r` and `keys`, and the steps `x` and `y`, each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
+| `Drag` | `c`, `r` and `keys`; the steps `x` and `y` in the element dragged, and `tx` and `ty` in a `t` with `drop` (as `TX` and `TY` where the language capitalises), each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover` | `c` and `r`, or `out` | `hover` |
 | `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press` |
 | `Count` | `count`: the click's place in its run of clicks (SPEC.md §9), 2 for the second click of a double click; 1 for a click whose detail has none | `click` |
@@ -489,7 +489,7 @@ none of these, and its payload is in its message.
 
 **`Caps`** (SPEC.md §4) has every field SPEC.md lists: `V`, `Ops`,
 `Events`, `Cell` (`w`, `h`), `Scale`, `Scheme`, `Limits`, `Net`,
-`Passthrough`, `Scroll`, `Steps`, `Count`, `Host`, `Version`. It also answers:
+`Passthrough`, `Scroll`, `Steps`, `Drop`, `Count`, `Host`, `Version`. It also answers:
 - `Supports(op)`: whether `op` is in `ops`; a host that lists no ops is
   taken to support them all;
 - `Sends(kind)`: whether the host sends `kind`; `drag` stands for the three
@@ -751,8 +751,9 @@ Go: `hottytest.Host`.
   not report `scroll`, so a key bound to a scroll action goes on as if its
   keymap did not bind it (SPEC.md §10.2). Nor can it measure where in an
   element the pointer is: a drag of an element with `data-steps` carries
-  the steps the test gives, and the host reports `steps` when the test asks
-  it to (SPEC.md §9.1).
+  the steps the test gives, in it and in `t`, and the host reports `steps`
+  and `drop` when the test asks it to (SPEC.md §9.1). A drag goes to the
+  element the test names, which may be one with `drop` in its `data-on`.
 - **Strict by default.** A malformed message, an `EINVAL`, or a HOTTY
   command other than the query sent to a terminal that is not a host fails
   the test. A lenient host records them instead.

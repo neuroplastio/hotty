@@ -1904,6 +1904,245 @@
    ]
   },
   {
+   "name": "drop: an element with drop in its data-on is a drag's t without being dragged, a press on it starts no drag, and one with data-steps says where in it the pointer is, tx and ty, with a drag each time that step changes; a drag that ends on a drop-only element inside the one it started on is still a click (SPEC \u00a79.1)",
+   "requires": [
+    "drop"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{display:block;height:var(--hotty-cell-h);width:calc(6*var(--hotty-cell-w));font-style:normal}#col{height:calc(3*var(--hotty-cell-h))}b{display:inline-block;width:calc(2*var(--hotty-cell-w));font-weight:normal}</style><i id=card data-on=\"drag\">card</i><i id=ada data-on=\"drop\">Ada</i><i id=col data-on=\"drop\" data-steps=\"3 2\">col</i><i id=row data-on=\"drag click\"><b id=pin data-on=\"drop\">p</b></i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "card",
+       "detail": {
+        "c": 1,
+        "r": 0,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      1
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "ada",
+       "detail": {
+        "c": 1,
+        "r": 1,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      2
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "col",
+       "detail": {
+        "c": 1,
+        "r": 2,
+        "keys": [],
+        "tx": 1,
+        "ty": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      2,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      2,
+      3
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "col",
+       "detail": {
+        "c": 2,
+        "r": 3,
+        "keys": [],
+        "tx": 1,
+        "ty": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      4,
+      4
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "col",
+       "detail": {
+        "c": 4,
+        "r": 4,
+        "keys": [],
+        "tx": 2,
+        "ty": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "col",
+       "detail": {
+        "c": 4,
+        "r": 4,
+        "keys": [],
+        "tx": 2,
+        "ty": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      1
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      2,
+      1
+     ],
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      5
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "row",
+       "detail": {
+        "c": 1,
+        "r": 5,
+        "keys": []
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "pin",
+       "detail": {
+        "c": 1,
+        "r": 5,
+        "keys": []
+       }
+      },
+      {
+       "e": "click",
+       "s": "x",
+       "t": "row",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 5,
+         "w": 6,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "a press with Alt is the program's: the surface hears nothing of it or of its gesture, whatever p asked for; the press decides, not the keys held later",
    "steps": [
     {
@@ -11024,6 +11263,60 @@
    ]
   },
   {
+   "name": "drop says an element with data-on~=drop can be a drag's t, and a drag says where in it the pointer is (SPEC \u00a74, \u00a79.1); absent, it does not",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;g6F2ozAuMqZldmVudHORpGRyYWekZHJvcMM=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuMqZldmVudHORpGRyYWc=\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2",
+     "events": [
+      "drag"
+     ],
+     "drop": true
+    },
+    {
+     "v": "0.2",
+     "events": [
+      "drag"
+     ]
+    }
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "caps": {
+      "drop": true,
+      "drags": true
+     }
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "q"
+     },
+     "caps": {
+      "drop": false,
+      "drags": true
+     }
+    }
+   ],
+   "requires": [
+    "event.drop"
+   ]
+  },
+  {
    "name": "a host that lists no ops supports them all, and no events sends them all, but neither drags nor hover; no cell is 9x18",
    "seqs": [
     "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
@@ -11954,6 +12247,113 @@
      "keys": [],
      "y": 3
     }
+   ]
+  },
+  {
+   "name": "a drag's tx and ty are the pointer's step in a t with drop, beside x and y in the element dragged; one the detail leaves out is absent (SPEC \u00a79.1)",
+   "seqs": [
+    "\u001b]7279;a=ev:s=g:e=drag:t=col;haFjAaFyAqRrZXlzkKJ0eAGidHkA\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=dragend:t=row;haFjAqFyBKRrZXlzkaVzaGlmdKF4A6J0eQE=\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag:t=;g6Fj/6FyAKRrZXlzkA==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "c": 1,
+     "r": 2,
+     "keys": [],
+     "tx": 1,
+     "ty": 0
+    },
+    {
+     "c": 2,
+     "r": 4,
+     "keys": [
+      "shift"
+     ],
+     "x": 3,
+     "ty": 1
+    },
+    {
+     "c": -1,
+     "r": 0,
+     "keys": []
+    }
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "drag",
+      "t": "col"
+     },
+     "event": {
+      "kind": "drag",
+      "target": "col",
+      "drag": {
+       "c": 1,
+       "r": 2,
+       "keys": [],
+       "x": null,
+       "y": null,
+       "tx": 1,
+       "ty": 0
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "dragend",
+      "t": "row"
+     },
+     "event": {
+      "kind": "dragend",
+      "target": "row",
+      "drag": {
+       "c": 2,
+       "r": 4,
+       "keys": [
+        "shift"
+       ],
+       "x": 3,
+       "y": null,
+       "tx": null,
+       "ty": 1
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "g",
+      "e": "drag",
+      "t": ""
+     },
+     "event": {
+      "kind": "drag",
+      "target": "",
+      "drag": {
+       "c": -1,
+       "r": 0,
+       "keys": [],
+       "x": null,
+       "y": null,
+       "tx": null,
+       "ty": null
+      }
+     }
+    }
+   ],
+   "requires": [
+    "event.drop"
    ]
   },
   {

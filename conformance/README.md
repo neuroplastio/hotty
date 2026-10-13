@@ -49,7 +49,8 @@ host that reports `passthrough` (SPEC §4, §9.3); `"hover"`, a host that
 lists `hover` in `events` (§9.4); `"scroll"`, a host that reports `scroll`
 (§4, §5.3); `"touch"`, a host that takes touch (SPEC §9.1, §16); `"steps"`, a
 host that reports `steps` (§4, §9.1); `"view"`, a host that lists `view` in
-`events` (§9.5); `"count"`, a host that reports `count` (§4, §9). A list
+`events` (§9.5); `"count"`, a host that reports `count` (§4, §9);
+`"drop"`, a host that reports `drop` (§4, §9.1). A list
 names several, all required.
 Its steps come in five kinds.
 
@@ -182,6 +183,7 @@ implements, and skips the rest:
 | `event.area` | `Event.Area` |
 | `event.view` | `Event.View` |
 | `event.count` | `Event.Count`, and the capabilities' `Count` |
+| `event.drop` | the drag's `tx` and `ty`, and the capabilities' `Drop` |
 | `caps.views` | `Caps`'s `Views` |
 | `reveal` | the `Reveal` builder |
 | `caps.drag-kinds` | `Sends` answers for `dragstart` and `dragend` as for `drag` (SPEC §4) |
@@ -225,7 +227,8 @@ in order:
   `code`, `detail`);
 - `event`: `Event`'s fields and accessors (`surface`, `kind`, `target`,
   `value`, `checked`, `fields`, `link` with `href` and `url`, `size` with
-  `w` and `h`, `fit_rows`, `drag` with `c`, `r` and `keys`, `hover` with
+  `w` and `h`, `fit_rows`, `drag` with `c`, `r`, `keys`, `x`, `y`, `tx` and
+  `ty`, `hover` with
   `c`, `r` and `out`, `view` with `areas` and `at_end`);
 - `caps`: `Caps`'s fields, and its answers: `supports` and `sends` map an
   argument to the answer, `drags`, `hovers`, `views`, `light`, `cell_css`
