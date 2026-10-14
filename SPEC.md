@@ -1420,6 +1420,7 @@ The default keymap is:
 | Meta+ArrowUp, Meta+ArrowDown | `input-start`, `input-end` |
 | Meta+Backspace | `delete-to-line-start` |
 | Meta+a | `select-all` |
+| Control+c, Meta+c | `copy` |
 | Control+x, Meta+x | `cut` |
 | Control+v, Meta+v | `paste` |
 | Control+z, Meta+z | `undo` |
@@ -1436,8 +1437,9 @@ Command+ArrowLeft as `0x01`, which is Control+a.
 
 A key goes to the field's keymap:
 - **Bound:** the field does the action. A key bound to `program`, or to an
-  action the field does not have (a multi-line one in an `input`, or `cut`
-  and `paste` where they have nothing to do, below), reaches the program.
+  action the field does not have (a multi-line one in an `input`, or
+  `copy`, `cut` and `paste` where they have nothing to do, below), reaches
+  the program.
 - **Not bound, with Shift:** the key is looked up again without Shift, so
   Shift+ArrowLeft does what ArrowLeft does, and selects (below). A
   character shows Shift in itself (`A`, §10.4), so this concerns the other
@@ -1464,6 +1466,7 @@ The actions:
 | `page-up`, `page-down` † | moves the caret as many rows up, or down, as the field shows, the same way |
 | `input-start`, `input-end` | moves the caret to the start, or the end, of the value |
 | `select-all` | selects the whole value: the anchor at its start, the caret at its end |
+| `copy` | puts the selected text on the clipboard, and leaves it selected |
 | `cut` | puts the selected text on the clipboard and deletes it |
 | `paste` | types the clipboard's text in place of the selection |
 | `undo`, `redo` | undoes the field's last edit, or redoes the last one undone (below) |
@@ -1500,10 +1503,10 @@ The actions:
   Shift+ArrowDown go on by a word, to the line's end and by a row. When the
   caret comes back to the anchor, nothing is selected.
 - **Every edit** is an edit for the `input` and `change` events (§9).
-- **The clipboard** is the host's, the one its copy keys write (§11): the
-  platform's, where there is one. A field has no `cut` with nothing
-  selected, nor in a password field, and no `paste` on a host that cannot
-  read the clipboard: the key reaches the program. An `input` drops the
+- **The clipboard** is the host's: the platform's, where there is one. A
+  field has no `copy` or `cut` with nothing selected, nor in a password
+  field, and no `paste` on a host that cannot read the clipboard: the key
+  reaches the program, so Control+c still interrupts it. An `input` drops the
   line breaks from what it pastes, as HTML's does.
 - **Undo.** Each text field keeps a history of its edits, as a browser's
   does, for as long as it is in the document:
@@ -1628,8 +1631,7 @@ Shift+Tab, which move focus, and a key it scrolls with (§5.3):
   or Meta. Typing goes only the second way, through the platform's input
   methods. If the surface uses the key, it is the surface's, and the
   terminal does nothing with it, not even a shortcut bound to it. A host
-  **MAY** keep keys it reserves for itself, as a browser keeps Control+t,
-  and keeps its copy keys while something is selected (§11).
+  **MAY** keep keys it reserves for itself, as a browser keeps Control+t.
 - **As the program would read it, otherwise.** A key the surface does not
   use goes on as it would with no surface: the terminal's shortcuts take
   the keys they bind, and the rest is what the terminal would send the
@@ -1688,18 +1690,24 @@ document, and therefore its text.
 - **There is one selection,** the terminal's on its cells or a surface's.
   A press anywhere else, on the cells or on another surface, drops a
   surface's, and a press on a surface drops the terminal's.
-- **Copying.** A host's copy keys **SHOULD** copy the selected text to the
-  clipboard, and leave it selected: Control+c and Meta+c (Command+c on
-  macOS), unless its user changes them, and any copy keys of its own. A
-  focused text field's selection is the one copied, and a password
-  field's never is; otherwise the document's is. While something is
-  selected, a copy key is the host's: neither the surface nor the program
-  hears it (§10.4). With nothing selected, it goes where it would:
-  Control+c interrupts the program.
-- **Cutting and pasting** are a text field's (§10.2), on the same
-  clipboard. While a text field has the keyboard, the terminal's own
-  paste, from its paste keys or its menu, **SHOULD** type into the field
-  as `paste` does, and not reach the program.
+- **Copying** is the `copy` action (§10.2), by the keymap, as cutting and
+  pasting are. A focused text field's selection is copied by a key its
+  keymap binds to `copy`, and a password field's never is.
+- **A selection in a document,** outside a text field, is copied by a key
+  that the keymap of the element whose text it starts in, in tree order,
+  binds to `copy`, read as a text field's keymap is: the default keymap,
+  then the `data-keys` of each element from the root down to it. The host
+  offers it each key first, before the surface that has the keyboard and
+  the terminal's own shortcuts, whether or not the surface has the
+  keyboard. A key it does not bind to `copy`, `program` included, goes on
+  as if nothing were selected: under `Control+c=program`, Control+c
+  interrupts the program while text is selected.
+- **The terminal's own copy** and paste, from its own keys or its menu,
+  are the user's whatever the keymaps say. Its copy **SHOULD** copy a
+  surface's selection, so that no document makes its text uncopyable, and
+  while a text field has the keyboard its paste **SHOULD** type into the
+  field as `paste` does, and not reach the program. Its own selection on
+  its cells it copies as it would without HOTTY.
 - **`user-select: none`** is the document's to set, as in a browser. A host
   **MUST NOT** start a selection on an element whose `user-select` is
   `none` (its used value, CSS UI 4: the elements inside one with `auto`
@@ -2178,15 +2186,14 @@ program → CSI ? 2026 l
   - **Selection by Shift and `select-all`, from the anchor,** as GUI fields
     select. A program that draws a field in cells shows a selection as it
     shows a selected row, and an SDK's field keeps one (SDK.md §4.6).
-  - **Copying is the host's,** with a browser's keys: the selection is
-    the host's (§11), and Control+c and Command+c copy in every GUI. Only
-    while something is selected, so that Control+c still interrupts
-    without a selection, as a terminal's user expects.
-  - **Cutting, pasting and undo are a field's,** with a browser's keys,
-    and only in a focused text field: there Control+x, Control+v and
-    Control+z edit in every GUI, and outside one they keep their terminal
-    meanings (nano's exit, quoting the next key, suspending). In a
-    field's keymap, a program that needs one binds it to `program`.
+  - **Copying, cutting, pasting and undo are the keymap's,** with a
+    browser's keys: Control+c, Control+x, Control+v and Control+z edit in
+    every GUI, and where nothing is selected, or outside a text field,
+    they keep their terminal meanings (interrupting, nano's exit, quoting
+    the next key, suspending). A program that needs one binds it to
+    `program`, as a REPL that always interrupts with Control+c. The
+    terminal's own copy and paste stay the user's, so no document makes
+    its text uncopyable.
 - **Why a host may show no select list.** A select's list opens past its
   control, and a surface is a rectangle of cells: drawn inside, a list
   would force small surfaces to grow, and drawn outside, it is something

@@ -804,8 +804,8 @@ grapheme segmentation.
   as SPEC.md §10.2 says: a delete deletes it, a move starts from its start
   or its end and ends it, and `select-all` selects the whole value.
   `submit` and `program` are the program's, and change nothing, as are
-  `cut`, `paste`, `undo` and `redo`: a Field holds no clipboard and no
-  history, which a program that keeps them adds around it.
+  `copy`, `cut`, `paste`, `undo` and `redo`: a Field holds no clipboard
+  and no history, which a program that keeps them adds around it.
 - **`Extend(action)`** does a move as Shift does it (SPEC.md §10.2): the
   anchor stays, or is set where the caret is, and the caret moves from
   where it is. An action that is not a move is `Do`'s.

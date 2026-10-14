@@ -8428,7 +8428,7 @@
    ]
   },
   {
-   "name": "each text field keeps a history of its edits: a run of typing is one edit, and so is a run of deleting characters; undo puts back the value before an edit and redo the one after, a new edit drops what was undone, and the keys are the field's with nothing to do; cut deletes the selection, and with nothing selected or in a password field its key reaches the program (SPEC \u00a710.2)",
+   "name": "each text field keeps a history of its edits: a run of typing is one edit, and so is a run of deleting characters; undo puts back the value before an edit and redo the one after, a new edit drops what was undone, and the keys are the field's with nothing to do; copy and cut take the selection, cut deleting it, and with nothing selected or in a password field their keys reach the program (SPEC \u00a710.2)",
    "requires": "undo",
    "steps": [
     {
@@ -8474,12 +8474,28 @@
      "events": []
     },
     {
+     "key": "c",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
      "send": {
       "a": "focus",
       "s": "x",
       "t": "t",
       "q": "2"
      },
+     "events": []
+    },
+    {
+     "key": "c",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
      "events": []
     },
     {
@@ -8694,6 +8710,14 @@
     },
     {
      "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "c",
      "keys": [
       "ctrl"
      ],
@@ -15995,9 +16019,9 @@
    "format": "Control+a=select-all Alt+a=select-all"
   },
   {
-   "name": "cut, paste, undo and redo are actions",
-   "parse": "Control+x=cut Control+v=paste Control+z=undo Control+y=redo",
-   "format": "Control+x=cut Control+v=paste Control+z=undo Control+y=redo"
+   "name": "copy, cut, paste, undo and redo are actions",
+   "parse": "Control+c=copy Control+x=cut Control+v=paste Control+z=undo Control+y=redo",
+   "format": "Control+c=copy Control+x=cut Control+v=paste Control+z=undo Control+y=redo"
   },
   {
    "name": "nothing",
@@ -16074,7 +16098,10 @@
     "Control+X": null,
     "Control+V": null,
     "Control+Y": null,
-    "Alt+z": null
+    "Alt+z": null,
+    "Control+c": "copy",
+    "Meta+c": "copy",
+    "Control+C": null
    },
    "selects": {
     "Shift+ArrowLeft": true,
@@ -16121,7 +16148,8 @@
     "Meta+ArrowLeft": "line-start",
     "Control+v": "paste",
     "Control+z": "undo",
-    "Meta+Z": "redo"
+    "Meta+Z": "redo",
+    "Control+c": "copy"
    },
    "selects": {
     "Shift+ArrowDown": true,

@@ -61,13 +61,16 @@ that lacks it says so in its capabilities.
   where in it the pointer is, `tx` and `ty`, and a `drag` goes out when that
   step changes: a row with `"0 1"` splits into halves, a folder with `"0 2"`
   into before, into and after. A host that does both reports `drop: true`.
-- **Copying** (SPEC.md §11): a host copies what is selected in a surface
-  with Control+c and Meta+c (Command+c), and its user can change the keys.
-  While something is selected the key is the host's and no program hears
-  it; with nothing selected, Control+c still interrupts. A double click
-  selects a word, a triple click a block, and Linux hosts put a selection
-  in the primary selection. There is one selection across the host. No
-  wire change and no capability: a program cannot tell.
+- **Copying** (SPEC.md §10.2, §11): the new action `copy`, which the
+  default keymap binds to Control+c and Meta+c (Command+c). A text field's
+  keymap copies its selection; a selection elsewhere in a document is
+  copied by the keymap of the element it starts in, which the host offers
+  each key first, keyboard or not. With nothing selected, in a password
+  field, or under `Control+c=program`, the key goes to the program: Control+c
+  still interrupts. The terminal's own copy keys and menu copy whatever
+  the keymaps say. A double click selects a word, a triple click a block,
+  and Linux hosts put a selection in the primary selection. There is one
+  selection across the host. No wire change and no capability.
 - **Cutting, pasting and undo** (SPEC.md §10.2, §11): a text field's
   default keymap binds Control+x and Meta+x to the new action `cut`,
   Control+v and Meta+v to `paste`, Control+z and Meta+z to `undo`, and
