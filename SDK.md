@@ -933,7 +933,7 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `FitRows`, `CellCSS` | `FitRows`, `CellCSS` | `fit_rows`, `cell_css` | as Python | as Python | `fitRows`, `cellCss` |
 | a message as a `Reply` or an `Event`, `Err` | `hotty.ReplyOf(m)`, `hotty.EventOf(m)`, `hotty.Err(r)` | `m.reply()`, `m.event()`, `r.err()` | `m:reply()`, `m:event()`, `r:err()` | methods | `m.reply()`, `m.event()`, `r.err()` |
 | `Supports`, `Sends`, `Drags`, `Hovers`, `Views`, `Light`, `CellCSS`, `Merge` | `hotty.Supports(c, op)`, …, `hotty.CellCSS(c)`, `hotty.Merge(c, changed)` | `c.supports(op)`, …, `c.merge(changed)` | `c:supports(op)`, … | methods | `c.supports(op)`, … |
-| `Command`, `Changed` | `hotty.CommandOf(e)`, `hotty.ChangedOf(e)` | `e.command`, `e.changed` | as Python | methods | `e.command`, `e.changed` |
+| `Command`, `Changed` | `Event.Command`, `Event.Changed` | `e.command`, `e.changed` | as Python | methods | `e.command`, `e.changed` |
 | a control's `get` and `with` | `hotty.Get(ctl, k)`, `hotty.With(ctl, k, v)` | the SDK's own | the SDK's own | the SDK's own | the SDK's own |
 | `ParseKey`, `DecodeKeys` | `hotty.ParseKey`, `hotty.DecodeKeys` | `parse_key`, `decode_keys` | as Python | as Python | `parseKey`, `decodeKeys` |
 | `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Program`, `Scroll`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Program`, `.Scroll`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.program`, `.scroll`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:program`, `:scroll`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.program`, `.scroll`, `.format` |
