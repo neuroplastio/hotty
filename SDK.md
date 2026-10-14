@@ -183,8 +183,8 @@ An SDK **MUST** provide every component of this section.
 
 And these sets, each value under its canonical name:
 - **event kinds**: `click`, `change`, `input`, `submit`, `press`, `focus`,
-  `blur`, `resize`, `fit`, `hover`, `view`, `dragstart`, `drag`, `dragend`
-  (SPEC.md §9);
+  `blur`, `resize`, `fit`, `hover`, `view`, `dragstart`, `drag`, `dragend`,
+  `command`, `caps` (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
   `EBUDGET`, `EVERSION` (SPEC.md §3.6);
 - **delta ops**: `morph`, `inner`, `replace`, `append`, `prepend`, `before`,
@@ -255,6 +255,8 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | `Blur` | `a=blur:s` | surface | 2 |
 | `Sync` | `CSI ? 2026 h`, the commands, `CSI ? 2026 l` (SPEC.md §6.3) | commands | — |
 | `WithdrawLate` | `a=q:q=2`: withdraws a query that asked for a late answer (SPEC.md §4) | — | — |
+| `Edit` | `a=edit:take=<names>`, the names joined by `,`, in the order given; `take=` empty takes none (SPEC.md §10.6) | names | 2 |
+| `Menu` | `a=menu` and the menu as msgpack (below); with no menu, no payload, which hides it (SPEC.md §10.6) | menu | 2 |
 
 - **`Doc` and `Place` answer errors**, since a refused document or placement
   (`EQUOTA`, `ENOENT`) is something a program must hear. Everything else
@@ -264,6 +266,12 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
   leaves the cursor where it was: for a full-screen program, which places
   surfaces where it draws them. The coordinates have no leading zeros.
 - **`Sync`** takes commands already built, and brackets them.
+- **`Menu`** takes a `MenuLevel`: `Seq`, `Label` and `Items`, each item a
+  `MenuItem` with `Key`, `Label`, `Group` and `Enabled`. It writes one
+  msgpack map, each value in the smallest of its type's forms: `seq`,
+  `label` unless it is empty, `items`; each item `key`, `label` unless it
+  is empty, `group` only when true, `enabled`. These are myelin's names
+  and order, so a program on myelin hands its menu over as it is.
 
 #### 3.4.1 Placement
 
@@ -465,9 +473,10 @@ field as its type.
 | `Caps` | the capabilities, the body of an ok reply to `q` |
 | `Err` | the reply as an error, carrying `Code` and `Detail`; none when OK |
 
-**`Event`** (SPEC.md §9), when the action is `ev`: `Surface`, `Kind` (as it
-came, known or not), `Target` (`t`, empty when empty), and what the detail
-carries, each absent when the event does not carry it:
+**`Event`** (SPEC.md §9), when the action is `ev`: `Surface` (absent for
+`command` and `caps`, which belong to no surface), `Kind` (as it came,
+known or not), `Target` (`t`, empty when empty or absent), and what the
+detail carries, each absent when the event does not carry it:
 
 | name | holds | for |
 | --- | --- | --- |
@@ -482,6 +491,8 @@ carries, each absent when the event does not carry it:
 | `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press` |
 | `Count` | `count`: the click's place in its run of clicks (SPEC.md §9), 2 for the second click of a double click; 1 for a click whose detail has none | `click` |
 | `View` | `Areas`, from `in`: each id in view to its cells as `Area` holds them, leaving out one whose area lacks a field, and none when `in` is absent; and `AtEnd`, from `end`, false when absent (SPEC.md §9.5) | `view` |
+| `Command` | `Name`, `Key` and `Text`, from `name`, `key` and `text`, each empty when absent, and `HasText`, whether `text` is there (SPEC.md §10.6); absent when the detail has no `name` | `command` |
+| `Changed` | the capabilities that changed, a `Caps` with only the fields the detail has (SPEC.md §4) | `caps` |
 
 The detail is read by the event's kind, so a form field named `value` is in
 `Fields` and nowhere else. An event of a kind the SDK does not know carries
@@ -489,7 +500,8 @@ none of these, and its payload is in its message.
 
 **`Caps`** (SPEC.md §4) has every field SPEC.md lists: `V`, `Ops`,
 `Events`, `Cell` (`w`, `h`), `Scale`, `Scheme`, `Limits`, `Net`,
-`Passthrough`, `Scroll`, `Steps`, `Drop`, `Count`, `Host`, `Version`. It also answers:
+`Passthrough`, `Scroll`, `Steps`, `Drop`, `Count`, `Mod`, `Edit`, `Keys`
+(`Leader`, `Timeout`), `Menu`, `Host`, `Version`. It also answers:
 - `Supports(op)`: whether `op` is in `ops`; a host that lists no ops is
   taken to support them all;
 - `Sends(kind)`: whether the host sends `kind`; `drag` stands for the three
@@ -500,6 +512,8 @@ none of these, and its payload is in its message.
   since they came after the first hosts: a program offers another way to
   do what they do;
 - `Light`: the scheme is `light`;
+- `Merge(changed)`: the capabilities with the fields of a `caps` event's
+  `Changed` in place of their own;
 - `CellCSS`: a cell's size in CSS pixels, `Cell` divided by `Scale` (1
   when absent), and a usual 9 × 18 when the host gave no cell.
 
@@ -515,26 +529,38 @@ host.
 
 - **`ParseKey(name)`** reads a key's name in any of the forms SPEC.md §10.4
   allows (`Shift+Control+a`, `Control+ `) and returns it in the canonical
-  one (`Control+A`, `Control+Space`): modifiers in the order `Control`,
-  `Alt`, `Meta`, `Shift`, Shift shown in a character where the character
-  can show it, `Space` for a space. A name that does not parse (empty, an
-  unknown modifier, `Control+` with no key) is absent.
+  one (`Control+A`, `Control+Space`): modifiers in the order `Mod`,
+  `Control`, `Alt`, `Meta`, `Shift`, Shift shown in a character where the
+  character can show it, `Space` for a space. `Mod` is kept as written: a
+  keymap reads it (below). A name that does not parse (empty, an unknown
+  modifier, `Control+` with no key) is absent.
+- **`Platform`** is how a host reads bindings: `Mod`, `Control` or `Meta`
+  (SPEC.md §10.4), and `Edit`, its edit shortcuts, from each action to its
+  keys (SPEC.md §10.2). The zero Platform is `Control` with the default
+  edit shortcuts. `PlatformOf(caps)` takes both from the capabilities,
+  each the zero Platform's when absent. `DefaultEdit(mod)` returns the
+  default edit shortcuts for a `Mod`, in SPEC.md §10.2's order, the keys
+  canonical with `Mod` read: `Control+Z` and `Control+y` for `redo` where
+  it is Control.
 - **`DecodeKeys(input)`** reads input from the terminal, the bytes a
   program reads, as SPEC.md §10.4 names it: a list with one entry for each
   key, the key's canonical name, or absent for input that is no key it
   names (a mouse report, a sequence it does not know). It is pure: an `ESC`
   at the end of the input is `Escape`, and the caller passes each read
   whole (a framework's parser has already cut the input into keys).
-- **`Keymap`** is a set of bindings, key to action. `ParseKeymap(value)`
-  reads a `data-keys` value as SPEC.md §10.2 has hosts read it, dropping
-  the bindings a host ignores; `Format()` writes one back: each key once,
-  where it was first bound, with its last action, as `key=action`,
-  separated by a space.
-- **`Resolve(multiline, values…)`** builds a field's keymap: SPEC.md's
-  default keymap for an `input`, or for a multi-line field, then each
-  `data-keys` value in turn, the root's first. A binding to a scroll action
-  is left out where it stands, in its own value too: it neither acts nor
-  overrides an earlier binding of its key (SPEC.md §10.2).
+- **`Keymap`** is a set of bindings, key to action, read on a Platform.
+  `ParseKeymap(platform, value)` reads a `data-keys` value as SPEC.md
+  §10.2 has hosts read it, dropping the bindings a host ignores, and `Mod`
+  as the Platform's: on Control, `Mod+a` and `Control+a` are one key, the
+  later binding's. `Format()` writes one back: each key once, where it was
+  first bound, as its last binding wrote it (`Mod` kept), with its last
+  action, as `key=action`, separated by a space.
+- **`Resolve(platform, multiline, values…)`** builds a field's keymap:
+  SPEC.md's default keymap for the Platform's `Mod`, with its `Edit`, for
+  an `input` or for a multi-line field, then each `data-keys` value in
+  turn, the root's first. A binding to a scroll action is left out where
+  it stands, in its own value too: it neither acts nor overrides an
+  earlier binding of its key (SPEC.md §10.2).
 - **`Lookup(key)`** on a resolved keymap returns what the field does with
   the key: an action; `insert` for a character it types; or absent when the
   key is not the field's (it reaches the program, or Tab moves focus). Tab,
@@ -548,7 +574,8 @@ host.
   binds the key to `program`, or, for a key with Shift it does not bind, the
   key without Shift. On an element that is not a text field, a host asks it
   of the element's keymap, `ParseKeymap` of its `data-keys` values joined
-  with a space, the root's first, with no default keymap; a key it gives
+  with a space, the root's first, on the host's Platform, with no default
+  keymap; a key it gives
   reaches the program before the element or a scroll uses it (SPEC.md
   §10.2, keys for the program).
 - **`Scroll(key)`** returns the scroll action a keymap binds the key to,
@@ -557,11 +584,11 @@ host.
   §10.2, scrolling keys).
 - **`TerminalKeys`** is the SDK's keymap, the same in every SDK (§2.3): the
   keys of Bubble Tea's text input and text area (bubbles), which a program
-  that edits fields in cells is likely to share, but for Control+a, which
-  selects all, as in a GUI field and SPEC.md's default keymap (Home still
-  goes to the line's start). A program puts it in the
+  that edits fields in cells is likely to share, but for Mod+a, which
+  selects all, as in a GUI field and SPEC.md's default keymap: Control+a
+  on Linux, while on macOS Control+a stays the line's start. A program puts it in the
   `data-keys` of an element that holds its fields, and gives its cells
-  rendition the same keymap, `Resolve(multiline, TerminalKeys)`.
+  rendition the same keymap, `Resolve(platform, multiline, TerminalKeys)`.
 
   | action | keys |
   | --- | --- |
@@ -577,7 +604,7 @@ host.
   | `line-previous`, `line-next` | ArrowUp, Control+p; ArrowDown, Control+n |
   | `page-up`, `page-down` | PageUp; PageDown |
   | `input-start`, `input-end` | Alt+<, Control+Home; Alt+>, Control+End |
-  | `select-all` | Control+a |
+  | `select-all` | Mod+a |
   | `newline` | Control+m |
 
   It leaves Enter to SPEC.md's default (`submit` in an `input`, `newline`
@@ -893,6 +920,8 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Del`, `DelAll` | `Del`, `DelAll` | `delete`, `del_all` | `del`, `del_all` | `del`, `del_all` | `del`, `delAll` |
 | `Detach`, `Focus`, `Blur`, `Sync` | the same | `detach`, `focus`, `blur`, `sync` | as Python | as Python | `detach`, `focus`, `blur`, `sync` |
 | `WithdrawLate` | `hotty.WithdrawLate` | `withdraw_late` | `withdraw_late` | `withdraw_late` | `withdrawLate` |
+| `Edit`, `Menu` | `hotty.Edit`, `hotty.Menu` | `edit`, `menu` | as Python | as Python | `edit`, `menu` |
+| `MenuLevel`, `MenuItem` and their fields | `hotty.MenuLevel{Seq, Label, Items}`, `hotty.MenuItem{Key, Label, Group, Enabled}` | `MenuLevel(seq, label, items)`, `MenuItem(key, label, group, enabled)` | tables with those keys | `MenuLevel { seq, … }` | `{ seq, label, items }` |
 | `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor }` |
 | `N`, `Q`, `Detached`, `Scroll`, `Late` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)`, `hotty.Late()` | `n=`, `q=`, `detached=`, `scroll=`, `late=` | `{ n = …, q = …, detached = …, scroll = …, late = … }` | builder methods | `{ n, q, detached, scroll, late }` |
 | `ScrollVertical`, `ScrollHorizontal` | `hotty.ScrollVertical`, `hotty.ScrollHorizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` |
@@ -903,11 +932,13 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |
 | `FitRows`, `CellCSS` | `FitRows`, `CellCSS` | `fit_rows`, `cell_css` | as Python | as Python | `fitRows`, `cellCss` |
 | a message as a `Reply` or an `Event`, `Err` | `hotty.ReplyOf(m)`, `hotty.EventOf(m)`, `hotty.Err(r)` | `m.reply()`, `m.event()`, `r.err()` | `m:reply()`, `m:event()`, `r:err()` | methods | `m.reply()`, `m.event()`, `r.err()` |
-| `Supports`, `Sends`, `Drags`, `Hovers`, `Views`, `Light`, `CellCSS` | `hotty.Supports(c, op)`, …, `hotty.CellCSS(c)` | `c.supports(op)`, … | `c:supports(op)`, … | methods | `c.supports(op)`, … |
+| `Supports`, `Sends`, `Drags`, `Hovers`, `Views`, `Light`, `CellCSS`, `Merge` | `hotty.Supports(c, op)`, …, `hotty.CellCSS(c)`, `hotty.Merge(c, changed)` | `c.supports(op)`, …, `c.merge(changed)` | `c:supports(op)`, … | methods | `c.supports(op)`, … |
+| `Command`, `Changed` | `hotty.CommandOf(e)`, `hotty.ChangedOf(e)` | `e.command`, `e.changed` | as Python | methods | `e.command`, `e.changed` |
 | a control's `get` and `with` | `hotty.Get(ctl, k)`, `hotty.With(ctl, k, v)` | the SDK's own | the SDK's own | the SDK's own | the SDK's own |
 | `ParseKey`, `DecodeKeys` | `hotty.ParseKey`, `hotty.DecodeKeys` | `parse_key`, `decode_keys` | as Python | as Python | `parseKey`, `decodeKeys` |
 | `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Program`, `Scroll`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Program`, `.Scroll`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.program`, `.scroll`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:program`, `:scroll`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.program`, `.scroll`, `.format` |
 | `TerminalKeys` | `hotty.TerminalKeys` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` |
+| `Platform`, `PlatformOf`, `DefaultEdit` | `hotty.Platform{Mod, Edit}`, `hotty.PlatformOf`, `hotty.DefaultEdit` | `Platform(mod, edit)`, `platform_of`, `default_edit` | a table `{ mod = …, edit = … }`, `platform_of`, `default_edit` | as Python | `{ mod, edit }`, `platformOf`, `defaultEdit` |
 | `Field`, `Do`, `Type` | `hottyedit.Field`, `(*Field).Do`, `.Type` | `Field`, `.do`, `.type` | `field`, `:do_action` (`do` is a keyword), `:type` | `Field`, `do_action`, `type_text` | `Field`, `.do`, `.type` |
 
 In the vectors, every name is in snake case: `place_at`, `keep_cursor`,

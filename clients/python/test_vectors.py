@@ -136,8 +136,23 @@ def build(b):
         "detach": lambda: hotty.detach(a["surface"], **ro),
         "focus": lambda: hotty.focus(a["surface"], a.get("target", ""), **ro),
         "blur": lambda: hotty.blur(a["surface"], **ro),
+        "edit": lambda: hotty.edit(a.get("names", []), **ro),
+        "menu": lambda: hotty.menu(menu_level(a["menu"]) if "menu" in a else None, **ro),
     }[name]
     return fn()
+
+
+def menu_level(m):
+    items = [hotty.MenuItem(i["key"], i.get("label", ""), i.get("group", False), i.get("enabled", True))
+             for i in m.get("items", [])]
+    return hotty.MenuLevel(m.get("seq", []), m.get("label", ""), items)
+
+
+def payload_of(seg):
+    """A command's payload as a vector gives it: text, or payload_b64."""
+    if "payload_b64" in seg:
+        return base64.b64decode(seg["payload_b64"])
+    return seg.get("payload", "").encode()
 
 
 def run_build(v):
@@ -150,11 +165,11 @@ def run_build(v):
         result, m = dec.feed(b)
         if result != hotty.COMPLETE:
             return False, f"a command did not decode: {result}"
-        got.append({"cmd": {"control": m.control, "payload": m.payload.decode()}})
+        got.append({"cmd": {"control": m.control, "payload": bytes(m.payload)}})
     want = []
     for seg in v["out"]:
         if "cmd" in seg:
-            want.append({"cmd": {"control": seg["cmd"]["control"], "payload": seg["cmd"].get("payload", "")}})
+            want.append({"cmd": {"control": seg["cmd"]["control"], "payload": payload_of(seg["cmd"])}})
         else:
             want.append(seg)
     return got == want, f"got {got}"
@@ -207,7 +222,9 @@ def event_view(e):
     hover = e.hover()
     area = e.area()
     view = e.view()
+    cmd = e.command()
     return {
+        "command": {"name": cmd.name, "key": cmd.key, "text": cmd.text, "has_text": cmd.has_text} if cmd else None,
         "surface": e.surface,
         "kind": e.kind,
         "target": e.target,
@@ -245,6 +262,10 @@ def caps_view(c, want):
         "steps": c.steps,
         "drop": c.drop,
         "count": c.count,
+        "mod": c.mod,
+        "edit": c.edit,
+        "keys": {"leader": c.keys.leader, "timeout": c.keys.timeout} if c.keys else None,
+        "menu": c.menu,
         "host": c.host,
         "version": c.version,
         "drags": c.drags(),
@@ -305,6 +326,16 @@ def run_decode(v):
             ok, why = match(event_view(e), want["event"], "event")
             if not ok:
                 return ok, why
+            if "changed" in want:
+                ch = e.changed()
+                if ch is None:
+                    return False, "no changed caps"
+                if set(ch.raw) != set(want["changed"]["fields"]):
+                    return False, f"changed fields {sorted(ch.raw)}"
+                fields = {k: x for k, x in want["changed"].items() if k != "fields"}
+                ok, why = match(caps_view(ch, fields), fields, "changed")
+                if not ok:
+                    return ok, why
         if "caps" in want:
             c = m.reply().caps() if m.reply() else None
             if want["caps"] is None:
@@ -409,9 +440,14 @@ def run_keys(v):
     return got == v["canon"], f"{got!r}, want {v['canon']!r}"
 
 
+def platform(v):
+    p = v.get("platform", {})
+    return hotty.Platform(p.get("mod", "Control"), p.get("edit"))
+
+
 def run_keymap(v):
     if "program" in v or "scroll" in v:
-        m = hotty.parse_keymap(" ".join(v["keys"]))
+        m = hotty.parse_keymap(platform(v), " ".join(v["keys"]))
         for key, want in v.get("program", {}).items():
             got = m.program(key)
             if got != want:
@@ -422,10 +458,10 @@ def run_keymap(v):
                 return False, f"{key!r}: scroll {got!r}, want {want!r}"
         return True, ""
     if "lookup" not in v:
-        got = hotty.parse_keymap(v["parse"] if "parse" in v else hotty.TERMINAL_KEYS).format()
+        got = hotty.parse_keymap(platform(v), v["parse"] if "parse" in v else hotty.TERMINAL_KEYS).format()
         return got == v["format"], f"{got!r}, want {v['format']!r}"
     layers = ([hotty.TERMINAL_KEYS] if v.get("terminal_keys") else []) + v["keys"]
-    m = hotty.resolve(v["multiline"], *layers)
+    m = hotty.resolve(platform(v), v["multiline"], *layers)
     for key, want in v["lookup"].items():
         got = m.lookup(key)
         if got != want:

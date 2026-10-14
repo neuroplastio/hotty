@@ -163,8 +163,8 @@ alphabet).
 - **A host's bodies are msgpack**
   ([MessagePack](https://github.com/msgpack/msgpack/blob/master/spec.md)).
   The body of a reply (§3.6, §4) or an event (§9) is one msgpack map, with
-  nothing after it. What a program sends is not msgpack: documents, deltas
-  and resources are text or bytes.
+  nothing after it. What a program sends is not msgpack, but
+  for a menu (§10.6): documents, deltas and resources are text or bytes.
 - **Each field has a type.** This document shows a body as JSON with types
   in place of values: `{"c": int, "keys": [str]}` is a map with an int
   `c` and an array of strings `keys`, and `{str: int}` a map from strings
@@ -210,7 +210,7 @@ into chunks of at most 4096 payload bytes each:
 
 | key | meaning |
 | --- | --- |
-| `a` | the action: `q`, `doc`, `place`, `hide`, `delta`, `res`, `del`, `detach`, `focus`, `blur` from the program (§4–§10); `ok`, `err`, `ev` from the host |
+| `a` | the action: `q`, `doc`, `place`, `hide`, `delta`, `res`, `del`, `detach`, `focus`, `blur`, `edit`, `menu` from the program (§4–§10); `ok`, `err`, `ev` from the host |
 | `s` | a surface name: `[A-Za-z0-9_-]{1,64}` |
 | `n` | a request number chosen by the program, echoed in the reply |
 | `q` | quiet: `0` (default) reply always, `1` reply only on error, `2` never reply |
@@ -339,6 +339,10 @@ The capabilities, the body of that reply, are a map of these fields (§3.3):
 | `steps` | bool | `true` when a drag of an element with `data-steps` says where in the element the pointer is (§9.1). Absent: a drag's detail has no `x` or `y` |
 | `drop` | bool | `true` when an element with `drop` in its `data-on` can be where a drag goes without being dragged, and a drag says where in it the pointer is when it has `data-steps` (§9.1). Absent: only an element that opts in to drags is ever `t`, and a drag's detail has no `tx` or `ty` |
 | `count` | bool | `true` when a repeated click carries its `count` (§9). Absent: every click reads as the first of its run, and a program offers another way to do what a double click would |
+| `mod` | str | `"Control"` or `"Meta"`: the modifier `Mod` stands for in bindings (§10.4) |
+| `edit` | `{str: [str]}` | the host's edit shortcuts (§10.2), from each action to its keys as §10.4 names them: `{"copy": ["Control+c"], …}`. A host that reports them takes edit commands from a program in the cells (§10.6) |
+| `keys` | `{"leader": str, "timeout": int}` | the user's leader, a key sequence, and how long a sequence waits for its next key, in milliseconds (§10.5). Absent: the host reads no key sequences |
+| `menu` | bool | `true` when the host shows a program's which-key menus (§10.6) |
 | `host` | str | optional: a name for the implementation |
 | `version` | str | optional, with `host`: the implementation's version, as dot-separated numbers compared one by one (`"0.0.10"` is after `"0.0.9"`) |
 
@@ -348,7 +352,8 @@ The capabilities describe the host when it answers. `cell` and `scale`
 change during a session, with the terminal's zoom, its font, or the
 display it is on (§5.3). A cell's size in CSS pixels, `cell` over `scale`,
 changes only with the font, and the host then sends `resize` (§9). A
-program that keeps it asks again (`a=q`) then.
+program that keeps it asks again (`a=q`) then. `mod`, `edit` and `keys`
+are the user's, and may change too: the host then sends `caps` (§9).
 
 ## 5. Surfaces
 
@@ -880,7 +885,11 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `fit` | on a placement made with `f=1` (§5.2), the rows the document needs at the placement's width changed; `t` is empty | `{"r": int}`: the rows `r=auto` would choose now |
 | `hover` | on a placement made with `v=1` (§5.2), the element the pointer is over changed, or the pointer left the window (§9.4) | `{"c": int, "r": int}`: the pointer's cell (§9.1); `{"out": bool}`, `true`, when it left, with `t` empty |
 | `view` | which elements with `data-on~=view` are in view, or where they are, changed, or whether the document shows its end (§9.5); `t` is empty | `{"in": {str: area}, "end": bool}`: each element in view by its id, with its cells (below) |
+| `command` | a key of an edit command the program takes, or a menu of the terminal (§10.6) | `{"name": str, "key": str}`, with `"text": str` for a paste |
+| `caps` | `mod`, `edit` or `keys` changed (§4) | the fields that changed, as the capabilities have them |
 
+- **Events of the terminal,** `command` and `caps`, belong to no surface,
+  and have neither `s` nor `t`.
 - **The element that reports** a `click` is the nearest one, from the target
   of the click outward, that is one of those kinds. If it has no `id`,
   nothing is reported: the id is the program's handle. A link is the
@@ -1346,15 +1355,19 @@ is offered the second time as the key that input reads as.
   one, or before the first, the surface loses the keyboard: the host sends
   `blur` and the terminal has the keyboard again.
 - **Escape** is never used by the surface, except by a select's open list
-  (below). It reaches the program, which decides, for instance by sending
-  `a=blur`.
+  (below) and a key sequence that waits (§10.5). It reaches the program,
+  which decides, for instance by sending `a=blur`.
+- **A key sequence that waits** (§10.5) takes every key first.
 - **A key the element gives the program** reaches it, whatever the element
   or the scrolling (§5.3) would do with it (below, *Keys for the program*).
+- **A key that starts a key sequence** (§10.5), and that the element does
+  not use, starts it.
 - **A key the element binds to a scroll action**, and does not use, scrolls
   the surface's document (below, *Scrolling keys*).
 - **Every other key** reaches the program as ordinary terminal input, in the
-  keyboard encoding the program has enabled. A program's own keymap therefore
-  keeps working while a surface holds the keyboard.
+  keyboard encoding the program has enabled, or as an edit command it takes
+  (§10.6). A program's own keymap therefore keeps working while a surface
+  holds the keyboard.
 
 #### Selects
 
@@ -1397,43 +1410,70 @@ only that.
 tab, line feed, form feed, carriage return), as HTML's space-separated
 tokens are. A binding is
 `key=action`, split at its last `=`: the key is named as §10.4 has it
-(`Control+a`, `Alt+ArrowLeft`, `Alt+==line-start` binds `Alt+=`), and the
+(`Control+a`, `Mod+s`, `Alt+ArrowLeft`, `Alt+==line-start` binds `Alt+=`), and the
 action is one of the table below or a scroll action (*Scrolling keys*). A
 host **MUST** ignore a binding whose key does not parse or whose action it
 does not know, and bindings of Tab,
 Shift+Tab and Escape, which keep their meaning above.
 
-The default keymap is:
+The default keymap is the keys every host binds, then those of the host's
+platform modifier, `Mod` (§10.4), then the host's edit shortcuts. Every
+host binds:
 
 | key | action |
 | --- | --- |
 | ArrowLeft, ArrowRight | `char-backward`, `char-forward` |
-| Control+ArrowLeft, Control+ArrowRight; Alt+ArrowLeft, Alt+ArrowRight | `word-backward`, `word-forward` |
+| Alt+ArrowLeft, Alt+ArrowRight | `word-backward`, `word-forward` |
 | Home, End | `line-start`, `line-end` |
-| Control+Home, Control+End | `input-start`, `input-end` |
 | Backspace, Delete | `delete-char-backward`, `delete-char-forward` |
-| Control+Backspace, Control+Delete; Alt+Backspace, Alt+Delete | `delete-word-backward`, `delete-word-forward` |
+| Alt+Backspace, Alt+Delete | `delete-word-backward`, `delete-word-forward` |
 | ArrowUp, ArrowDown | `line-previous`, `line-next` |
 | PageUp, PageDown | `page-up`, `page-down` |
-| Control+a | `select-all` |
+| Enter | `submit` in an `input`, `newline` in a multi-line field |
+
+Where `Mod` is Control:
+
+| key | action |
+| --- | --- |
+| Control+ArrowLeft, Control+ArrowRight | `word-backward`, `word-forward` |
+| Control+Home, Control+End | `input-start`, `input-end` |
+| Control+Backspace, Control+Delete | `delete-word-backward`, `delete-word-forward` |
+
+Where `Mod` is Meta:
+
+| key | action |
+| --- | --- |
 | Meta+ArrowLeft, Meta+ArrowRight | `line-start`, `line-end` |
 | Meta+ArrowUp, Meta+ArrowDown | `input-start`, `input-end` |
 | Meta+Backspace | `delete-to-line-start` |
-| Meta+a | `select-all` |
-| Control+c, Meta+c | `copy` |
-| Control+x, Meta+x | `cut` |
-| Control+v, Meta+v | `paste` |
-| Control+z, Meta+z | `undo` |
-| Control+Z, Control+y, Meta+Z | `redo` |
-| Enter | `submit` in an `input`, `newline` in a multi-line field |
+| Control+a, Control+e | `line-start`, `line-end` |
+| Control+b, Control+f | `char-backward`, `char-forward` |
+| Control+p, Control+n | `line-previous`, `line-next` |
+| Control+h, Control+d | `delete-char-backward`, `delete-char-forward` |
+| Control+k | `delete-to-line-end` |
 
-These are a text field's keys in a browser: on Linux and Windows, and on
-macOS, whose Command key is Meta and Option key Alt (§10.4). Control+Z is
-Control+Shift+z (§10.4). Shift selects with each move (below). A program that wants one of them binds it to
-`program`. A host that sees only what the program would read (§10.4) can
-offer a key only as that: in the legacy encoding a terminal may send
-Control+Backspace as `0x08`, which is Control+h, and a macOS terminal sends
-Command+ArrowLeft as `0x01`, which is Control+a.
+The **edit shortcuts** are the host's, and the user's to change; a host
+reports them as `edit` (§4). The same keys send a program in the cells the
+edit commands it takes (§10.6). Unless the user changes them, they are:
+
+| key | action |
+| --- | --- |
+| Mod+a | `select-all` |
+| Mod+c | `copy` |
+| Mod+x | `cut` |
+| Mod+v | `paste` |
+| Mod+z | `undo` |
+| Mod+Z; Control+y where `Mod` is Control | `redo` |
+
+These are a text field's keys in a browser on Linux and Windows, where
+`Mod` is Control, and on macOS, where it is Meta: the Command key is Meta,
+the Option key Alt (§10.4), and Control+a and the keys after it are
+Cocoa's. Mod+Z is Mod+Shift+z (§10.4). Shift selects with each move
+(below). A program that wants one of them binds it to `program`. A host
+that sees only what the program would read (§10.4) can offer a key only as
+that: in the legacy encoding a terminal may send Control+Backspace as
+`0x08`, which is Control+h, and a macOS terminal sends Command+ArrowLeft as
+`0x01`, which is Control+a.
 
 A key goes to the field's keymap:
 - **Bound:** the field does the action. A key bound to `program`, or to an
@@ -1506,7 +1546,7 @@ The actions:
 - **The clipboard** is the host's: the platform's, where there is one. A
   field has no `copy` or `cut` with nothing selected, nor in a password
   field, and no `paste` on a host that cannot read the clipboard: the key
-  reaches the program, so Control+c still interrupts it. An `input` drops the
+  reaches the program, so Control+c on Linux still interrupts it. An `input` drops the
   line breaks from what it pastes, as HTML's does.
 - **Undo.** Each text field keeps a history of its edits, as a browser's
   does, for as long as it is in the document:
@@ -1617,10 +1657,18 @@ each followed by `+`: `a`, `A`, `Enter`, `ArrowLeft`, `Control+a`,
   (`Control+Shift+a` reads as `Control+A`).
 - **`Space`** is the space bar's key value, a space, written so that it can
   stand in a list (`Control+Space`). `+` is the plus key (`Control++`).
+- **`Mod`**, in a binding (§10.2, §10.5), is the platform's modifier for
+  commands: Meta on macOS, whose Command key is Meta, and Control
+  elsewhere, unless the user sets it otherwise. A host reports it as `mod`
+  (§4), and reads `Mod` as that modifier wherever it reads a binding, so
+  `Mod+c` is `Meta+c` on macOS and `Control+c` on Linux. It is written
+  before the other modifiers (`Mod+Shift+ArrowLeft`), and no key pressed
+  is named with it.
 
 A host offers a surface that has the keyboard each key at most twice
 (§10.2). The surface uses a key that its focused element uses, Tab and
-Shift+Tab, which move focus, and a key it scrolls with (§5.3):
+Shift+Tab, which move focus, a key of a key sequence (§10.5), and a key it
+scrolls with (§5.3):
 - **As pressed, first.** A host that sees the key the user pressed (a
   terminal emulator, a browser) offers it before the terminal's own
   shortcuts and before the bindings that translate keys, named from the key
@@ -1676,6 +1724,143 @@ Shift+Tab, which move focus, and a key it scrolls with (§5.3):
 - **Anything else,** such as a sequence this table does not name, is no key
   a field uses: it reaches the program.
 
+### 10.5 Key sequences
+
+A document gives an element a key sequence that activates it, as an access
+key does in a browser, and while a sequence waits for its next key the host
+shows which keys can follow, as a which-key menu:
+
+```html
+<menu data-key="<leader> f" aria-label="File">
+  <button id=new data-key="n">New file</button>
+  <button id=open data-key="o">Open…</button>
+</menu>
+<button id=top data-key="g g" hidden>Top</button>
+```
+
+- **`data-key`** is a sequence: keys named as §10.4 names them, `Mod`
+  included, separated by ASCII white space, as myelin writes them. `g g` is
+  `g` twice. `<leader>` stands for the user's leader, a sequence the host
+  reports as `keys.leader` (§4). A host **MUST** ignore a `data-key` with a
+  key that does not parse, with Tab, Shift+Tab or Escape, or with any other
+  name in angle brackets.
+- **Groups.** A sequence goes on from the one of the nearest element around
+  it that has a `data-key`: above, the button's `n` is `<leader> f n`. An
+  element with such elements inside it is a group: its sequence leads to
+  theirs, and does nothing itself.
+- **What a sequence does.** The host activates its element as a browser
+  does an access key. It clicks an element a click activates (a `button`,
+  a link, a `summary`, a checkbox or radio button, an `input` of type
+  `button`, `submit` or `reset`, an element with `data-on~=click`), which
+  does and reports what a click from the keyboard does (§9), and focuses
+  any other element that takes focus (§10.1). A disabled element's
+  sequence does nothing. A hidden element's works, so a hidden button is a
+  command with nothing on the screen; its click's `area` is all zeros.
+- **Which element.** Sequences work while the surface has the keyboard
+  (§10.1). Where several elements have the same sequence, the one nearest
+  the focused element wins: the one whose nearest common ancestor with it
+  is deepest, and of those the last in tree order.
+- **Starting.** A key that starts a sequence starts it when the focused
+  element does not use it and its keymap does not give it to the program
+  (§10.2): Space on a button presses the button, and a character in a text
+  field types.
+- **Waiting.** While a sequence waits, the next key the host offers, as
+  pressed or as the program would read it (§10.4), is the sequence's:
+  - a key that finishes a sequence runs it, unless a longer one, at least
+    as near the focus, goes on from it: then it waits again, as it does on
+    a key that only goes on;
+  - **Escape** ends the wait, and does nothing more;
+  - **any other key** ends the wait, and the keys typed, that one included,
+    go on in order as if no element had a `data-key`: to the element, the
+    scroll actions and the program (§10.2);
+  - after `keys.timeout` milliseconds (§4) with no key, the sequence typed
+    runs if it finishes one, and its keys go on otherwise.
+
+  The wait also ends, and its keys do nothing, when the surface loses the
+  keyboard. These are myelin's rules, so a program that reads the same
+  keymap in its cells does there what the host does here (§10.6).
+- **The menu.** While a sequence waits, the host **SHOULD** show the keys
+  that can follow it, each with its label: a group's `aria-label`, an
+  element's `aria-label`, or else its text, with its white space collapsed.
+  A disabled element's key shows as disabled. The host draws the menu
+  itself, as it may a select's list (§10.2), and **MAY** wait a moment
+  first, so that a sequence typed quickly shows none.
+- A host that reads sequences reports `keys` (§4). Others ignore
+  `data-key`.
+
+### 10.6 Commands in the cells
+
+A program in the cells reads keys as bytes, and to it an edit shortcut
+(§10.2) is a key like any other: Control+c interrupts, Control+v quotes the
+next key. A program that selects, edits or undoes in its cells, as a text
+field does on a surface, takes the edit commands instead:
+
+```
+ESC ] 7279 ; a=edit:take=copy,paste,undo,redo ST
+```
+
+- **`take`** names the commands, the actions of the edit shortcuts
+  (`select-all`, `copy`, `cut`, `paste`, `undo`, `redo`), comma-separated.
+  Each `a=edit` replaces what the last took, and one with an empty `take`,
+  or none, takes nothing. A host **MUST** ignore a name it does not know.
+- **Per screen.** The main screen and the alternate screen each keep their
+  own, as the kitty keyboard protocol keeps its flags (§10.3): a
+  full-screen program takes its commands after switching to the alternate
+  screen, and leaving it drops them. A full reset (RIS) drops both.
+- **A key of a command taken,** one of the host's edit shortcuts (`edit`,
+  §4), reaches the program as the event `command`, in place of its bytes,
+  and so does each of its repeats. Its release sends nothing (§10.3).
+
+  ```
+  ESC ] 7279 ; a=ev:e=command ; <base64 msgpack detail> ST
+  ```
+
+  The detail is `{"name": str, "key": str}`: the command, and its key as
+  §10.4 names it. A `paste` also has `"text": str`, the text on the
+  clipboard, and none when the clipboard holds no text or the host cannot
+  read it.
+- **The program decides** what the command means. It copies what it has
+  selected, and with nothing selected takes the command as its key, as a
+  text field does (§10.2): Control+c still interrupts.
+- **The terminal's selection comes first.** While the user has text
+  selected in the cells, a key of `copy` copies it, as the terminal's own
+  copy does, and is not sent. A surface's selection is copied as §11 says.
+- **A surface that has the keyboard** is offered the key first (§10.2). A
+  key it does not use reaches the program as the command.
+- **The terminal's menus,** such as an Edit menu or a context menu, send
+  the command they name, with no `key`, where its key would send one. Their
+  copy copies the terminal's selection first, as above.
+- **In order.** A command reaches the program on its input, among the keys
+  typed around it, as every event does (§9): a paste never overtakes what
+  was typed before it. The terminal's own paste, by a key that is no edit
+  shortcut, still sends the clipboard as it would without HOTTY, as a
+  bracketed paste where the program asked for one.
+- **A host that takes `a=edit`** reports its edit shortcuts as `edit`
+  (§4). When they change, or `mod` does (§10.4), as when a multiplexer's
+  viewer changes to one on another platform, it sends `caps` (§9).
+
+**Menus.** A program that reads key sequences in its cells, as one built on
+myelin does, shows which keys can follow one while it waits by sending the
+host its menu:
+
+```
+ESC ] 7279 ; a=menu ; <base64 msgpack menu> ST
+```
+
+- **The menu** is one msgpack map (§3.3), myelin's which-key level:
+  `{"seq": [str], "label": str, "items": [item]}`. `seq` is the keys typed
+  so far, as §10.4 names them, and `label` their group's label. Each item
+  is a key that can follow them, `{"key": str, "label": str, "group":
+  bool, "enabled": bool}`: the key, what it does, whether more keys follow
+  it, and whether it does anything now. A host **MAY** show only as many
+  items as fit.
+- **The host shows it** as it shows a surface's (§10.5), until the program
+  sends another, or `a=menu` with no body, which hides it. It also hides
+  it on Escape, on a key the menu does not list, when the screen changes
+  and on a full reset (RIS), so that a program that ends while it waits
+  leaves none behind. The keys still reach the program.
+- A host that shows menus reports `menu` (§4).
+
 ## 11. Text
 
 A surface is drawn as pixels, but it is never only pixels: the host holds its
@@ -1700,7 +1885,7 @@ document, and therefore its text.
   offers it each key first, before the surface that has the keyboard and
   the terminal's own shortcuts, whether or not the surface has the
   keyboard. A key it does not bind to `copy`, `program` included, goes on
-  as if nothing were selected: under `Control+c=program`, Control+c
+  as if nothing were selected: under `Mod+c=program`, Control+c on Linux
   interrupts the program while text is selected.
 - **The terminal's own copy** and paste, from its own keys or its menu,
   are the user's whatever the keymaps say. Its copy **SHOULD** copy a
@@ -1833,7 +2018,8 @@ A host conforms to HOTTY version 0.2 when:
 
 The vectors check replies, error codes, every delta op, morph, context
 parsing, resources, drags and their steps, presses with Alt, `fit`, hover,
-`area`, scrolling, `reveal` and `view`, keymaps and the envelope, and their
+`area`, scrolling, `reveal` and `view`, key sequences, edit commands,
+keymaps and the envelope, and their
 `keys`, `keymap` and `edit` sections a host's key names (§10.4), keymaps
 and actions (§10.2).
 They inspect documents and events, not pixels.
@@ -1841,7 +2027,9 @@ The vectors marked `"passthrough"` apply to a host that reports it (§9.3),
 those marked `"hover"` to a host whose `events` list it (§9.4), those
 marked `"scroll"` to a host that reports it (§5.3), those marked
 `"steps"`, `"drop"` or `"count"` to a host that reports it (§9.1, §9),
-and those marked `"view"` to a host whose `events` list it (§9.5).
+those marked `"view"` to a host whose `events` list it (§9.5), those
+marked `"keys"` to a host that reports it (§10.5), and those marked
+`"commands"` to a host with a terminal that takes edit commands (§10.6).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
@@ -2194,6 +2382,32 @@ program → CSI ? 2026 l
     `program`, as a REPL that always interrupts with Control+c. The
     terminal's own copy and paste stay the user's, so no document makes
     its text uncopyable.
+  - **One key per platform, `Mod`,** because binding both Control+c and
+    Command+c takes a key from the program on each platform for nothing.
+    The rows around it follow the platform too: Control+a is a line's
+    start on macOS and Command+a selects all.
+- **Why edit commands in the cells.** A program that selects and edits in
+  its cells needs the same keys as a field, and those keys mean something
+  in a terminal. Neither side can decide alone: the terminal does not know
+  whether the program has something selected, and the program cannot read
+  the clipboard in order with its keys. So the terminal sends the command
+  with its key, the paste with its text, and the program decides, as a
+  field decides on a surface. It takes them by name, per screen, as the
+  kitty keyboard protocol's flags are taken, so a shell and a full-screen
+  editor run in one terminal each get what they asked for.
+- **Why key sequences.** Leader keys and which-key menus are how keyboard
+  programs grow past the keys they have (Spacemacs, Neovim, Zed, Helix).
+  On a surface only the host can wait for the next key without a race,
+  so the document declares its sequences on the elements they activate,
+  as `accesskey` does, and the host resolves them by myelin's rules.
+  - **The element's own keys first,** so a leader never takes Space from a
+    button or a letter from a field.
+  - **The label is the element's,** its text or `aria-label`, so the menu
+    says what the screen says.
+  - **In the cells the program resolves them,** since it reads the keys
+    anyway, and sends only the menu to draw. One menu, drawn by the host,
+    serves both, and a program that builds both from one keymap behaves
+    the same in each.
 - **Why a host may show no select list.** A select's list opens past its
   control, and a surface is a rectangle of cells: drawn inside, a list
   would force small surfaces to grow, and drawn outside, it is something

@@ -10155,6 +10155,499 @@
      ]
     }
    ]
+  },
+  {
+   "name": "a key sequence clicks its element; its keys are the surface's, and a key that does not go on lets the keys typed go on in order (SPEC \u00a710.5)",
+   "requires": "keys",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}button,input{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}</style><button id=k>k</button><button id=top data-key=\"g g\">top</button>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "k",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "top",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 1,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "g",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Escape",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a group's sequence leads to those inside it, and the leader is the host's (SPEC \u00a710.5)",
+   "requires": "keys",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}button,input{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}</style><button id=k>k</button><menu data-key=\"<leader> f\" aria-label=File><button id=new data-key=n>new</button><button id=open data-key=o>open</button></menu>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "k",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "f",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "o",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "open",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 2,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "f",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "n",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "new",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 1,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "the focused element keeps the keys it uses: Space presses a button, and a field types (SPEC \u00a710.5)",
+   "requires": "keys",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}button,input{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}</style><button id=k>k</button><input id=i data-on=input><button id=b data-key=\"<leader> b\">b</button><button id=g data-key=\"g\">g</button>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "k",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "i",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "value": "g"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "of two elements with one sequence, the one nearest the focus wins; a disabled element's does nothing, a hidden one's clicks with no area, and one that takes focus is focused (SPEC \u00a710.5)",
+   "requires": "keys",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}button,input{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}</style><div><button id=a data-key=x>a</button></div><div><button id=f>f</button><button id=b data-key=x>b</button></div><button id=d disabled data-key=z>d</button><button id=h hidden data-key=h>h</button><input id=i data-key=\"/\">"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "f",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 2,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "h",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 0,
+         "h": 0
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "/",
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "i"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a sequence that finishes one and goes on to a longer one waits; a key the keymap gives the program never starts one, and an invalid data-key is ignored (SPEC \u00a710.5)",
+   "requires": "keys",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}button,input{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}</style><div data-keys=\"p=program\"><button id=k>k</button><button id=g1 data-key=g>g</button><button id=g2 data-key=\"g g\">gg</button><button id=p data-key=p>p</button><button id=t data-key=\"t Tab\">t</button></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "k",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "g2",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 2,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "p",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "t",
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "edit commands: a program takes them by name, and their keys reach it as command, with the key (SPEC \u00a710.6)",
+   "requires": "commands",
+   "steps": [
+    {
+     "send": {
+      "a": "edit",
+      "take": "copy,undo",
+      "q": "2"
+     }
+    },
+    {
+     "key": "c",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "command",
+       "detail": {
+        "name": "copy",
+        "key": "Control+c"
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "command",
+       "detail": {
+        "name": "undo",
+        "key": "Control+z"
+       }
+      }
+     ]
+    },
+    {
+     "key": "x",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "edit",
+      "take": "",
+      "q": "2"
+     }
+    },
+    {
+     "key": "c",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    }
+   ]
   }
  ],
  "wire": [
@@ -11142,6 +11635,102 @@
        "q": "1"
       },
       "payload": "<p>hi</p>"
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit: a=edit:take with the names, comma-separated, in order (SPEC \u00a710.6)",
+   "build": "edit",
+   "args": {
+    "names": [
+     "copy",
+     "paste",
+     "undo",
+     "redo"
+    ]
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "edit",
+       "take": "copy,paste,undo,redo",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "edit with no names: take= empty takes none",
+   "build": "edit",
+   "args": {
+    "names": []
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "edit",
+       "take": "",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "menu: a=menu and the level as msgpack, myelin's names and order, an empty label and a false group left out (SPEC \u00a710.6, SDK.md \u00a73.4)",
+   "build": "menu",
+   "args": {
+    "menu": {
+     "seq": [
+      "Space"
+     ],
+     "label": "",
+     "items": [
+      {
+       "key": "f",
+       "label": "+file",
+       "group": true,
+       "enabled": true
+      },
+      {
+       "key": "q",
+       "label": "Quit",
+       "enabled": true
+      },
+      {
+       "key": "w",
+       "enabled": false
+      }
+     ]
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "menu",
+       "q": "2"
+      },
+      "payload_b64": "gqNzZXGRpVNwYWNlpWl0ZW1zk4Sja2V5oWalbGFiZWylK2ZpbGWlZ3JvdXDDp2VuYWJsZWTDg6NrZXmhcaVsYWJlbKRRdWl0p2VuYWJsZWTDgqNrZXmhd6dlbmFibGVkwg=="
+     }
+    }
+   ]
+  },
+  {
+   "name": "menu with none: no payload, which hides it",
+   "build": "menu",
+   "args": {},
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "menu",
+       "q": "2"
+      }
      }
     }
    ]
@@ -14876,6 +15465,269 @@
    "requires": [
     "event.count"
    ]
+  },
+  {
+   "name": "command: an edit command with its key, which belongs to no surface (SPEC \u00a710.6)",
+   "seqs": [
+    "\u001b]7279;a=ev:e=command;gqRuYW1lpGNvcHmja2V5qUNvbnRyb2wrYw==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "name": "copy",
+     "key": "Control+c"
+    }
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "e": "command"
+     },
+     "event": {
+      "surface": null,
+      "kind": "command",
+      "target": "",
+      "command": {
+       "name": "copy",
+       "key": "Control+c",
+       "text": "",
+       "has_text": false
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "command: a paste carries the clipboard's text",
+   "seqs": [
+    "\u001b]7279;a=ev:e=command;g6RuYW1lpXBhc3Rlo2tleaZNZXRhK3akdGV4dKl0d28KbGluZXM=\u001b\\"
+   ],
+   "bodies": [
+    {
+     "name": "paste",
+     "key": "Meta+v",
+     "text": "two\nlines"
+    }
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "e": "command"
+     },
+     "event": {
+      "kind": "command",
+      "command": {
+       "name": "paste",
+       "key": "Meta+v",
+       "text": "two\nlines",
+       "has_text": true
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "command: from a menu, no key; an empty text is text",
+   "seqs": [
+    "\u001b]7279;a=ev:e=command;gqRuYW1lpXBhc3RlpHRleHSg\u001b\\"
+   ],
+   "bodies": [
+    {
+     "name": "paste",
+     "text": ""
+    }
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "e": "command"
+     },
+     "event": {
+      "kind": "command",
+      "command": {
+       "name": "paste",
+       "key": "",
+       "text": "",
+       "has_text": true
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "command: a detail with no name is no command",
+   "seqs": [
+    "\u001b]7279;a=ev:e=command;gaNrZXmpQ29udHJvbCtj\u001b\\"
+   ],
+   "bodies": [
+    {
+     "key": "Control+c"
+    }
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "e": "command"
+     },
+     "event": {
+      "kind": "command",
+      "command": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "caps: the capabilities that changed, and only those (SPEC \u00a74)",
+   "seqs": [
+    "\u001b]7279;a=ev:e=caps;gqNtb2SkTWV0YaRlZGl0gqRjb3B5kaZNZXRhK2OkcmVkb5GmTWV0YSta\u001b\\"
+   ],
+   "bodies": [
+    {
+     "mod": "Meta",
+     "edit": {
+      "copy": [
+       "Meta+c"
+      ],
+      "redo": [
+       "Meta+Z"
+      ]
+     }
+    }
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "e": "caps"
+     },
+     "event": {
+      "surface": null,
+      "kind": "caps",
+      "target": ""
+     },
+     "changed": {
+      "fields": [
+       "mod",
+       "edit"
+      ],
+      "mod": "Meta",
+      "edit": {
+       "copy": [
+        "Meta+c"
+       ],
+       "redo": [
+        "Meta+Z"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "the capabilities' mod, edit, keys and menu (SPEC \u00a74)",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;haF2ozAuMqNtb2SkTWV0YaRlZGl0gqpzZWxlY3QtYWxskaZNZXRhK2GkY29weZGmTWV0YStjpGtleXOCpmxlYWRlcqVTcGFjZad0aW1lb3V0zQPopG1lbnXD\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2",
+     "mod": "Meta",
+     "edit": {
+      "select-all": [
+       "Meta+a"
+      ],
+      "copy": [
+       "Meta+c"
+      ]
+     },
+     "keys": {
+      "leader": "Space",
+      "timeout": 1000
+     },
+     "menu": true
+    }
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "caps": {
+      "mod": "Meta",
+      "edit": {
+       "select-all": [
+        "Meta+a"
+       ],
+       "copy": [
+        "Meta+c"
+       ]
+      },
+      "keys": {
+       "leader": "Space",
+       "timeout": 1000
+      },
+      "menu": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "a keys whose timeout is not an int fails the capabilities (SPEC \u00a73.3)",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqRrZXlzgqZsZWFkZXKlU3BhY2WndGltZW91dKIxcw==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.2",
+     "keys": {
+      "leader": "Space",
+      "timeout": "1s"
+     }
+    }
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "caps": null
+    }
+   ]
   }
  ],
  "scan": [
@@ -15995,13 +16847,48 @@
    "name": "a modifier alone is a key",
    "key": "Shift",
    "canon": "Shift"
+  },
+  {
+   "name": "a binding's Mod is kept, first: 'Mod+a' (SPEC \u00a710.4)",
+   "key": "Mod+a",
+   "canon": "Mod+a"
+  },
+  {
+   "name": "a binding's Mod is kept, first: 'Shift+Mod+z' (SPEC \u00a710.4)",
+   "key": "Shift+Mod+z",
+   "canon": "Mod+Z"
+  },
+  {
+   "name": "a binding's Mod is kept, first: 'Control+Mod+a' (SPEC \u00a710.4)",
+   "key": "Control+Mod+a",
+   "canon": "Mod+Control+a"
+  },
+  {
+   "name": "a binding's Mod is kept, first: 'Alt+Mod+ArrowLeft' (SPEC \u00a710.4)",
+   "key": "Alt+Mod+ArrowLeft",
+   "canon": "Mod+Alt+ArrowLeft"
+  },
+  {
+   "name": "a binding's Mod is kept, first: 'Mod+Mod+a' (SPEC \u00a710.4)",
+   "key": "Mod+Mod+a",
+   "canon": null
+  },
+  {
+   "name": "a binding's Mod is kept, first: 'mod+a' (SPEC \u00a710.4)",
+   "key": "mod+a",
+   "canon": null
+  },
+  {
+   "name": "a binding's Mod is kept, first: 'Mod+' (SPEC \u00a710.4)",
+   "key": "Mod+",
+   "canon": null
   }
  ],
  "keymap": [
   {
    "name": "TerminalKeys, formatted",
    "terminal_keys": true,
-   "format": "ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward Home=line-start End=line-end Control+e=line-end Backspace=delete-char-backward Control+h=delete-char-backward Delete=delete-char-forward Control+d=delete-char-forward Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next PageUp=page-up PageDown=page-down Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end Control+a=select-all Control+m=newline"
+   "format": "ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward Home=line-start End=line-end Control+e=line-end Backspace=delete-char-backward Control+h=delete-char-backward Delete=delete-char-forward Control+d=delete-char-forward Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next PageUp=page-up PageDown=page-down Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end Mod+a=select-all Control+m=newline"
   },
   {
    "name": "a key bound twice keeps its first place and its last action; ASCII white space separates, other white space does not",
@@ -16029,7 +16916,7 @@
    "format": ""
   },
   {
-   "name": "the default keymap, in an input: a browser field's keys, macOS's Command ones as Meta, and Shift selects with a move (SPEC \u00a710.2)",
+   "name": "the default keymap, in an input, where Mod is Control: a browser field's keys on Linux, and Shift selects with a move (SPEC \u00a710.2)",
    "multiline": false,
    "keys": [],
    "lookup": {
@@ -16054,7 +16941,7 @@
     "Shift+Backspace": "delete-char-backward",
     "Control+a": "select-all",
     "Alt+b": null,
-    "Meta+a": "select-all",
+    "Meta+a": null,
     "Control+Space": null,
     "Alt+Space": null,
     "Tab": null,
@@ -16079,29 +16966,33 @@
     "Control+A": null,
     "Shift+ArrowUp": null,
     "Meta+A": null,
-    "Meta+ArrowLeft": "line-start",
-    "Meta+ArrowRight": "line-end",
-    "Meta+ArrowUp": "input-start",
-    "Meta+ArrowDown": "input-end",
-    "Meta+Backspace": "delete-to-line-start",
-    "Meta+Shift+ArrowLeft": "line-start",
+    "Meta+ArrowLeft": null,
+    "Meta+ArrowRight": null,
+    "Meta+ArrowUp": null,
+    "Meta+ArrowDown": null,
+    "Meta+Backspace": null,
+    "Meta+Shift+ArrowLeft": null,
     "Control+x": "cut",
-    "Meta+x": "cut",
+    "Meta+x": null,
     "Control+v": "paste",
-    "Meta+v": "paste",
+    "Meta+v": null,
     "Control+z": "undo",
-    "Meta+z": "undo",
+    "Meta+z": null,
     "Control+Z": "redo",
     "Control+Shift+z": "redo",
     "Control+y": "redo",
-    "Meta+Z": "redo",
+    "Meta+Z": null,
     "Control+X": null,
     "Control+V": null,
     "Control+Y": null,
     "Alt+z": null,
     "Control+c": "copy",
-    "Meta+c": "copy",
-    "Control+C": null
+    "Meta+c": null,
+    "Control+C": null,
+    "Control+e": null,
+    "Control+k": null,
+    "Control+b": null,
+    "Control+d": null
    },
    "selects": {
     "Shift+ArrowLeft": true,
@@ -16119,16 +17010,12 @@
     "Control+A": false,
     "A": false,
     "Shift+Tab": false,
-    "Meta+Shift+ArrowLeft": true,
-    "Meta+Shift+ArrowUp": true,
-    "Meta+Backspace": false,
-    "Meta+a": false,
     "Control+Z": false,
     "Control+x": false
    }
   },
   {
-   "name": "the default keymap, in a multi-line field",
+   "name": "the default keymap, in a multi-line field, where Mod is Control",
    "multiline": true,
    "keys": [],
    "lookup": {
@@ -16143,13 +17030,15 @@
     "Control+End": "input-end",
     "Control+a": "select-all",
     "Shift+PageUp": "page-up",
-    "Meta+ArrowUp": "input-start",
-    "Meta+ArrowDown": "input-end",
-    "Meta+ArrowLeft": "line-start",
+    "Meta+ArrowUp": null,
+    "Meta+ArrowDown": null,
+    "Meta+ArrowLeft": null,
     "Control+v": "paste",
     "Control+z": "undo",
-    "Meta+Z": "redo",
-    "Control+c": "copy"
+    "Meta+Z": null,
+    "Control+c": "copy",
+    "Control+p": null,
+    "Control+n": null
    },
    "selects": {
     "Shift+ArrowDown": true,
@@ -16403,6 +17292,170 @@
     "Shift+ArrowDown": "scroll-down",
     "Control+ArrowDown": null,
     "x": null
+   }
+  },
+  {
+   "name": "the default keymap where Mod is Meta: macOS's field keys, Command as Meta, and Cocoa's Control keys (SPEC \u00a710.2)",
+   "platform": {
+    "mod": "Meta"
+   },
+   "multiline": false,
+   "keys": [],
+   "lookup": {
+    "Meta+a": "select-all",
+    "Meta+c": "copy",
+    "Meta+x": "cut",
+    "Meta+v": "paste",
+    "Meta+z": "undo",
+    "Meta+Z": "redo",
+    "Meta+Shift+z": "redo",
+    "Control+y": null,
+    "Control+c": null,
+    "Control+v": null,
+    "Control+z": null,
+    "Control+Z": null,
+    "Meta+ArrowLeft": "line-start",
+    "Meta+ArrowRight": "line-end",
+    "Meta+ArrowUp": "input-start",
+    "Meta+ArrowDown": "input-end",
+    "Meta+Backspace": "delete-to-line-start",
+    "Control+a": "line-start",
+    "Control+e": "line-end",
+    "Control+b": "char-backward",
+    "Control+f": "char-forward",
+    "Control+p": null,
+    "Control+n": null,
+    "Control+h": "delete-char-backward",
+    "Control+d": "delete-char-forward",
+    "Control+k": "delete-to-line-end",
+    "Alt+ArrowLeft": "word-backward",
+    "Alt+Backspace": "delete-word-backward",
+    "Control+ArrowLeft": null,
+    "Control+Home": null,
+    "Control+Backspace": null,
+    "ArrowLeft": "char-backward",
+    "Home": "line-start",
+    "Enter": "submit",
+    "a": "insert"
+   },
+   "selects": {
+    "Meta+Shift+ArrowLeft": true,
+    "Meta+Shift+ArrowUp": true,
+    "Control+A": false,
+    "Alt+Shift+ArrowLeft": true,
+    "Meta+Backspace": false,
+    "Meta+a": false
+   }
+  },
+  {
+   "name": "the same in a multi-line field: Control+p and Control+n move by a row",
+   "platform": {
+    "mod": "Meta"
+   },
+   "multiline": true,
+   "keys": [],
+   "lookup": {
+    "Control+p": "line-previous",
+    "Control+n": "line-next",
+    "Enter": "newline",
+    "Meta+ArrowUp": "input-start",
+    "Control+Home": null
+   }
+  },
+  {
+   "name": "the edit shortcuts are the host's: its own replace the defaults, and the keys they leave are not bound (SPEC \u00a710.2)",
+   "platform": {
+    "mod": "Control",
+    "edit": {
+     "copy": [
+      "Control+C"
+     ],
+     "paste": [
+      "Control+V",
+      "Shift+Insert"
+     ],
+     "frobnicate": [
+      "Control+q"
+     ]
+    }
+   },
+   "multiline": false,
+   "keys": [],
+   "lookup": {
+    "Control+C": "copy",
+    "Control+V": "paste",
+    "Shift+Insert": "paste",
+    "Control+c": null,
+    "Control+v": null,
+    "Control+a": null,
+    "Control+z": null,
+    "Control+q": null,
+    "Control+ArrowLeft": "word-backward"
+   }
+  },
+  {
+   "name": "TerminalKeys where Mod is Meta: Command+a selects all, and Control+a goes to the line's start (SDK.md \u00a73.10)",
+   "platform": {
+    "mod": "Meta"
+   },
+   "multiline": false,
+   "terminal_keys": true,
+   "keys": [],
+   "lookup": {
+    "Meta+a": "select-all",
+    "Control+a": "line-start",
+    "Control+e": "line-end",
+    "Control+ArrowLeft": "word-backward",
+    "Meta+c": "copy"
+   }
+  },
+  {
+   "name": "Mod reads as the platform's modifier: on Control, Mod+a and Control+a are one key, the later binding's, and Format keeps Mod (SPEC \u00a710.4, SDK.md \u00a73.10)",
+   "platform": {
+    "mod": "Control"
+   },
+   "parse": "Control+a=line-start Mod+a=select-all Shift+Mod+z=redo Mod+Mod+x=cut",
+   "format": "Mod+a=select-all Mod+Z=redo"
+  },
+  {
+   "name": "the same where Mod is Meta: Mod+a and Control+a are two keys",
+   "platform": {
+    "mod": "Meta"
+   },
+   "parse": "Control+a=line-start Mod+a=select-all Shift+Mod+z=redo",
+   "format": "Control+a=line-start Mod+a=select-all Mod+Z=redo"
+  },
+  {
+   "name": "a field's data-keys with Mod: Mod+c given to the program is Meta+c where Mod is Meta, and Control+c stays unbound",
+   "platform": {
+    "mod": "Meta"
+   },
+   "multiline": false,
+   "keys": [
+    "Mod+c=program Mod+ArrowLeft=word-backward"
+   ],
+   "lookup": {
+    "Meta+c": null,
+    "Control+c": null,
+    "Meta+ArrowLeft": "word-backward",
+    "Meta+v": "paste"
+   }
+  },
+  {
+   "name": "outside a text field, a binding's Mod is the platform's (SPEC \u00a710.2, \u00a710.4)",
+   "platform": {
+    "mod": "Meta"
+   },
+   "keys": [
+    "Mod+j=program Mod+k=scroll-up"
+   ],
+   "program": {
+    "Meta+j": true,
+    "Control+j": false
+   },
+   "scroll": {
+    "Meta+k": "scroll-up",
+    "Control+k": null
    }
   }
  ],

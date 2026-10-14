@@ -80,6 +80,26 @@ that lacks it says so in its capabilities.
   program. The terminal's own paste types into a field that has the
   keyboard. A host that does not know the actions leaves the keys to the
   program, as before; no capability.
+- **`Mod` and the edit shortcuts** (SPEC.md §10.2, §10.4): a binding's
+  `Mod` is Meta on macOS and Control elsewhere, reported as `mod`. The
+  default keymap now binds each edit action once, to the host's edit
+  shortcuts (Mod+a, Mod+c, Mod+x, Mod+v, Mod+z, Mod+Z, and Control+y where
+  Mod is Control), which the user may change and the host reports as
+  `edit`. Its other rows follow the platform: Control+ArrowLeft moves by a
+  word where Mod is Control; Meta+ArrowLeft and Control+a go to the line's
+  start where it is Meta. A Linux host no longer binds Meta+c, nor a macOS
+  host Control+c. Breaks 0.2 in place.
+- **Key sequences** (SPEC.md §10.5): `data-key="<leader> f n"` gives an
+  element a sequence that clicks or focuses it, with groups, `<leader>`
+  and a timeout reported as `keys`, by myelin's rules. While one waits the
+  host shows a which-key menu of the elements' labels.
+- **Commands in the cells** (SPEC.md §10.6): `a=edit:take=copy,paste,…`
+  makes the edit shortcuts reach a program as the event `command`, with
+  their key and, for a paste, the clipboard's text, per screen. The
+  terminal's selection is still copied first, and its menus send commands
+  without a key. `a=menu` shows a program's which-key menu, a msgpack map
+  as myelin's levels are, reported as `menu`. `caps` says when `mod`,
+  `edit` or `keys` change. `command` and `caps` belong to no surface.
 
 Each SDK has the builder `Reveal`, the event's `View` (`Areas` and `AtEnd`,
 from `in` and `end`), `Views`, the event's `Count`, the drag's `tx` and

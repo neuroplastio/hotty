@@ -50,7 +50,11 @@ lists `hover` in `events` (§9.4); `"scroll"`, a host that reports `scroll`
 (§4, §5.3); `"touch"`, a host that takes touch (SPEC §9.1, §16); `"steps"`, a
 host that reports `steps` (§4, §9.1); `"view"`, a host that lists `view` in
 `events` (§9.5); `"count"`, a host that reports `count` (§4, §9);
-`"drop"`, a host that reports `drop` (§4, §9.1); `"undo"`, a host whose
+`"drop"`, a host that reports `drop` (§4, §9.1); `"keys"`, a host that
+reports `keys` (§4, §10.5), run with its leader `Space` and a timeout no
+step outlasts; `"commands"`, a host with a terminal that takes edit
+commands (§10.6), run with `mod` Control and the default edit shortcuts;
+`"undo"`, a host whose
 text fields keep a history and cut (§10.2), which the SDKs' test hosts
 (SDK.md §4.4) do not. A list
 names several, all required.
@@ -206,7 +210,8 @@ of its own. The output, split into raw bytes and HOTTY sequences, must be
   moves, `Query`'s DA1 and `Sync`'s brackets;
 - `{ "cmd": { "control": {…}, "payload": text? } }`: one command, decoded.
   Its control has exactly these keys (`m` and `o` never), and its payload is
-  this text, empty when absent.
+  this text, empty when absent, or the bytes of `"payload_b64"` (a menu's
+  msgpack).
 
 **Encode** `{ "control": [[key, value], …], "payload": text | "payload_b64":
 …, "bytes"?: text, "chunks"?: [ { "control": text, "len": n } ] }`: the
@@ -231,8 +236,12 @@ in order:
   `value`, `checked`, `fields`, `link` with `href` and `url`, `size` with
   `w` and `h`, `fit_rows`, `drag` with `c`, `r`, `keys`, `x`, `y`, `tx` and
   `ty`, `hover` with
-  `c`, `r` and `out`, `view` with `areas` and `at_end`);
-- `caps`: `Caps`'s fields, and its answers: `supports` and `sends` map an
+  `c`, `r` and `out`, `view` with `areas` and `at_end`, `command` with
+  `name`, `key`, `text` and `has_text`);
+- `changed`: a `caps` event's `Changed`, with `fields` the names of
+  exactly the fields it has, and those fields as `caps` checks them;
+- `caps`: `Caps`'s fields (`keys` with `leader` and `timeout`), and its
+  answers: `supports` and `sends` map an
   argument to the answer, `drags`, `hovers`, `views`, `light`, `cell_css`
   with `w` and `h`. `null`: the reply carries none, as when its body does
   not decode.
@@ -272,12 +281,14 @@ holds after the stream `held` (none when absent), what `Flush` returns
 - `{ "key": text, "canon": text | null }`: `ParseKey(key)` must return
   `canon`, `null` when the name does not parse.
 
-**Keymap** checks keymaps (SPEC §10.2, SDK.md §3.10), in three forms:
-- `{ "parse": text, "format": text }`: `ParseKeymap(parse).Format()` must be
+**Keymap** checks keymaps (SPEC §10.2, SDK.md §3.10), each on the
+Platform in `"platform": { "mod"?, "edit"? }`, the zero Platform (Control,
+the default edit shortcuts) where absent, in three forms:
+- `{ "parse": text, "format": text }`: `ParseKeymap(platform, parse).Format()` must be
   `format`; with `"terminal_keys": true` and no `parse`, `TerminalKeys`
   formatted must be `format`;
 - `{ "multiline": bool, "terminal_keys"?: true, "keys": [ … ], "lookup": {
-  key: action | null } }`: `Resolve(multiline, …)` with `TerminalKeys`
+  key: action | null } }`: `Resolve(platform, multiline, …)` with `TerminalKeys`
   first when `terminal_keys` is true, then each of `keys`. `Lookup` of each
   key of `lookup` must return its value: an action, `"insert"`, or `null`
   when the key is not the field's. `Selects` of each key of `selects`, if

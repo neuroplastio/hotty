@@ -55,6 +55,8 @@ EVENT_VIEW = "view"
 EVENT_DRAG_START = "dragstart"
 EVENT_DRAG = "drag"
 EVENT_DRAG_END = "dragend"
+EVENT_COMMAND = "command"
+EVENT_CAPS = "caps"
 
 EINVAL = "EINVAL"
 ENOENT = "ENOENT"
@@ -191,6 +193,53 @@ def withdraw_late():
     """Withdraws a query that asked for a late answer (SPEC §4): a query
     that wants no answer, which takes its place."""
     return encode([("a", "q"), ("q", NO_REPLY)])
+
+
+def edit(names, n=None, q=None):
+    """Takes the edit commands named, comma-separated (SPEC §10.6); none
+    takes nothing."""
+    return _command([("a", "edit"), ("take", ",".join(names))], b"", NO_REPLY, n, q)
+
+
+@dataclass
+class MenuItem:
+    """A key that can follow a menu's sequence (SPEC §10.6)."""
+
+    key: str
+    label: str = ""
+    group: bool = False
+    enabled: bool = True
+
+
+@dataclass
+class MenuLevel:
+    """A which-key level (SPEC §10.6): the keys typed, their group's label,
+    and the keys that can follow them."""
+
+    seq: list = field(default_factory=list)
+    label: str = ""
+    items: list = field(default_factory=list)
+
+
+def menu(level=None, n=None, q=None):
+    """Shows a program's which-key menu, or with none hides it (SPEC
+    §10.6). The map has myelin's names and order (SDK.md §3.4)."""
+    if level is None:
+        return _command([("a", "menu")], b"", NO_REPLY, n, q)
+    m = {"seq": list(level.seq)}
+    if level.label:
+        m["label"] = level.label
+    items = []
+    for it in level.items:
+        i = {"key": it.key}
+        if it.label:
+            i["label"] = it.label
+        if it.group:
+            i["group"] = True
+        i["enabled"] = bool(it.enabled)
+        items.append(i)
+    m["items"] = items
+    return _command([("a", "menu")], pack(m), NO_REPLY, n, q)
 
 
 SCROLL_VERTICAL = 1
@@ -460,6 +509,17 @@ class Area:
 
 
 @dataclass
+class Command:
+    """An edit command (SPEC §10.6): its name, its key, empty from a menu,
+    and a paste's text, has_text telling an empty one from none."""
+
+    name: str
+    key: str = ""
+    text: str = ""
+    has_text: bool = False
+
+
+@dataclass
 class View:
     """The elements in view by id, with their cells, and whether the
     document shows its end (SPEC §9.5)."""
@@ -514,6 +574,10 @@ _CAPS = {
     "steps": "bool",
     "drop": "bool",
     "count": "bool",
+    "mod": "str",
+    "edit": {"*": ["str"]},
+    "keys": {"leader": "str", "timeout": "int"},
+    "menu": "bool",
     "host": "str",
     "version": "str",
 }
@@ -533,6 +597,8 @@ _DETAIL = {
     EVENT_DRAG_END: _DRAG,
     EVENT_HOVER: {"c": "int", "r": "int", "out": "bool"},
     EVENT_VIEW: {"in": {"*": _AREA}, "end": "bool"},
+    EVENT_COMMAND: {"name": "str", "key": "str", "text": "str"},
+    EVENT_CAPS: _CAPS,
 }
 
 
@@ -543,7 +609,7 @@ class Event:
 
     def __init__(self, m):
         self.message = m
-        self.surface = m["s"]
+        self.surface = m["s"]  # None for command and caps (SPEC §9)
         self.kind = m["e"]
         self.target = m["t"] or ""
         t = _DETAIL.get(self.kind)
@@ -613,6 +679,20 @@ class Event:
             return None
         return Hover(c, r)
 
+    def command(self):
+        """An edit command (SPEC §10.6), or None."""
+        if self.kind != EVENT_COMMAND or "name" not in self._d:
+            return None
+        d = self._d
+        return Command(d["name"], d.get("key", ""), d.get("text", ""), "text" in d)
+
+    def changed(self):
+        """The capabilities a caps event says changed (SPEC §4), a Caps with
+        only those fields in raw; None when its detail does not decode."""
+        if self.kind != EVENT_CAPS or self._body is None:
+            return None
+        return Caps(self._body)
+
     def view(self):
         """What a view reports: an element whose area lacks a field is left
         out."""
@@ -623,6 +703,15 @@ class Event:
             if all(k in a for k in "crwh"):
                 areas[id] = Area(a["c"], a["r"], a["w"], a["h"])
         return View(areas, self._d.get("end", False))
+
+
+@dataclass
+class Keys:
+    """The user's leader, a key sequence, and how long a sequence waits, in
+    milliseconds (SPEC §10.5)."""
+
+    leader: str = None
+    timeout: int = None
 
 
 class Caps:
@@ -645,6 +734,11 @@ class Caps:
         self.steps = d.get("steps", False)
         self.drop = d.get("drop", False)
         self.count = d.get("count", False)
+        self.mod = d.get("mod")
+        self.edit = d.get("edit")
+        keys = d.get("keys")
+        self.keys = Keys(keys.get("leader"), keys.get("timeout")) if keys is not None else None
+        self.menu = d.get("menu", False)
         self.host = d.get("host")
         self.version = d.get("version")
 
@@ -672,6 +766,10 @@ class Caps:
 
     def light(self):
         return self.scheme == "light"
+
+    def merge(self, changed):
+        """The capabilities with the fields a caps event changed (SPEC §4)."""
+        return Caps({**self.raw, **changed.raw})
 
     def cell_css(self):
         """A cell's size in CSS pixels: a usual 9x18 when the host did not
@@ -711,6 +809,41 @@ _SIZED = {0xC4: ("bin", ">B"), 0xC5: ("bin", ">H"), 0xC6: ("bin", ">I"),
           0xD9: ("str", ">B"), 0xDA: ("str", ">H"), 0xDB: ("str", ">I"),
           0xDC: ("array", ">H"), 0xDD: ("array", ">I"), 0xDE: ("map", ">H"), 0xDF: ("map", ">I")}
 _FIXEXT = {0xD4: 1, 0xD5: 2, 0xD6: 4, 0xD7: 8, 0xD8: 16}
+
+
+def _len_head(n, fix, fixmax, h8, h16, h32):
+    if n <= fixmax:
+        return bytes([fix | n])
+    if h8 is not None and n < 1 << 8:
+        return bytes([h8, n])
+    if n < 1 << 16:
+        return bytes([h16]) + n.to_bytes(2, "big")
+    return bytes([h32]) + n.to_bytes(4, "big")
+
+
+def pack(v):
+    """v as msgpack, each value in the smallest of its type's forms: a dict
+    a map in its order, a list an array, str a str, a bool, an int."""
+    if isinstance(v, bool):
+        return b"\xc3" if v else b"\xc2"
+    if isinstance(v, int):
+        if 0 <= v < 128:
+            return bytes([v])
+        if -32 <= v < 0:
+            return (v & 0xFF).to_bytes(1, "big")
+        for lo, hi, h, n in ((0, 1 << 8, 0xCC, 1), (0, 1 << 16, 0xCD, 2), (0, 1 << 32, 0xCE, 4),
+                             (-(1 << 7), 1 << 7, 0xD0, 1), (-(1 << 15), 1 << 15, 0xD1, 2),
+                             (-(1 << 31), 1 << 31, 0xD2, 4), (-(1 << 63), 1 << 64, 0xD3, 8)):
+            if lo <= v < hi:
+                return bytes([h]) + v.to_bytes(n, "big", signed=v < 0 or h >= 0xD0)
+    if isinstance(v, str):
+        b = v.encode()
+        return _len_head(len(b), 0xA0, 31, 0xD9, 0xDA, 0xDB) + b
+    if isinstance(v, list):
+        return _len_head(len(v), 0x90, 15, None, 0xDC, 0xDD) + b"".join(pack(x) for x in v)
+    if isinstance(v, dict):
+        return _len_head(len(v), 0x80, 15, None, 0xDE, 0xDF) + b"".join(pack(k) + pack(x) for k, x in v.items())
+    raise TypeError(f"msgpack: cannot pack {type(v).__name__}")
 
 
 def unpack(data):
@@ -1184,6 +1317,9 @@ class Detector:
 # --- keys (SDK.md §3.10; SPEC.md §10.2, §10.4) --------------------------------
 
 MODIFIERS = ("Control", "Alt", "Meta", "Shift")
+# Mod, in a binding, is the platform's modifier for commands (SPEC.md
+# §10.4), written first.
+_ALL_MODS = ("Mod",) + MODIFIERS
 
 ACTIONS = (
     "char-backward", "char-forward", "word-backward", "word-forward", "line-start", "line-end",
@@ -1208,7 +1344,7 @@ _BACK = frozenset(("char-backward", "word-backward", "line-start", "line-previou
 INSERT = "insert"
 
 # The SDK's keymap (SDK.md §3.10): Bubble Tea's text input and text area, but
-# Control+a selects all.
+# Mod+a selects all.
 TERMINAL_KEYS = " ".join((
     "ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward",
     "Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward",
@@ -1222,7 +1358,7 @@ TERMINAL_KEYS = " ".join((
     "ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next",
     "PageUp=page-up PageDown=page-down",
     "Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end",
-    "Control+a=select-all",
+    "Mod+a=select-all",
     "Control+m=newline",
 ))
 
@@ -1255,7 +1391,7 @@ def _split_key(name):
         i = name.rfind("+")
         head, value = (name[:i], name[i + 1:]) if i >= 0 else ("", name)
     mods = head.split("+") if head else []
-    if any(m not in MODIFIERS for m in mods) or len(set(mods)) != len(mods):
+    if any(m not in _ALL_MODS for m in mods) or len(set(mods)) != len(mods):
         return None
     if value == "Space":
         value = " "
@@ -1274,7 +1410,7 @@ def _key_name(mods, value):
             value, mods = up, mods - {"Shift"}
         elif len(low) == 1 and low != value:
             mods = mods - {"Shift"}
-    return "+".join([m for m in MODIFIERS if m in mods] + ["Space" if value == " " else value])
+    return "+".join([m for m in _ALL_MODS if m in mods] + ["Space" if value == " " else value])
 
 
 def parse_key(name):
@@ -1428,23 +1564,59 @@ def decode_keys(data):
     return out
 
 
-class Keymap:
-    """Bindings of keys to actions (SPEC.md §10.2). `resolve` makes the one a
-    field uses, whose `lookup` says what the field does with a key."""
+class Platform:
+    """How a host reads bindings (SDK.md §3.10): Mod, Control or Meta, and
+    its edit shortcuts, from action to keys; None for the defaults."""
 
-    def __init__(self, multiline=False):
-        self.bindings = {}
+    def __init__(self, mod="Control", edit=None):
+        self.mod = mod if mod in ("Control", "Meta") else "Control"
+        self.edit = edit
+
+
+def platform_of(caps):
+    """The Platform of a host's capabilities, the defaults where absent."""
+    return Platform(caps.mod or "Control", caps.edit)
+
+
+_EDIT_ACTIONS = ("select-all", "copy", "cut", "paste", "undo", "redo")
+
+
+def _read_mod(key, mod):
+    """A canonical key's name with Mod read as mod."""
+    mods, value = _split_key(key)
+    return _key_name([mod if m == "Mod" else m for m in mods], value)
+
+
+def default_edit(mod="Control"):
+    """The default edit shortcuts for a Mod (SPEC.md §10.2), Mod read."""
+    e = {"select-all": ["Mod+a"], "copy": ["Mod+c"], "cut": ["Mod+x"], "paste": ["Mod+v"], "undo": ["Mod+z"],
+         "redo": ["Mod+Z"] + (["Control+y"] if mod == "Control" else [])}
+    return {a: [_read_mod(k, mod) for k in ks] for a, ks in e.items()}
+
+
+class Keymap:
+    """Bindings of keys to actions (SPEC.md §10.2), read on a Platform.
+    `resolve` makes the one a field uses, whose `lookup` says what the field
+    does with a key."""
+
+    def __init__(self, multiline=False, platform=None):
+        self.bindings = {}  # key, Mod read, to action
+        self.written = {}  # key, Mod read, to its last binding's key
         self.multiline = multiline
+        self.platform = platform or Platform()
 
     def bind(self, key, action):
-        self.bindings[key] = action
-
-    def update(self, other):
-        for k, a in other.bindings.items():
-            self.bindings[k] = a
+        k = _read_mod(key, self.platform.mod)
+        self.bindings[k] = action
+        self.written[k] = key
 
     def format(self):
-        return " ".join(f"{k}={a}" for k, a in self.bindings.items())
+        return " ".join(f"{self.written[k]}={a}" for k, a in self.bindings.items())
+
+    def _key(self, key):
+        """A key's canonical name with Mod read, or None."""
+        k = parse_key(key)
+        return None if k is None else _read_mod(k, self.platform.mod)
 
     def _bound(self, k):
         """The action bound to canonical key k, or to k without Shift when k
@@ -1459,21 +1631,21 @@ class Keymap:
         """Whether the keymap gives the key to the program (SPEC.md §10.2):
         on an element that is not a text field, a host asks it of the
         element's data-keys alone, before the element or a scroll uses it."""
-        k = parse_key(key)
+        k = self._key(key)
         return k is not None and self._bound(k) == "program"
 
     def scroll(self, key):
         """The scroll action the keymap binds the key to, or None (SPEC.md
         §10.2): a host asks it, outside a text field, for a key the element
         does not use."""
-        k = parse_key(key)
+        k = self._key(key)
         a = None if k is None else self._bound(k)
         return a if a in SCROLL_ACTIONS else None
 
     def lookup(self, key):
         """An action, INSERT for a character the field types, or None when
         the key is not the field's."""
-        k = parse_key(key)
+        k = self._key(key)
         if k is None or k in ("Tab", "Shift+Tab", "Escape"):
             return None
         mods, value = _split_key(k)
@@ -1487,7 +1659,7 @@ class Keymap:
     def selects(self, key):
         """Whether the field selects with the key (SPEC.md §10.2): it looks
         up a move, and its name has Shift. The field then extends with it."""
-        k = parse_key(key)
+        k = self._key(key)
         return k is not None and self.lookup(k) in MOVES and "Shift" in _split_key(k)[0]
 
 
@@ -1503,35 +1675,53 @@ def _bindings(value):
         yield k, a
 
 
-def parse_keymap(value):
-    """A data-keys value's bindings, without those a host ignores."""
-    m = Keymap()
+def parse_keymap(platform, value):
+    """A data-keys value's bindings, without those a host ignores, Mod read
+    as the platform's."""
+    m = Keymap(platform=platform)
     for k, a in _bindings(value):
         m.bind(k, a)
     return m
 
 
-def resolve(multiline, *values):
-    """A field's keymap: SPEC.md's default, then each data-keys value, the
-    root's first, less their scroll actions."""
-    m = Keymap(multiline)
-    for k, a in (("ArrowLeft", "char-backward"), ("ArrowRight", "char-forward"),
-                 ("Control+ArrowLeft", "word-backward"), ("Control+ArrowRight", "word-forward"),
-                 ("Alt+ArrowLeft", "word-backward"), ("Alt+ArrowRight", "word-forward"),
-                 ("Home", "line-start"), ("End", "line-end"), ("Control+Home", "input-start"), ("Control+End", "input-end"),
-                 ("Backspace", "delete-char-backward"), ("Delete", "delete-char-forward"),
-                 ("Control+Backspace", "delete-word-backward"), ("Control+Delete", "delete-word-forward"),
-                 ("Alt+Backspace", "delete-word-backward"), ("Alt+Delete", "delete-word-forward"),
-                 ("ArrowUp", "line-previous"), ("ArrowDown", "line-next"), ("PageUp", "page-up"),
-                 ("PageDown", "page-down"), ("Control+a", "select-all"),
-                 ("Meta+ArrowLeft", "line-start"), ("Meta+ArrowRight", "line-end"),
-                 ("Meta+ArrowUp", "input-start"), ("Meta+ArrowDown", "input-end"),
-                 ("Meta+Backspace", "delete-to-line-start"), ("Meta+a", "select-all"),
-                 ("Control+c", "copy"), ("Meta+c", "copy"), ("Control+x", "cut"), ("Meta+x", "cut"), ("Control+v", "paste"), ("Meta+v", "paste"),
-                 ("Control+z", "undo"), ("Meta+z", "undo"),
-                 ("Control+Z", "redo"), ("Control+y", "redo"), ("Meta+Z", "redo"),
-                 ("Enter", "newline" if multiline else "submit")):
+# The default keymap (SPEC.md §10.2): every host's keys, then those of its
+# Mod; the edit shortcuts come last.
+_DEFAULT = (("ArrowLeft", "char-backward"), ("ArrowRight", "char-forward"),
+            ("Alt+ArrowLeft", "word-backward"), ("Alt+ArrowRight", "word-forward"),
+            ("Home", "line-start"), ("End", "line-end"),
+            ("Backspace", "delete-char-backward"), ("Delete", "delete-char-forward"),
+            ("Alt+Backspace", "delete-word-backward"), ("Alt+Delete", "delete-word-forward"),
+            ("ArrowUp", "line-previous"), ("ArrowDown", "line-next"), ("PageUp", "page-up"), ("PageDown", "page-down"))
+_DEFAULT_MOD = {
+    "Control": (("Control+ArrowLeft", "word-backward"), ("Control+ArrowRight", "word-forward"),
+                ("Control+Home", "input-start"), ("Control+End", "input-end"),
+                ("Control+Backspace", "delete-word-backward"), ("Control+Delete", "delete-word-forward")),
+    "Meta": (("Meta+ArrowLeft", "line-start"), ("Meta+ArrowRight", "line-end"),
+             ("Meta+ArrowUp", "input-start"), ("Meta+ArrowDown", "input-end"),
+             ("Meta+Backspace", "delete-to-line-start"),
+             ("Control+a", "line-start"), ("Control+e", "line-end"),
+             ("Control+b", "char-backward"), ("Control+f", "char-forward"),
+             ("Control+p", "line-previous"), ("Control+n", "line-next"),
+             ("Control+h", "delete-char-backward"), ("Control+d", "delete-char-forward"),
+             ("Control+k", "delete-to-line-end")),
+}
+
+
+def resolve(platform, multiline, *values):
+    """A field's keymap: SPEC.md's default for the platform, then each
+    data-keys value, the root's first, less their scroll actions."""
+    platform = platform or Platform()
+    m = Keymap(multiline, platform)
+    for k, a in _DEFAULT + (("Enter", "newline" if multiline else "submit"),) + _DEFAULT_MOD[platform.mod]:
         m.bind(k, a)
+    edit = platform.edit if platform.edit is not None else default_edit(platform.mod)
+    for a, keys in edit.items():
+        if a not in _EDIT_ACTIONS:
+            continue
+        for key in keys:
+            k = parse_key(key)
+            if k is not None and k not in ("Tab", "Shift+Tab", "Escape"):
+                m.bind(k, a)
     for v in values:
         for k, a in _bindings(v):
             if a not in SCROLL_ACTIONS:
