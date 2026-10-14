@@ -886,7 +886,7 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `hover` | on a placement made with `v=1` (§5.2), the element the pointer is over changed, or the pointer left the window (§9.4) | `{"c": int, "r": int}`: the pointer's cell (§9.1); `{"out": bool}`, `true`, when it left, with `t` empty |
 | `view` | which elements with `data-on~=view` are in view, or where they are, changed, or whether the document shows its end (§9.5); `t` is empty | `{"in": {str: area}, "end": bool}`: each element in view by its id, with its cells (below) |
 | `command` | a key of an edit command the program takes, or a menu of the terminal (§10.6) | `{"name": str, "key": str}`, with `"text": str` for a paste |
-| `caps` | `mod`, `edit` or `keys` changed (§4) | the fields that changed, as the capabilities have them |
+| `caps` | `mod`, `edit` or `keys` changed (§4) | the fields that changed, as the capabilities have them. One that became absent comes as its type's empty value: `"edit": {}`, the host takes no edit commands now (§10.6), and `"keys": {}`, it reads no key sequences (§10.5). `mod` is never absent |
 
 - **Events of the terminal,** `command` and `caps`, belong to no surface,
   and have neither `s` nor `t`.

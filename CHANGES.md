@@ -99,7 +99,8 @@ that lacks it says so in its capabilities.
   terminal's selection is still copied first, and its menus send commands
   without a key. `a=menu` shows a program's which-key menu, a msgpack map
   as myelin's levels are, reported as `menu`. `caps` says when `mod`,
-  `edit` or `keys` change. `command` and `caps` belong to no surface.
+  `edit` or `keys` change, and sends one that became absent empty
+  (`"edit": {}`). `command` and `caps` belong to no surface.
 
 Each SDK has the builder `Reveal`, the event's `View` (`Areas` and `AtEnd`,
 from `in` and `end`), `Views`, the event's `Count`, the drag's `tx` and

@@ -768,8 +768,10 @@ class Caps:
         return self.scheme == "light"
 
     def merge(self, changed):
-        """The capabilities with the fields a caps event changed (SPEC §4)."""
-        return Caps({**self.raw, **changed.raw})
+        """The capabilities with the fields a caps event changed (SPEC §4),
+        and without those it empties: absent now (SPEC §9)."""
+        raw = {**self.raw, **changed.raw}
+        return Caps({k: v for k, v in raw.items() if not (k in changed.raw and v == {})})
 
     def cell_css(self):
         """A cell's size in CSS pixels: a usual 9x18 when the host did not

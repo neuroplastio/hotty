@@ -513,7 +513,8 @@ none of these, and its payload is in its message.
   do what they do;
 - `Light`: the scheme is `light`;
 - `Merge(changed)`: the capabilities with the fields of a `caps` event's
-  `Changed` in place of their own;
+  `Changed` in place of their own, and without those it empties (`{}`:
+  absent now, SPEC.md §9);
 - `CellCSS`: a cell's size in CSS pixels, `Cell` divided by `Scale` (1
   when absent), and a usual 9 × 18 when the host gave no cell.
 
