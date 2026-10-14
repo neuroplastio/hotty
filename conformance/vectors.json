@@ -10164,7 +10164,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}button,input{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}</style><button id=k>k</button><button id=top data-key=\"g g\">top</button>"
+     "payload": "<style>body{margin:0}button,input,div[tabindex]{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}[hidden]{display:none}</style><button id=k>k</button><button id=top data-key=\"g g\">top</button>"
     },
     {
      "send": {
@@ -10245,7 +10245,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}button,input{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}</style><button id=k>k</button><menu data-key=\"<leader> f\" aria-label=File><button id=new data-key=n>new</button><button id=open data-key=o>open</button></menu>"
+     "payload": "<style>body{margin:0}button,input,div[tabindex]{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}[hidden]{display:none}</style><div id=k tabindex=0>k</div><menu data-key=\"<leader> f\" aria-label=File><button id=new data-key=n>new</button><button id=open data-key=o>open</button></menu>"
     },
     {
      "send": {
@@ -10335,7 +10335,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}button,input{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}</style><button id=k>k</button><input id=i data-on=input><button id=b data-key=\"<leader> b\">b</button><button id=g data-key=\"g\">g</button>"
+     "payload": "<style>body{margin:0}button,input,div[tabindex]{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}[hidden]{display:none}</style><button id=k>k</button><input id=i data-on=input><button id=b data-key=\"<leader> b\">b</button><button id=g data-key=\"g\">g</button>"
     },
     {
      "send": {
@@ -10409,7 +10409,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}button,input{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}</style><div><button id=a data-key=x>a</button></div><div><button id=f>f</button><button id=b data-key=x>b</button></div><button id=d disabled data-key=z>d</button><button id=h hidden data-key=h>h</button><input id=i data-key=\"/\">"
+     "payload": "<style>body{margin:0}button,input,div[tabindex]{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}[hidden]{display:none}</style><div><button id=a data-key=x>a</button></div><div><button id=f>f</button><button id=b data-key=x>b</button></div><button id=d disabled data-key=z>d</button><button id=h hidden data-key=h>h</button><input id=i data-key=\"/\">"
     },
     {
      "send": {
@@ -10523,7 +10523,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}button,input{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}</style><div data-keys=\"p=program\"><button id=k>k</button><button id=g1 data-key=g>g</button><button id=g2 data-key=\"g g\">gg</button><button id=p data-key=p>p</button><button id=t data-key=\"t Tab\">t</button></div>"
+     "payload": "<style>body{margin:0}button,input,div[tabindex]{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}[hidden]{display:none}</style><div data-keys=\"p=program\"><button id=k>k</button><button id=g1 data-key=g>g</button><button id=g2 data-key=\"g g\">gg</button><button id=p data-key=p>p</button><button id=t data-key=\"t Tab\">t</button></div>"
     },
     {
      "send": {
