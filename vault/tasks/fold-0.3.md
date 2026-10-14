@@ -146,7 +146,9 @@ consumers.
       since a program can already show its which-key menu as a surface at a
       higher `z`, and keep `a=edit` in the companion. `caps` stays in the
       core, for `mod` and `cell` (FOLD-04).
-      consumers: `a=edit` only in hotty-a2ui's storybook; `a=menu` none.
+      consumers (checked again 2026-10-14): `a=edit` in hotty-a2ui's
+      storybook (`takeEdit`), and plx relays it per pane (in progress,
+      not released); `a=menu` none shipped, and plx plans to relay it.
 
 - [ ] **FOLD-09** Key sequences are resolved by the program
       status: proposed | needs: maintainer | added: 2026-10-14
