@@ -8428,6 +8428,340 @@
    ]
   },
   {
+   "name": "each text field keeps a history of its edits: a run of typing is one edit, and so is a run of deleting characters; undo puts back the value before an edit and redo the one after, a new edit drops what was undone, and the keys are the field's with nothing to do; cut deletes the selection, and with nothing selected or in a password field its key reaches the program (SPEC \u00a710.2)",
+   "requires": "undo",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t data-on=input><input id=p type=password value=secret>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "p",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "x",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "x",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "a",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "a"
+       }
+      }
+     ]
+    },
+    {
+     "key": "b",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "ab"
+       }
+      }
+     ]
+    },
+    {
+     "key": "c",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abc"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Backspace",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "ab"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Backspace",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "a"
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abc"
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": ""
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "y",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abc"
+       }
+      }
+     ]
+    },
+    {
+     "key": "Z",
+     "keys": [
+      "ctrl",
+      "shift"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "a"
+       }
+      }
+     ]
+    },
+    {
+     "key": "y",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abc"
+       }
+      }
+     ]
+    },
+    {
+     "key": "d",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abcd"
+       }
+      }
+     ]
+    },
+    {
+     "key": "y",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "x",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": ""
+       }
+      }
+     ]
+    },
+    {
+     "key": "x",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abcd"
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "abc"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "a multi-line action reaches the program from an input, and moves the caret in a textarea: by rows, keeping its place along them, and to the ends of the value, which an input goes to as well (SPEC \u00a710.2)",
    "steps": [
     {
@@ -15661,6 +15995,11 @@
    "format": "Control+a=select-all Alt+a=select-all"
   },
   {
+   "name": "cut, paste, undo and redo are actions",
+   "parse": "Control+x=cut Control+v=paste Control+z=undo Control+y=redo",
+   "format": "Control+x=cut Control+v=paste Control+z=undo Control+y=redo"
+  },
+  {
    "name": "nothing",
    "parse": "",
    "format": ""
@@ -15721,7 +16060,21 @@
     "Meta+ArrowUp": "input-start",
     "Meta+ArrowDown": "input-end",
     "Meta+Backspace": "delete-to-line-start",
-    "Meta+Shift+ArrowLeft": "line-start"
+    "Meta+Shift+ArrowLeft": "line-start",
+    "Control+x": "cut",
+    "Meta+x": "cut",
+    "Control+v": "paste",
+    "Meta+v": "paste",
+    "Control+z": "undo",
+    "Meta+z": "undo",
+    "Control+Z": "redo",
+    "Control+Shift+z": "redo",
+    "Control+y": "redo",
+    "Meta+Z": "redo",
+    "Control+X": null,
+    "Control+V": null,
+    "Control+Y": null,
+    "Alt+z": null
    },
    "selects": {
     "Shift+ArrowLeft": true,
@@ -15742,7 +16095,9 @@
     "Meta+Shift+ArrowLeft": true,
     "Meta+Shift+ArrowUp": true,
     "Meta+Backspace": false,
-    "Meta+a": false
+    "Meta+a": false,
+    "Control+Z": false,
+    "Control+x": false
    }
   },
   {
@@ -15763,7 +16118,10 @@
     "Shift+PageUp": "page-up",
     "Meta+ArrowUp": "input-start",
     "Meta+ArrowDown": "input-end",
-    "Meta+ArrowLeft": "line-start"
+    "Meta+ArrowLeft": "line-start",
+    "Control+v": "paste",
+    "Control+z": "undo",
+    "Meta+Z": "redo"
    },
    "selects": {
     "Shift+ArrowDown": true,
@@ -15806,7 +16164,7 @@
     "Enter": "submit",
     "Control+Shift+ArrowLeft": "word-backward",
     "Control+A": null,
-    "Control+v": null
+    "Control+v": "paste"
    },
    "selects": {
     "Control+Shift+ArrowLeft": true,

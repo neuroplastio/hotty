@@ -50,7 +50,9 @@ lists `hover` in `events` (§9.4); `"scroll"`, a host that reports `scroll`
 (§4, §5.3); `"touch"`, a host that takes touch (SPEC §9.1, §16); `"steps"`, a
 host that reports `steps` (§4, §9.1); `"view"`, a host that lists `view` in
 `events` (§9.5); `"count"`, a host that reports `count` (§4, §9);
-`"drop"`, a host that reports `drop` (§4, §9.1). A list
+`"drop"`, a host that reports `drop` (§4, §9.1); `"undo"`, a host whose
+text fields keep a history and cut (§10.2), which the SDKs' test hosts
+(SDK.md §4.4) do not. A list
 names several, all required.
 Its steps come in five kinds.
 

@@ -1420,11 +1420,15 @@ The default keymap is:
 | Meta+ArrowUp, Meta+ArrowDown | `input-start`, `input-end` |
 | Meta+Backspace | `delete-to-line-start` |
 | Meta+a | `select-all` |
+| Control+x, Meta+x | `cut` |
+| Control+v, Meta+v | `paste` |
+| Control+z, Meta+z | `undo` |
+| Control+Z, Control+y, Meta+Z | `redo` |
 | Enter | `submit` in an `input`, `newline` in a multi-line field |
 
 These are a text field's keys in a browser: on Linux and Windows, and on
-macOS, whose Command key is Meta and Option key Alt (§10.4). Shift selects
-with each move (below). A program that wants one of them binds it to
+macOS, whose Command key is Meta and Option key Alt (§10.4). Control+Z is
+Control+Shift+z (§10.4). Shift selects with each move (below). A program that wants one of them binds it to
 `program`. A host that sees only what the program would read (§10.4) can
 offer a key only as that: in the legacy encoding a terminal may send
 Control+Backspace as `0x08`, which is Control+h, and a macOS terminal sends
@@ -1432,8 +1436,8 @@ Command+ArrowLeft as `0x01`, which is Control+a.
 
 A key goes to the field's keymap:
 - **Bound:** the field does the action. A key bound to `program`, or to an
-  action the field does not have (a multi-line one in an `input`), reaches
-  the program.
+  action the field does not have (a multi-line one in an `input`, or `cut`
+  and `paste` where they have nothing to do, below), reaches the program.
 - **Not bound, with Shift:** the key is looked up again without Shift, so
   Shift+ArrowLeft does what ArrowLeft does, and selects (below). A
   character shows Shift in itself (`A`, §10.4), so this concerns the other
@@ -1460,6 +1464,9 @@ The actions:
 | `page-up`, `page-down` † | moves the caret as many rows up, or down, as the field shows, the same way |
 | `input-start`, `input-end` | moves the caret to the start, or the end, of the value |
 | `select-all` | selects the whole value: the anchor at its start, the caret at its end |
+| `cut` | puts the selected text on the clipboard and deletes it |
+| `paste` | types the clipboard's text in place of the selection |
+| `undo`, `redo` | undoes the field's last edit, or redoes the last one undone (below) |
 | `newline` † | types a line break |
 | `submit` | submits the field's form, as Enter does in a text `input` (§9 `submit`) |
 | `program` | nothing: the key reaches the program |
@@ -1493,6 +1500,25 @@ The actions:
   Shift+ArrowDown go on by a word, to the line's end and by a row. When the
   caret comes back to the anchor, nothing is selected.
 - **Every edit** is an edit for the `input` and `change` events (§9).
+- **The clipboard** is the host's, the one its copy keys write (§11): the
+  platform's, where there is one. A field has no `cut` with nothing
+  selected, nor in a password field, and no `paste` on a host that cannot
+  read the clipboard: the key reaches the program. An `input` drops the
+  line breaks from what it pastes, as HTML's does.
+- **Undo.** Each text field keeps a history of its edits, as a browser's
+  does, for as long as it is in the document:
+  - Typing characters one after another is one edit, and so is deleting
+    them one at a time, with `delete-char-backward` or
+    `delete-char-forward`. The run ends with any other action, and when
+    the pointer moves the caret. Every other edit, a cut and a paste among
+    them, is one of its own.
+  - `undo` puts back the value and the selection from before the last
+    edit, and `redo` those from after the edit last undone. A new edit
+    drops the edits undone.
+  - With nothing to undo, or to redo, the key is still the field's, and
+    does nothing.
+  - A value the program sets (§6.2, *Controls whose values the program
+    sets*) clears the history.
 
 #### Keys for the program
 
@@ -1670,6 +1696,10 @@ document, and therefore its text.
   selected, a copy key is the host's: neither the surface nor the program
   hears it (§10.4). With nothing selected, it goes where it would:
   Control+c interrupts the program.
+- **Cutting and pasting** are a text field's (§10.2), on the same
+  clipboard. While a text field has the keyboard, the terminal's own
+  paste, from its paste keys or its menu, **SHOULD** type into the field
+  as `paste` does, and not reach the program.
 - **`user-select: none`** is the document's to set, as in a browser. A host
   **MUST NOT** start a selection on an element whose `user-select` is
   `none` (its used value, CSS UI 4: the elements inside one with `auto`
@@ -2151,9 +2181,12 @@ program → CSI ? 2026 l
   - **Copying is the host's,** with a browser's keys: the selection is
     the host's (§11), and Control+c and Command+c copy in every GUI. Only
     while something is selected, so that Control+c still interrupts
-    without a selection, as a terminal's user expects. Pasting and undo
-    have no keys yet: Control+v quotes the next key and Control+z
-    suspends.
+    without a selection, as a terminal's user expects.
+  - **Cutting, pasting and undo are a field's,** with a browser's keys,
+    and only in a focused text field: there Control+x, Control+v and
+    Control+z edit in every GUI, and outside one they keep their terminal
+    meanings (nano's exit, quoting the next key, suspending). In a
+    field's keymap, a program that needs one binds it to `program`.
 - **Why a host may show no select list.** A select's list opens past its
   control, and a surface is a rectangle of cells: drawn inside, a list
   would force small surfaces to grow, and drawn outside, it is something

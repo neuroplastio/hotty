@@ -68,6 +68,15 @@ that lacks it says so in its capabilities.
   selects a word, a triple click a block, and Linux hosts put a selection
   in the primary selection. There is one selection across the host. No
   wire change and no capability: a program cannot tell.
+- **Cutting, pasting and undo** (SPEC.md §10.2, §11): a text field's
+  default keymap binds Control+x and Meta+x to the new action `cut`,
+  Control+v and Meta+v to `paste`, Control+z and Meta+z to `undo`, and
+  Control+Z, Control+y and Meta+Z to `redo`. Each field keeps its own
+  history, as a browser's does; a value the program sets clears it. `cut`
+  with nothing selected, or in a password field, leaves the key to the
+  program. The terminal's own paste types into a field that has the
+  keyboard. A host that does not know the actions leaves the keys to the
+  program, as before; no capability.
 
 Each SDK has the builder `Reveal`, the event's `View` (`Areas` and `AtEnd`,
 from `in` and `end`), `Views`, the event's `Count`, the drag's `tx` and

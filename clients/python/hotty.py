@@ -1190,6 +1190,7 @@ ACTIONS = (
     "delete-char-backward", "delete-char-forward", "delete-word-backward", "delete-word-forward",
     "delete-to-line-start", "delete-to-line-end", "line-previous", "line-next", "page-up", "page-down",
     "input-start", "input-end", "select-all", "newline", "submit", "program",
+    "cut", "paste", "undo", "redo",
 ) + (
     "scroll-up", "scroll-down", "scroll-left", "scroll-right", "scroll-page-up", "scroll-page-down",
     "scroll-half-page-up", "scroll-half-page-down", "scroll-start", "scroll-end",
@@ -1526,6 +1527,9 @@ def resolve(multiline, *values):
                  ("Meta+ArrowLeft", "line-start"), ("Meta+ArrowRight", "line-end"),
                  ("Meta+ArrowUp", "input-start"), ("Meta+ArrowDown", "input-end"),
                  ("Meta+Backspace", "delete-to-line-start"), ("Meta+a", "select-all"),
+                 ("Control+x", "cut"), ("Meta+x", "cut"), ("Control+v", "paste"), ("Meta+v", "paste"),
+                 ("Control+z", "undo"), ("Meta+z", "undo"),
+                 ("Control+Z", "redo"), ("Control+y", "redo"), ("Meta+Z", "redo"),
                  ("Enter", "newline" if multiline else "submit")):
         m.bind(k, a)
     for v in values:
