@@ -43,7 +43,8 @@ runner reads the file keeping the two apart: Python's `json` does, Go's
 with `UseNumber`, Rust's `serde_json` (`is_f64`), and JavaScript's
 `JSON.parse` with a reviver that reads the source text.
 
-Each vector starts on a fresh host. A vector with `"requires"` applies only
+Each vector starts on a fresh host, with `mod` Control and the default
+edit shortcuts (SPEC §10.2, §10.4), whatever its platform. A vector with `"requires"` applies only
 to a host that has what it names, and others skip it: `"passthrough"`, a
 host that reports `passthrough` (SPEC §4, §9.3); `"hover"`, a host that
 lists `hover` in `events` (§9.4); `"scroll"`, a host that reports `scroll`
@@ -53,7 +54,7 @@ host that reports `steps` (§4, §9.1); `"view"`, a host that lists `view` in
 `"drop"`, a host that reports `drop` (§4, §9.1); `"keys"`, a host that
 reports `keys` (§4, §10.5), run with its leader `Space` and a timeout no
 step outlasts; `"commands"`, a host with a terminal that takes edit
-commands (§10.6), run with `mod` Control and the default edit shortcuts;
+commands (§10.6);
 `"undo"`, a host whose
 text fields keep a history and cut (§10.2), which the SDKs' test hosts
 (SDK.md §4.4) do not. A list

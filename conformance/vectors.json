@@ -7920,7 +7920,7 @@
    ]
   },
   {
-   "name": "a key is offered as pressed first: Control+Backspace deletes a word, Command (Meta) with the arrows goes to the line's ends and with Shift selects, Command+a selects all and Command+Backspace deletes to the line's start (SPEC \u00a710.2, \u00a710.4)",
+   "name": "a key is offered as pressed first: where Mod is Control, Control+Backspace deletes a word, Control+Home goes to the start, Shift+End selects and Control+a selects all, and Command (Meta) keys are not the field's (SPEC \u00a710.2, \u00a710.4)",
    "steps": [
     {
      "send": {
@@ -7971,9 +7971,9 @@
      ]
     },
     {
-     "key": "ArrowLeft",
+     "key": "Home",
      "keys": [
-      "meta"
+      "ctrl"
      ],
      "terminal": false,
      "events": []
@@ -7993,9 +7993,8 @@
      ]
     },
     {
-     "key": "ArrowRight",
+     "key": "End",
      "keys": [
-      "meta",
       "shift"
      ],
      "terminal": false,
@@ -8018,7 +8017,7 @@
     {
      "key": "a",
      "keys": [
-      "meta"
+      "ctrl"
      ],
      "terminal": false,
      "events": []
@@ -8042,17 +8041,16 @@
      "keys": [
       "meta"
      ],
-     "terminal": false,
-     "events": [
-      {
-       "e": "input",
-       "s": "x",
-       "t": "t",
-       "detail": {
-        "value": ""
-       }
-      }
-     ]
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "ArrowLeft",
+     "keys": [
+      "meta"
+     ],
+     "terminal": true,
+     "events": []
     }
    ]
   },
