@@ -37,7 +37,7 @@ OSC_NUMBER = NUMBER  # the name this client had first
 CHUNK = 4096
 MAX_SIZE = 1000
 MAX_NAME = 64
-VERSION = "0.2"
+VERSION = "0.3"
 COMPRESS_FROM = 256
 SCAN_MAX = 64 << 10
 
@@ -48,7 +48,6 @@ EVENT_SUBMIT = "submit"
 EVENT_PRESS = "press"
 EVENT_FOCUS = "focus"
 EVENT_BLUR = "blur"
-EVENT_RESIZE = "resize"
 EVENT_FIT = "fit"
 EVENT_HOVER = "hover"
 EVENT_VIEW = "view"
@@ -65,6 +64,18 @@ EDETACHED = "EDETACHED"
 EQUOTA = "EQUOTA"
 EBUDGET = "EBUDGET"
 EVERSION = "EVERSION"
+
+# The features a host may lack (SPEC §4).
+FEATURE_PASSTHROUGH = "passthrough"
+FEATURE_HOVER = "hover"
+FEATURE_COUNT = "count"
+FEATURE_MENU = "menu"
+
+# The modifier bits of an event's `mods` (SPEC §9).
+MOD_SHIFT = 1
+MOD_ALT = 2
+MOD_CONTROL = 4
+MOD_META = 8
 
 OPS = ("morph", "inner", "replace", "append", "prepend", "before", "after", "remove", "attr", "unattr", "text", "var", "reveal")
 
@@ -126,19 +137,16 @@ def encode(control, payload=b"", compress=True):
     pairs = list(control.items()) if isinstance(control, dict) else list(control)
     body, zipped = payload, False
     if compress and len(payload) >= COMPRESS_FROM:
-        z = zlib.compress(payload, 1)
+        z = zlib.compress(payload, 6)
         if len(z) < len(payload):
             body, zipped = z, True
     b64 = base64.b64encode(body).decode()
-    quiet = None
     parts = []
     for k, v in pairs:
         if k in ("o", "m"):
             continue  # Encode's to set
         v = clean_value(v)
         parts.append(f"{k}={v}")
-        if k == "q":
-            quiet = v
     if zipped:
         parts.append("o=z")
     ctl = ":".join(parts)
@@ -152,7 +160,7 @@ def encode(control, payload=b"", compress=True):
             out.append(f"{head}{ctl}:m=1;{piece}{_ST}")
             continue
         more = "0" if i + CHUNK >= len(b64) else "1"
-        out.append(f"{head}m={more}" + (f":q={quiet}" if quiet is not None else "") + f";{piece}{_ST}")
+        out.append(f"{head}m={more};{piece}{_ST}")
     return "".join(out)
 
 
@@ -170,13 +178,14 @@ def _set(pairs, k, v):
 def _command(pairs, payload, default_q, n=None, q=None):
     """Reply options (SDK.md §3.4): `n` numbers the command and asks for its
     reply, `q` sets the quiet level, and a `q` given wins over the one `n`
-    implies, whatever the order."""
-    _set(pairs, "q", default_q)
+    implies, whatever the order. `q` goes out only where the wire does not
+    imply it (SPEC §3.5, SDK.md §3.4.2): it is left out where it would be
+    0 with `n`, or 1 without."""
     if n is not None:
         _set(pairs, "n", n)
-        _set(pairs, "q", REPLY_ALWAYS)
-    if q is not None:
-        _set(pairs, "q", q)
+    level = q if q is not None else (REPLY_ALWAYS if n is not None else default_q)
+    if level != (REPLY_ALWAYS if n is not None else REPLY_ON_ERROR):
+        _set(pairs, "q", level)
     return encode(pairs, payload)
 
 
@@ -203,7 +212,7 @@ def edit(names, n=None, q=None):
 
 @dataclass
 class MenuItem:
-    """A key that can follow a menu's sequence (SPEC §10.6)."""
+    """A key that can follow a menu's sequence (SPEC §10.5)."""
 
     key: str
     label: str = ""
@@ -213,7 +222,7 @@ class MenuItem:
 
 @dataclass
 class MenuLevel:
-    """A which-key level (SPEC §10.6): the keys typed, their group's label,
+    """A which-key level (SPEC §10.5): the keys typed, their group's label,
     and the keys that can follow them."""
 
     seq: list = field(default_factory=list)
@@ -223,7 +232,7 @@ class MenuLevel:
 
 def menu(level=None, n=None, q=None):
     """Shows a program's which-key menu, or with none hides it (SPEC
-    §10.6). The map has myelin's names and order (SDK.md §3.4)."""
+    §10.5). The map has myelin's names and order (SDK.md §3.4)."""
     if level is None:
         return _command([("a", "menu")], b"", NO_REPLY, n, q)
     m = {"seq": list(level.seq)}
@@ -270,15 +279,17 @@ class Window:
 
 @dataclass
 class Placement:
-    """Where and how a surface is shown (SPEC §5.2). rows 0 is auto."""
+    """Where and how a surface is shown (SPEC §5.2). rows 0 is auto. `press`,
+    `fit` and `hover` belong to the surface and hold until sent again:
+    None leaves the key out, True sends 1 and False sends 0 (SDK.md §3.4.1)."""
 
     cols: int
     rows: int = 0
     window: Window = None
     z: int = 0
-    press: bool = False
-    fit: bool = False
-    hover: bool = False
+    press: bool = None
+    fit: bool = None
+    hover: bool = None
     keep_cursor: bool = False
 
     def control(self, surface):
@@ -289,12 +300,9 @@ class Placement:
                 pairs += [("x", str(w.x)), ("y", str(w.y)), ("w", str(w.w)), ("h", str(w.h))]
         if self.z:
             pairs.append(("z", str(self.z)))
-        if self.press:
-            pairs.append(("p", "1"))
-        if self.fit:
-            pairs.append(("f", "1"))
-        if self.hover:
-            pairs.append(("v", "1"))
+        for key, flag in (("p", self.press), ("f", self.fit), ("v", self.hover)):
+            if flag is not None:
+                pairs.append((key, "1" if flag else "0"))
         if self.keep_cursor:
             pairs.append(("C", "1"))
         return pairs
@@ -316,40 +324,121 @@ def hide(surface, n=None, q=None):
     return _command([("a", "hide"), ("s", surface)], b"", NO_REPLY, n, q)
 
 
-def delta(surface, op, target="", key="", payload=b"", n=None, q=None):
-    """Changes a surface's document (SPEC §6.1)."""
-    pairs = [("a", "delta"), ("s", surface), ("op", op)]
-    if target:
-        pairs.append(("t", target))
-    if key:
-        pairs.append(("k", key))
-    return _command(pairs, payload, NO_REPLY, n, q)
+@dataclass
+class Op:
+    """One op of a delta (SPEC §6.1, SDK.md §3.4.3): the op, its target (empty:
+    none), its key for `attr`, `unattr` and `var`, and its value."""
+
+    op: str
+    target: str = ""
+    key: str = ""
+    value: str = ""
+
+
+# The ops that always carry a value `v`, even an empty one (SPEC §6.1);
+# `reveal` carries it only as "start" or "end".
+_VALUED = frozenset(("morph", "inner", "replace", "append", "prepend", "before", "after", "attr", "text", "var"))
+_KEYED = frozenset(("attr", "unattr", "var"))
+
+
+def _op_map(o):
+    m = {"op": o.op}
+    if o.target:
+        m["t"] = o.target
+    if o.op in _KEYED:
+        m["k"] = o.key
+    if o.op in _VALUED or (o.op == "reveal" and o.value in ("start", "end")):
+        m["v"] = str(o.value)
+    return m
+
+
+def morph(target, html):
+    """Morphs the target (empty: the whole tree) to html (SPEC §6.2)."""
+    return Op("morph", target, "", html)
+
+
+def inner(target, html):
+    return Op("inner", target, "", html)
+
+
+def replace(target, html):
+    return Op("replace", target, "", html)
+
+
+def append(target, html):
+    return Op("append", target, "", html)
+
+
+def prepend(target, html):
+    return Op("prepend", target, "", html)
+
+
+def before(target, html):
+    return Op("before", target, "", html)
+
+
+def after(target, html):
+    return Op("after", target, "", html)
+
+
+def remove(target):
+    return Op("remove", target)
+
+
+def attr(target, name, value):
+    return Op("attr", target, name, str(value))
+
+
+def unattr(target, name):
+    return Op("unattr", target, name)
+
+
+def text(target, text):
+    return Op("text", target, "", text)
+
+
+def var(target, name, value):
+    return Op("var", target, name, str(value))
+
+
+def reveal_op(target, where=""):
+    """Scrolls the target into view: where is "start" or "end", or empty for
+    as little as brings it into view."""
+    return Op("reveal", target, "", where)
+
+
+def delta(surface, *ops, n=None, q=None):
+    """Changes a surface's document with the ops given, applied in order and
+    shown as one (SPEC §6.1). The body is one msgpack map, `{"ops": [...]}`;
+    targets and values travel in it as they are, uncleaned (SDK.md §3.4.3)."""
+    body = pack({"ops": [_op_map(o) for o in ops]})
+    return _command([("a", "delta"), ("s", surface)], body, NO_REPLY, n, q)
 
 
 def set_text(surface, target, text, n=None, q=None):
-    return delta(surface, "text", target, "", text, n, q)
+    return delta(surface, Op("text", target, "", text), n=n, q=q)
 
 
 def set_var(surface, target, name, value, n=None, q=None):
-    return delta(surface, "var", target, name, str(value), n, q)
+    return delta(surface, var(target, name, value), n=n, q=q)
 
 
 def set_attr(surface, target, name, value, n=None, q=None):
-    return delta(surface, "attr", target, name, str(value), n, q)
+    return delta(surface, attr(target, name, value), n=n, q=q)
 
 
 def remove_attr(surface, target, name, n=None, q=None):
-    return delta(surface, "unattr", target, name, b"", n, q)
+    return delta(surface, unattr(target, name), n=n, q=q)
 
 
 def morph_to(surface, target, html, n=None, q=None):
-    return delta(surface, "morph", target, "", html, n, q)
+    return delta(surface, morph(target, html), n=n, q=q)
 
 
 def reveal(surface, target, where="", n=None, q=None):
     """Scrolls the target into view (SPEC §6.1): where is "start" or "end",
     or empty for as little as brings it into view."""
-    return delta(surface, "reveal", target, "", where, n, q)
+    return delta(surface, reveal_op(target, where), n=n, q=q)
 
 
 def res(id, mime, data, n=None, q=None):
@@ -457,6 +546,7 @@ class Reply:
         self.surface = m["s"]
         self.cols = _int(m["c"])
         self.rows = _int(m["r"])
+        self.op = _int(m["i"])  # the op of a delta at fault, from 0 (SPEC §3.6, §6.1)
         self.code = self.detail = None
         if not self.ok:
             body = _typed_body(m, _ERROR) or {}
@@ -478,12 +568,11 @@ class Reply:
 
 @dataclass
 class Drag:
-    """A drag's cell and keys, its steps x and y in the element dragged,
-    and tx and ty in t, each None where the detail has none (SPEC §9.1)."""
+    """A drag's cell, its steps x and y in the element dragged, and tx and
+    ty in t, each None where the detail has none (SPEC §9.1)."""
 
     c: int
     r: int
-    keys: list = field(default_factory=list)
     x: int = None
     y: int = None
     tx: int = None
@@ -530,7 +619,8 @@ class View:
 
 # The types of a body's fields (SPEC §3.3): a type's name, a list of one
 # type (an array of it), or a dict: a map's fields by name, or under "*" the
-# type of each value of a map keyed by strings. A field not named is not
+# type of each value of a map keyed by strings; a tuple is an array of exactly
+# those types, in order. A field not named is not
 # checked, as one a program does not know is ignored (SDK.md §2.7).
 _IS = {
     "int": lambda v: isinstance(v, int) and not isinstance(v, bool),
@@ -543,6 +633,8 @@ _IS = {
 def _typed(v, t):
     if isinstance(t, str):
         return _IS[t](v)
+    if isinstance(t, tuple):  # an array of exactly these types, in order
+        return isinstance(v, list) and len(v) == len(t) and all(_typed(x, f) for x, f in zip(v, t))
     if isinstance(t, list):
         return isinstance(v, list) and all(_typed(x, t[0]) for x in v)
     if not isinstance(v, dict):
@@ -562,35 +654,26 @@ def _typed_body(m, t):
 _ERROR = {"code": "str", "detail": "str"}
 _CAPS = {
     "v": "str",
-    "ops": ["str"],
-    "events": ["str"],
-    "cell": {"w": "int", "h": "int"},
+    "cellcss": {"w": "float", "h": "float"},
     "scale": "float",
     "scheme": "str",
+    "mod": "str",
+    "features": ["str"],
     "limits": {"*": "int"},
     "net": {"*": ["str"]},
-    "passthrough": "bool",
-    "scroll": "bool",
-    "steps": "bool",
-    "drop": "bool",
-    "count": "bool",
-    "mod": "str",
     "edit": {"*": ["str"]},
-    "keys": {"leader": "str", "timeout": "int"},
-    "menu": "bool",
     "host": "str",
     "version": "str",
 }
 _AREA = {"c": "int", "r": "int", "w": "int", "h": "int"}
-_DRAG = {"c": "int", "r": "int", "keys": ["str"], "x": "int", "y": "int", "tx": "int", "ty": "int"}
+_DRAG = {"c": "int", "r": "int", "mods": "int", "x": "int", "y": "int", "tx": "int", "ty": "int"}
 # Each kind's detail (SPEC §9); a kind not here carries none a program reads.
 _DETAIL = {
-    EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA, "count": "int"},
-    EVENT_PRESS: {"area": _AREA},
+    EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA, "mods": "int", "count": "int"},
+    EVENT_PRESS: {"area": _AREA, "mods": "int"},
     EVENT_CHANGE: {"checked": "bool", "value": "str"},
     EVENT_INPUT: {"value": "str"},
-    EVENT_SUBMIT: {"*": "str"},
-    EVENT_RESIZE: {"w": "float", "h": "float"},
+    EVENT_SUBMIT: {"fields": [("str", "str")]},
     EVENT_FIT: {"r": "int"},
     EVENT_DRAG_START: _DRAG,
     EVENT_DRAG: _DRAG,
@@ -625,10 +708,18 @@ class Event:
         return self._d.get("checked") if self.kind == EVENT_CHANGE else None
 
     def fields(self):
-        """A submit's fields by name."""
-        if self.kind != EVENT_SUBMIT or self._body is None:
+        """A submit's fields, a list of (name, value) in order: two fields of
+        one name are two pairs (SPEC §9). None when the detail has none."""
+        if self.kind != EVENT_SUBMIT or "fields" not in self._d:
             return None
-        return dict(self._body)
+        return [tuple(p) for p in self._d["fields"]]
+
+    def mods(self):
+        """The modifier keys held, as bits (MOD_SHIFT, …); 0 when none was
+        (SPEC §9)."""
+        if self.kind not in (EVENT_CLICK, EVENT_PRESS, EVENT_DRAG_START, EVENT_DRAG, EVENT_DRAG_END):
+            return 0
+        return self._d.get("mods", 0)
 
     def link(self):
         """(href, url) of a link's click; url is None when there is none."""
@@ -636,12 +727,6 @@ class Event:
         if self.kind != EVENT_CLICK or href is None:
             return None
         return href, self._d.get("url")
-
-    def size(self):
-        w, h = self._d.get("w"), self._d.get("h")
-        if self.kind != EVENT_RESIZE or w is None or h is None:
-            return None
-        return w, h
 
     def fit_rows(self):
         return self._d.get("r") if self.kind == EVENT_FIT else None
@@ -653,7 +738,7 @@ class Event:
         if c is None or r is None:
             return None
         d = self._d
-        return Drag(c, r, list(d.get("keys", [])), d.get("x"), d.get("y"), d.get("tx"), d.get("ty"))
+        return Drag(c, r, d.get("x"), d.get("y"), d.get("tx"), d.get("ty"))
 
     def count(self):
         """A click's place in its run of clicks (SPEC §9): 2 for the second
@@ -705,81 +790,48 @@ class Event:
         return View(areas, self._d.get("end", False))
 
 
-@dataclass
-class Keys:
-    """The user's leader, a key sequence, and how long a sequence waits, in
-    milliseconds (SPEC §10.5)."""
+class CellCSS(NamedTuple):
+    """One cell's size in CSS pixels (SPEC §4, §5.3)."""
 
-    leader: str = None
-    timeout: int = None
+    w: float
+    h: float
 
 
 class Caps:
     """What a host says about itself (SPEC §4), from a body whose fields
-    have their types (Reply.caps)."""
+    have their types (Reply.caps). A field the host did not send is None,
+    or empty."""
 
     def __init__(self, d):
         self.raw = d
         self.v = d.get("v", "")
-        self.ops = d.get("ops", [])
-        self.events = d.get("events", [])
-        cell = d.get("cell", {})
-        self.cell = (cell["w"], cell["h"]) if "w" in cell and "h" in cell else None
+        cell = d.get("cellcss", {})
+        self.cell_css = CellCSS(cell["w"], cell["h"]) if "w" in cell and "h" in cell else None
         self.scale = d.get("scale")
         self.scheme = d.get("scheme", "")
+        self.mod = d.get("mod")
+        self.features = d.get("features", [])
         self.limits = d.get("limits", {})
         self.net = d.get("net", {})
-        self.passthrough = d.get("passthrough", False)
-        self.scroll = d.get("scroll", False)
-        self.steps = d.get("steps", False)
-        self.drop = d.get("drop", False)
-        self.count = d.get("count", False)
-        self.mod = d.get("mod")
         self.edit = d.get("edit")
-        keys = d.get("keys")
-        self.keys = Keys(keys.get("leader"), keys.get("timeout")) if keys is not None else None
-        self.menu = d.get("menu", False)
         self.host = d.get("host")
         self.version = d.get("version")
 
-    def supports(self, op):
-        """Whether the host supports a delta op; one that lists none, all."""
-        return not self.ops or op in self.ops
-
-    def sends(self, kind):
-        """Whether the host sends an event kind; one that lists none, all."""
-        if kind in (EVENT_DRAG_START, EVENT_DRAG_END):
-            kind = EVENT_DRAG
-        return not self.events or kind in self.events
-
-    def drags(self):
-        """Whether the host lists drag: a host that lists no kinds does not."""
-        return EVENT_DRAG in self.events
-
-    def hovers(self):
-        """Whether the host lists hover: a host that lists no kinds does not."""
-        return EVENT_HOVER in self.events
-
-    def views(self):
-        """Whether the host lists view: a host that lists no kinds does not."""
-        return EVENT_VIEW in self.events
+    def has(self, feature):
+        """Whether the host has a feature (SPEC §4): passthrough, hover,
+        count or menu."""
+        return feature in self.features
 
     def light(self):
         return self.scheme == "light"
 
     def merge(self, changed):
         """The capabilities with the fields a caps event changed (SPEC §4),
-        and without those it empties: absent now (SPEC §9)."""
+        and without those it empties (`{}`, `[]` or `""`): absent now
+        (SPEC §9)."""
         raw = {**self.raw, **changed.raw}
-        return Caps({k: v for k, v in raw.items() if not (k in changed.raw and v == {})})
-
-    def cell_css(self):
-        """A cell's size in CSS pixels: a usual 9x18 when the host did not
-        say."""
-        s = self.scale if self.scale and self.scale > 0 else 1
-        if self.cell is None or self.cell[0] <= 0 or self.cell[1] <= 0:
-            return 9, 18
-        return self.cell[0] / s, self.cell[1] / s
+        return Caps({k: v for k, v in raw.items()
+                     if not (k in changed.raw and isinstance(v, (dict, list, str)) and not v)})
 
 
 # --- msgpack (SPEC §3.3, SDK.md §3.9) ----------------------------------------
@@ -825,9 +877,12 @@ def _len_head(n, fix, fixmax, h8, h16, h32):
 
 def pack(v):
     """v as msgpack, each value in the smallest of its type's forms: a dict
-    a map in its order, a list an array, str a str, a bool, an int."""
+    a map in its order, a list an array, str a str, a bool, an int, a float
+    64 bits."""
     if isinstance(v, bool):
         return b"\xc3" if v else b"\xc2"
+    if isinstance(v, float):
+        return b"\xcb" + struct.pack(">d", v)
     if isinstance(v, int):
         if 0 <= v < 128:
             return bytes([v])
@@ -1028,7 +1083,7 @@ class Decoder:
         ctl = _parse_control(ctl_s)
         if ctl is None:
             return self._bad()
-        if "m" in ctl and set(ctl) <= {"m", "q"}:
+        if set(ctl) == {"m"}:
             if self._pending is None or ctl["m"] not in ("0", "1"):
                 return self._bad()
             p = self._add(b64)
@@ -1327,7 +1382,7 @@ ACTIONS = (
     "char-backward", "char-forward", "word-backward", "word-forward", "line-start", "line-end",
     "delete-char-backward", "delete-char-forward", "delete-word-backward", "delete-word-forward",
     "delete-to-line-start", "delete-to-line-end", "line-previous", "line-next", "page-up", "page-down",
-    "input-start", "input-end", "select-all", "newline", "submit", "program",
+    "input-start", "input-end", "select-all", "newline", "submit", "program", "prefix",
     "copy", "cut", "paste", "undo", "redo",
 ) + (
     "scroll-up", "scroll-down", "scroll-left", "scroll-right", "scroll-page-up", "scroll-page-down",
@@ -1631,10 +1686,18 @@ class Keymap:
 
     def program(self, key):
         """Whether the keymap gives the key to the program (SPEC.md §10.2):
-        on an element that is not a text field, a host asks it of the
-        element's data-keys alone, before the element or a scroll uses it."""
+        it binds the key to `program` or `prefix`. On an element that is not
+        a text field, a host asks it of the element's data-keys alone, before
+        the element or a scroll uses it."""
         k = self._key(key)
-        return k is not None and self._bound(k) == "program"
+        return k is not None and self._bound(k) in ("program", "prefix")
+
+    def prefix(self, key):
+        """Whether the keymap binds the key to `prefix`, with the same
+        fallback without Shift: a host gives the program every key after it
+        (SPEC.md §10.5)."""
+        k = self._key(key)
+        return k is not None and self._bound(k) == "prefix"
 
     def scroll(self, key):
         """The scroll action the keymap binds the key to, or None (SPEC.md
@@ -1653,7 +1716,7 @@ class Keymap:
         mods, value = _split_key(k)
         a = self._bound(k)
         if a is not None:
-            return None if a == "program" or (a in MULTILINE_ACTIONS and not self.multiline) else a
+            return None if a in ("program", "prefix") or (a in MULTILINE_ACTIONS and not self.multiline) else a
         if _is_char(value) and not {"Control", "Alt", "Meta"} & set(mods):
             return INSERT
         return None
@@ -1932,17 +1995,19 @@ class Hotty:
         self.out.write(text.encode() if isinstance(text, str) else text)
         self.out.flush()
 
-    def doc(self, surface, html, quiet=REPLY_ON_ERROR, detached=False, scroll=0):
+    def doc(self, surface, html, quiet=None, detached=False, scroll=0):
         self.write(doc(surface, html, detached=detached, scroll=scroll, q=quiet))
 
-    def place(self, surface, cols, rows="auto", move_cursor=True, quiet=REPLY_ON_ERROR, window=None, z=0, press=False, fit=False, hover=False):
+    def place(self, surface, cols, rows="auto", move_cursor=True, quiet=None, window=None, z=0, press=None, fit=None, hover=None):
         """Places a surface at the cursor. `window` is (x, y, w, h): the part
         of the surface to show (SPEC §5.2), or None for all of it; `z` puts
         the placement above (greater) or below overlapping ones; `press`
         asks for a `press` event on every press in it (SPEC §9); `fit` asks
         for a `fit` event whenever the rows its document needs change;
         `hover` asks for a `hover` event whenever the element under the
-        pointer changes, or the pointer leaves (SPEC §9.4)."""
+        pointer changes, or the pointer leaves (SPEC §9.4). These three
+        belong to the surface: None leaves them as they were, True turns
+        them on and False off (SPEC §5.2)."""
         p = Placement(
             cols=int(cols),
             rows=0 if rows == "auto" else int(rows),
@@ -1955,12 +2020,14 @@ class Hotty:
         )
         self.write(place(surface, p, q=quiet))
 
-    def hide(self, surface, quiet=NO_REPLY):
+    def hide(self, surface, quiet=None):
         """Removes the placement and keeps the surface (SPEC §5.4)."""
         self.write(hide(surface, q=quiet))
 
-    def delta(self, surface, op, target=None, payload="", key=None, quiet=NO_REPLY):
-        self.write(delta(surface, op, target or "", key or "", payload, q=quiet))
+    def delta(self, surface, *ops, quiet=None):
+        """Sends one delta of the ops (`morph`, `text`, … build them): the
+        changes of a frame to one surface go in one delta (SDK.md §2.9)."""
+        self.write(delta(surface, *ops, q=quiet))
 
     def text(self, surface, target, text):
         self.write(set_text(surface, target, text))
@@ -1974,19 +2041,19 @@ class Hotty:
     def reveal(self, surface, target, where=""):
         self.write(reveal(surface, target, where))
 
-    def res(self, name, mime, data, quiet=NO_REPLY):
+    def res(self, name, mime, data, quiet=None):
         self.write(res(name, mime, data, q=quiet))
 
-    def delete(self, surface, quiet=NO_REPLY):
+    def delete(self, surface, quiet=None):
         self.write(delete(surface, q=quiet))
 
-    def detach(self, surface, quiet=NO_REPLY):
+    def detach(self, surface, quiet=None):
         self.write(detach(surface, q=quiet))
 
-    def focus(self, surface, target=None, quiet=NO_REPLY):
+    def focus(self, surface, target=None, quiet=None):
         self.write(focus(surface, target or "", q=quiet))
 
-    def blur(self, surface, quiet=NO_REPLY):
+    def blur(self, surface, quiet=None):
         self.write(blur(surface, q=quiet))
 
     @contextlib.contextmanager
@@ -2045,7 +2112,7 @@ class Hotty:
 
     def query(self, timeout=None):
         """Is there a HOTTY host that speaks VERSION? Returns its
-        capabilities (their body, decoded), or None. Reads until detection is done (SDK.md §3.8), and leaves
+        capabilities (a Caps), or None. Reads until detection is done (SDK.md §3.8), and leaves
         everything that is not detection's in the buffer, for take()."""
         now = lambda: time.monotonic() * 1000  # noqa: E731
         det = Detector(1)
@@ -2085,4 +2152,4 @@ class Hotty:
         if det.state != NATIVE:
             return None
         self.caps = det.caps
-        return det.caps.raw
+        return det.caps

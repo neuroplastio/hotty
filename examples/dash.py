@@ -13,7 +13,7 @@ import sys
 import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "clients", "python"))
-from hotty import Hotty  # noqa: E402
+from hotty import Hotty, inner, morph, text, var  # noqa: E402
 
 STYLE = """
 <style>
@@ -126,7 +126,7 @@ def body(state):
 
 def main():
     args = sys.argv[1:]
-    morph = "--morph" in args
+    mode_morph = "--morph" in args
     hz = float(args[args.index("--hz") + 1]) if "--hz" in args else 10.0
     seconds = float(args[args.index("--seconds") + 1]) if "--seconds" in args else None
     # --cores K: update only the clock and K core bars per frame (delta-size experiments).
@@ -135,7 +135,7 @@ def main():
     if record:
         # Write the command stream for --frames N frames to a file, as fast as
         # possible, for `hotty replay` (hotty-blitz's benchmark).
-        return record_stream(record, morph, int(args[args.index("--frames") + 1]) if "--frames" in args else 100)
+        return record_stream(record, mode_morph, int(args[args.index("--frames") + 1]) if "--frames" in args else 100)
     lam = Hotty()
     size = shutil.get_terminal_size()
     sent = [0]
@@ -152,7 +152,7 @@ def main():
         lam.write("\x1b[?1049h\x1b[?25l\x1b[H\x1b[2J")
         prev = read_cpu()
         state = {
-            "mode": "morph" if morph else "delta",
+            "mode": "morph" if mode_morph else "delta",
             "clock": "",
             "cpu": [0.0] * len(prev),
             "mem": meminfo(),
@@ -194,27 +194,8 @@ def main():
                     )
                     continue
                 with lam.sync():
-                    if morph:
-                        lam.delta("dash", "morph", "app", body(state))
-                    elif only is not None:
-                        lam.text("dash", "clock", state["clock"])
-                        for i, p in enumerate(state["cpu"][1 : 1 + only]):
-                            lam.var("dash", f"c{i}", "p", f"{p:.0f}")
-                            lam.text("dash", f"cv{i}", f"{p:4.0f}%")
-                    else:
-                        total, used = state["mem"]
-                        lam.text("dash", "clock", state["clock"])
-                        lam.text("dash", "cpu", f"{state['cpu'][0]:.0f}%")
-                        lam.var("dash", "cpubar", "p", f"{state['cpu'][0]:.0f}")
-                        lam.text("dash", "mem", f"{used / 1048576:.1f} GB")
-                        lam.var("dash", "membar", "p", f"{100 * used / total:.0f}")
-                        lam.text("dash", "load", state["load"])
-                        lam.text("dash", "frames", str(state["frames"]))
-                        for i, p in enumerate(state["cpu"][1:]):
-                            lam.var("dash", f"c{i}", "p", f"{p:.0f}")
-                            lam.text("dash", f"cv{i}", f"{p:4.0f}%")
-                        if now - last_procs < 1.0 / hz:
-                            lam.delta("dash", "inner", "procs", procs_rows(state["procs"]))
+                    # One delta for the whole frame (SDK.md §2.9).
+                    lam.delta("dash", *frame_ops(state, mode_morph, only, now - last_procs < 1.0 / hz))
                     lam.write(f"\x1b[{size.lines};1H q quits · {state['mode']} · {hz:g} Hz\x1b[K")
         except (KeyboardInterrupt, EOFError):
             pass
@@ -230,26 +211,33 @@ def main():
             f.write(line + "\n")
 
 
-def frame_ops(lam, state, morph, procs_changed):
-    if morph:
-        lam.delta("dash", "morph", "app", body(state))
-        return
+def frame_ops(state, whole, only, procs_changed):
+    """The ops of one frame: the whole tree morphed, or the changes."""
+    if whole:
+        return [morph("app", body(state))]
+    ops = [text("clock", state["clock"])]
+    if only is not None:
+        # --cores K: the clock and K core bars.
+        for i, p in enumerate(state["cpu"][1 : 1 + only]):
+            ops += [var(f"c{i}", "p", f"{p:.0f}"), text(f"cv{i}", f"{p:4.0f}%")]
+        return ops
     total, used = state["mem"]
-    lam.text("dash", "clock", state["clock"])
-    lam.text("dash", "cpu", f"{state['cpu'][0]:.0f}%")
-    lam.var("dash", "cpubar", "p", f"{state['cpu'][0]:.0f}")
-    lam.text("dash", "mem", f"{used / 1048576:.1f} GB")
-    lam.var("dash", "membar", "p", f"{100 * used / total:.0f}")
-    lam.text("dash", "load", state["load"])
-    lam.text("dash", "frames", str(state["frames"]))
+    ops += [
+        text("cpu", f"{state['cpu'][0]:.0f}%"),
+        var("cpubar", "p", f"{state['cpu'][0]:.0f}"),
+        text("mem", f"{used / 1048576:.1f} GB"),
+        var("membar", "p", f"{100 * used / total:.0f}"),
+        text("load", state["load"]),
+        text("frames", str(state["frames"])),
+    ]
     for i, p in enumerate(state["cpu"][1:]):
-        lam.var("dash", f"c{i}", "p", f"{p:.0f}")
-        lam.text("dash", f"cv{i}", f"{p:4.0f}%")
+        ops += [var(f"c{i}", "p", f"{p:.0f}"), text(f"cv{i}", f"{p:4.0f}%")]
     if procs_changed:
-        lam.delta("dash", "inner", "procs", procs_rows(state["procs"]))
+        ops.append(inner("procs", procs_rows(state["procs"])))
+    return ops
 
 
-def record_stream(path, morph, frames):
+def record_stream(path, whole, frames):
     import random
 
     rng = random.Random(7)
@@ -257,7 +245,7 @@ def record_stream(path, morph, frames):
         lam = Hotty(out=f)
         ncores = 24
         state = {
-            "mode": "morph" if morph else "delta",
+            "mode": "morph" if whole else "delta",
             "clock": "00:00:00.000",
             "cpu": [0.0] * (ncores + 1),
             "mem": (32 << 20, 12 << 20),
@@ -277,7 +265,7 @@ def record_stream(path, morph, frames):
             if procs_changed:
                 state["procs"] = [(rng.randint(100, 900) << 10, str(1000 + i), f"proc{i}") for i in range(8)]
             with lam.sync():
-                frame_ops(lam, state, morph, procs_changed)
+                lam.delta("dash", *frame_ops(state, whole, None, procs_changed))
 
 
 if __name__ == "__main__":

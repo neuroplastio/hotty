@@ -16,22 +16,9 @@ import hotty  # noqa: E402
 
 # What this client implements, for vectors marked "requires".
 FEATURES = {
-    "place.hover",
-    "event.hover",
-    "caps.passthrough",
-    "caps.version",
-    "caps.drag-kinds",
     "options.unordered",
-    "doc.scroll",
-    "event.area",
-    "event.view",
-    "caps.views",
-    "reveal",
-    "caps.scroll",
     "decode.abort-count",
     "decode.max",
-    "event.count",
-    "event.drop",
     "decode.unterminated",
     "scanner.da1",
 }
@@ -96,9 +83,9 @@ def placement(p):
         rows=p.get("rows", 0),
         window=hotty.Window(w["x"], w["y"], w["w"], w["h"]) if w else None,
         z=p.get("z", 0),
-        press=p.get("press", False),
-        fit=p.get("fit", False),
-        hover=p.get("hover", False),
+        press=p.get("press"),
+        fit=p.get("fit"),
+        hover=p.get("hover"),
         keep_cursor=p.get("keep_cursor", False),
     )
 
@@ -118,7 +105,8 @@ def build(b):
     if name == "place_at":
         return hotty.place_at(a["surface"], a["x"], a["y"], placement(a["placement"]), **ro)
     if name == "delta":
-        return hotty.delta(a["surface"], a["op"], a.get("target", ""), a.get("key", ""), a.get("payload", ""), **ro)
+        ops = [hotty.Op(o["op"], o.get("target", ""), o.get("key", ""), o.get("value", "")) for o in a["ops"]]
+        return hotty.delta(a["surface"], *ops, **ro)
     if name == "sync":
         return hotty.sync(*(build(c) for c in a["commands"]))
     fn = {
@@ -155,6 +143,11 @@ def payload_of(seg):
     return seg.get("payload", "").encode()
 
 
+def body_matches(cmd):
+    """A build vector's body, as JSON, is what its payload_b64 holds."""
+    return hotty.unpack(base64.b64decode(cmd["payload_b64"])) == cmd["body"]
+
+
 def run_build(v):
     got = []
     dec = hotty.Decoder()
@@ -170,6 +163,8 @@ def run_build(v):
     for seg in v["out"]:
         if "cmd" in seg:
             want.append({"cmd": {"control": seg["cmd"]["control"], "payload": payload_of(seg["cmd"])}})
+            if "body" in seg["cmd"] and not body_matches(seg["cmd"]):
+                return False, "body and payload_b64 disagree"
         else:
             want.append(seg)
     return got == want, f"got {got}"
@@ -212,12 +207,11 @@ def num_eq(a, b):
 
 
 def reply_view(r):
-    return {"ok": r.ok, "re": r.re, "n": r.n, "surface": r.surface, "cols": r.cols, "rows": r.rows, "code": r.code, "detail": r.detail}
+    return {"ok": r.ok, "re": r.re, "n": r.n, "surface": r.surface, "cols": r.cols, "rows": r.rows, "code": r.code, "detail": r.detail, "op": r.op}
 
 
 def event_view(e):
     link = e.link()
-    size = e.size()
     drag = e.drag()
     hover = e.hover()
     area = e.area()
@@ -230,11 +224,11 @@ def event_view(e):
         "target": e.target,
         "value": e.value(),
         "checked": e.checked(),
-        "fields": e.fields(),
+        "fields": [list(p) for p in e.fields()] if e.fields() is not None else None,
+        "mods": e.mods(),
         "link": {"href": link[0], "url": link[1]} if link else None,
-        "size": {"w": size[0], "h": size[1]} if size else None,
         "fit_rows": e.fit_rows(),
-        "drag": {"c": drag.c, "r": drag.r, "keys": drag.keys, "x": drag.x, "y": drag.y, "tx": drag.tx, "ty": drag.ty} if drag else None,
+        "drag": {"c": drag.c, "r": drag.r, "x": drag.x, "y": drag.y, "tx": drag.tx, "ty": drag.ty} if drag else None,
         "hover": {"c": hover.c, "r": hover.r, "out": hover.out} if hover else None,
         "area": {"c": area.c, "r": area.r, "w": area.w, "h": area.h} if area else None,
         "count": e.count(),
@@ -248,35 +242,21 @@ def event_view(e):
 
 
 def caps_view(c, want):
-    view = {
+    return {
         "v": c.v,
-        "ops": c.ops,
-        "events": c.events,
-        "cell": {"w": c.cell[0], "h": c.cell[1]} if c.cell else None,
+        "cell_css": {"w": c.cell_css.w, "h": c.cell_css.h} if c.cell_css else None,
         "scale": c.scale,
         "scheme": c.scheme,
+        "mod": c.mod,
+        "features": c.features,
         "limits": c.limits,
         "net": c.net,
-        "passthrough": c.passthrough,
-        "scroll": c.scroll,
-        "steps": c.steps,
-        "drop": c.drop,
-        "count": c.count,
-        "mod": c.mod,
         "edit": c.edit,
-        "keys": {"leader": c.keys.leader, "timeout": c.keys.timeout} if c.keys else None,
-        "menu": c.menu,
         "host": c.host,
         "version": c.version,
-        "drags": c.drags(),
-        "hovers": c.hovers(),
-        "views": c.views(),
         "light": c.light(),
-        "cell_css": dict(zip("wh", c.cell_css())),
+        "has": {f: c.has(f) for f in want.get("has", {})},
     }
-    view["supports"] = {op: c.supports(op) for op in want.get("supports", {})}
-    view["sends"] = {k: c.sends(k) for k in want.get("sends", {})}
-    return view
 
 
 def match(got, want, path):
@@ -446,12 +426,16 @@ def platform(v):
 
 
 def run_keymap(v):
-    if "program" in v or "scroll" in v:
+    if "program" in v or "scroll" in v or "prefix" in v:
         m = hotty.parse_keymap(platform(v), " ".join(v["keys"]))
         for key, want in v.get("program", {}).items():
             got = m.program(key)
             if got != want:
                 return False, f"{key!r}: program {got!r}, want {want!r}"
+        for key, want in v.get("prefix", {}).items():
+            got = m.prefix(key)
+            if got != want:
+                return False, f"{key!r}: prefix {got!r}, want {want!r}"
         for key, want in v.get("scroll", {}).items():
             got = m.scroll(key)
             if got != want:

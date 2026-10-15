@@ -32,7 +32,7 @@ import zlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "clients", "python"))
-from hotty import Hotty  # noqa: E402
+from hotty import Hotty, append, attr, replace  # noqa: E402
 
 GAME_DIR = os.path.abspath(os.environ.get("BUBBROS_DIR") or os.path.join(HERE, "..", "..", "bubbros"))
 FRAME = 0.025  # the game's own step (bb_tornado.py's periodic callback)
@@ -183,24 +183,27 @@ class Screen:
         styles = [self.style(s) for s in cur]
         styles += ["display:none"] * (len(self.slots) - len(styles))
         new = []
+        ops = []
         changed = 0
         for n, st in enumerate(styles):
             if n >= len(self.slots):
                 new.append(f"<div class=s id=s{n} style='{st}'></div>")
                 self.slots.append(st)
             elif self.slots[n] != st:
-                self.lam.attr("game", f"s{n}", "style", st)
+                ops.append(attr(f"s{n}", "style", st))
                 self.slots[n] = st
                 changed += 1
         if new:
-            self.lam.delta("game", "append", "board", "".join(new))
+            ops.append(append("board", "".join(new)))
             changed += len(new)
+        if ops:
+            self.lam.delta("game", *ops)  # one delta for the frame (SDK.md §2.9)
         self.frames += 1
         self.changed += changed
 
     def restyle(self):
         """After a rescale: every slot again."""
-        self.lam.delta("game", "replace", "board", self.board_html())
+        self.lam.delta("game", replace("board", self.board_html()))
         self.slots = []
 
 
@@ -297,8 +300,7 @@ def main():
 
         def layout():
             cols, lines = os.get_terminal_size(out.fileno())
-            cw = caps["cell"]["w"] / caps.get("scale", 1)
-            ch = caps["cell"]["h"] / caps.get("scale", 1)
+            cw, ch = caps.cell_css  # CSS pixels (SPEC §4)
             screen.fit(cols, lines - 1, cw, ch)
             return cols, lines
 
@@ -336,8 +338,12 @@ def main():
                 if lam.read(max(0.0, next_tick - now)):
                     msgs, data = lam.take()
                     for m in msgs:
-                        if m["a"] == "ev" and m["e"] == "resize":
-                            resized.append(1)
+                        # A new font is a caps event with the new cellcss (SPEC §4).
+                        if m["a"] == "ev" and m["e"] == "caps":
+                            changed = m.event().changed()
+                            if changed is not None:
+                                caps = caps.merge(changed)
+                                resized.append(1)
                     events = kitty_events(data) if kitty else [(k, 1) for k in legacy_keys(data)]
                     for key, event in events:
                         if key in ("q", "escape") and event == 1:

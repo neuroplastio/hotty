@@ -99,7 +99,7 @@ def main():
                     elif e == "click" and m["t"] == "cancel":
                         status("cancelled")
                     elif e == "submit":
-                        status("saved: " + ", ".join(f"{k}={v}" for k, v in (detail or {}).items()))
+                        status("saved: " + ", ".join(f"{k}={v}" for k, v in m.event().fields() or []))
                     elif e == "blur":
                         focused = False
                         footer()
