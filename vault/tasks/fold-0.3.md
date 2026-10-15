@@ -137,38 +137,40 @@ consumers.
 
 ## Scope decisions
 
-- [ ] **FOLD-08** The features for programs in the cells leave HOTTY's core
-      status: proposed | needs: maintainer | added: 2026-10-14
-      problem: `a=edit`, the `command` event, `a=menu` and the `menu`
-      capability serve a program drawing in the cells, not a surface: the
-      terminal using HOTTY's envelope as a side channel.
-      proposal: a companion spec on the same envelope; or drop `a=menu`,
-      since a program can already show its which-key menu as a surface at a
-      higher `z`, and keep `a=edit` in the companion. `caps` stays in the
-      core, for `mod` and `cell` (FOLD-04).
-      consumers (checked again 2026-10-14): `a=edit` in hotty-a2ui's
-      storybook (`takeEdit`), and plx relays it per pane (in progress,
-      not released); `a=menu` none shipped, and plx plans to relay it.
+- **FOLD-08** The features for programs in the cells leave HOTTY's core
+      status: rejected | added: 2026-10-14
+      proposal was: `a=edit`, the `command` event, `a=menu` and the `menu`
+      capability go to a companion spec, or `a=menu` goes.
+      why rejected (the maintainer, 2026-10-16): they stay in the core.
+      `a=menu` is a feature of its own, not only key sequences' display: a
+      terminal or a multiplexer that knows the actions a pane's program
+      offers can show them in a contextual palette, and to AI agents that
+      drive a TUI without knowing its keys.
 
 - [ ] **FOLD-09** Key sequences are resolved by the program
-      status: proposed | needs: maintainer | added: 2026-10-14
+      status: accepted (the maintainer, 2026-10-16) | added: 2026-10-14
       problem: §10.5 puts a sequence engine in the host: `data-key`, groups,
       the nearest-to-focus rule, `<leader>`, a timeout, `keys` in the
-      capabilities, and a which-key menu the host draws. Appendix B's main
-      reason is a race: after a leader, the next key can reach a focused
-      text field before the program can react.
+      capabilities, and a which-key menu the host draws from the document.
+      Appendix B's main reason is a race: after a leader, the next key can
+      reach a focused text field before the program can react.
       proposal: one keymap action, `prefix`. The key reaches the program,
       and so does every key after it, whatever is focused, until the
       program sends `a=focus` or the surface loses the keyboard. The program
       resolves sequences with myelin, as it does in its cells, labels them
-      from the document it wrote, and shows its menu as a surface.
-      gain: `data-key`, `keys`, menus drawn by the host and the vectors'
-      `keys` marker go.
+      from the document it wrote, and shows its menu with `a=menu`, which
+      stays (FOLD-08) and then serves a surface's program as it does one in
+      the cells.
+      gain: `data-key`, `keys`, the hosts' sequence engines and the
+      vectors' `keys` marker go. `a=menu` becomes the one way a menu is
+      shown.
       cost: the menu shows a round trip later, which which-key's own pause
-      hides; the action it leads to needed the program anyway. It reverses
-      what shipped on 2026-10-14 (hottyterm 26.10.14-dev.740d7f8,
-      xterm-addon-hotty 0.1.0-next.17). No consumer uses `data-key` yet, so
-      it is cheapest now.
+      hides; the action it leads to needed the program anyway. Keys after a
+      `prefix` that finish no sequence stay the program's: they no longer
+      go on to the focused element. A program's leader is its own setting,
+      not the terminal's. It reverses what shipped on 2026-10-14 (hottyterm
+      26.10.14-dev.740d7f8, xterm-addon-hotty 0.1.0-next.17). No consumer
+      uses `data-key` yet, so it is cheapest now.
 
 ## SDKs (any time, not tied to 0.3)
 
