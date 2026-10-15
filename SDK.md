@@ -1,6 +1,6 @@
 # HOTTY SDKs
 
-    Version:  0.2, with SPEC.md 0.2
+    Version:  0.3, with SPEC.md 0.3
     Status:   Draft. It changes with SPEC.md (§15 there).
     Licence:  CC BY 4.0
 
@@ -64,10 +64,10 @@ are to be interpreted as in SPEC.md §2.
   a clock: where it needs the time (the Detector, §3.8), the caller passes
   it in. Given the same input, it returns the same output.
 - **It depends on the language's standard library only**, and on base64,
-  zlib and msgpack where that library lacks them. msgpack is needed only to
-  read what a host sends (SPEC.md §3.3). zlib is needed only to compress
-  what a program sends, which is optional (§3.3); a host never compresses
-  what it sends (SPEC.md §3.3).
+  zlib and msgpack where that library lacks them. msgpack writes a
+  program's deltas and menus and reads what a host sends (SPEC.md §3.3).
+  zlib is needed only to compress what a program sends, which is optional
+  (§3.3); a host never compresses what it sends (SPEC.md §3.3).
 - **The SDK layer is built on the wire layer's public interface**, so a
   program that needs something the SDK layer does not do can do it from the
   same parts.
@@ -90,9 +90,9 @@ are to be interpreted as in SPEC.md §2.
   `None`, Lua's `nil`, Rust's `Option`. The vectors write it `null`.
 - **Data takes the language's form**: what a message or a control holds
   (§3.2, §3.9) is a field or an accessor, and a question about it
-  (`Supports`) a method or a function. hotty-go's are plain structs with
+  (`Has`) a method or a function. hotty-go's are plain structs with
   no methods but what its codec generates: a field (`ev.Value`), and a
-  function beside the type (`hotty.Supports(caps, op)`).
+  function beside the type (`hotty.Light(caps)`).
 
 ### 2.3 Shared defaults
 
@@ -153,6 +153,17 @@ the SDK layer uses what the environment provides: it feeds complete
 sequences to the Decoder (§3.6) and writes through the environment's
 output. The wire layer is the same everywhere.
 
+### 2.9 Updates cost what they change
+
+A program that redraws a surface's tree, itself or through a framework,
+diffs the new tree against the last one it sent and sends what changed as
+the ops of one delta (SPEC.md §6.1): a `text` op where a cell's text
+changed, 56 bytes, where morphing the whole tree of a small table sends 930.
+A whole-tree `morph` without a target stays the fallback, and keeps what the
+user was doing. A stylesheet that several documents share goes once, as a
+resource (SPEC.md §7.1), not in each document. An SDK's helpers that build
+documents (§2.4) do both.
+
 ## 3. The wire layer
 
 An SDK **MUST** provide every component of this section.
@@ -178,13 +189,16 @@ An SDK **MUST** provide every component of this section.
 | `Chunk` | 4096, the most base64 bytes in one sequence |
 | `MaxSize` | 1000, the most columns or rows of a surface |
 | `MaxName` | 64, the longest surface name |
-| `Version` | `"0.2"`, the protocol version the SDK speaks, which its query lists (SPEC.md §4) |
+| `Version` | `"0.3"`, the protocol version the SDK speaks, which its query lists (SPEC.md §4) |
 | `DefaultMax` | 16777216 (16 MiB), the most bytes a Decoder decodes one message to unless its `Max` says otherwise (§3.6) |
 
 And these sets, each value under its canonical name:
 - **event kinds**: `click`, `change`, `input`, `submit`, `press`, `focus`,
-  `blur`, `resize`, `fit`, `hover`, `view`, `dragstart`, `drag`, `dragend`,
+  `blur`, `fit`, `hover`, `view`, `dragstart`, `drag`, `dragend`,
   `command`, `caps` (SPEC.md §9);
+- **features**: `passthrough`, `hover`, `count`, `menu` (SPEC.md §4);
+- **modifier bits**: `ModShift` 1, `ModAlt` 2, `ModControl` 4, `ModMeta` 8
+  (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
   `EBUDGET`, `EVERSION` (SPEC.md §3.6);
 - **delta ops**: `morph`, `inner`, `replace`, `append`, `prepend`, `before`,
@@ -215,15 +229,16 @@ the program (compression), so the `encode` vectors compare bytes.
   is sent as nothing, with no `;` before it.
 - **Compression is the program's choice.** An SDK **MAY** compress a payload
   with zlib and mark it `o=z`, and then only a payload of 256 bytes or more,
-  and only when compressing makes it smaller. `o=z` follows the other keys.
+  and only when compressing makes it smaller. It compresses at zlib's
+  default level, 6: a stylesheet of 20 KB comes out a third smaller than at
+  level 1, for about a millisecond. `o=z` follows the other keys.
 - **`o` and `m` are Encode's.** A control given with either goes out
   without it, and Encode sets them as this section says.
 - **Chunks.** A payload whose base64 is longer than 4096 bytes is split
   into chunks of exactly 4096, the last one excepted. Nothing of 4096 or
   less is chunked.
   - The first chunk carries the whole control, then `m=1`.
-  - Every further chunk carries `m` (`1`, or `0` on the last) and, if the
-    control has one, `q` with the same value: `m=0:q=2`.
+  - Every further chunk carries only `m`: `1`, or `0` on the last.
 - **Every sequence ends with ST** (`ESC \`).
 
 ### 3.4 Commands
@@ -234,18 +249,18 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 
 | builder | sends | parameters | default `q` |
 | --- | --- | --- | --- |
-| `Query` | `a=q:n=<n>:v=<Version>`, `late=1` with the `Late` option, then DA1 (`ESC [ c`) | n | none |
+| `Query` | `a=q:n=<n>:v=<Version>`, `late=1` with the `Late` option, then DA1 (`ESC [ c`) | n | 0 |
 | `Doc` | `a=doc:s` and the HTML; `d=1` with the `Detached` option, `scroll` with `Scroll` | surface, html | 1 |
 | `Place` | `a=place` (§3.4.1) | surface, placement | 1 |
 | `PlaceAt` | `ESC 7`, `ESC [ <y+1> ; <x+1> H`, `Place` with `C=1`, `ESC 8` | surface, x, y, placement | 1 |
 | `Hide` | `a=hide:s` | surface | 2 |
-| `Delta` | `a=delta:s:op[:t][:k]` and the payload; `t` and `k` only when given | surface, op, target, key, payload | 2 |
-| `SetText` | `Delta` with `op=text` | surface, target, text | 2 |
-| `SetVar` | `Delta` with `op=var`, `k` the name | surface, target, name, value | 2 |
-| `SetAttr` | `Delta` with `op=attr`, `k` the name | surface, target, name, value | 2 |
-| `RemoveAttr` | `Delta` with `op=unattr`, `k` the name, no payload | surface, target, name | 2 |
-| `MorphTo` | `Delta` with `op=morph` | surface, target, html | 2 |
-| `Reveal` | `Delta` with `op=reveal`, the payload `where`: `start`, `end`, or empty for the nearest (SPEC.md §6.1) | surface, target, where | 2 |
+| `Delta` | `a=delta:s` and its ops as msgpack (§3.4.3) | surface, ops | 2 |
+| `SetText` | `Delta` with one op, `Text` | surface, target, text | 2 |
+| `SetVar` | `Delta` with one op, `Var` | surface, target, name, value | 2 |
+| `SetAttr` | `Delta` with one op, `Attr` | surface, target, name, value | 2 |
+| `RemoveAttr` | `Delta` with one op, `Unattr` | surface, target, name | 2 |
+| `MorphTo` | `Delta` with one op, `Morph` | surface, target, html | 2 |
+| `Reveal` | `Delta` with one op, `RevealOp`: `where` is `start`, `end`, or empty for the nearest (SPEC.md §6.1) | surface, target, where | 2 |
 | `Res` | `a=res:id:type` and the data | id, mime, data | 2 |
 | `DelRes` | `a=del:id` | id | 2 |
 | `Del` | `a=del:s` | surface | 2 |
@@ -256,7 +271,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | `Sync` | `CSI ? 2026 h`, the commands, `CSI ? 2026 l` (SPEC.md §6.3) | commands | — |
 | `WithdrawLate` | `a=q:q=2`: withdraws a query that asked for a late answer (SPEC.md §4) | — | — |
 | `Edit` | `a=edit:take=<names>`, the names joined by `,`, in the order given; `take=` empty takes none (SPEC.md §10.6) | names | 2 |
-| `Menu` | `a=menu` and the menu as msgpack (below); with no menu, no payload, which hides it (SPEC.md §10.6) | menu | 2 |
+| `Menu` | `a=menu` and the menu as msgpack (below); with no menu, no payload, which hides it (SPEC.md §10.5) | menu | 2 |
 
 - **`Doc` and `Place` answer errors**, since a refused document or placement
   (`EQUOTA`, `ENOENT`) is something a program must hear. Everything else
@@ -283,18 +298,28 @@ A `Placement` says where and how a surface is shown (SPEC.md §5.2):
 | `Rows` | `r` | 0, which is `auto` | always: the number, or `auto` |
 | `Window` | `x`, `y`, `w`, `h` | none | all four, or none: none when absent, when all are 0, or when it shows the whole surface (rows given, and the window is 0, 0, cols, rows) |
 | `Z` | `z` | 0 | when not 0 |
-| `Press` | `p=1` | false | when true |
-| `Fit` | `f=1` | false | when true |
-| `Hover` | `v=1` | false | when true |
+| `Press` | `p` | absent | `p=1` when on, `p=0` when off, nothing when absent |
+| `Fit` | `f` | absent | as `Press` |
+| `Hover` | `v` | absent | as `Press` |
 | `KeepCursor` | `C=1` | false | when true |
+
+`Press`, `Fit` and `Hover` belong to the surface (SPEC.md §5.2), so each is
+absent, on or off: a placement that leaves them absent leaves them as they
+were. Go spells them `hotty.On` and `hotty.Off`, with the zero value
+absent.
 
 #### 3.4.2 Reply options
 
 Every builder but `Query`, `Sync` and `WithdrawLate` takes two options:
 - **`N(n)`** numbers the command and asks for its reply: `n=<n>`, and
-  `q=0` unless the program gives `Q`.
+  quiet level 0 unless the program gives `Q`.
 - **`Q(q)`** sets the quiet level. A `Q` given wins over the level `N`
   implies, whatever the order in which the program gives them.
+
+**`q` goes out only when the wire does not imply it** (SPEC.md §3.5): it is
+left out where it would be 0 with `n`, or 1 without, and for the query. So
+`Doc` and `Place` carry no `q`, a delta carries `q=2`, and `Doc` with `N(4)`
+carries `n=4` alone.
 
 `Query` takes one option of its own, **`Late`** (`late=1`): the program
 asks for a late answer (SPEC.md §4).
@@ -303,6 +328,35 @@ Each key goes out once. `Doc` also takes **`Detached`** (`d=1`) and
 **`Scroll(axes)`** (`scroll=<axes>`, SPEC.md §5.1): a bitmask of
 `ScrollVertical` (1) and `ScrollHorizontal` (2). `0`, the default, sends
 no key; any other value goes out as given, for the host to judge.
+
+#### 3.4.3 Ops
+
+`Delta(surface, ops…)` sends one delta of the ops given, in order (SPEC.md
+§6.1). An **`Op`** has `Op`, `Target`, `Key` and `Value`, and a builder for
+each op makes one:
+
+| builder | op | parameters |
+| --- | --- | --- |
+| `Morph` | `morph` | target (empty: the whole tree), html |
+| `Inner`, `Replace`, `Append`, `Prepend`, `Before`, `After` | the same, in lower case | target, html |
+| `Remove` | `remove` | target |
+| `Attr` | `attr` | target, name, value |
+| `Unattr` | `unattr` | target, name |
+| `Text` | `text` | target, text |
+| `Var` | `var` | target, name, value |
+| `RevealOp` | `reveal` | target, where |
+
+The body is one msgpack map, `{"ops": [op, …]}`, each value in the smallest
+of its type's forms, and each op a map with its keys in this order:
+- `op`;
+- `t`, unless the target is empty;
+- `k`, for `attr`, `unattr` and `var`;
+- `v`: for an op that takes one (SPEC.md §6.1), always, even empty; for
+  `reveal`, only when `where` is `start` or `end`.
+
+Targets and values are not cleaned (§3.3): they travel in the body, as the
+document has them. A `Delta` of no ops is still sent, and the host answers
+it `EINVAL` (SPEC.md §6.1).
 
 ### 3.5 Names
 
@@ -331,8 +385,8 @@ ones. A new Decoder is ready to use.
   not parse, a value outside printable ASCII, a key that appears twice, or
   an empty control is malformed.
 - **Chunks** (SPEC.md §3.4):
-  - A control with only `m` and `q` continues the message in progress; with
-    none in progress, it is malformed.
+  - A control with only `m` continues the message in progress; with none
+    in progress, it is malformed.
   - Any other message arriving before the last chunk aborts the one in
     progress, which counts as malformed, and is then decoded as usual. If it
     is malformed itself, that makes two (SPEC.md §3.7).
@@ -475,18 +529,18 @@ field as its type.
 
 **`Event`** (SPEC.md §9), when the action is `ev`: `Surface` (absent for
 `command` and `caps`, which belong to no surface), `Kind` (as it came,
-known or not), `Target` (`t`, empty when empty or absent), and what the
-detail carries, each absent when the event does not carry it:
+known or not), `Target` (`t`, empty when absent), and what the detail
+carries, each absent when the event does not carry it:
 
 | name | holds | for |
 | --- | --- | --- |
 | `Value` | `value`, a string | `click`, `change`, `input` |
 | `Checked` | `checked`, a boolean | `change` |
-| `Fields` | the detail: names to values | `submit` |
+| `Fields` | `fields`: the pairs of a name and a value, in order (SPEC.md §9) | `submit` |
+| `Mods` | `mods`: the modifier bits (§3.1), 0 when absent | `click`, `press`, `dragstart`, `drag`, `dragend` |
 | `Link` | `href`, and `url` if present | `click` on a link |
-| `Size` | `w` and `h`, in CSS pixels | `resize` |
 | `FitRows` | `r` | `fit` |
-| `Drag` | `c`, `r` and `keys`; the steps `x` and `y` in the element dragged, and `tx` and `ty` in a `t` with `drop` (as `TX` and `TY` where the language capitalises), each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
+| `Drag` | `c` and `r`; the steps `x` and `y` in the element dragged, and `tx` and `ty` in a `t` with `drop` (as `TX` and `TY` where the language capitalises), each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover` | `c` and `r`, or `out` | `hover` |
 | `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press` |
 | `Count` | `count`: the click's place in its run of clicks (SPEC.md §9), 2 for the second click of a double click; 1 for a click whose detail has none | `click` |
@@ -498,25 +552,14 @@ The detail is read by the event's kind, so a form field named `value` is in
 `Fields` and nowhere else. An event of a kind the SDK does not know carries
 none of these, and its payload is in its message.
 
-**`Caps`** (SPEC.md §4) has every field SPEC.md lists: `V`, `Ops`,
-`Events`, `Cell` (`w`, `h`), `Scale`, `Scheme`, `Limits`, `Net`,
-`Passthrough`, `Scroll`, `Steps`, `Drop`, `Count`, `Mod`, `Edit`, `Keys`
-(`Leader`, `Timeout`), `Menu`, `Host`, `Version`. It also answers:
-- `Supports(op)`: whether `op` is in `ops`; a host that lists no ops is
-  taken to support them all;
-- `Sends(kind)`: whether the host sends `kind`; `drag` stands for the three
-  drag kinds (SPEC.md §4); a host that lists no events is taken to send
-  them all;
-- `Drags`, `Hovers` and `Views`: whether `drag`, `hover` and `view` are in
-  `events`. A host that lists no events is taken to send none of them,
-  since they came after the first hosts: a program offers another way to
-  do what they do;
+**`Caps`** (SPEC.md §4) has every field SPEC.md lists: `V`, `CellCSS`
+(`w`, `h`, from `cellcss`), `Scale`, `Scheme`, `Mod`, `Features`,
+`Limits`, `Net`, `Edit`, `Host`, `Version`. It also answers:
+- `Has(feature)`: whether `feature` is in `features` (SPEC.md §4);
 - `Light`: the scheme is `light`;
 - `Merge(changed)`: the capabilities with the fields of a `caps` event's
-  `Changed` in place of their own, and without those it empties (`{}`:
-  absent now, SPEC.md §9);
-- `CellCSS`: a cell's size in CSS pixels, `Cell` divided by `Scale` (1
-  when absent), and a usual 9 × 18 when the host gave no cell.
+  `Changed` in place of their own, and without those it empties (`{}`,
+  `[]` or `""`: absent now, SPEC.md §9).
 
 **An error** carries `Code` and `Detail`, and its message names both.
 
@@ -566,19 +609,23 @@ host.
   the key: an action; `insert` for a character it types; or absent when the
   key is not the field's (it reaches the program, or Tab moves focus). Tab,
   Shift+Tab and Escape are never the field's, nor a key bound to `program`
-  or to an action the field does not have.
+  or `prefix`, or to an action the field does not have.
 - **`Selects(key)`** says whether the field selects with the key (SPEC.md
   §10.2, Shift selects): `Lookup` returns a move for it, and its canonical
   name has `Shift` (`Shift+ArrowLeft`, `Control+Shift+End`, not `Alt+<`).
   A field then does the move with `Extend` (§4.6).
 - **`Program(key)`** says whether a keymap gives the key to the program: it
-  binds the key to `program`, or, for a key with Shift it does not bind, the
-  key without Shift. On an element that is not a text field, a host asks it
+  binds the key to `program` or `prefix`, or, for a key with Shift it does
+  not bind, the key without Shift. On an element that is not a text field, a host asks it
   of the element's keymap, `ParseKeymap` of its `data-keys` values joined
   with a space, the root's first, on the host's Platform, with no default
   keymap; a key it gives
   reaches the program before the element or a scroll uses it (SPEC.md
   §10.2, keys for the program).
+- **`Prefix(key)`** says whether a keymap binds the key to `prefix`, with
+  the same fallback without Shift. A host asks it of a key `Program` gives
+  the program, and from then on gives the program every key (SPEC.md
+  §10.5).
 - **`Scroll(key)`** returns the scroll action a keymap binds the key to,
   with the same fallback without Shift, or absent. A host asks it of the
   keymap it asks `Program` of, for a key the element does not use (SPEC.md
@@ -728,10 +775,12 @@ frameworks get their own adapter, with the same responsibilities.
   `Press`, `Fit`, `Hover`, `Scroll` (the axes the host scrolls the document
   along, §3.4.2), and a function that returns the document. The Session
   sends only what changed:
-  - a document once, attached, with `q=1` and its `Scroll`, and again only
-    when the host has lost it or its `Scroll` changed;
-  - a placement (`PlaceAt`) when its rectangle, window or options changed;
-    a surface clipped to nothing is as good as not wanted;
+  - a document once, attached, with its `Scroll`, and again only when the
+    host has lost it or its `Scroll` changed;
+  - a placement (`PlaceAt`) when its rectangle, window or options changed,
+    with `Press`, `Fit` and `Hover` only when they differ from what the
+    surface has (SPEC.md §5.2), on or off; a surface clipped to nothing is
+    as good as not wanted;
   - for a surface no longer wanted, `Hide` if `Keep`, else `Del`.
 - **Order.** Its commands go out with the framework's frames, in the same
   stream, so that a placement lands with the cells around it.
@@ -775,13 +824,15 @@ Go: `hottytest.Host`.
   passes the host vectors' `send`, `inspect` and `key` steps. It speaks
   the SDK's `Version` only: it answers a query that lists it with its
   capabilities, and any other with `EVERSION` (SPEC.md §4). It lays
-  nothing out: `r=auto` gets an estimate the test may replace, and it does
-  not report `scroll`, so a key bound to a scroll action goes on as if its
-  keymap did not bind it (SPEC.md §10.2). Nor can it measure where in an
-  element the pointer is: a drag of an element with `data-steps` carries
-  the steps the test gives, in it and in `t`, and the host reports `steps`
-  and `drop` when the test asks it to (SPEC.md §9.1). A drag goes to the
-  element the test names, which may be one with `drop` in its `data-on`.
+  nothing out: `r=auto` gets an estimate the test may replace, nothing in
+  it scrolls, so a key bound to a scroll action goes on as if its keymap
+  did not bind it (SPEC.md §10.2), and it sends no `view`. Nor can it
+  measure where in an element the pointer is: a drag of an element with
+  `data-steps` carries the steps the test gives, in it and in `t` (SPEC.md
+  §9.1). A drag goes to the element the test names, which may be one with
+  `drop` in its `data-on`. So it skips the vectors marked `scroll`,
+  `steps`, `drop` and `view` (conformance/README.md), which every other
+  host passes.
 - **Strict by default.** A malformed message, an `EINVAL`, or a HOTTY
   command other than the query sent to a terminal that is not a host fails
   the test. A lenient host records them instead.
@@ -893,7 +944,7 @@ every SDK section, `edit` where it provides a Field.
 | --- | --- | --- | --- |
 | [hotty-go](https://github.com/neuroplastio/hotty-go) | Go | the reference; complete, with what a relay writes as a host (replies, events, `Message.Placement`, `CursorBelow`) | `hottyterm`, `hottytea`, `hottytest`, `hottyedit` (§4.6) |
 | `clients/python` (this repository) | Python | complete | `Hotty`, for the examples |
-| [hotty-lua](https://github.com/neuroplastio/hotty-lua) | Lua | complete, under LuaJIT, Lua 5.1, Neovim and gopher-lua (plx's) | `hotty.nvim` (§4.2) |
+| [hotty-lua](https://github.com/neuroplastio/hotty-lua) | Lua | complete for 0.2, under LuaJIT, Lua 5.1, Neovim and gopher-lua (plx's); 0.3 to come | `hotty.nvim` (§4.2) |
 
 hotty-go's runners (`vectors_test.go`, and `hottyedit`'s for `edit`) run
 every SDK section and skip nothing. hotty-lua's (`tests/vectors.lua`, under
@@ -916,6 +967,8 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Doc` | `Doc` | `doc` | `doc` | `doc` | `doc` |
 | `Place`, `PlaceAt` | `Place`, `PlaceAt` | `place`, `place_at` | `place`, `place_at` | `place`, `place_at` | `place`, `placeAt` |
 | `Hide`, `Delta` | `Hide`, `Delta` | `hide`, `delta` | `hide`, `delta` | `hide`, `delta` | `hide`, `delta` |
+| `Op` and its fields | `hotty.Op{Op, Target, Key, Value}` | `Op(op, target, key, value)` | a table with those keys | `Op { op, target, key, value }` | `{ op, target, key, value }` |
+| `Morph`, `Inner`, `Replace`, `Append`, `Prepend`, `Before`, `After`, `Remove`, `Attr`, `Unattr`, `Text`, `Var`, `RevealOp` | `hotty.OpMorph`, `hotty.OpInner`, …, `hotty.OpText`, `hotty.OpVar`, `hotty.OpReveal` (`hotty.Text` is a detector's state) | `morph`, `inner`, …, `text`, `var`, `reveal_op` | as Python | as Python | `morph`, `inner`, …, `text`, `varOp`, `revealOp` |
 | `SetText`, `SetVar`, `SetAttr`, `RemoveAttr`, `MorphTo`, `Reveal` | the same | `set_text`, `set_var`, `set_attr`, `remove_attr`, `morph_to`, `reveal` | as Python | as Python | `setText`, `setVar`, `setAttr`, `removeAttr`, `morphTo`, `reveal` |
 | `Res`, `DelRes` | `Res`, `DelRes` | `res`, `del_res` | `res`, `del_res` | `res`, `del_res` | `res`, `delRes` |
 | `Del`, `DelAll` | `Del`, `DelAll` | `delete`, `del_all` | `del`, `del_all` | `del`, `del_all` | `del`, `delAll` |
@@ -924,6 +977,7 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Edit`, `Menu` | `hotty.Edit`, `hotty.Menu` | `edit`, `menu` | as Python | as Python | `edit`, `menu` |
 | `MenuLevel`, `MenuItem` and their fields | `hotty.MenuLevel{Seq, Label, Items}`, `hotty.MenuItem{Key, Label, Group, Enabled}` | `MenuLevel(seq, label, items)`, `MenuItem(key, label, group, enabled)` | tables with those keys | `MenuLevel { seq, … }` | `{ seq, label, items }` |
 | `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor }` |
+| a flag on, off or absent (`Press`, `Fit`, `Hover`) | `hotty.On`, `hotty.Off`, the zero value | `True`, `False`, `None` | `true`, `false`, `nil` | `Option<bool>` | `true`, `false`, `undefined` |
 | `N`, `Q`, `Detached`, `Scroll`, `Late` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)`, `hotty.Late()` | `n=`, `q=`, `detached=`, `scroll=`, `late=` | `{ n = …, q = …, detached = …, scroll = …, late = … }` | builder methods | `{ n, q, detached, scroll, late }` |
 | `ScrollVertical`, `ScrollHorizontal` | `hotty.ScrollVertical`, `hotty.ScrollHorizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` |
 | `Decoder.Feed`, `Invalid`, `Max` | `(*Decoder).Feed`, `.Invalid`, `.Max` | `Decoder.feed`, `.invalid`, `.max` | `decoder:feed`, `.invalid`, `hotty.decoder({ max = … })` | `Decoder::feed`, `.invalid`, `.max` | `Decoder.feed`, `.invalid`, `.max` |
@@ -931,13 +985,14 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Scanner`, `Detector` | `Scanner`, `Detector` | `Scanner`, `Detector` | `scanner`, `detector` | `Scanner`, `Detector` | `Scanner`, `Detector` |
 | `Holding`, `InSequence` | `(*Scanner).Holding`, `.InSequence` | `Scanner.holding`, `.in_sequence` | `scanner:holding`, `:in_sequence` | `Scanner::holding`, `::in_sequence` | `Scanner.holding`, `.inSequence` |
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |
-| `FitRows`, `CellCSS` | `FitRows`, `CellCSS` | `fit_rows`, `cell_css` | as Python | as Python | `fitRows`, `cellCss` |
+| `FitRows`, `Mods`, `CellCSS` | `FitRows`, `Mods`, `CellCSS` | `fit_rows`, `mods`, `cell_css` | as Python | as Python | `fitRows`, `mods`, `cellCss` |
+| `ModShift`, `ModAlt`, `ModControl`, `ModMeta` | `hotty.ModShift`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … |
 | a message as a `Reply` or an `Event`, `Err` | `hotty.ReplyOf(m)`, `hotty.EventOf(m)`, `hotty.Err(r)` | `m.reply()`, `m.event()`, `r.err()` | `m:reply()`, `m:event()`, `r:err()` | methods | `m.reply()`, `m.event()`, `r.err()` |
-| `Supports`, `Sends`, `Drags`, `Hovers`, `Views`, `Light`, `CellCSS`, `Merge` | `hotty.Supports(c, op)`, …, `hotty.CellCSS(c)`, `hotty.Merge(c, changed)` | `c.supports(op)`, …, `c.merge(changed)` | `c:supports(op)`, … | methods | `c.supports(op)`, … |
+| `Has`, `Light`, `Merge` | `hotty.HasFeature(c, feature)` (`hotty.Has` asks a control), `hotty.Light(c)`, `hotty.Merge(c, changed)` | `c.has(feature)`, `c.light()`, `c.merge(changed)` | `c:has(feature)`, … | methods | `c.has(feature)`, … |
 | `Command`, `Changed` | `Event.Command`, `Event.Changed` | `e.command`, `e.changed` | as Python | methods | `e.command`, `e.changed` |
 | a control's `get` and `with` | `hotty.Get(ctl, k)`, `hotty.With(ctl, k, v)` | the SDK's own | the SDK's own | the SDK's own | the SDK's own |
 | `ParseKey`, `DecodeKeys` | `hotty.ParseKey`, `hotty.DecodeKeys` | `parse_key`, `decode_keys` | as Python | as Python | `parseKey`, `decodeKeys` |
-| `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Program`, `Scroll`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Program`, `.Scroll`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.program`, `.scroll`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:program`, `:scroll`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.program`, `.scroll`, `.format` |
+| `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Program`, `Prefix`, `Scroll`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Program`, `.Prefix`, `.Scroll`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.program`, `.prefix`, `.scroll`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:program`, `:prefix`, `:scroll`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.program`, `.prefix`, `.scroll`, `.format` |
 | `TerminalKeys` | `hotty.TerminalKeys` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` |
 | `Platform`, `PlatformOf`, `DefaultEdit` | `hotty.Platform{Mod, Edit}`, `hotty.PlatformOf`, `hotty.DefaultEdit` | `Platform(mod, edit)`, `platform_of`, `default_edit` | a table `{ mod = …, edit = … }`, `platform_of`, `default_edit` | as Python | `{ mod, edit }`, `platformOf`, `defaultEdit` |
 | `Field`, `Do`, `Type` | `hottyedit.Field`, `(*Field).Do`, `.Type` | `Field`, `.do`, `.type` | `field`, `:do_action` (`do` is a keyword), `:type` | `Field`, `do_action`, `type_text` | `Field`, `.do`, `.type` |
@@ -983,36 +1038,39 @@ In the vectors, every name is in snake case: `place_at`, `keep_cursor`,
   presents its content is that program's choice, and an SDK that builds
   documents would make it for every program, in each language differently.
 
-## Appendix C. Moving from 0.1
+## Appendix C. Moving from 0.2
 
-Informative. HOTTY 0.2 broke 0.1 (SPEC.md §15): a host's bodies are msgpack
-(§3.9), and a query lists the versions the program speaks (§3.8). A program
-ported by renaming what no longer compiles can still be wrong. These are the
-mistakes ports made:
+Informative. HOTTY 0.3 breaks 0.2 (SPEC.md §15), as a fold of what 0.2
+grew. A program and its SDK move together, and its tests' fake hosts with
+them. These are the places a port goes wrong:
 
-- **A link is `Link`, not a field.** A 0.1 SDK that read any detail as a
-  map of strings let a program find a clicked link's href among the fields.
-  In 0.2, `Fields` holds a submit's fields and nothing else, and a click on a
-  link carries `Link` (`href`, and `url`). Code that still looks in `Fields`
-  compiles, and every link click goes nowhere.
-- **Read the event's fields, never its detail.** A detail is msgpack: code
-  that parses it as JSON, as 0.1's bodies were, reads nothing, and every
-  field it fills is zero (a box always unchecked). `Value`, `Checked`,
-  `Fields`, `Link`, `Size`, `FitRows`, `Drag`, `Hover`, `Area` and `Count` are the
-  detail, read by the event's kind. The detail's bytes are for a relay to
-  pass on.
-- **A fake host answers in 0.2.** A test that plays the host must answer a
-  query that lists `0.2` with msgpack capabilities whose `v` is `"0.2"`.
-  Anything else, a 0.1 test's JSON capabilities among it, is no host to the
-  Detector, and the program under test draws in cells. An SDK's test host
-  (§4.4) writes such a reply.
-- **The capabilities come whole or not at all.** A reply whose body does not
-  decode, or names another version, gives no capabilities, not empty ones:
-  a program that took any reply for a host now falls back.
-- **An error answering the query is detection's.** The SDK layer swallows
-  it, as it swallows the DA1 behind it. A program that logged replies sees
-  no error from a host of another version.
-- **What a host sends is typed.** A host writes each field as its type: a
-  float as a float even when whole (`scale: 2.0`, a resize's `w` and `h`),
-  never a nil, and answers a query by its versions (`EVERSION`).
-
+- **A delta is a list of ops.** `Delta(surface, op, target, key,
+  payload)` became `Delta(surface, ops…)`, the ops built by `Text`,
+  `Attr` and the rest (§3.4.3; in Go `OpText`, `OpAttr`, …). A frame's changes to one surface go in one
+  delta, which the host applies as one; the one-op shorthands (`SetText`,
+  …) are still there for a single change.
+- **The flags stay on the surface.** `p`, `f` and `v` hold until the
+  program turns them off (SPEC.md §5.2). A program that placed a surface
+  without `Press` to stop its presses now sends `Press: Off`. A Session
+  (§4.3) sends them when they change.
+- **Ask by feature.** `Supports`, `Sends`, `Drags`, `Hovers`, `Views` and
+  the capabilities' `Passthrough`, `Scroll`, `Steps`, `Drop`, `Count` and
+  `Menu` are gone: everything a 0.3 host does, it does, and `HasFeature(c,
+  feature)` answers for `passthrough`, `hover`, `count` and `menu`.
+- **The cell is in CSS pixels.** `Cell`, in device pixels, is gone, and
+  `CellCSS` is the host's own field. There is no `resize`: a new font is a
+  `caps` event with the new `CellCSS`, which `Merge` folds in.
+- **A submit's fields are pairs**, in order: two fields of one name are
+  two pairs. Code that looked a name up in a map looks it up in the pairs.
+- **Modifiers are bits.** A drag's `Keys` list is `Mods`, and clicks and
+  presses carry it too: `Mods & ModShift` for Shift.
+- **An empty target is absent.** `Target` reads the same, empty, but a
+  host's `t=` with nothing after it is gone from the wire, and a fake host
+  that sends one is out of date.
+- **No key sequences in the host.** `data-key` and the capabilities'
+  `Keys` are gone. A program binds its leader to `prefix` (SPEC.md §10.5),
+  reads the keys after it, and sends `a=focus` when the sequence ends. Its
+  menu goes to `Menu`, as in the cells.
+- **Errors only, unless asked.** A builder sends no `q` where the wire
+  implies it, and `N(n)` alone asks for the reply. A fake host must answer
+  a command without `q` only with an error.

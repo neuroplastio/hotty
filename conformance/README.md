@@ -29,7 +29,7 @@ too little.
 ## Format
 
 ```
-{ "version": "0.2",
+{ "version": "0.3",
   "vectors": [ { "name": …, "steps": [ step, … ] } ],
   "wire":    [ { "name": …, "stream": …, "commands": [ … ], "invalid": n } ],
   "build":   [ … ], "encode": [ … ], "decode": [ … ], "scan": [ … ],
@@ -44,31 +44,31 @@ with `UseNumber`, Rust's `serde_json` (`is_f64`), and JavaScript's
 `JSON.parse` with a reviver that reads the source text.
 
 Each vector starts on a fresh host, with `mod` Control and the default
-edit shortcuts (SPEC §10.2, §10.4), whatever its platform. A vector with `"requires"` applies only
-to a host that has what it names, and others skip it: `"passthrough"`, a
-host that reports `passthrough` (SPEC §4, §9.3); `"hover"`, a host that
-lists `hover` in `events` (§9.4); `"scroll"`, a host that reports `scroll`
-(§4, §5.3); `"touch"`, a host that takes touch (SPEC §9.1, §16); `"steps"`, a
-host that reports `steps` (§4, §9.1); `"view"`, a host that lists `view` in
-`events` (§9.5); `"count"`, a host that reports `count` (§4, §9);
-`"drop"`, a host that reports `drop` (§4, §9.1); `"keys"`, a host that
-reports `keys` (§4, §10.5), run with its leader `Space` and a timeout no
-step outlasts; `"commands"`, a host with a terminal that takes edit
-commands (§10.6);
-`"undo"`, a host whose
-text fields keep a history and cut (§10.2), which the SDKs' test hosts
-(SDK.md §4.4) do not. A list
-names several, all required.
+edit shortcuts (SPEC §10.2, §10.4), whatever its platform. A vector with
+`"requires"` applies only to a host that has what it names, and others skip
+it. A list names several, all required:
+- a feature (SPEC §4): `"passthrough"` (§9.3), `"hover"` (§9.4),
+  `"count"` (§9), `"menu"` (§10.5);
+- `"touch"`, a host that takes touch (SPEC §9.1, §16);
+- `"commands"`, a host with a terminal that takes edit commands (§10.6);
+- `"undo"`, a host whose text fields keep a history and cut (§10.2);
+- `"scroll"` (§5.3), `"steps"`, `"drop"` (§9.1) and `"view"` (§9.5): what
+  every host of this version does, named so that a host that lays nothing
+  out, an SDK's test host (SDK.md §4.4), skips it. Nor do test hosts keep a
+  history, so they skip `"undo"`.
+
 Its steps come in five kinds.
 
-**Send** `{ "send": {control}, "payload": text?, "reply": …, "events": … }`:
-the command goes to the host as the program would send it. It is
-base64-encoded and chunked as needed, and the payload is UTF-8.
+**Send** `{ "send": {control}, "payload": text?, "body": value?, "reply":
+…, "events": … }`: the command goes to the host as the program would send
+it. It is base64-encoded and chunked as needed. `payload` is UTF-8 text;
+`body` is a msgpack body (a delta's ops, a menu), as JSON: the runner
+writes it as msgpack, its numbers as Numbers (above) say, and sends that.
 - `"reply"` absent: replies are not checked.
 - `"reply": null`: the command must produce no reply.
 - `"reply": {…}`: the first reply (`a=ok` or `a=err`) must match. Every key
   but `code`, `detail`, `body` and `types` is compared with the reply's
-  control; `code` and `detail` with the body of an `a=err`. `body` gives
+  control, and one whose value is `null` must be absent from it; `code` and `detail` with the body of an `a=err`. `body` gives
   fields the body of an `a=ok` must have, equal as values (Numbers, above);
   fields it does not name are not checked. `types` gives the type of
   each field of the body (SPEC §3.3): `"int"`, `"float"`, `"str"`, `"bool"`,
@@ -125,7 +125,8 @@ checked).
   checked.
 - `"events"`: every event (`a=ev`) the step makes the host send, in order,
   and nothing more. Each is compared as a reply is: every key but `detail`
-  with the event's control, and `detail`, when present, with its body,
+  with the event's control, `null` for a key it must not have (`"t":
+  null`: the event names no element, SPEC §9), and `detail`, when present, with its body,
   decoded: equal as values, each of its type (Numbers, above), and `null`
   when the event has none. Absent: events are not checked.
 
@@ -183,17 +184,6 @@ implements, and skips the rest:
 
 | `requires` | what it names |
 | --- | --- |
-| `place.hover` | `Placement.Hover` (`v=1`) |
-| `event.hover` | `Event.Hover` |
-| `caps.passthrough`, `caps.version`, `caps.scroll` | those fields of `Caps` |
-| `doc.scroll` | `Doc`'s `Scroll` option (`scroll=<axes>`) |
-| `event.area` | `Event.Area` |
-| `event.view` | `Event.View` |
-| `event.count` | `Event.Count`, and the capabilities' `Count` |
-| `event.drop` | the drag's `tx` and `ty`, and the capabilities' `Drop` |
-| `caps.views` | `Caps`'s `Views` |
-| `reveal` | the `Reveal` builder |
-| `caps.drag-kinds` | `Sends` answers for `dragstart` and `dragend` as for `drag` (SPEC §4) |
 | `options.unordered` | a `q` given wins over the `q` that `n` implies, whatever their order |
 | `decode.abort-count` | a malformed message that aborts a chunked one counts twice (SPEC §3.7) |
 | `decode.unterminated` | `Feed` takes a sequence without its terminator |
@@ -211,8 +201,9 @@ of its own. The output, split into raw bytes and HOTTY sequences, must be
   moves, `Query`'s DA1 and `Sync`'s brackets;
 - `{ "cmd": { "control": {…}, "payload": text? } }`: one command, decoded.
   Its control has exactly these keys (`m` and `o` never), and its payload is
-  this text, empty when absent, or the bytes of `"payload_b64"` (a menu's
-  msgpack).
+  this text, empty when absent, or the bytes of `"payload_b64"`: a delta's
+  or a menu's msgpack, which `"body"` shows as JSON, as a Decode vector's
+  `bodies` do (below), and runners ignore.
 
 **Encode** `{ "control": [[key, value], …], "payload": text | "payload_b64":
 …, "bytes"?: text, "chunks"?: [ { "control": text, "len": n } ] }`: the
@@ -234,18 +225,16 @@ in order:
 - `reply`: `Reply`'s fields (`ok`, `re`, `n`, `surface`, `cols`, `rows`,
   `code`, `detail`);
 - `event`: `Event`'s fields and accessors (`surface`, `kind`, `target`,
-  `value`, `checked`, `fields`, `link` with `href` and `url`, `size` with
-  `w` and `h`, `fit_rows`, `drag` with `c`, `r`, `keys`, `x`, `y`, `tx` and
-  `ty`, `hover` with
-  `c`, `r` and `out`, `view` with `areas` and `at_end`, `command` with
-  `name`, `key`, `text` and `has_text`);
+  `value`, `checked`, `fields` as a list of `[name, value]`, `mods`, `link`
+  with `href` and `url`, `fit_rows`, `drag` with `c`, `r`, `x`, `y`, `tx`
+  and `ty`, `hover` with `c`, `r` and `out`, `area`, `count`, `view` with
+  `areas` and `at_end`, `command` with `name`, `key`, `text` and
+  `has_text`);
 - `changed`: a `caps` event's `Changed`, with `fields` the names of
-  exactly the fields it has, and those fields as `caps` checks them;
-- `caps`: `Caps`'s fields (`keys` with `leader` and `timeout`), and its
-  answers: `supports` and `sends` map an
-  argument to the answer, `drags`, `hovers`, `views`, `light`, `cell_css`
-  with `w` and `h`. `null`: the reply carries none, as when its body does
-  not decode.
+  exactly the fields it has, as the body names them (`cellcss`), and those fields as `caps` checks them;
+- `caps`: `Caps`'s fields (`cell_css` with `w` and `h`, `features`), and
+  its answers: `has` maps a feature to the answer, and `light`. `null`: the
+  reply carries none, as when its body does not decode.
 
 Only the keys listed are checked, but `view`'s `areas`, which is compared
 whole: the same ids, each with the same area. Numbers compare as
@@ -261,8 +250,9 @@ so `bodies` shows them as JSON (Numbers, above), one for each sequence:
   what no host sends (a nil, a key that is not a string, an extension).
 
 Runners ignore it. `scripts/bodies.py` writes the base64 in `seqs` from
-it, splitting a chunked body where its chunks split it before, and with
-`--check` fails when the two differ. The vector about base64 itself
+it, splitting a chunked body where its chunks split it before, and a Build
+vector's `payload_b64` from its `body`, and with `--check` fails when they
+differ. The vector about base64 itself
 writes its sequences by hand, and has no `bodies`.
 
 **Scan** `{ "stream": text, "segments": [ … ], "held"?: text, "flush"?: [
@@ -294,11 +284,12 @@ the default edit shortcuts) where absent, in three forms:
   key of `lookup` must return its value: an action, `"insert"`, or `null`
   when the key is not the field's. `Selects` of each key of `selects`, if
   there is one, must return its value;
-- `{ "keys": [ … ], "program"?: { key: bool }, "scroll"?: { key: action |
-  null } }`: an element's keymap outside a text field, with no default
-  keymap: `ParseKeymap` of `keys` joined with a space, the root's first.
-  `Program` of each key of `program`, and `Scroll` of each key of
-  `scroll`, must return its value, `null` for none.
+- `{ "keys": [ … ], "program"?: { key: bool }, "prefix"?: { key: bool },
+  "scroll"?: { key: action | null } }`: an element's keymap outside a text
+  field, with no default keymap: `ParseKeymap` of `keys` joined with a
+  space, the root's first. `Program` of each key of `program`, `Prefix` of
+  each key of `prefix`, and `Scroll` of each key of `scroll`, must return
+  its value, `null` for none.
 
 **Edit** `{ "field": { "value", "caret", "anchor"?, "multiline"?,
 "password"?, "rows"? }, "steps": [ … ] }`: a Field (SDK.md §4.6) made from

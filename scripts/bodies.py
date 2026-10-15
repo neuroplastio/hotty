@@ -4,7 +4,8 @@
 A host's bodies are msgpack in base64 (SPEC.md §3.3), which no one reads.
 So a decode vector's `bodies`, and a detect step's `body`, show each one as
 JSON (conformance/README.md, Numbers), and this writes the base64 in the
-sequences from them:
+sequences from them. It writes a build vector's `payload_b64` from the
+`body` beside it in the same way:
 
     python3 scripts/bodies.py          # writes the file
     python3 scripts/bodies.py --check  # fails when it would change it
@@ -145,6 +146,22 @@ def write_seqs(seqs, bodies, name):
     return seqs
 
 
+def write_build(out):
+    """Sets payload_b64 of every command of a build vector that has a body."""
+    for item in out:
+        cmd = item.get("cmd")
+        if cmd is None or "body" not in cmd:
+            continue
+        text = base64.b64encode(body_bytes(cmd["body"])).decode()
+        # payload_b64 follows body in the command.
+        item["cmd"] = {}
+        for k, val in cmd.items():
+            if k != "payload_b64":
+                item["cmd"][k] = val
+            if k == "body":
+                item["cmd"]["payload_b64"] = text
+
+
 def main():
     check = sys.argv[1:] == ["--check"]
     with open(PATH, encoding="utf-8") as f:
@@ -153,6 +170,8 @@ def main():
     for d in v["decode"]:
         if "bodies" in d:
             d["seqs"] = write_seqs(d["seqs"], d["bodies"], d["name"])
+    for d in v["build"]:
+        write_build(d["out"])
     for d in v["detect"]:
         for s in d["steps"]:
             if "body" in s:

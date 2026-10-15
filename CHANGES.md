@@ -1,5 +1,51 @@
 # Changes
 
+## 0.3
+
+A draft, as every 0.x is. It breaks 0.2 (SPEC.md §15): it folds what 0.2
+grew, for bandwidth and for fewer rules, and programs and hosts move to it
+together. The list it folds is `vault/tasks/fold-0.3.md`.
+
+### What changed
+
+- **A delta is one list of ops** (SPEC.md §6.1): `a=delta:s=<name>` and one
+  msgpack map, `{"ops": [{"op", "t", "k", "v"}, …]}`, applied in order and
+  shown as one. The control keys `op`, `t` and `k`, and the text payload,
+  are gone. A frame of fifteen small changes is 184 bytes, not 755. An op
+  whose target is missing fails alone, and the reply names it by its index,
+  `i`; a malformed op rejects the whole delta. Targets travel as the
+  document has them, so an id outside ASCII is addressed as it is.
+- **`p`, `f` and `v` belong to the surface** (SPEC.md §5.2): `1` on, `0`
+  off, held until the program sends them again. A placement without them
+  leaves them as they were. One table in §9 says, for every event, what
+  asks for it, how long and how often.
+- **Features** (SPEC.md §4): a 0.3 host does every op and event, scrolling,
+  steps, drops and `view`. One list, `features`, names what a host may
+  lack: `passthrough`, `hover`, `count`, `menu`. The capabilities' `ops`,
+  `events`, `passthrough`, `scroll`, `steps`, `drop`, `count`, `keys` and
+  `menu` are gone.
+- **The cell is in CSS pixels** (SPEC.md §4, §5.3, §8): `cellcss` takes the
+  place of `cell`, `resize` is gone, and a new font sends `caps` with the
+  new `cellcss`. `--hotty-px` is one device pixel, current through zooms.
+  `scale` stays, as a hint for images.
+- **`caps` carries any field that changed** (SPEC.md §4, §9), not only
+  `mod` and `edit`: a multiplexer whose program moves to another viewer's
+  host tells it everything that differs.
+- **Event details** (SPEC.md §9): a submit's fields are pairs,
+  `{"fields": [[name, value], …]}`; `mods`, one int of modifier bits, goes
+  on clicks, presses and drags in place of a drag's `keys`; `t` is absent,
+  not empty, where no element is meant; a detail with no field is no
+  payload.
+- **Errors only, unless asked** (SPEC.md §3.5, §3.6): `q` defaults to 1,
+  and to 0 for a query and a command with `n`. Continuation chunks carry
+  only `m`.
+- **Key sequences are the program's** (SPEC.md §10.5): `data-key`, the
+  capabilities' `keys`, and the hosts' sequence engines are gone. A keymap
+  action, `prefix`, sends the program every key after it, whatever is
+  focused, until it sends `a=focus`. `a=menu` stays, now for a program on
+  a surface as in the cells, and a host that shows menus has the feature
+  `menu`.
+
 ## 0.2
 
 A draft, as every 0.x is. It breaks 0.1 (SPEC.md §15): programs and hosts

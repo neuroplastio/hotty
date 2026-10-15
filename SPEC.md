@@ -1,6 +1,6 @@
 # HOTTY — HTML Over The TTY
 
-    Version:  0.2
+    Version:  0.3
     Status:   Draft. Versions 0.x may change incompatibly (§15).
     Licence:  CC BY 4.0 (this document); the conformance vectors are
               Apache-2.0.
@@ -159,18 +159,18 @@ alphabet).
   and events), so a program needs no zlib to read them.
 - An empty body is sent as nothing, and the `;` before it may then be
   omitted.
-- Text bodies (markup, delta values) are UTF-8.
-- **A host's bodies are msgpack**
+- Text bodies (markup) are UTF-8.
+- **Bodies with fields are msgpack**
   ([MessagePack](https://github.com/msgpack/msgpack/blob/master/spec.md)).
   The body of a reply (§3.6, §4) or an event (§9) is one msgpack map, with
-  nothing after it. What a program sends is not msgpack, but
-  for a menu (§10.6): documents, deltas and resources are text or bytes.
+  nothing after it, and so are a program's deltas (§6.1) and menus
+  (§10.5). Documents are text, and resources bytes.
 - **Each field has a type.** This document shows a body as JSON with types
   in place of values: `{"c": int, "keys": [str]}` is a map with an int
   `c` and an array of strings `keys`, and `{str: int}` a map from strings
   to ints. The types are `int`, `float`, `str` and `bool`.
-  - A host **MUST** send each field as its type. A field it has nothing
-    for is left out, not sent as nil.
+  - Whoever sends a body **MUST** send each field as its type. A field it
+    has nothing for is left out, not sent as nil.
   - An int is at most 2^53 − 1 from zero either way, so that a reader
     whose numbers are doubles (JavaScript, Lua 5.1) holds it exactly.
   - A body holds no nil, and its maps are keyed by strings, each given
@@ -183,7 +183,8 @@ alphabet).
     from 1970 and its nanoseconds under a second. No field of this version
     carries one.
   - A body that breaks any of these, anywhere in it, in a field a reader
-    knows or not, does not decode (SDK.md §3.9).
+    knows or not, does not decode (SDK.md §3.9). A host answers a body
+    from a program that does not decode with `EINVAL` (§3.6).
 
 ### 3.4 Chunks
 
@@ -191,8 +192,8 @@ A message whose encoded payload is longer than 4096 bytes **MUST** be split
 into chunks of at most 4096 payload bytes each:
 
 - The first chunk carries the whole control plus `m=1`.
-- Every further chunk carries only `m` and, if the message has one, `q`.
-  Every chunk but the last has `m=1`; the last has `m=0`.
+- Every further chunk carries only `m`. Every chunk but the last has `m=1`;
+  the last has `m=0`.
 - The chunks of one message are contiguous. A HOTTY message with any other key
   arriving before the last chunk aborts the message in progress. The host
   **MUST** discard that message and process the new one normally.
@@ -213,7 +214,7 @@ into chunks of at most 4096 payload bytes each:
 | `a` | the action: `q`, `doc`, `place`, `hide`, `delta`, `res`, `del`, `detach`, `focus`, `blur`, `edit`, `menu` from the program (§4–§10); `ok`, `err`, `ev` from the host |
 | `s` | a surface name: `[A-Za-z0-9_-]{1,64}` |
 | `n` | a request number chosen by the program, echoed in the reply |
-| `q` | quiet: `0` (default) reply always, `1` reply only on error, `2` never reply |
+| `q` | quiet: `0` reply always, `1` reply only on error, `2` never reply. Absent: `0` for a query (`a=q`) and for a command with `n`, `1` for any other |
 | `o` | `z`: the payload is zlib-compressed |
 | `m` | `1`: more chunks follow; `0`: last chunk |
 
@@ -227,13 +228,18 @@ ESC ] 7279 ; a=ok|err [:n=<n>] [:s=<s>] :re=<action> [:<more>] [; <payload>] ST
 
 - `n` and `s` are echoed when the command had them, and `re` names the action
   answered.
+- **Only errors, unless asked.** A command without `q` is answered only
+  with an error, unless it has `n` or is a query (§3.5). A program numbers
+  the commands whose answer it reads, such as a placement's rows (§5.2).
 - `a=ok` replies to `place` carry `c` and `r` (§5.2); the reply to `q`
   carries the capabilities (§4).
-- `a=err` carries the body `{"code": str, "detail": str}`. The codes:
+- `a=err` carries the body `{"code": str, "detail": str}`, and, answering a
+  delta, the key `i` in its control: the index of the op that failed, from
+  0 (§6.1). The codes:
 
 | code | when |
 | --- | --- |
-| `EINVAL` | an unknown action or op; a bad surface name; a missing `s`, `t`, `k`, `c` or `id`; `c` or `r` out of range |
+| `EINVAL` | an unknown action or op; a bad surface name; a missing `s`, `t`, `k`, `c` or `id`; `c` or `r` out of range; a program's body that does not decode, or holds a field of another type (§3.3) |
 | `ENOENT` | no surface of that name |
 | `ENOTARGET` | no element with that id. The detail is the id, or the missing ids comma-separated (§6.2) |
 | `EDETACHED` | the surface is detached (§5.5) |
@@ -242,7 +248,7 @@ ESC ] 7279 ; a=ok|err [:n=<n>] [:s=<s>] :re=<action> [:<more>] [; <payload>] ST
 | `EVERSION` | a query (§4) lists no version the host speaks, or none at all. The detail is the versions the host speaks, comma-separated |
 
 Replies travel on the program's input, interleaved with whatever the user
-types. A program that does not want them sends `q=2`.
+types. A program that wants none, not even an error, sends `q=2`.
 
 ### 3.7 Malformed messages
 
@@ -264,7 +270,7 @@ A program finds out whether it has a host by sending a query, then Primary
 Device Attributes as a fence:
 
 ```
-ESC ] 7279 ; a=q:n=1:v=0.2 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.3 ST   CSI c
 ```
 
 Every terminal answers DA1. A host answers the query first:
@@ -277,8 +283,8 @@ If the DA1 answer arrives with no HOTTY reply before it, there is no host. The
 program **SHOULD** then fall back (§14).
 
 **Versions.** `v` lists the HOTTY versions the program speaks,
-comma-separated: `v=0.2` for this document, and one day perhaps
-`v=0.2,0.3`. A version is `major.minor`, two numbers written without
+comma-separated: `v=0.3` for this document, and `v=0.2,0.3` for a
+program that speaks 0.2 as well. A version is `major.minor`, two numbers written without
 leading zeros, and versions compare as those numbers, the major first.
 - A host answers in the highest version it shares with the program: `a=ok`,
   with that version's capabilities, whose `v` names it. It speaks that
@@ -304,7 +310,7 @@ terminal attached. A program that can start using HOTTY after it has fallen
 back asks for a late answer with `late=1`:
 
 ```
-ESC ] 7279 ; a=q:n=1:v=0.2:late=1 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.3:late=1 ST   CSI c
 ```
 
 - A host answers it as any query, at once.
@@ -326,34 +332,44 @@ The capabilities, the body of that reply, are a map of these fields (§3.3):
 
 | field | type | meaning |
 | --- | --- | --- |
-| `v` | str | the HOTTY version the host answers in (Versions, above): `"0.2"` for this document |
-| `ops` | [str] | the delta ops it supports (§6) |
-| `events` | [str] | the event kinds it can send (§9). `drag` stands for `dragstart`, `drag` and `dragend` (§9.1) |
-| `cell` | `{"w": int, "h": int}` | the cell size in device pixels |
-| `scale` | float | device pixels per CSS pixel |
+| `v` | str | the HOTTY version the host answers in (Versions, above): `"0.3"` for this document |
+| `cellcss` | `{"w": float, "h": float}` | one cell's size in CSS pixels (§5.3) |
+| `scale` | float | device pixels per CSS pixel when the host answers: a hint for the resolution of images, which a zoom changes without telling (§5.3) |
 | `scheme` | str | `"dark"` or `"light"`: the terminal's colour scheme |
+| `mod` | str | `"Control"` or `"Meta"`: the modifier `Mod` stands for in bindings (§10.4) |
+| `features` | [str] | the optional features the host has (below). Absent: none |
 | `limits` | `{str: int}` | the host's limits (§13), such as `{"resources": <bytes>, "surfaces": <count>, "message": <bytes>}` |
 | `net` | `{str: [str]}` | the host's network policy (§7.2), from directive to sources, such as `{"img-src": ["https://example.com"]}`. Absent or empty: the host fetches nothing from the network |
-| `passthrough` | bool | `true` when the pointer passes through the parts of a surface that take no pointer (§9.3). Absent: every window takes the pointer wherever it is |
-| `scroll` | bool | `true` when a document can ask to scroll (`scroll`, §5.1, §5.3). Absent: nothing in a surface scrolls |
-| `steps` | bool | `true` when a drag of an element with `data-steps` says where in the element the pointer is (§9.1). Absent: a drag's detail has no `x` or `y` |
-| `drop` | bool | `true` when an element with `drop` in its `data-on` can be where a drag goes without being dragged, and a drag says where in it the pointer is when it has `data-steps` (§9.1). Absent: only an element that opts in to drags is ever `t`, and a drag's detail has no `tx` or `ty` |
-| `count` | bool | `true` when a repeated click carries its `count` (§9). Absent: every click reads as the first of its run, and a program offers another way to do what a double click would |
-| `mod` | str | `"Control"` or `"Meta"`: the modifier `Mod` stands for in bindings (§10.4) |
 | `edit` | `{str: [str]}` | the host's edit shortcuts (§10.2), from each action to its keys as §10.4 names them: `{"copy": ["Control+c"], …}`. A host that reports them takes edit commands from a program in the cells (§10.6) |
-| `keys` | `{"leader": str, "timeout": int}` | the user's leader, a key sequence, and how long a sequence waits for its next key, in milliseconds (§10.5). Absent: the host reads no key sequences |
-| `menu` | bool | `true` when the host shows a program's which-key menus (§10.6) |
 | `host` | str | optional: a name for the implementation |
 | `version` | str | optional, with `host`: the implementation's version, as dot-separated numbers compared one by one (`"0.0.10"` is after `"0.0.9"`) |
 
-Programs **MUST** ignore fields they do not know.
+`v`, `cellcss`, `scale`, `scheme` and `mod` are always there. Programs
+**MUST** ignore fields they do not know.
 
-The capabilities describe the host when it answers. `cell` and `scale`
-change during a session, with the terminal's zoom, its font, or the
-display it is on (§5.3). A cell's size in CSS pixels, `cell` over `scale`,
-changes only with the font, and the host then sends `resize` (§9). A
-program that keeps it asks again (`a=q`) then. `mod`, `edit` and `keys`
-are the user's, and may change too: the host then sends `caps` (§9).
+**What every host does.** A host of this version does all that this
+document describes: every action, delta op and event kind, scrolling
+(§5.3), steps and drops (§9.1), and `view` (§9.5). What a host may lack is
+a **feature**, and `features` lists those it has:
+
+| feature | the host |
+| --- | --- |
+| `passthrough` | lets the pointer pass through the parts of a surface that take none (§9.3). Without it, every window takes the pointer wherever it is |
+| `hover` | says where the pointer is, with `hover` (§9.4). Without it, a program never hears that the pointer has left |
+| `count` | says that a click repeats one before it, with `count` (§9). Without it, every click reads as the first of its run, and a program offers another way to do what a double click would |
+| `menu` | shows a program's menus (§10.5) |
+
+A program **MUST** ignore a feature it does not know: later versions add
+them (§15).
+
+**Changes.** The capabilities describe the host when it answers, and some
+change during a session: `cellcss` with the terminal's font (§5.3),
+`scheme` with its theme, `mod` and `edit` with the user's settings, and any
+of them where a multiplexer answers for several terminals and the one whose
+keys reach the program changes (§2). The host then sends `caps` (§9) with
+every field that changed since the program last heard them. A zoom, or a
+display with another pixel density, changes `scale` alone and sends
+nothing: a document reads one device pixel from `--hotty-px` (§8).
 
 ## 5. Surfaces
 
@@ -376,8 +392,7 @@ ESC ] 7279 ; a=doc:s=<name>[:d=1][:scroll=<axes>] ; <HTML> ST
 - `scroll` lets the document scroll (§5.3) along the axes it names, a
   bitmask: `1` vertically, `2` horizontally, `3` both. Absent or anything
   else, it does not scroll. Like `d`, it belongs to the document: a new
-  document sent without it does not scroll. A host without `scroll` in its
-  capabilities ignores it (§15).
+  document sent without it does not scroll.
 - The document's `<base href>` sets its base URL (§7.3), and its
   `<meta name="hotty-network">` asks for network access (§7.2).
 - The host applies its stylesheet (§8) and the security rules (§12) before
@@ -386,15 +401,16 @@ ESC ] 7279 ; a=doc:s=<name>[:d=1][:scroll=<axes>] ; <HTML> ST
 ### 5.2 Placement: `a=place`
 
 ```
-ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:z=<n>][:p=1][:f=1][:v=1][:C=1] ST
+ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:z=<n>][:p=0|1][:f=0|1][:v=0|1][:C=1] ST
 ```
 
 - **Size:** the surface is `c` columns wide and `r` rows tall, and its
   document is laid out at that size (§5.3). Both range from 1 to 1000; a
   missing `r` is `auto`.
 - **`r=auto`:** the host lays the document out `c` columns wide and uses the
-  smallest number of rows that holds its content, up to 1000. The reply
-  reports the rows chosen: `a=ok:…:c=<c>:r=<r>`.
+  smallest number of rows that holds its content, up to 1000. The reply,
+  where the program asks for one (§3.6), reports the rows chosen:
+  `a=ok:…:c=<c>:r=<r>`.
 - **The window:** `x`, `y`, `w` and `h` choose the part of the surface the
   placement shows: `w` columns and `h` rows, starting `x` columns and `y`
   rows into the surface. By default `x` and `y` are 0, and `w` and `h` reach
@@ -412,35 +428,29 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   surface again without `z` puts it back at 0. Every placement is above the
   cells, whatever its `z`. Where placements overlap, the topmost one under
   the pointer receives it (§5.3).
-- **Presses:** with `p=1`, the program hears of every press in the window,
-  whatever it lands on, as `press` (§9). Like `z`, it belongs to the
-  placement: placing the surface again without it stops them.
-- **Fit:** with `f=1`, the program hears `fit` (§9) whenever the number of
-  rows the document needs at the placement's width — the rows `r=auto` would
-  choose — differs from the rows it last heard. The first it hears are the
-  placement's own: `r`, or for `r=auto` the rows chosen, whether or not a
-  reply carries them (§3.5). `f` other than `1` is as if absent. A
-  document's height changes after it is placed when a resource it refers to
-  arrives or is replaced (§7.1), an image or font it fetched loads (§7.2), a
-  delta changes it (§6), or a cell's size in CSS pixels changes (§5.3).
-  - The placement keeps its size: the footprint is the program's (§11), and
-    placing the surface again with the new rows is the program's to do.
-  - A host sends at most one `fit` per surface per frame it draws, with the
-    rows of the layout drawn in it. A placement the host does not draw,
-    scrolled out of view (§5.4), hears of a change once it is drawn again.
-    Its order with other events the same change causes, such as `resize`
-    (§5.3), is not set.
-  - A detached surface sends none (§5.5), and the rows the program last
-    heard stay as they were: once a document makes it the program's again,
-    it hears how they differ.
-  - Like `z`, it belongs to the placement: placing the surface again without
-    it stops them, and placing it again with it starts again from the new
-    placement's rows.
-- **Hover:** with `v=1`, the program hears `hover` (§9.4) each time the
-  element the pointer is over in the window changes, and when the pointer
-  leaves the window. (`h` is taken: it is the window's rows.) `v` other
-  than `1` is as if absent. Like `z`, it belongs to the placement: placing
-  the surface again without it stops them.
+- **What the program hears:** `p`, `f` and `v` ask for events (§9). Each
+  belongs to the surface, not to the placement: `1` turns it on and `0`
+  off, and it holds until the program sends it again. A placement without
+  one leaves it as it was, so a program that places a surface every frame
+  sends it once. A new surface has none of them, and any other value is as
+  if absent.
+  - **Presses:** with `p=1`, the program hears of every press in the
+    window, whatever it lands on, as `press` (§9).
+  - **Fit:** with `f=1`, the program hears `fit` (§9) whenever the number
+    of rows the document needs at the placement's width — the rows `r=auto`
+    would choose — differs from the rows it last heard. Each placement
+    starts from its own rows: `r`, or for `r=auto` the rows chosen, whether
+    or not a reply carries them (§3.6). A document's height changes after
+    it is placed when a resource it refers to arrives or is replaced
+    (§7.1), an image or font it fetched loads (§7.2), a delta changes it
+    (§6), or a cell's size in CSS pixels changes (§5.3). The placement
+    keeps its size: the footprint is the program's (§11), and placing the
+    surface again with the new rows is the program's to do.
+  - **Hover:** with `v=1`, the program hears `hover` (§9.4) each time the
+    element the pointer is over in the window changes, and when the
+    pointer leaves the window. (`h` is taken: it is the window's rows.)
+
+  How often each is sent, and when a surface sends none, is in §9.
 - **Moving and removing:** placing a surface that is already placed moves
   it, or shows another window of it: the old placement is removed. A program
   scrolling a region of the screen that holds a surface places it again with
@@ -504,11 +514,12 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
     device pixels a CSS pixel is. `scale` (§4) follows, so a cell and the
     root font keep their size in CSS pixels, and the document keeps its
     layout, as a page in a frame does under a browser's zoom. The host
-    draws it again at the new scale, and the program hears nothing.
+    draws it again at the new scale, with `--hotty-px` at its new value
+    (§8), and the program hears nothing.
   - **The terminal's font**, a new family or size in its settings,
     changes a cell's size in CSS pixels. The host lays the document out
-    again, with no involvement from the program, and **SHOULD** send
-    `resize` (§9).
+    again, with no involvement from the program, and sends `caps` with the
+    new `cellcss` (§4, §9).
 - Pixels inside the rectangle **MAY** differ between hosts, as text does
   between fonts. The cell footprint **MUST NOT**.
 
@@ -608,45 +619,69 @@ or creates it detached, with `d=1` on the `a=doc` that sends its document
 ### 6.1 `a=delta`
 
 ```
-ESC ] 7279 ; a=delta:s=<name>:op=<op>[:t=<element id>][:k=<name>] ; <payload> ST
+ESC ] 7279 ; a=delta:s=<name> ; <base64 msgpack ops> ST
 ```
 
-Deltas change one surface's document, addressing elements by id.
+A delta changes one surface's document, addressing elements by id. Its
+body is one msgpack map (§3.3), `{"ops": [op]}`: the changes, in the order
+they apply. Each op is a map:
 
-| `op` | payload | effect |
+```
+{"op": str, "t": str, "k": str, "v": str}
+```
+
+- `op` names what it does (the table below);
+- `t` is its target, the id of an element, written as the document has it,
+  so that an id outside ASCII is addressed as it is (§3.2);
+- `k` is a name, for `attr`, `unattr` and `var`;
+- `v` is its value: the HTML, the text or the value the table says.
+
+| `op` | `v` | effect |
 | --- | --- | --- |
-| `morph` (the default) | HTML | morph the target into the payload (§6.2) |
-| `inner` | HTML | morph the target's children into the payload's nodes |
-| `replace` | HTML | replace the target with the payload's nodes, without morphing |
-| `append`, `prepend` | HTML | insert the payload's nodes as the target's last or first children. A payload element whose id is already a child of the target is morphed where it is, not added again |
-| `before`, `after` | HTML | insert the payload's nodes before or after the target |
+| `morph` | HTML | morph the target into `v` (§6.2) |
+| `inner` | HTML | morph the target's children into `v`'s nodes |
+| `replace` | HTML | replace the target with `v`'s nodes, without morphing |
+| `append`, `prepend` | HTML | insert `v`'s nodes as the target's last or first children. An element of `v` whose id is already a child of the target is morphed where it is, not added again |
+| `before`, `after` | HTML | insert `v`'s nodes before or after the target |
 | `remove` | none | remove the target |
 | `attr` | a value | set the target's attribute `k` |
 | `unattr` | none | remove the target's attribute `k` |
-| `text` | UTF-8 text | replace the target's children with one text node |
+| `text` | text | replace the target's children with one text node |
 | `var` | a value | set the custom property `--k` on the target (a `k` that already starts with `--` is used as is) |
 | `reveal` | `start`, `end`, or none | scroll the target into view (below) |
 
-- **Missing arguments:** `t` is required except for `morph`, and `k` for
-  `attr`, `unattr` and `var`. A missing one is `EINVAL`, and an unknown op is
-  `EINVAL`.
-- **A missing target** is `ENOTARGET`, with the id as the detail.
-- **Context:** a payload is parsed as a fragment in the context of the
+- **One unit.** A host applies a delta's ops in order and shows none of
+  the states between them, as if they were bracketed in synchronized
+  output (§6.3). A program that changes a surface in one frame sends one
+  delta.
+- **Checked first.** The host checks the whole body before it applies any
+  op, and answers `EINVAL`, applying nothing, when: the body does not
+  decode (§3.3), is not such a map, or has no ops; an op is not a map, or
+  names an op the table does not have; `t` is missing where the op needs
+  one (every op but `morph`), or `k` for `attr`, `unattr` and `var`; or
+  `reveal` has a `v` other than `start` or `end`. Where one op is at
+  fault, the reply names the first such by its index, `i` (§3.6). A `v`
+  that an op does not take is ignored, as is a key of an op that this
+  table does not name (§15).
+- **A missing target** is `ENOTARGET`, with the id as the detail. That op
+  changes nothing, and the ops after it still apply. The reply names the
+  first op that failed by its index, `i`, and a host that answers with no
+  error applied every op.
+- **Context:** HTML in `v` is parsed as a fragment in the context of the
   element it will become a child of, so table rows, cells and list items
   parse as they would in place.
-- **The cheap path:** `var` and `text` are the deltas that change every
-  frame (a bar's width, a clock). A host **SHOULD** make them cheap.
+- **The cheap path:** `var` and `text` are the ops that change every frame
+  (a bar's width, a clock). A host **SHOULD** make them cheap.
 - **Reveal** changes no node. It scrolls each box that holds the target,
   the innermost first and the document's root last, so that the target's
   border box is in view: its top at the top of each box with `start`, its
-  bottom at the bottom with `end`, and with no payload, by as little as
-  brings it into view, as a browser's `scrollIntoView` does with
-  `block: "nearest"`. Across, it always scrolls as little as it can. It
-  scrolls only what scrolls (§5.3): in a document that asked for no
-  scrolling, it moves nothing. It moves neither focus nor the keyboard
-  (§10), and sends no event of its own: elements that report whether they
-  are in view report it as after any scroll (§9.5). Another payload is
-  `EINVAL`.
+  bottom at the bottom with `end`, and with no `v`, by as little as brings
+  it into view, as a browser's `scrollIntoView` does with `block:
+  "nearest"`. Across, it always scrolls as little as it can. It scrolls
+  only what scrolls (§5.3): in a document that asked for no scrolling, it
+  moves nothing. It moves neither focus nor the keyboard (§10), and sends
+  no event of its own: elements that report whether they are in view
+  report it as after any scroll (§9.5).
 
 ### 6.2 Morph
 
@@ -682,21 +717,22 @@ sets a control's default changes (`value` on inputs, textareas and selects;
 **MUST** also set the control's current state to it, unless the control is
 focused. The program's value wins, except while the user is editing.
 
-**`morph` without `t`** matches each top-level element of the payload to the
+**`morph` without `t`** matches each top-level element of `v` to the
 document element with the same id, and morphs it. Elements whose id is not in
 the document are skipped and reported in one `ENOTARGET`, their ids
 comma-separated in the detail. The others are still applied. This lets a
 program that redraws its whole tree every frame keep the terminal-side state
 of what did not change.
 
-**A payload with other than one top-level element**, given to `morph` with a
+**HTML with other than one top-level element**, given to `morph` with a
 `t`, replaces the target with all of its nodes.
 
 ### 6.3 Order and transactions
 
 - The host applies commands in the order they arrive. It **SHOULD** render
   at most once per display frame.
-- For atomicity, a program brackets a batch in synchronized output (DEC
+- One delta is already one unit (§6.1). For a batch of several commands,
+  or of several surfaces, a program brackets it in synchronized output (DEC
   private mode 2026: `CSI ? 2026 h` … `CSI ? 2026 l`). The host **MUST NOT**
   show a state from inside the batch. It may hold commands until the batch
   ends, or apply them without drawing.
@@ -810,6 +846,7 @@ contains at least:
   --hotty-accent: var(--hotty-ansi-12);  /* dark; ansi-4 when light */
   --hotty-cell-w: …px;             /* one cell, in CSS pixels */
   --hotty-cell-h: …px;
+  --hotty-px: …px;                 /* one device pixel, in CSS pixels */
   --hotty-font: <the terminal's font family>, monospace;
   font-family: var(--hotty-font);
   font-size: <the terminal's font size>;
@@ -850,10 +887,14 @@ button:enabled, input:is([type=button], [type=submit], [type=reset]):enabled {
   - `ansi-8` (bright black) is the dim grey themes give for secondary
     text: borders, buttons, placeholders and what is disabled. A disabled
     button keeps the background, so its text stays legible.
+- **`--hotty-px`** is one device pixel, `1px` over `scale` (§4), so that a
+  border or a rule can be exactly one device pixel thick, or a box
+  snapped to device pixels, at every zoom: `border-top: var(--hotty-px)
+  solid`.
 - When the terminal's theme or font changes, the host updates the
-  stylesheet and draws every surface again. A zoom changes neither
-  `--hotty-cell-*` nor `font-size`: the host draws every surface again at
-  the new scale (§5.3).
+  stylesheet and draws every surface again. A zoom changes `--hotty-px`
+  alone, neither `--hotty-cell-*` nor `font-size`: the host draws every
+  surface again at the new scale (§5.3).
 
 The custom-property prefix `--hotty-` and the attribute prefix `data-hotty-`
 are reserved for this specification.
@@ -861,7 +902,7 @@ are reserved for this specification.
 ## 9. Events
 
 ```
-ESC ] 7279 ; a=ev:s=<name>:e=<kind>:t=<element id> [; <base64 msgpack detail>] ST
+ESC ] 7279 ; a=ev:s=<name>:e=<kind>[:t=<element id>] [; <base64 msgpack detail>] ST
 ```
 
 The host reports what the user did. Events are not replies: they are sent
@@ -871,29 +912,63 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 
 | `e` | when | detail |
 | --- | --- | --- |
-| `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `{"area": area}`, the element's cells (below); with `"href": str` and `"url": str` for links (below), `"value": str` when the element has a `value` attribute, and `"count": int` for a repeated click (below) |
+| `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `{"area": area, "mods": int}`, the element's cells and the modifier keys held (below); with `"href": str` and `"url": str` for links (below), `"value": str` when the element has a `value` attribute, and `"count": int` for a repeated click (below) |
 | `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": bool, "value": str}` for checkboxes and radio buttons, `{"value": str}` otherwise |
 | `input` | every edit of a control with `data-on~=input` | `{"value": str}` |
-| `submit` | a form submitted (a submit button, or Enter in a text field) | the form's fields, `{str: str}` from names to values, the submitter's included |
-| `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface placed with `p=1` (§5.2), except a mouse's or a pen's press with Alt held (§9.2) and where the pointer passes through (§9.3) | `{"area": area}`, the cells of the element `t` names (below); none when `t` is empty |
-| `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": int, "r": int, "keys": [str]}`: the pointer's cell and the keys held, with `"x": int` and `"y": int`, its step, on an element with `data-steps` (§9.1) |
+| `submit` | a form submitted (a submit button, or Enter in a text field) | `{"fields": [[str, str]]}`: the form's fields, each its name and its value, in tree order, the submitter's included |
+| `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface whose `p` is on (§5.2), except a mouse's or a pen's press with Alt held (§9.2) and where the pointer passes through (§9.3) | `{"area": area, "mods": int}`: the cells of the element `t` names (below), and the modifier keys held; no `area` without `t` |
+| `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": int, "r": int, "mods": int}`: the pointer's cell and the modifier keys held, with `"x": int` and `"y": int`, its step, on an element with `data-steps` (§9.1) |
 | `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element or in `t` (§9.1) | the same, with `"tx": int` and `"ty": int`, the step in `t`, where `t` has `drop` in its `data-on` and `data-steps` (§9.1) |
 | `dragend` | the drag ended: the button released or the finger lifted, wherever the pointer is (§9.1) | as for `drag` |
 | `focus` | the user focuses an element: the surface gains the keyboard, or its focus moves to another of its elements (§10.1); `t` names the element focused | none |
-| `blur` | the surface loses the keyboard (§10); `t` is empty | none |
-| `resize` | the surface's size in CSS pixels changed without its cells changing: the terminal's font changed (§5.3); `t` is empty | `{"w": float, "h": float}` in CSS pixels |
-| `fit` | on a placement made with `f=1` (§5.2), the rows the document needs at the placement's width changed; `t` is empty | `{"r": int}`: the rows `r=auto` would choose now |
-| `hover` | on a placement made with `v=1` (§5.2), the element the pointer is over changed, or the pointer left the window (§9.4) | `{"c": int, "r": int}`: the pointer's cell (§9.1); `{"out": bool}`, `true`, when it left, with `t` empty |
-| `view` | which elements with `data-on~=view` are in view, or where they are, changed, or whether the document shows its end (§9.5); `t` is empty | `{"in": {str: area}, "end": bool}`: each element in view by its id, with its cells (below) |
+| `blur` | the surface loses the keyboard (§10) | none |
+| `fit` | on a surface whose `f` is on (§5.2), the rows the document needs at the placement's width changed | `{"r": int}`: the rows `r=auto` would choose now |
+| `hover` | on a surface whose `v` is on (§5.2), the element the pointer is over changed, or the pointer left the window (§9.4) | `{"c": int, "r": int}`: the pointer's cell (§9.1); `{"out": true}` when it left |
+| `view` | which elements with `data-on~=view` are in view, or where they are, changed, or whether the document shows its end (§9.5) | `{"in": {str: area}, "end": bool}`: each element in view by its id, with its cells (below) |
 | `command` | a key of an edit command the program takes, or a menu of the terminal (§10.6) | `{"name": str, "key": str}`, with `"text": str` for a paste |
-| `caps` | `mod`, `edit` or `keys` changed (§4) | the fields that changed, as the capabilities have them. One that became absent comes as its type's empty value: `"edit": {}`, the host takes no edit commands now (§10.6), and `"keys": {}`, it reads no key sequences (§10.5). `mod` is never absent |
+| `caps` | a capability changed (§4) | the fields that changed, as the capabilities have them. One that became absent comes as its type's empty value: `"edit": {}`, the host takes no edit commands now (§10.6), and `"features": []`, it has none of them |
 
+- **`t` names an element**, by its id, and is absent where none is meant:
+  in a `blur`, a `fit` and a `view`, a `hover` that says the pointer left,
+  and where the element found has no id (below).
 - **Events of the terminal,** `command` and `caps`, belong to no surface,
   and have neither `s` nor `t`.
+- **Modifiers.** `mods` is the modifier keys held, as bits: 1 Shift, 2
+  Alt, 4 Control and 8 Meta (§10.4), left out when none is. A press and a
+  drag's events carry those held at that moment, a click those held at its
+  release, or with the key that clicked.
+
+**What asks for each event, and how often.** An event is sent only where
+the program asked for it, and as often as this table says:
+
+| `e` | asked for by | how long | how often |
+| --- | --- | --- | --- |
+| `click`, `change`, `input`, `submit` | the element: its kind, or its `data-on` (`click`, `input`) | while it is so | each time |
+| `focus`, `blur` | nothing: the keyboard is always told | — | each time |
+| `dragstart`, `drag`, `dragend` | the element: `drag` in its `data-on`, and `drop` for a target (§9.1) | from a press to its release | for each element, cell or step crossed (§9.1) |
+| `press` | `p=1` on the surface (§5.2) | until `p=0` | each press |
+| `hover` | `v=1` on the surface (§5.2) | until `v=0` | each change, at most one a frame (§9.4) |
+| `fit` | `f=1` on the surface (§5.2) | until `f=0` | at most one a frame, with the rows of the layout drawn in it |
+| `view` | the element: `view` in its `data-on` (§9.5) | while it has it | once a scroll rests, else at most one a frame |
+| `command` | `a=edit` (§10.6) | until the program takes others, or leaves the screen | each key |
+| `caps` | the query (§4) | the session | each change |
+
+- **What needs a window.** A surface's `press`, drags, `hover`, `fit` and
+  `view` need a placement the host draws: a surface hidden (§5.4), or
+  placed and scrolled out of view, sends none of them. When it is drawn
+  again, it reports how what it would say differs from what the program
+  last heard: the rows (counted from the placement's own, §5.2), the
+  element under the pointer, the elements in view.
+- **Detached** (§5.5), a surface sends none, and what the program last
+  heard stays as it was: once a document makes the surface the program's
+  again, it hears how that differs.
+- The order of a `fit` with other events the same change causes is not
+  set.
+
 - **The element that reports** a `click` is the nearest one, from the target
   of the click outward, that is one of those kinds. If it has no `id`,
   nothing is reported: the id is the program's handle. A link is the
-  exception: its `href` is the handle, and `t` is then empty.
+  exception: its `href` is the handle, and `t` is then absent.
 - **Where the element is.** A `click`'s and a `press`'s `area`, and each
   of a `view`'s, is `{"c": int, "r": int, "w": int, "h": int}`: the cells
   the element's border box covers as the user sees it, scrolled (§5.3)
@@ -913,10 +988,10 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   then a `click` with `"count": 2`. A click on another element, or on
   another surface, starts a new run. A click without `count` is the first
   of its run, and so is every click from the keyboard. A host that counts
-  clicks reports `count` (§4).
+  clicks has the feature `count` (§4).
 - **A press** is reported whatever it lands on: a control, an element with
   a handler, plain text, or empty space. `t` is the id of the nearest
-  element that has one, from the pressed element outward, and empty if
+  element that has one, from the pressed element outward, and absent if
   none has. It comes before every other event the press causes, on this
   surface or another (`change`, `blur`, `focus`), and so before the `click`
   its release may make. A press the host takes for a hyperlink's own
@@ -961,10 +1036,11 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   or the finger. Taps and long presses, and clicks and drags (§9.1) that
   do not begin with Alt held (§9.2), stay the surface's.
 - **The detail** is a msgpack map (§3.3), base64-encoded. Values are the
-  program's (§7): an `href` is reported as the document has it.
+  program's (§7): an `href` is reported as the document has it. A detail
+  that would have no field is left out, with no payload: a `press` with no
+  `t` and no modifier held.
 - **Unknown kinds.** A program **MUST** ignore an event whose kind it does
-  not know: later versions add kinds (§15). The capabilities list the kinds
-  a host sends (`events`, §4).
+  not know: later versions add kinds (§15).
 
 ### 9.1 Drags
 
@@ -984,9 +1060,9 @@ let go. An element that is only a place to drop on opts in with `drop`
     drag.
   - `drag`, each time the element under the pointer changes. `t` is the
     nearest element with an `id` and `drag` or `drop` in its `data-on`,
-    from the one under the pointer outward, and empty where there is none,
-    outside the window included. While `t` is empty, a `drag` is sent each
-    time the cell under the pointer changes instead. A `drag` is also sent
+    from the one under the pointer outward, and absent where there is none,
+    outside the window included. While there is no `t`, a `drag` is sent
+    each time the cell under the pointer changes instead. A `drag` is also sent
     each time a step (below) changes: `x` or `y` in the element dragged,
     `tx` or `ty` in `t`. A move that changes several of these, the element
     or the cell included, sends one.
@@ -995,7 +1071,7 @@ let go. An element that is only a place to drop on opts in with `drop`
 
   A drag therefore costs a few events for each element it crosses, and one
   for each step, not one for every move.
-- **The detail** of each is `{"c": int, "r": int, "keys": [str]}`, with
+- **The detail** of each is `{"c": int, "r": int, "mods": int}`, with
   `"x": int` and `"y": int` on an element with steps, and in `drag` and
   `dragend`, `"tx": int` and `"ty": int` where `t` is a drop target with
   steps (below):
@@ -1005,10 +1081,9 @@ let go. An element that is only a place to drop on opts in with `drop`
     above it and to its left, its size or more below it and to its right.
     A program that scrolls while the pointer is past an edge knows how far
     past it the pointer is.
-  - `keys` are the modifier keys held: a list of `"shift"`, `"ctrl"`,
-    `"alt"` and `"meta"`, in that order, empty when none is. `"alt"` is
-    never in `dragstart`'s: a press with Alt held starts no drag (§9.2).
-    Alt pressed later is reported, and the drag goes on.
+  - `mods` are the modifier keys held (§9), left out when none is. Alt
+    is never in `dragstart`'s: a press with Alt held starts no drag
+    (§9.2). Alt pressed later is reported, and the drag goes on.
 - **Where in the element: steps.** An element that opts in to drags, or to
   drops, may say how many steps its width and its height are divided into, with
   `data-steps="<x>"` or `data-steps="<x> <y>"`: whole numbers from 0 to
@@ -1031,7 +1106,7 @@ let go. An element that is only a place to drop on opts in with `drop`
   drag starts. A value that is not one or two whole numbers in that range
   gives no steps. If the element leaves the document during the drag, `x`
   and `y` stay as they last were, as they do in a `dragend` that ends a drag
-  early (below). `steps` in the capabilities (§4) says a host does this.
+  early (below).
 - **Where in the target.** When `t` has `drop` in its `data-on` (below)
   and steps, `drag` and `dragend` also say where in `t` the pointer is:
   `tx` and `ty`, measured against `t`'s border box as `x` and `y` are
@@ -1039,17 +1114,14 @@ let go. An element that is only a place to drop on opts in with `drop`
   a list splits a row with `data-on="drag drop"` and `data-steps="0 1"`
   into halves, for an item to land before or after it, and a tree splits a
   folder with `data-steps="0 2"` into before, into and after: a quarter, a
-  half and a quarter. Where `t` is empty, has no `drop` or has no steps,
-  there is no `tx` or `ty`, so a slider's drag over itself carries only
-  `x`; a `dragend` that ends a drag early (below) has none either. `drop`
-  in the capabilities (§4) says a host does this.
+  half and a quarter. Where there is no `t`, or it has no `drop` or no
+  steps, there is no `tx` or `ty`, so a slider's drag over itself carries
+  only `x`; a `dragend` that ends a drag early (below) has none either.
 - **A place to drop on.** An element with `drop` in its `data-on` and an
   `id` can be `t` without being dragged. A press on it starts no drag of it
   (one of an element around it that opts in to drags starts as before), and
   its text can be selected as any other's (§11). An element with both is
-  dragged and dropped on. `drop` in the capabilities (§4) says a host does
-  this; where it is absent, only an element that opts in to drags is ever
-  `t`, and a program offers another way to do what a drop would.
+  dragged and dropped on.
 - **The pointer is the surface's until the release,** or the finger until
   it lifts, as a page's `setPointerCapture` makes it an element's. Every
   move goes to the drag, wherever the pointer is: over the cells, over
@@ -1089,7 +1161,7 @@ let go. An element that is only a place to drop on opts in with `drop`
     press if held past the host's long-press time. Each is what it is on
     any other element (§9): a tap presses at its lift. A long press never
     becomes a drag.
-  - **Alt.** A touch that begins with Alt held is never a drag. `keys` are
+  - **Alt.** A touch that begins with Alt held is never a drag. `mods` are
     the modifier keys held on a keyboard when the finger touched, and as
     for a mouse after.
 - **Order.** The press that starts a drag is a press like any other
@@ -1104,8 +1176,8 @@ let go. An element that is only a place to drop on opts in with `drop`
   `data-on` as well reports `click`, after `dragend`. A drag that ends
   anywhere else reports no `click`. So does a touch's: one that lifts on
   the element it began on reports `click` after `dragend`.
-- **What ends a drag early.** The host sends `dragend` at once, with `t`
-  empty and the last cell the pointer was on, when before the release:
+- **What ends a drag early.** The host sends `dragend` at once, with no
+  `t` and the last cell the pointer was on, when before the release:
   - the surface's placement goes away (`a=hide`, or its line leaving the
     screen);
   - a new document replaces the surface's (`a=doc`);
@@ -1118,9 +1190,6 @@ let go. An element that is only a place to drop on opts in with `drop`
   A surface that is detached or deleted during a drag reports nothing more
   (§5.5). Nothing else ends a drag: neither a delta nor a new placement
   (moving the surface, or showing another window of it).
-- **Detection.** `drag` in `events` (§4) stands for the three kinds. Where
-  it is absent, a program offers another way to do what its drags do, such
-  as keys or clicks.
 
 ### 9.2 Presses with Alt
 
@@ -1143,7 +1212,7 @@ handles it as a press on the cells beneath the surface.
   none of them reaches a surface.
 - **The press decides,** and the keys held later change nothing. A drag
   that a press without Alt began stays the surface's when Alt is pressed
-  during it (its `keys` then list `"alt"`, §9.1). A gesture that a press
+  during it (its `mods` then have Alt, §9.1). A gesture that a press
   with Alt began stays the program's when Alt is let go.
 - **On macOS, Alt is Option**, whether or not the terminal makes Option
   type as Alt for keys (Ghostty's `macos-option-as-alt`, say). That setting
@@ -1154,7 +1223,7 @@ handles it as a press on the cells beneath the surface.
 ### 9.3 Where the pointer passes through
 
 A surface that only shows something, such as a frame drawn around cells,
-should not keep the pointer from them. On a host that reports
+should not keep the pointer from them. On a host with the feature
 `passthrough` (§4), a surface takes the pointer only where an element is
 there for it: where CSS hit testing finds an element at the point, as a
 browser's does. Hit testing skips every box whose `pointer-events` is
@@ -1190,7 +1259,7 @@ cells whose pointer it needs.
 ### 9.4 Hover
 
 Hover stays local (§9): `:hover` and the pointer's shape need no program.
-A program that asks, with `v=1` on a placement (§5.2), also hears where the
+A program that asks, with `v=1` on the surface (§5.2), also hears where the
 pointer is over the window, element by element: to show a hint of its own
 for what is under it, or to know that the pointer has gone from what the
 program draws itself, such as cells it lit while the pointer was over them.
@@ -1198,10 +1267,10 @@ program draws itself, such as cells it lit while the pointer was over them.
 - **Over the window.** `hover` is sent each time the element the pointer
   is over changes. `t` is the nearest element with an `id`, from the one
   under the pointer outward (the innermost one `:hover` matches), and
-  empty where none has an id. The detail is `{"c": int, "r": int}`, the cell
+  absent where none has an id. The detail is `{"c": int, "r": int}`, the cell
   of the surface under the pointer, counted as for drags (§9.1): from the
   surface's top left cell, not its window's.
-- **Out.** `hover` with `t` empty and the detail `{"out": true}` is sent
+- **Out.** `hover` with no `t` and the detail `{"out": true}` is sent
   when the window loses the pointer. A window has the pointer while it
   receives it (§5.3): the pointer is in it, it is the topmost window there,
   and on a host with `passthrough` it takes the pointer at that point
@@ -1216,8 +1285,8 @@ program draws itself, such as cells it lit while the pointer was over them.
   to another, the first one's out comes before the second one's `hover`.
 - **Only changes.** A `hover` is sent when `t`, or whether the window has
   the pointer, differs from what the program last heard: neither a move
-  within an element nor a new cell sends one. A placement made with `v=1`
-  starts from out. A host **MAY** send only the last of the changes
+  within an element nor a new cell sends one. A surface starts from out
+  when `v` is turned on. A host **MAY** send only the last of the changes
   between two frames it draws, so at most one per surface per frame.
 - **A held button holds hover.** From a press a surface takes to its
   release, no surface sends `hover`: the pointer is the gesture's, and a
@@ -1237,15 +1306,14 @@ program draws itself, such as cells it lit while the pointer was over them.
 - **Under a pointer that does not move.** When a delta, a new document, a
   resource, or a new placement changes what lies under a pointer that has
   not moved, a host **MAY** report it only at the pointer's next move.
-- **Lifetime.** Like `p`, it belongs to the placement: placing the surface
-  again without `v=1` stops it, and so does hiding it. Placing it again
-  with `v=1` goes on from what the program last heard, or from out if the
-  placement before did not ask. A new document keeps it, and what the
-  program last heard: an element with the same id under the pointer is
-  not reported again. A detached surface sends none (§5.5); once a document
-  makes it the program's again, it hears how the pointer differs from what
-  it heard last.
-- **Detection.** `hover` in `events` (§4). Where it is absent, a program
+- **Lifetime.** It holds until the program turns `v` off (§5.2), across
+  placements and documents. Hidden, or scrolled out of view, a surface
+  sends none, and goes on from what the program last heard once it is
+  drawn again (§9): an element with the same id under the pointer is not
+  reported again. A detached surface sends none (§5.5); once a document
+  makes it the program's again, it hears how the pointer differs from
+  what it heard last.
+- **Detection.** The feature `hover` (§4). Where it is absent, a program
   never hears that the pointer has left for a surface, and does not keep a
   state of its own that waits for it: it clears it on the next thing it
   hears instead, a key or a press.
@@ -1262,7 +1330,7 @@ a table of contents does, or to fetch what comes into view.
   neither scrolled away nor clipped by a box that holds it (§5.3). One that
   is not rendered (`display: none`, `visibility: hidden`) is not in view,
   and one without an `id` is never reported.
-- **The event.** `view`, with `t` empty, carries `{"in": {str: area},
+- **The event.** `view`, with no `t`, carries `{"in": {str: area},
   "end": bool}`: each element in view, by its id, with its area as a
   click's (§9), the whole of it however little is shown; and `end`,
   `true` when the document's root is scrolled as far down as it goes, as
@@ -1276,14 +1344,12 @@ a table of contents does, or to fetch what comes into view.
   sends one `view` then. Otherwise it sends at most one per surface per
   frame it draws, with the layout drawn in it. A document with no element
   that asks sends none.
-- **Lifetime.** It belongs to the placement, as `fit` does (§5.2): a
-  placement the host does not draw, scrolled out of view (§5.4), hears of
-  a change once it is drawn again; hiding the surface stops it; placing it
-  again sends one as the first. A new document sends one once it is laid
-  out. A detached surface sends none (§5.5).
-- **Detection.** `view` in `events` (§4). Where it is absent, a program
-  that needs to know what is shown draws that part in cells, or takes the
-  element it last brought into view (`reveal`, §6.1) as the one shown.
+- **Lifetime.** It holds while an element asks, across placements and
+  documents. Hidden, or scrolled out of view, a surface sends none, and
+  reports how what it would carry differs from what the program last
+  heard once it is drawn again (§9). A new document sends one once it is
+  laid out, if an element in it asks. A detached surface sends none
+  (§5.5).
 
 ## 10. Keyboard and focus
 
@@ -1300,11 +1366,12 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
 - **Without `t`:** the surface's focused element keeps focus, or else the
   first focusable element receives it.
 - **Echo:** no `focus` event is sent for focus the program gave.
+- **A prefix ends** (§10.5) with either form, whether or not focus moves.
 - **The host says where the user puts focus.** Each time the user focuses
   an element of a surface, by a click or with Tab (§10.2), whether the
   surface had the keyboard or not, the host sends `focus`. Its `t` is the
   id of the nearest element that has one, from the focused element
-  outward, and empty if none has. So a program knows which element the
+  outward, and absent if none has. So a program knows which element the
   keys it is given come from (§10.2, *Keys for the program*). The `change`
   that focus leaving a text control commits comes first, and a click's
   `press` before both (§9).
@@ -1355,13 +1422,13 @@ is offered the second time as the key that input reads as.
   one, or before the first, the surface loses the keyboard: the host sends
   `blur` and the terminal has the keyboard again.
 - **Escape** is never used by the surface, except by a select's open list
-  (below) and a key sequence that waits (§10.5). It reaches the program,
-  which decides, for instance by sending `a=blur`.
-- **A key sequence that waits** (§10.5) takes every key first.
-- **A key the element gives the program** reaches it, whatever the element
-  or the scrolling (§5.3) would do with it (below, *Keys for the program*).
-- **A key that starts a key sequence** (§10.5), and that the element does
-  not use, starts it.
+  (below). It reaches the program, which decides, for instance by sending
+  `a=blur`.
+- **After a prefix** (§10.5), every key reaches the program, before
+  anything below.
+- **A key the element gives the program**, bound to `program` or
+  `prefix`, reaches it, whatever the element or the scrolling (§5.3) would
+  do with it (below, *Keys for the program*).
 - **A key the element binds to a scroll action**, and does not use, scrolls
   the surface's document (below, *Scrolling keys*).
 - **Every other key** reaches the program as ordinary terminal input, in the
@@ -1476,10 +1543,10 @@ that: in the legacy encoding a terminal may send Control+Backspace as
 `0x01`, which is Control+a.
 
 A key goes to the field's keymap:
-- **Bound:** the field does the action. A key bound to `program`, or to an
-  action the field does not have (a multi-line one in an `input`, or
-  `copy`, `cut` and `paste` where they have nothing to do, below), reaches
-  the program.
+- **Bound:** the field does the action. A key bound to `program` or
+  `prefix`, or to an action the field does not have (a multi-line one in
+  an `input`, or `copy`, `cut` and `paste` where they have nothing to do,
+  below), reaches the program.
 - **Not bound, with Shift:** the key is looked up again without Shift, so
   Shift+ArrowLeft does what ArrowLeft does, and selects (below). A
   character shows Shift in itself (`A`, §10.4), so this concerns the other
@@ -1513,6 +1580,7 @@ The actions:
 | `newline` † | types a line break |
 | `submit` | submits the field's form, as Enter does in a text `input` (§9 `submit`) |
 | `program` | nothing: the key reaches the program |
+| `prefix` | nothing: the key reaches the program, and so does every key after it (§10.5) |
 
 † Multi-line fields only: a `textarea` and an editing host.
 
@@ -1565,20 +1633,21 @@ The actions:
 
 #### Keys for the program
 
-A key that the focused element's keymap binds to `program` reaches the
-program, before the element uses it and before the surface scrolls with it
-(§5.3), whatever the element. It reaches it as terminal input, which names
-no element: the last `focus` does (§10.1), or the program's own `a=focus`.
+A key that the focused element's keymap binds to `program` or `prefix`
+reaches the program, before the element uses it and before the surface
+scrolls with it (§5.3), whatever the element. It reaches it as terminal
+input, which names no element: the last `focus` does (§10.1), or the
+program's own `a=focus`.
 - **Every focused element has a keymap**, read as a text field's is, but
   with its scroll actions: the `data-keys` of each element from the
   document's root down to it, the element's own last, each overriding what
   came before it key by key. A
   key with Shift that is not bound is looked up again without it. Only a
   text field starts from the default keymap.
-- **Outside a text field,** a keymap gives only `program` and the scroll
-  actions (below). Its other bindings still override farther ones key by
-  key, but do nothing there: the element uses those keys as the table
-  above says.
+- **Outside a text field,** a keymap gives only `program`, `prefix` and
+  the scroll actions (below). Its other bindings still override farther
+  ones key by key, but do nothing there: the element uses those keys as
+  the table above says.
 - **With no element focused** there is no keymap. A program that wants
   keys in a surface with nothing to focus gives an element a `tabindex`
   and focuses it.
@@ -1609,16 +1678,15 @@ surfaces where the host scrolls them (§5.3):
   it, and never past the root: a key never scrolls the terminal. Where
   nothing it may reach can move, the key is used, and does nothing, unlike
   a key a browser scrolls with, which then goes on to the program (§5.3).
-- **Order.** A key bound to `program` is the program's (above). Any other
-  key the focused element uses (the table at the start of §10.2) stays the
-  element's: Space on a button presses it, and a character on a select
-  picks. A key the element does not use and its keymap binds to a scroll
+- **Order.** A key bound to `program` or `prefix` is the program's
+  (above). Any other key the focused element uses (the table at the start
+  of §10.2) stays the element's: Space on a button presses it, and a
+  character on a select picks. A key the element does not use and its keymap binds to a scroll
   action scrolls, before the surface's own scrolling keys (§5.3), and does
   not reach the program.
 - **Along an axis the document does not scroll** (§5.1 `scroll`), a scroll
   action does nothing, and the key goes on as if its keymap did not bind
-  it. On a host without `scroll`, and on one older than these actions,
-  which ignores them, the program hears these keys as before.
+  it.
 - **A text field's keymap leaves scroll actions out.** A binding to one
   neither acts nor overrides the bindings before it, so a field inside an
   element that scrolls with `j` still types `j`, and a `textarea` keeps
@@ -1657,7 +1725,7 @@ each followed by `+`: `a`, `A`, `Enter`, `ArrowLeft`, `Control+a`,
   (`Control+Shift+a` reads as `Control+A`).
 - **`Space`** is the space bar's key value, a space, written so that it can
   stand in a list (`Control+Space`). `+` is the plus key (`Control++`).
-- **`Mod`**, in a binding (§10.2, §10.5), is the platform's modifier for
+- **`Mod`**, in a binding (§10.2), is the platform's modifier for
   commands: Meta on macOS, whose Command key is Meta, and Control
   elsewhere, unless the user sets it otherwise. A host reports it as `mod`
   (§4), and reads `Mod` as that modifier wherever it reads a binding, so
@@ -1667,8 +1735,8 @@ each followed by `+`: `a`, `A`, `Enter`, `ArrowLeft`, `Control+a`,
 
 A host offers a surface that has the keyboard each key at most twice
 (§10.2). The surface uses a key that its focused element uses, Tab and
-Shift+Tab, which move focus, a key of a key sequence (§10.5), and a key it
-scrolls with (§5.3):
+Shift+Tab, which move focus, and a key it scrolls with (§5.3), but none
+after a prefix (§10.5):
 - **As pressed, first.** A host that sees the key the user pressed (a
   terminal emulator, a browser) offers it before the terminal's own
   shortcuts and before the bindings that translate keys, named from the key
@@ -1726,67 +1794,66 @@ scrolls with (§5.3):
 
 ### 10.5 Key sequences
 
-A document gives an element a key sequence that activates it, as an access
-key does in a browser, and while a sequence waits for its next key the host
-shows which keys can follow, as a which-key menu:
+A program reads its key sequences itself, a leader and the keys after it,
+or `g g`, with the keymap it uses in its cells (myelin's, say), and shows
+which keys can follow one in a menu. On a surface it needs two things of
+the host: the keys after the first, whatever is focused, and a place to
+show the menu.
+
+**A prefix.** A key that the focused element's keymap binds to `prefix`
+(§10.2) reaches the program, as one bound to `program` does, and so does
+every key after it, whatever the focused element or the scrolling (§5.3)
+would do with it: Tab, Shift+Tab and Escape too.
 
 ```html
-<menu data-key="<leader> f" aria-label="File">
-  <button id=new data-key="n">New file</button>
-  <button id=open data-key="o">Open…</button>
-</menu>
-<button id=top data-key="g g" hidden>Top</button>
+<main data-keys="Mod+k=prefix">
+  <ul id=files tabindex=0 data-keys="g=prefix">…</ul>
+</main>
 ```
 
-- **`data-key`** is a sequence: keys named as §10.4 names them, `Mod`
-  included, separated by ASCII white space, as myelin writes them. `g g` is
-  `g` twice. `<leader>` stands for the user's leader, a sequence the host
-  reports as `keys.leader` (§4). A host **MUST** ignore a `data-key` with a
-  key that does not parse, with Tab, Shift+Tab or Escape, or with any other
-  name in angle brackets.
-- **Groups.** A sequence goes on from the one of the nearest element around
-  it that has a `data-key`: above, the button's `n` is `<leader> f n`. An
-  element with such elements inside it is a group: its sequence leads to
-  theirs, and does nothing itself.
-- **What a sequence does.** The host activates its element as a browser
-  does an access key. It clicks an element a click activates (a `button`,
-  a link, a `summary`, a checkbox or radio button, an `input` of type
-  `button`, `submit` or `reset`, an element with `data-on~=click`), which
-  does and reports what a click from the keyboard does (§9), and focuses
-  any other element that takes focus (§10.1). A disabled element's
-  sequence does nothing. A hidden element's works, so a hidden button is a
-  command with nothing on the screen; its click's `area` is all zeros.
-- **Which element.** Sequences work while the surface has the keyboard
-  (§10.1). Where several elements have the same sequence, the one nearest
-  the focused element wins: the one whose nearest common ancestor with it
-  is deepest, and of those the last in tree order.
-- **Starting.** A key that starts a sequence starts it when the focused
-  element does not use it and its keymap does not give it to the program
-  (§10.2): Space on a button presses the button, and a character in a text
-  field types.
-- **Waiting.** While a sequence waits, the next key the host offers, as
-  pressed or as the program would read it (§10.4), is the sequence's:
-  - a key that finishes a sequence runs it, unless a longer one, at least
-    as near the focus, goes on from it: then it waits again, as it does on
-    a key that only goes on;
-  - **Escape** ends the wait, and does nothing more;
-  - **any other key** ends the wait, and the keys typed, that one included,
-    go on in order as if no element had a `data-key`: to the element, the
-    scroll actions and the program (§10.2);
-  - after `keys.timeout` milliseconds (§4) with no key, the sequence typed
-    runs if it finishes one, and its keys go on otherwise.
+Above, `Mod+k` anywhere in `main`, and `g` on the list, hand the program
+the keys that follow.
+- **The keys** reach the program as any key the surface does not use
+  (§10.2, §10.4): after the terminal's own shortcuts, as terminal input in
+  the encoding the program enabled, or as an edit command it takes
+  (§10.6).
+- **It lasts** until the program sends `a=focus` to the surface, with or
+  without `t` (without it, focus stays where it is, §10.1), or `a=blur`;
+  until the surface loses the keyboard; or until the user focuses an
+  element of it with a press. The program hears of each that is not its
+  own command (`blur`, `focus`, §9), so it always knows where its keys
+  come from.
+- **Nothing waits in the host.** The program keeps the sequence's time, and
+  once it ends, by a key, a timeout or Escape, gives the keys back with
+  `a=focus`. The keys typed before that are the program's.
 
-  The wait also ends, and its keys do nothing, when the surface loses the
-  keyboard. These are myelin's rules, so a program that reads the same
-  keymap in its cells does there what the host does here (§10.6).
-- **The menu.** While a sequence waits, the host **SHOULD** show the keys
-  that can follow it, each with its label: a group's `aria-label`, an
-  element's `aria-label`, or else its text, with its white space collapsed.
-  A disabled element's key shows as disabled. The host draws the menu
-  itself, as it may a select's list (§10.2), and **MAY** wait a moment
-  first, so that a sequence typed quickly shows none.
-- A host that reads sequences reports `keys` (§4). Others ignore
-  `data-key`.
+**Menus.** While a sequence waits for its next key, or whenever it wants
+to say which keys do what, a program shows its menu by sending it to the
+host:
+
+```
+ESC ] 7279 ; a=menu ; <base64 msgpack menu> ST
+```
+
+- **The menu** is one msgpack map (§3.3), myelin's which-key level:
+  `{"seq": [str], "label": str, "items": [item]}`. `seq` is the keys typed
+  so far, as §10.4 names them, `Mod` included, and `label` their group's
+  label. Each item is a key that can follow them, `{"key": str, "label":
+  str, "group": bool, "enabled": bool}`: the key, what it does, whether
+  more keys follow it, and whether it does anything now.
+- **The host shows it** over its cells and surfaces, where it likes: each
+  item's key, read as `mod` says (§10.4), and its label, a group's marked
+  as one, and one that does nothing now as disabled. It **MAY** show only
+  as many items as fit, and **MAY** wait a moment before it shows a menu,
+  so that a sequence typed quickly shows none.
+- **Until** the program sends another, or `a=menu` with no body, which
+  hides it. The host also hides it on Escape, on a key the menu does not
+  list, when the screen changes and on a full reset (RIS), so that a
+  program that ends while it waits leaves none behind. The keys still go
+  where they would without it.
+- A host that shows menus has the feature `menu` (§4). On one that does
+  not, a program shows its menu itself: in its cells, or as a surface at
+  a higher `z` (§5.2).
 
 ### 10.6 Commands in the cells
 
@@ -1838,28 +1905,6 @@ ESC ] 7279 ; a=edit:take=copy,paste,undo,redo ST
 - **A host that takes `a=edit`** reports its edit shortcuts as `edit`
   (§4). When they change, or `mod` does (§10.4), as when a multiplexer's
   viewer changes to one on another platform, it sends `caps` (§9).
-
-**Menus.** A program that reads key sequences in its cells, as one built on
-myelin does, shows which keys can follow one while it waits by sending the
-host its menu:
-
-```
-ESC ] 7279 ; a=menu ; <base64 msgpack menu> ST
-```
-
-- **The menu** is one msgpack map (§3.3), myelin's which-key level:
-  `{"seq": [str], "label": str, "items": [item]}`. `seq` is the keys typed
-  so far, as §10.4 names them, and `label` their group's label. Each item
-  is a key that can follow them, `{"key": str, "label": str, "group":
-  bool, "enabled": bool}`: the key, what it does, whether more keys follow
-  it, and whether it does anything now. A host **MAY** show only as many
-  items as fit.
-- **The host shows it** as it shows a surface's (§10.5), until the program
-  sends another, or `a=menu` with no body, which hides it. It also hides
-  it on Escape, on a key the menu does not list, when the screen changes
-  and on a full reset (RIS), so that a program that ends while it waits
-  leaves none behind. The keys still reach the program.
-- A host that shows menus reports `menu` (§4).
 
 ## 11. Text
 
@@ -1991,11 +2036,12 @@ the text of §11.
   common, the program falls back (§14). A host or a program **MAY** speak
   several versions.
 - **A field keeps its type,** from 0.2 on: a version that needs another type
-  for it adds a field under a new name. A reader then never meets a field
-  it knows with a type it does not.
+  for it adds a field under a new name, as 0.3's `cellcss` took the place
+  of 0.2's `cell`. A reader then never meets a field it knows with a type
+  it does not.
 - A host **MUST** ignore control keys it does not know. An unknown action or
-  delta op is `EINVAL`. A program **MUST** ignore event kinds (§9) and
-  capability fields (§4) it does not know.
+  delta op is `EINVAL`. A program **MUST** ignore event kinds (§9),
+  capability fields and features (§4) it does not know.
 - `host` and `version` (§4) only name an implementation. A program **MAY**
   use them to avoid a known bug of some of its versions, and falls back as
   if the bug were there when either is absent. What a capability field
@@ -2012,24 +2058,19 @@ the text of §11.
 
 ## 16. Conformance
 
-A host conforms to HOTTY version 0.2 when:
+A host conforms to HOTTY version 0.3 when:
 - it meets every **MUST** of this document;
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
 The vectors check replies, error codes, every delta op, morph, context
 parsing, resources, drags and their steps, presses with Alt, `fit`, hover,
-`area`, scrolling, `reveal` and `view`, key sequences, edit commands,
-keymaps and the envelope, and their
-`keys`, `keymap` and `edit` sections a host's key names (§10.4), keymaps
-and actions (§10.2).
-They inspect documents and events, not pixels.
-The vectors marked `"passthrough"` apply to a host that reports it (§9.3),
-those marked `"hover"` to a host whose `events` list it (§9.4), those
-marked `"scroll"` to a host that reports it (§5.3), those marked
-`"steps"`, `"drop"` or `"count"` to a host that reports it (§9.1, §9),
-those marked `"view"` to a host whose `events` list it (§9.5), those
-marked `"keys"` to a host that reports it (§10.5), and those marked
-`"commands"` to a host with a terminal that takes edit commands (§10.6).
+`area`, scrolling, `reveal` and `view`, prefixes, edit commands, keymaps
+and the envelope, and their `keys`, `keymap` and `edit` sections a host's
+key names (§10.4), keymaps and actions (§10.2). They inspect documents and
+events, not pixels. The vectors marked with a feature (`"passthrough"`,
+`"hover"`, `"count"`, `"menu"`, §4) apply to a host that has it, and those
+marked `"commands"` to a host with a terminal that takes edit commands
+(§10.6).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
@@ -2044,8 +2085,8 @@ terminal's window, and press keys where the keyboard is. A host that takes
 touch also lets a test touch a cell of a surface with one finger, move it,
 and lift it, and tells it whether a touch went on to the terminal. A host
 with `passthrough` also tells the test whether each of those reached the
-surface or passed through it, and a host with `scroll` whether a wheel or
-a key went on to the terminal.
+surface or passed through it, and whether a wheel or a key went on to the
+terminal.
 
 This is a test interface, not part of the wire protocol.
 
@@ -2061,21 +2102,23 @@ fields (SDK.md §4.6).
 Detection (payload shortened):
 
 ```
-program → ESC ] 7279 ; a=q:n=1:v=0.2 ST  CSI c
-host    → ESC ] 7279 ; a=ok:n=1:re=q ; hqF2ozAuMqNvcHOcpW1vcnBo… ST  CSI ? 62 ; 22 c
+program → ESC ] 7279 ; a=q:n=1:v=0.3 ST  CSI c
+host    → ESC ] 7279 ; a=ok:n=1:re=q ; haF2ozAuM6djZWxsY3Nz… ST  CSI ? 62 ; 22 c
 ```
 
-A card placed below the prompt, then a delta and an event:
+A card placed below the prompt, asking for the rows it took, then a delta
+and an event:
 
 ```
-program → ESC ] 7279 ; a=doc:s=card:q=2 ; PGJ1dHRvbiBpZD1nbz5HbzwvYnV0dG9uPg== ST
-          (<button id=go>Go</button>)
-program → ESC ] 7279 ; a=place:s=card:c=40:r=auto ST
-host    → ESC ] 7279 ; a=ok:s=card:re=place:c=40:r=2 ST
-program → ESC ] 7279 ; a=delta:s=card:op=text:t=go:q=2 ; U3RhcnQ= ST
-          (the button now reads "Start")
-host    → ESC ] 7279 ; a=ev:s=card:e=click:t=go ST
-          (the user clicked it)
+program → ESC ] 7279 ; a=doc:s=card ; PGJ1dHRvbiBpZD1nbz5HbzwvYnV0dG9uPg== ST
+          (<button id=go>Go</button>; no reply, as nothing went wrong)
+program → ESC ] 7279 ; a=place:s=card:c=40:r=auto:n=2 ST
+host    → ESC ] 7279 ; a=ok:n=2:s=card:re=place:c=40:r=2 ST
+program → ESC ] 7279 ; a=delta:s=card:q=2 ; gaNvcHORg6JvcKR0ZXh0oXSiZ2+hdqVTdGFydA== ST
+          ({"ops": [{"op": "text", "t": "go", "v": "Start"}]}: the button
+           now reads "Start")
+host    → ESC ] 7279 ; a=ev:s=card:e=click:t=go ; gaRhcmVhhKFjAKFyAKF3BKFoAQ== ST
+          ({"area": {"c": 0, "r": 0, "w": 4, "h": 1}}: the user clicked it)
 ```
 
 A page that asks for images from its own site, on a host whose policy grants
@@ -2083,23 +2126,24 @@ that origin (`"net": {"img-src": ["https://example.com"]}` in its
 capabilities):
 
 ```
-program → ESC ] 7279 ; a=doc:s=post:q=2 ; … ST
+program → ESC ] 7279 ; a=doc:s=post ; … ST
           (<base href="https://example.com/blog/">
            <meta name="hotty-network" content="img-src https://example.com">
            <img src="cover.png"> <a href="../about">About</a>)
           (the host fetches https://example.com/blog/cover.png)
-host    → ESC ] 7279 ; a=ev:s=post:e=click:t= ; eyJocmVmIjoiLi4vYWJvdXQiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tL2Fib3V0In0= ST
-          ({"href":"../about","url":"https://example.com/about"}: the user
-           clicked the link, and the program decides where it goes)
+host    → ESC ] 7279 ; a=ev:s=post:e=click ; g6RhcmVhhKFjDKFyA6F3BaFoAaRocmVmqC4uL2Fib3V0o3VybLlodHRwczovL2V4YW1wbGUuY29tL2Fib3V0 ST
+          ({"area": …, "href": "../about", "url": "https://example.com/about"}:
+           the user clicked the link, and the program decides where it goes)
 ```
 
-A value that changes every frame, cheaply:
+Values that change every frame, cheaply, in one delta that the host
+applies as one:
 
 ```
-program → CSI ? 2026 h
-program → ESC ] 7279 ; a=delta:s=dash:op=var:t=cpu:k=p:q=2 ; NDI= ST        (--p: 42)
-program → ESC ] 7279 ; a=delta:s=dash:op=text:t=clock:q=2 ; MTI6MDA6MDE= ST  (12:00:01)
-program → CSI ? 2026 l
+program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoXaiNDKDom9wpHRleHShdKVjbG9ja6F2qDEyOjAwOjAx ST
+          ({"ops": [{"op": "var", "t": "cpu", "k": "p", "v": "42"},
+                    {"op": "text", "t": "clock", "v": "12:00:01"}]}:
+           --p: 42 on cpu, and the clock reads 12:00:01)
 ```
 
 ## Appendix B. Rationale
@@ -2131,7 +2175,8 @@ program → CSI ? 2026 l
   - Its maps are keyed by name, as JSON's are, so a version adds a field
     that an older reader ignores (§15).
   - It stays inside the base64, since its bytes include ST and BEL.
-  - What a program sends stays text: a document is HTML.
+  - A document stays text, as it is HTML. A delta is msgpack since 0.3,
+    since its ops are fields, and a menu is.
 - **Why hosts do not compress.** Replies and events are small, and zlib
   would be a second dependency a program needs only to read them.
   Programs keep it for what they send, where documents are large.
@@ -2140,6 +2185,16 @@ program → CSI ? 2026 l
     cost what it changes.
   - `morph` without a target also serves programs that redraw their whole
     tree (immediate mode) while keeping what the user was doing.
+  - **One delta, many ops.** Until 0.3 each op was a message of its own,
+    with an envelope and a control: 49 bytes to set `--p: 42`, and 755 for
+    a frame of fifteen small changes, which zlib could not shrink, since it
+    sees one message at a time. As one list they are 184. A frame's changes
+    to a surface are one unit, so the host never shows half of them, with
+    no synchronized output around them. And a target is a string in a
+    body, so an id outside ASCII is addressed as it is.
+  - **Ops are maps keyed by name,** as every body is: a later version adds
+    a key an older host ignores. Positional arrays would save a dozen bytes
+    an op, which zlib mostly saves anyway.
 - **Why no script:** it keeps the sandbox small enough to defend, and the
   program in charge.
 - **Why `fit` tells, and the host does not resize.** A document's height can
@@ -2155,12 +2210,20 @@ program → CSI ? 2026 l
   sharp. Growing the CSS cell instead would grow only what is sized in
   cells or rem, and leave images, borders and gaps at their old size in
   a bigger box. It would also lay the document out again, send `fit` and
-  `resize`, and make a cell size the program read stale. Viewers of one
+  `caps`, and make a cell size the program read stale. Viewers of one
   pane in a multiplexer, each at its own zoom, would each lay it out
   differently. A browser zooms a page in a frame the same way: the frame
   keeps its size in CSS pixels, and its document its layout. A new font
   is different: the cell changes in CSS pixels, and the document is laid
   out for it.
+  - **The cell in CSS pixels.** Until 0.3 the capabilities gave the cell in
+    device pixels, beside `scale`, so a new font sent `resize` to every
+    surface and the program asked again for the cell, while a zoom changed
+    `scale` and told nothing, leaving a program that drew device pixels
+    from it wrong. The cell in CSS pixels changes only with the font, and
+    `caps` says so once. What needs a device pixel, a hairline or a box
+    snapped to the screen's pixels, is the document's, and `--hotty-px`
+    gives it there, right after every zoom.
 - **Why the host grants and the document asks.** Markup can come from
   anywhere, a file someone `cat`s included, and every fetch tells a server
   who looked and where. So only the host (its user, or the page that embeds
@@ -2216,10 +2279,12 @@ program → CSI ? 2026 l
     input: a document printed by a program that exits without detaching
     (§5.5) would otherwise type an event into the shell on every click on
     its text. The programs that ask are those that read events.
-  - **On the placement**, because the pointer belongs to the window that
-    receives it (§5.3), and a program that composes surfaces places them
-    every frame anyway. A multiplexer asks for every surface it relays, and
-    passes a `press` on only to a program whose own placement asked.
+  - **On the surface, until the program says otherwise,** so a program
+    that places its surfaces every frame, as a multiplexer does, sends
+    each once, and never loses them the one time it forgets. Until 0.3
+    they belonged to the placement, and every placement had to repeat
+    them. A multiplexer asks for every surface it relays, and passes a
+    `press` on only to a program that asked for it.
   - **First**, as a browser's `pointerdown` comes before the focus moves: a
     program hears where the user went before it hears what that did.
 - **Why drags.** A spreadsheet selects a range by dragging across it, and
@@ -2395,19 +2460,25 @@ program → CSI ? 2026 l
   field decides on a surface. It takes them by name, per screen, as the
   kitty keyboard protocol's flags are taken, so a shell and a full-screen
   editor run in one terminal each get what they asked for.
-- **Why key sequences.** Leader keys and which-key menus are how keyboard
-  programs grow past the keys they have (Spacemacs, Neovim, Zed, Helix).
-  On a surface only the host can wait for the next key without a race,
-  so the document declares its sequences on the elements they activate,
-  as `accesskey` does, and the host resolves them by myelin's rules.
-  - **The element's own keys first,** so a leader never takes Space from a
-    button or a letter from a field.
-  - **The label is the element's,** its text or `aria-label`, so the menu
-    says what the screen says.
-  - **In the cells the program resolves them,** since it reads the keys
-    anyway, and sends only the menu to draw. One menu, drawn by the host,
-    serves both, and a program that builds both from one keymap behaves
-    the same in each.
+- **Why a prefix, and the program resolves sequences.** Leader keys and
+  which-key menus are how keyboard programs grow past the keys they have
+  (Spacemacs, Neovim, Zed, Helix). On a surface, after a leader, the next
+  key could reach a focused text field before the program could take the
+  keyboard back. 0.2 closed that race by resolving sequences in the host,
+  from `data-key` attributes: a sequence engine in every host, a second
+  keymap in the document, and the user's leader in the terminal's
+  settings. A prefix closes it with one rule, and the program resolves
+  its sequences with the keymap it uses in its cells, labels its menu
+  from what it wrote, and keeps its own time.
+  - **The menu shows a round trip later,** which which-key's own pause
+    hides; the action it leads to needed the program anyway.
+  - **Ended by the program,** with `a=focus`, which it already sends, so
+    no new command and no state the program cannot see.
+- **Why the host draws menus.** A program in its cells would have to draw
+  over its own output, and one on a surface a surface of its own. One menu
+  drawn by the host serves both, looks the same in every program, and
+  tells the terminal which keys do what, which a terminal or a multiplexer
+  can show elsewhere, such as in a palette.
 - **Why a host may show no select list.** A select's list opens past its
   control, and a surface is a rectangle of cells: drawn inside, a list
   would force small surfaces to grow, and drawn outside, it is something
@@ -2466,6 +2537,24 @@ program → CSI ? 2026 l
     it would move the keyboard from where the user is. Its payload names
     the alignments a reader needs, those of `scrollIntoView`; across,
     where nothing is read in order, as little as it can.
+
+- **Why features.** Each addition within 0.2 got a flag of its own
+  (`passthrough`, `scroll`, `steps`, `drop`, `count`, `menu`), beside
+  lists of ops and events whose absence meant opposite things: no `ops`
+  was every op, no `events` was no drag, hover or view. 0.3 makes what
+  both hosts do the baseline, and one list names what a host may lack.
+- **Why errors only, unless asked.** A program that sends deltas every
+  frame and forgets `q` filled its input with replies. Errors still come,
+  since a refused document leaves a hole in the screen; a numbered command
+  asks for its reply by its number. Continuation chunks carried `q` until
+  0.3, which did nothing: replies are per message.
+- **Why `mods`.** Drags spelt their modifiers `"ctrl"`, `"shift"`, while
+  key names spell `Control`, `Shift` (§10.4), and clicks and presses
+  carried none, so Shift with a click could not extend a selection. One
+  number, with §10.4's bits, is both shorter and the same everywhere.
+- **Why a submit's fields are pairs.** A form may give two controls one
+  name, as two checkboxes for one setting do, and a map holds a name once.
+  Pairs in tree order are what a browser's `FormData` holds.
 
 ## Appendix C. Prior art
 

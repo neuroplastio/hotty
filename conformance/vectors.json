@@ -1,6 +1,6 @@
 {
- "version": "0.2",
- "protocol": "SPEC.md version 0.2",
+ "version": "0.3",
+ "protocol": "SPEC.md version 0.3",
  "vectors": [
   {
    "name": "a=q answers ok and echoes n",
@@ -9,7 +9,7 @@
      "send": {
       "a": "q",
       "n": "7",
-      "v": "0.2"
+      "v": "0.3"
      },
      "reply": {
       "a": "ok",
@@ -26,14 +26,14 @@
      "send": {
       "a": "q",
       "n": "1",
-      "v": "0.2,99.0"
+      "v": "0.3,99.0"
      },
      "reply": {
       "a": "ok",
       "re": "q",
       "n": "1",
       "body": {
-       "v": "0.2"
+       "v": "0.3"
       }
      }
     },
@@ -41,14 +41,14 @@
      "send": {
       "a": "q",
       "n": "2",
-      "v": "99.0,0.2"
+      "v": "99.0,0.3"
      },
      "reply": {
       "a": "ok",
       "re": "q",
       "n": "2",
       "body": {
-       "v": "0.2"
+       "v": "0.3"
       }
      }
     },
@@ -56,14 +56,14 @@
      "send": {
       "a": "q",
       "n": "3",
-      "v": "0.1,0.2"
+      "v": "0.2,0.3"
      },
      "reply": {
       "a": "ok",
       "re": "q",
       "n": "3",
       "body": {
-       "v": "0.2"
+       "v": "0.3"
       }
      }
     }
@@ -82,7 +82,7 @@
       "re": "q",
       "n": "1",
       "code": "EVERSION",
-      "detail": "0.2"
+      "detail": "0.3"
      }
     },
     {
@@ -96,7 +96,7 @@
       "re": "q",
       "n": "2",
       "code": "EVERSION",
-      "detail": "0.2"
+      "detail": "0.3"
      }
     },
     {
@@ -110,21 +110,21 @@
       "re": "q",
       "n": "3",
       "code": "EVERSION",
-      "detail": "0.2"
+      "detail": "0.3"
      }
     },
     {
      "send": {
       "a": "q",
       "n": "4",
-      "v": "0.20"
+      "v": "0.30"
      },
      "reply": {
       "a": "err",
       "re": "q",
       "n": "4",
       "code": "EVERSION",
-      "detail": "0.2"
+      "detail": "0.3"
      }
     },
     {
@@ -138,7 +138,7 @@
       "re": "q",
       "n": "5",
       "code": "EVERSION",
-      "detail": "0.2"
+      "detail": "0.3"
      }
     },
     {
@@ -157,7 +157,7 @@
      "send": {
       "a": "q",
       "n": "1",
-      "v": "0.2"
+      "v": "0.3"
      },
      "reply": {
       "a": "ok",
@@ -165,18 +165,16 @@
       "n": "1",
       "types": {
        "v": "str",
-       "ops": [
-        "str"
-       ],
-       "events": [
-        "str"
-       ],
-       "cell": {
-        "w": "int",
-        "h": "int"
+       "cellcss": {
+        "w": "float",
+        "h": "float"
        },
        "scale": "float",
        "scheme": "str",
+       "mod": "str",
+       "features": [
+        "str"
+       ],
        "limits": {
         "*": "int"
        },
@@ -185,9 +183,11 @@
          "str"
         ]
        },
-       "passthrough": "bool",
-       "scroll": "bool",
-       "steps": "bool",
+       "edit": {
+        "*": [
+         "str"
+        ]
+       },
        "host": "str",
        "version": "str"
       }
@@ -202,7 +202,7 @@
      "send": {
       "a": "q",
       "n": "5",
-      "v": "0.2",
+      "v": "0.3",
       "late": "1"
      },
      "reply": {
@@ -249,11 +249,17 @@
     {
      "send": {
       "a": "delta",
-      "s": "nope",
-      "op": "text",
-      "t": "p"
+      "s": "nope"
      },
-     "payload": "x",
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "p",
+        "v": "x"
+       }
+      ]
+     },
      "reply": {
       "a": "err",
       "code": "ENOENT"
@@ -267,7 +273,8 @@
     {
      "send": {
       "a": "doc",
-      "s": "x"
+      "s": "x",
+      "q": "0"
      },
      "payload": "<p id=p>hi</p>",
      "reply": {
@@ -280,10 +287,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "text",
-      "t": "p"
+      "q": "0"
      },
-     "payload": "bye",
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "p",
+        "v": "bye"
+       }
+      ]
+     },
      "reply": {
       "a": "ok",
       "re": "delta",
@@ -316,15 +330,22 @@
     {
      "send": {
       "a": "delta",
-      "s": "x",
-      "op": "text",
-      "t": "nope"
+      "s": "x"
      },
-     "payload": "x",
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "nope",
+        "v": "x"
+       }
+      ]
+     },
      "reply": {
       "a": "err",
       "code": "ENOTARGET",
-      "detail": "nope"
+      "detail": "nope",
+      "i": "0"
      }
     }
    ]
@@ -343,50 +364,78 @@
     {
      "send": {
       "a": "delta",
-      "s": "x",
-      "op": "reveal",
-      "t": "nope"
+      "s": "x"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "nope"
+       }
+      ]
      },
      "reply": {
       "a": "err",
       "code": "ENOTARGET",
-      "detail": "nope"
+      "detail": "nope",
+      "i": "0"
      }
     },
     {
      "send": {
       "a": "delta",
-      "s": "x",
-      "op": "reveal",
-      "t": "a"
+      "s": "x"
      },
-     "payload": "middle",
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "a",
+        "v": "middle"
+       }
+      ]
+     },
      "reply": {
       "a": "err",
-      "code": "EINVAL"
+      "code": "EINVAL",
+      "i": "0"
      }
     },
     {
      "send": {
       "a": "delta",
-      "s": "x",
-      "op": "reveal",
-      "t": "a"
+      "s": "x"
      },
-     "payload": "START",
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "a",
+        "v": "START"
+       }
+      ]
+     },
      "reply": {
       "a": "err",
-      "code": "EINVAL"
+      "code": "EINVAL",
+      "i": "0"
      }
     },
     {
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "a"
+      "q": "0"
      },
-     "payload": "start",
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "a",
+        "v": "start"
+       }
+      ]
+     },
      "reply": {
       "a": "ok",
       "re": "delta"
@@ -396,8 +445,15 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "a"
+      "q": "0"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "a"
+       }
+      ]
      },
      "reply": {
       "a": "ok",
@@ -422,25 +478,38 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "text",
-      "t": "nope",
       "q": "1"
      },
-     "payload": "x",
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "nope",
+        "v": "x"
+       }
+      ]
+     },
      "reply": {
       "a": "err",
-      "code": "ENOTARGET"
+      "code": "ENOTARGET",
+      "i": "0"
      }
     },
     {
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "text",
-      "t": "nope",
       "q": "2"
      },
-     "payload": "x",
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "nope",
+        "v": "x"
+       }
+      ]
+     },
      "reply": null
     }
    ]
@@ -461,7 +530,8 @@
       "a": "place",
       "s": "x",
       "c": "30",
-      "r": "4"
+      "r": "4",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -511,7 +581,8 @@
      "send": {
       "a": "place",
       "s": "x",
-      "c": "20"
+      "c": "20",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -533,7 +604,8 @@
      "send": {
       "a": "place",
       "s": "x",
-      "c": "20"
+      "c": "20",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -555,7 +627,8 @@
      "send": {
       "a": "place",
       "s": "x",
-      "c": "20"
+      "c": "20",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -585,7 +658,8 @@
       "c": "30",
       "r": "4",
       "y": "1",
-      "h": "2"
+      "h": "2",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -602,7 +676,8 @@
       "c": "30",
       "r": "4",
       "x": "10",
-      "y": "3"
+      "y": "3",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -684,7 +759,8 @@
       "s": "x",
       "c": "30",
       "r": "4",
-      "z": "1"
+      "z": "1",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -700,7 +776,8 @@
       "s": "x",
       "c": "30",
       "r": "4",
-      "z": "-1000"
+      "z": "-1000",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -716,7 +793,8 @@
       "s": "x",
       "c": "30",
       "r": "4",
-      "z": "1000"
+      "z": "1000",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -768,7 +846,7 @@
    ]
   },
   {
-   "name": "p=1 asks for presses; the placement answers as any other",
+   "name": "p=1 asks for presses and holds on the surface: placing again without p goes on hearing them, p=0 stops them; the placement answers as any other (SPEC \u00a75.2)",
    "steps": [
     {
      "send": {
@@ -776,7 +854,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<p id=p>hi</p>"
+     "payload": "<style>body{margin:0}p{margin:0;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><p id=p>hi</p>"
     },
     {
      "send": {
@@ -784,7 +862,8 @@
       "s": "x",
       "c": "30",
       "r": "4",
-      "p": "1"
+      "p": "1",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -799,7 +878,8 @@
       "a": "place",
       "s": "x",
       "c": "30",
-      "r": "4"
+      "r": "4",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -808,6 +888,65 @@
       "c": "30",
       "r": "4"
      }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "p",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "p",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "p": "0",
+      "q": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "p",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": []
     }
    ]
   },
@@ -863,8 +1002,7 @@
        "t": "a",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -880,8 +1018,7 @@
        "t": "b",
        "detail": {
         "c": 4,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -894,11 +1031,10 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 7,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -914,11 +1050,10 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 7,
-        "r": 1,
-        "keys": []
+        "r": 1
        }
       }
      ]
@@ -934,11 +1069,10 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 8,
-        "r": 1,
-        "keys": []
+        "r": 1
        }
       }
      ]
@@ -954,11 +1088,10 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 7,
-        "r": -2,
-        "keys": []
+        "r": -2
        }
       }
      ]
@@ -974,11 +1107,10 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 30,
-        "r": 4,
-        "keys": []
+        "r": 4
        }
       }
      ]
@@ -998,9 +1130,7 @@
        "detail": {
         "c": 1,
         "r": 0,
-        "keys": [
-         "shift"
-        ]
+        "mods": 1
        }
       }
      ]
@@ -1019,10 +1149,7 @@
        "detail": {
         "c": 1,
         "r": 0,
-        "keys": [
-         "shift",
-         "ctrl"
-        ]
+        "mods": 5
        }
       }
      ]
@@ -1070,8 +1197,7 @@
        "t": "a",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1085,8 +1211,7 @@
        "t": "a",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       },
       {
@@ -1105,8 +1230,7 @@
        "t": "a",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1122,8 +1246,7 @@
        "t": "b",
        "detail": {
         "c": 4,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1137,8 +1260,7 @@
        "t": "b",
        "detail": {
         "c": 4,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1152,8 +1274,7 @@
        "t": "b",
        "detail": {
         "c": 4,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1169,8 +1290,7 @@
        "t": "a",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1186,8 +1306,7 @@
        "t": "b",
        "detail": {
         "c": 4,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1201,8 +1320,7 @@
        "t": "b",
        "detail": {
         "c": 4,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       },
       {
@@ -1373,8 +1491,7 @@
        "t": "a",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1390,8 +1507,7 @@
        "t": "b",
        "detail": {
         "c": 4,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1406,11 +1522,10 @@
       {
        "e": "dragend",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 4,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1443,8 +1558,7 @@
        "t": "a",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1460,11 +1574,10 @@
       {
        "e": "dragend",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1482,8 +1595,7 @@
        "t": "a",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1548,8 +1660,7 @@
        "detail": {
         "c": 4,
         "r": 0,
-        "x": 1,
-        "keys": []
+        "x": 1
        }
       }
      ]
@@ -1569,8 +1680,7 @@
        "detail": {
         "c": 5,
         "r": 0,
-        "x": 3,
-        "keys": []
+        "x": 3
        }
       }
      ]
@@ -1590,8 +1700,7 @@
        "detail": {
         "c": 7,
         "r": 0,
-        "x": 7,
-        "keys": []
+        "x": 7
        }
       }
      ]
@@ -1611,8 +1720,7 @@
        "detail": {
         "c": 7,
         "r": 1,
-        "x": 7,
-        "keys": []
+        "x": 7
        }
       }
      ]
@@ -1632,8 +1740,7 @@
        "detail": {
         "c": 10,
         "r": 1,
-        "x": 13,
-        "keys": []
+        "x": 13
        }
       }
      ]
@@ -1649,12 +1756,11 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 10,
         "r": 2,
-        "x": 13,
-        "keys": []
+        "x": 13
        }
       }
      ]
@@ -1670,12 +1776,11 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 13,
         "r": 2,
-        "x": 16,
-        "keys": []
+        "x": 16
        }
       }
      ]
@@ -1691,12 +1796,11 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 15,
         "r": 2,
-        "x": 16,
-        "keys": []
+        "x": 16
        }
       }
      ]
@@ -1712,12 +1816,11 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 1,
         "r": 2,
-        "x": 0,
-        "keys": []
+        "x": 0
        }
       }
      ]
@@ -1728,12 +1831,11 @@
       {
        "e": "dragend",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 1,
         "r": 2,
-        "x": 0,
-        "keys": []
+        "x": 0
        }
       }
      ]
@@ -1780,8 +1882,7 @@
        "detail": {
         "c": 1,
         "r": 0,
-        "y": 1,
-        "keys": []
+        "y": 1
        }
       }
      ]
@@ -1801,8 +1902,7 @@
        "detail": {
         "c": 1,
         "r": 1,
-        "y": 3,
-        "keys": []
+        "y": 3
        }
       }
      ]
@@ -1827,12 +1927,11 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 2,
         "r": 3,
-        "y": 4,
-        "keys": []
+        "y": 4
        }
       }
      ]
@@ -1843,12 +1942,11 @@
       {
        "e": "dragend",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 2,
         "r": 3,
-        "y": 4,
-        "keys": []
+        "y": 4
        }
       }
      ]
@@ -1871,8 +1969,7 @@
        "t": "bad",
        "detail": {
         "c": 1,
-        "r": 2,
-        "keys": []
+        "r": 2
        }
       }
      ]
@@ -1895,8 +1992,7 @@
        "t": "bad",
        "detail": {
         "c": 2,
-        "r": 2,
-        "keys": []
+        "r": 2
        }
       }
      ]
@@ -1944,8 +2040,7 @@
        "t": "card",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -1964,8 +2059,7 @@
        "t": "ada",
        "detail": {
         "c": 1,
-        "r": 1,
-        "keys": []
+        "r": 1
        }
       }
      ]
@@ -1985,7 +2079,6 @@
        "detail": {
         "c": 1,
         "r": 2,
-        "keys": [],
         "tx": 1,
         "ty": 0
        }
@@ -2016,7 +2109,6 @@
        "detail": {
         "c": 2,
         "r": 3,
-        "keys": [],
         "tx": 1,
         "ty": 1
        }
@@ -2038,7 +2130,6 @@
        "detail": {
         "c": 4,
         "r": 4,
-        "keys": [],
         "tx": 2,
         "ty": 2
        }
@@ -2055,7 +2146,6 @@
        "detail": {
         "c": 4,
         "r": 4,
-        "keys": [],
         "tx": 2,
         "ty": 2
        }
@@ -2106,8 +2196,7 @@
        "t": "row",
        "detail": {
         "c": 1,
-        "r": 5,
-        "keys": []
+        "r": 5
        }
       }
      ]
@@ -2121,8 +2210,7 @@
        "t": "pin",
        "detail": {
         "c": 1,
-        "r": 5,
-        "keys": []
+        "r": 5
        }
       },
       {
@@ -2218,8 +2306,7 @@
        "t": "a",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -2239,9 +2326,7 @@
        "detail": {
         "c": 4,
         "r": 0,
-        "keys": [
-         "alt"
-        ]
+        "mods": 2
        }
       }
      ]
@@ -2261,9 +2346,7 @@
        "detail": {
         "c": 1,
         "r": 0,
-        "keys": [
-         "alt"
-        ]
+        "mods": 2
        }
       }
      ]
@@ -2281,9 +2364,7 @@
        "detail": {
         "c": 1,
         "r": 0,
-        "keys": [
-         "alt"
-        ]
+        "mods": 2
        }
       },
       {
@@ -2318,7 +2399,8 @@
     {
      "send": {
       "a": "hide",
-      "s": "x"
+      "s": "x",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -2330,11 +2412,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "text",
-      "t": "p",
       "q": "2"
      },
-     "payload": "yo"
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "p",
+        "v": "yo"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -2348,7 +2436,8 @@
     {
      "send": {
       "a": "hide",
-      "s": "x"
+      "s": "x",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -2361,7 +2450,8 @@
       "a": "place",
       "s": "x",
       "c": "10",
-      "r": "2"
+      "r": "2",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -2398,11 +2488,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "append",
-      "t": "l",
       "q": "2"
      },
-     "payload": "<li id=c>c</li><li id=b>B</li>"
+     "body": {
+      "ops": [
+       {
+        "op": "append",
+        "t": "l",
+        "v": "<li id=c>c</li><li id=b>B</li>"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -2446,11 +2542,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "prepend",
-      "t": "l",
       "q": "2"
      },
-     "payload": "<li id=z>z</li>"
+     "body": {
+      "ops": [
+       {
+        "op": "prepend",
+        "t": "l",
+        "v": "<li id=z>z</li>"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -2489,11 +2591,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "morph",
-      "t": "p",
       "q": "2"
      },
-     "payload": "<p id=p class=b>new</p>"
+     "body": {
+      "ops": [
+       {
+        "op": "morph",
+        "t": "p",
+        "v": "<p id=p class=b>new</p>"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -2525,10 +2633,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "t": "p",
       "q": "2"
      },
-     "payload": "<p id=p>new</p>"
+     "body": {
+      "ops": [
+       {
+        "op": "morph",
+        "t": "p",
+        "v": "<p id=p>new</p>"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -2555,14 +2670,21 @@
     {
      "send": {
       "a": "delta",
-      "s": "x",
-      "op": "morph"
+      "s": "x"
      },
-     "payload": "<p id=p>P</p><p id=gone>g</p>",
+     "body": {
+      "ops": [
+       {
+        "op": "morph",
+        "v": "<p id=p>P</p><p id=gone>g</p>"
+       }
+      ]
+     },
      "reply": {
       "a": "err",
       "code": "ENOTARGET",
-      "detail": "gone"
+      "detail": "gone",
+      "i": "0"
      }
     },
     {
@@ -2600,11 +2722,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "morph",
-      "t": "p",
       "q": "2"
      },
-     "payload": "<i id=i1>1</i><i id=i2>2</i>"
+     "body": {
+      "ops": [
+       {
+        "op": "morph",
+        "t": "p",
+        "v": "<i id=i1>1</i><i id=i2>2</i>"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -2650,11 +2778,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "inner",
-      "t": "l",
       "q": "2"
      },
-     "payload": "<li id=k>K</li><li>2</li><li>3</li>"
+     "body": {
+      "ops": [
+       {
+        "op": "inner",
+        "t": "l",
+        "v": "<li id=k>K</li><li>2</li><li>3</li>"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -2698,11 +2832,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "replace",
-      "t": "p",
       "q": "2"
      },
-     "payload": "<h2 id=h>h</h2>"
+     "body": {
+      "ops": [
+       {
+        "op": "replace",
+        "t": "p",
+        "v": "<h2 id=h>h</h2>"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -2736,21 +2876,33 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "before",
-      "t": "p",
       "q": "2"
      },
-     "payload": "<i id=b>b</i>"
+     "body": {
+      "ops": [
+       {
+        "op": "before",
+        "t": "p",
+        "v": "<i id=b>b</i>"
+       }
+      ]
+     }
     },
     {
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "after",
-      "t": "p",
       "q": "2"
      },
-     "payload": "<i id=a>a</i>"
+     "body": {
+      "ops": [
+       {
+        "op": "after",
+        "t": "p",
+        "v": "<i id=a>a</i>"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -2781,9 +2933,15 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "remove",
-      "t": "p",
       "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "remove",
+        "t": "p"
+       }
+      ]
      }
     },
     {
@@ -2823,12 +2981,18 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "attr",
-      "t": "p",
-      "k": "data-x",
       "q": "2"
      },
-     "payload": "1"
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "p",
+        "k": "data-x",
+        "v": "1"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -2846,10 +3010,16 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "unattr",
-      "t": "p",
-      "k": "data-x",
       "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "unattr",
+        "t": "p",
+        "k": "data-x"
+       }
+      ]
      }
     },
     {
@@ -2866,14 +3036,21 @@
     {
      "send": {
       "a": "delta",
-      "s": "x",
-      "op": "attr",
-      "t": "p"
+      "s": "x"
      },
-     "payload": "1",
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "p",
+        "v": "1"
+       }
+      ]
+     },
      "reply": {
       "a": "err",
-      "code": "EINVAL"
+      "code": "EINVAL",
+      "i": "0"
      }
     }
    ]
@@ -2893,11 +3070,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "text",
-      "t": "p",
       "q": "2"
      },
-     "payload": "z"
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "p",
+        "v": "z"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -2926,11 +3109,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "append",
-      "t": "tb",
       "q": "2"
      },
-     "payload": "<tr id=r2><td>2</td></tr>"
+     "body": {
+      "ops": [
+       {
+        "op": "append",
+        "t": "tb",
+        "v": "<tr id=r2><td>2</td></tr>"
+       }
+      ]
+     }
     },
     {
      "inspect": [
@@ -3092,7 +3281,8 @@
     {
      "send": {
       "a": "del",
-      "s": "x"
+      "s": "x",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3103,11 +3293,17 @@
     {
      "send": {
       "a": "delta",
-      "s": "x",
-      "op": "text",
-      "t": "p"
+      "s": "x"
      },
-     "payload": "x",
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "p",
+        "v": "x"
+       }
+      ]
+     },
      "reply": {
       "a": "err",
       "code": "ENOENT"
@@ -3122,7 +3318,8 @@
      "send": {
       "a": "res",
       "id": "r",
-      "type": "text/css"
+      "type": "text/css",
+      "q": "0"
      },
      "payload": "p{}",
      "reply": {
@@ -3133,7 +3330,8 @@
     {
      "send": {
       "a": "del",
-      "id": "r"
+      "id": "r",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3191,7 +3389,8 @@
     {
      "send": {
       "a": "detach",
-      "s": "x"
+      "s": "x",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3223,7 +3422,8 @@
     {
      "send": {
       "a": "detach",
-      "s": "x"
+      "s": "x",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3276,7 +3476,8 @@
      "send": {
       "a": "focus",
       "s": "x",
-      "t": "i"
+      "t": "i",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3286,7 +3487,8 @@
     {
      "send": {
       "a": "detach",
-      "s": "x"
+      "s": "x",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3309,10 +3511,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "text",
-      "t": "p"
+      "q": "0"
      },
-     "payload": "yo",
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "p",
+        "v": "yo"
+       }
+      ]
+     },
      "reply": {
       "a": "ok",
       "re": "delta"
@@ -3332,7 +3541,8 @@
       "a": "place",
       "s": "x",
       "c": "20",
-      "r": "3"
+      "r": "3",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3359,7 +3569,8 @@
      "send": {
       "a": "doc",
       "s": "x",
-      "d": "1"
+      "d": "1",
+      "q": "0"
      },
      "payload": "<form><input id=i><button id=b>go</button></form>",
      "reply": {
@@ -3399,7 +3610,8 @@
      "send": {
       "a": "focus",
       "s": "x",
-      "t": "i"
+      "t": "i",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3506,8 +3718,7 @@
        "t": "h",
        "detail": {
         "c": 4,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -3521,11 +3732,10 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -3537,11 +3747,10 @@
       {
        "e": "dragend",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -3565,7 +3774,8 @@
       "s": "x",
       "c": "20",
       "r": "1",
-      "f": "1"
+      "f": "1",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3603,7 +3813,8 @@
       "s": "x",
       "c": "20",
       "r": "auto",
-      "f": "1"
+      "f": "1",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3617,12 +3828,18 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "var",
-      "t": "d",
-      "k": "n",
       "q": "2"
      },
-     "payload": "4",
+     "body": {
+      "ops": [
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "4"
+       }
+      ]
+     },
      "events": [
       {
        "e": "fit",
@@ -3637,24 +3854,36 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "var",
-      "t": "d",
-      "k": "n",
       "q": "2"
      },
-     "payload": "4",
+     "body": {
+      "ops": [
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "4"
+       }
+      ]
+     },
      "events": []
     },
     {
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "var",
-      "t": "d",
-      "k": "n",
       "q": "2"
      },
-     "payload": "1",
+     "body": {
+      "ops": [
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "1"
+       }
+      ]
+     },
      "events": [
       {
        "e": "fit",
@@ -3684,7 +3913,8 @@
       "s": "x",
       "c": "20",
       "r": "auto",
-      "f": "1"
+      "f": "1",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3715,7 +3945,7 @@
    ]
   },
   {
-   "name": "without f=1 nothing is heard; placing again without it stops fit, and with it starts from the new placement's rows",
+   "name": "without f=1 nothing is heard; f=1 holds on the surface: placing again without it goes on hearing fit, f=0 stops it, and a placement starts from its own rows (SPEC \u00a75.2)",
    "steps": [
     {
      "send": {
@@ -3730,7 +3960,8 @@
       "a": "place",
       "s": "x",
       "c": "20",
-      "r": "auto"
+      "r": "auto",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3743,12 +3974,18 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "var",
-      "t": "d",
-      "k": "n",
       "q": "2"
      },
-     "payload": "3",
+     "body": {
+      "ops": [
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "3"
+       }
+      ]
+     },
      "events": []
     },
     {
@@ -3757,7 +3994,8 @@
       "s": "x",
       "c": "20",
       "r": "3",
-      "f": "1"
+      "f": "1",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3773,7 +4011,8 @@
       "a": "place",
       "s": "x",
       "c": "20",
-      "r": "3"
+      "r": "3",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3781,18 +4020,69 @@
       "s": "x",
       "c": "20",
       "r": "3"
-     }
+     },
+     "events": []
     },
     {
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "var",
-      "t": "d",
-      "k": "n",
       "q": "2"
      },
-     "payload": "6",
+     "body": {
+      "ops": [
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "6"
+       }
+      ]
+     },
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "detail": {
+        "r": 6
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "f": "0",
+      "q": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "4"
+       }
+      ]
+     },
      "events": []
     },
     {
@@ -3801,7 +4091,8 @@
       "s": "x",
       "c": "20",
       "r": "2",
-      "f": "1"
+      "f": "1",
+      "q": "0"
      },
      "reply": {
       "a": "ok",
@@ -3815,7 +4106,7 @@
        "e": "fit",
        "s": "x",
        "detail": {
-        "r": 6
+        "r": 4
        }
       }
      ]
@@ -3884,7 +4175,7 @@
       {
        "e": "hover",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 3,
         "r": 2
@@ -3922,7 +4213,7 @@
       {
        "e": "hover",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "out": true
        }
@@ -3963,7 +4254,7 @@
       {
        "e": "hover",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "out": true
        }
@@ -3973,7 +4264,7 @@
    ]
   },
   {
-   "name": "without v=1 nothing is heard; v=1 starts from out and lives with the placement: placing again with it goes on, without it or hidden it stops",
+   "name": "without v=1 nothing is heard; v=1 holds on the surface and starts from out: placing again without it goes on, v=0 or hidden stops hover, and drawn again it goes on from what the program last heard, not from out (SPEC \u00a75.2, \u00a79.4)",
    "requires": "hover",
    "steps": [
     {
@@ -4089,6 +4380,36 @@
       3,
       3
      ],
+     "events": [
+      {
+       "e": "hover",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 3,
+        "r": 3
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "v": "0",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      1
+     ],
      "events": []
     },
     {
@@ -4137,6 +4458,53 @@
       1
      ],
      "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      3
+     ],
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      3
+     ],
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      1
+     ],
+     "events": [
+      {
+       "e": "hover",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 3,
+        "r": 1
+       }
+      }
+     ]
     }
    ]
   },
@@ -4191,8 +4559,7 @@
        "t": "a",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -4208,11 +4575,10 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 1,
-        "r": 1,
-        "keys": []
+        "r": 1
        }
       }
      ]
@@ -4228,11 +4594,10 @@
       {
        "e": "drag",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 1,
-        "r": 2,
-        "keys": []
+        "r": 2
        }
       }
      ]
@@ -4243,11 +4608,10 @@
       {
        "e": "dragend",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "c": 1,
-        "r": 2,
-        "keys": []
+        "r": 2
        }
       },
       {
@@ -4308,7 +4672,7 @@
       {
        "e": "hover",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "out": true
        }
@@ -4395,8 +4759,7 @@
        "t": "h",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -4416,8 +4779,7 @@
        "t": "n",
        "detail": {
         "c": 6,
-        "r": 1,
-        "keys": []
+        "r": 1
        }
       }
      ]
@@ -4437,8 +4799,7 @@
        "t": "h",
        "detail": {
         "c": 6,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -4452,8 +4813,7 @@
        "t": "h",
        "detail": {
         "c": 6,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       },
       {
@@ -4598,7 +4958,7 @@
       {
        "e": "hover",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "out": true
        }
@@ -4717,7 +5077,7 @@
       {
        "e": "hover",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "out": true
        }
@@ -4744,7 +5104,7 @@
       {
        "e": "hover",
        "s": "y",
-       "t": "",
+       "t": null,
        "detail": {
         "out": true
        }
@@ -4779,7 +5139,7 @@
       {
        "e": "hover",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "out": true
        }
@@ -4865,7 +5225,7 @@
       {
        "e": "hover",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "out": true
        }
@@ -4895,7 +5255,7 @@
    ]
   },
   {
-   "name": "view: once placed, a document hears which of its elements with data-on~=view and an id are in view, each by its id with its whole area, and whether it shows its end; then only what changes; hiding stops it, placing again sends one first, and a new document with none that asks sends none (SPEC \u00a79.5)",
+   "name": "view: once placed, a document hears which of its elements with data-on~=view and an id are in view, each by its id with its whole area, and whether it shows its end; then only what changes; hiding stops it, placing again sends one if what it carries differs from what the program last heard, and a new document with none that asks sends none (SPEC \u00a79.5)",
    "requires": "view",
    "steps": [
     {
@@ -4919,7 +5279,7 @@
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "a": {
@@ -4944,26 +5304,38 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "text",
-      "t": "a",
       "q": "2"
      },
-     "payload": "A",
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "a",
+        "v": "A"
+       }
+      ]
+     },
      "events": []
     },
     {
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "remove",
-      "t": "b",
       "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "remove",
+        "t": "b"
+       }
+      ]
      },
      "events": [
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "a": {
@@ -4994,16 +5366,22 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "unattr",
-      "t": "e",
-      "k": "style",
       "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "unattr",
+        "t": "e",
+        "k": "style"
+       }
+      ]
      },
      "events": [
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "a": {
@@ -5042,9 +5420,15 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "remove",
-      "t": "a",
       "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "remove",
+        "t": "a"
+       }
+      ]
      },
      "events": []
     },
@@ -5060,7 +5444,7 @@
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "d": {
@@ -5089,6 +5473,24 @@
     },
     {
      "send": {
+      "a": "hide",
+      "s": "x",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
       "a": "doc",
       "s": "x",
       "q": "2"
@@ -5107,7 +5509,7 @@
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "z": {
@@ -5150,7 +5552,7 @@
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "b": {
@@ -5185,7 +5587,7 @@
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "t": {
@@ -5329,7 +5731,7 @@
       {
        "e": "press",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": null
       }
      ]
@@ -5447,7 +5849,7 @@
       {
        "e": "focus",
        "s": "x",
-       "t": ""
+       "t": null
       }
      ]
     },
@@ -5457,7 +5859,7 @@
       {
        "e": "click",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "href": "next",
         "area": {
@@ -6230,23 +6632,35 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "text",
-      "t": "a",
       "q": "2"
      },
-     "payload": "A",
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "a",
+        "v": "A"
+       }
+      ]
+     },
      "events": []
     },
     {
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "attr",
-      "t": "j",
-      "k": "title",
       "q": "2"
      },
-     "payload": "last",
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "j",
+        "k": "title",
+        "v": "last"
+       }
+      ]
+     },
      "events": []
     },
     {
@@ -6600,7 +7014,7 @@
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "a": {
@@ -6619,16 +7033,22 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "e",
       "q": "2"
      },
-     "payload": "start",
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "e",
+        "v": "start"
+       }
+      ]
+     },
      "events": [
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "e": {
@@ -6647,16 +7067,22 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "e",
       "q": "2"
      },
-     "payload": "end",
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "e",
+        "v": "end"
+       }
+      ]
+     },
      "events": [
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "e": {
@@ -6675,9 +7101,15 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "e",
       "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "e"
+       }
+      ]
      },
      "events": []
     },
@@ -6685,15 +7117,21 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "j",
       "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "j"
+       }
+      ]
      },
      "events": [
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "j": {
@@ -6712,15 +7150,21 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "e",
       "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "e"
+       }
+      ]
      },
      "events": [
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "e": {
@@ -6739,16 +7183,22 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "a",
       "q": "2"
      },
-     "payload": "start",
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "a",
+        "v": "start"
+       }
+      ]
+     },
      "events": [
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "a": {
@@ -6793,7 +7243,7 @@
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "a": {
@@ -6812,16 +7262,22 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "i3",
       "q": "2"
      },
-     "payload": "start",
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "i3",
+        "v": "start"
+       }
+      ]
+     },
      "events": [
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "i3": {
@@ -6840,15 +7296,21 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "a",
       "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "a"
+       }
+      ]
      },
      "events": [
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "a": {
@@ -6873,16 +7335,22 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "i3",
       "q": "2"
      },
-     "payload": "end",
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "i3",
+        "v": "end"
+       }
+      ]
+     },
      "events": [
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "i3": {
@@ -6923,7 +7391,7 @@
       {
        "e": "view",
        "s": "x",
-       "t": "",
+       "t": null,
        "detail": {
         "in": {
          "a": {
@@ -6942,9 +7410,15 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "j",
       "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "j"
+       }
+      ]
      },
      "events": []
     },
@@ -6952,22 +7426,34 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "j",
       "q": "2"
      },
-     "payload": "start",
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "j",
+        "v": "start"
+       }
+      ]
+     },
      "events": []
     },
     {
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "reveal",
-      "t": "j",
       "q": "2"
      },
-     "payload": "end",
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "j",
+        "v": "end"
+       }
+      ]
+     },
      "events": []
     }
    ]
@@ -7339,12 +7825,18 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "attr",
-      "t": "a",
-      "k": "value",
       "q": "2"
      },
-     "payload": "zzz",
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "a",
+        "k": "value",
+        "v": "zzz"
+       }
+      ]
+     },
      "events": []
     },
     {
@@ -7365,10 +7857,16 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "unattr",
-      "t": "a",
-      "k": "value",
       "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "unattr",
+        "t": "a",
+        "k": "value"
+       }
+      ]
      },
      "events": []
     },
@@ -7376,11 +7874,17 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "morph",
-      "t": "a",
       "q": "2"
      },
-     "payload": "<input id=a data-on=input value=q>",
+     "body": {
+      "ops": [
+       {
+        "op": "morph",
+        "t": "a",
+        "v": "<input id=a data-on=input value=q>"
+       }
+      ]
+     },
      "events": []
     },
     {
@@ -7401,12 +7905,18 @@
      "send": {
       "a": "delta",
       "s": "x",
-      "op": "attr",
-      "t": "b",
-      "k": "value",
       "q": "2"
      },
-     "payload": "x",
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "b",
+        "k": "value",
+        "v": "x"
+       }
+      ]
+     },
      "events": []
     },
     {
@@ -7527,7 +8037,7 @@
       {
        "e": "blur",
        "s": "x",
-       "t": ""
+       "t": null
       }
      ]
     },
@@ -7696,7 +8206,7 @@
       {
        "e": "blur",
        "s": "x",
-       "t": ""
+       "t": null
       }
      ]
     },
@@ -8353,7 +8863,7 @@
       {
        "e": "blur",
        "s": "x",
-       "t": ""
+       "t": null
       }
      ]
     }
@@ -9123,7 +9633,12 @@
        "s": "x",
        "t": "f",
        "detail": {
-        "q": "hi"
+        "fields": [
+         [
+          "q",
+          "hi"
+         ]
+        ]
        }
       }
      ]
@@ -10072,8 +10587,7 @@
        "t": "row",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -10087,8 +10601,7 @@
        "t": "row",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       },
       {
@@ -10116,8 +10629,7 @@
        "t": "row",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       }
      ]
@@ -10132,8 +10644,7 @@
        "t": "row",
        "detail": {
         "c": 1,
-        "r": 0,
-        "keys": []
+        "r": 0
        }
       },
       {
@@ -10151,431 +10662,6 @@
        }
       }
      ]
-    }
-   ]
-  },
-  {
-   "name": "a key sequence clicks its element; its keys are the surface's, and a key that does not go on lets the keys typed go on in order (SPEC \u00a710.5)",
-   "requires": "keys",
-   "steps": [
-    {
-     "send": {
-      "a": "doc",
-      "s": "x",
-      "q": "2"
-     },
-     "payload": "<style>body{margin:0}button,input,div[tabindex]{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}[hidden]{display:none}</style><button id=k>k</button><button id=top data-key=\"g g\">top</button>"
-    },
-    {
-     "send": {
-      "a": "place",
-      "s": "x",
-      "c": "20",
-      "r": "6",
-      "q": "2"
-     }
-    },
-    {
-     "send": {
-      "a": "focus",
-      "s": "x",
-      "t": "k",
-      "q": "2"
-     },
-     "events": []
-    },
-    {
-     "key": "g",
-     "terminal": false,
-     "events": []
-    },
-    {
-     "key": "g",
-     "terminal": false,
-     "events": [
-      {
-       "e": "click",
-       "s": "x",
-       "t": "top",
-       "detail": {
-        "area": {
-         "c": 0,
-         "r": 1,
-         "w": 4,
-         "h": 1
-        }
-       }
-      }
-     ]
-    },
-    {
-     "key": "g",
-     "terminal": false,
-     "events": []
-    },
-    {
-     "key": "x",
-     "terminal": true,
-     "events": []
-    },
-    {
-     "key": "g",
-     "terminal": false,
-     "events": []
-    },
-    {
-     "key": "Escape",
-     "terminal": false,
-     "events": []
-    },
-    {
-     "key": "x",
-     "terminal": true,
-     "events": []
-    }
-   ]
-  },
-  {
-   "name": "a group's sequence leads to those inside it, and the leader is the host's (SPEC \u00a710.5)",
-   "requires": "keys",
-   "steps": [
-    {
-     "send": {
-      "a": "doc",
-      "s": "x",
-      "q": "2"
-     },
-     "payload": "<style>body{margin:0}button,input,div[tabindex]{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}[hidden]{display:none}</style><div id=k tabindex=0>k</div><menu data-key=\"<leader> f\" aria-label=File><button id=new data-key=n>new</button><button id=open data-key=o>open</button></menu>"
-    },
-    {
-     "send": {
-      "a": "place",
-      "s": "x",
-      "c": "20",
-      "r": "6",
-      "q": "2"
-     }
-    },
-    {
-     "send": {
-      "a": "focus",
-      "s": "x",
-      "t": "k",
-      "q": "2"
-     },
-     "events": []
-    },
-    {
-     "key": " ",
-     "terminal": false,
-     "events": []
-    },
-    {
-     "key": "f",
-     "terminal": false,
-     "events": []
-    },
-    {
-     "key": "o",
-     "terminal": false,
-     "events": [
-      {
-       "e": "click",
-       "s": "x",
-       "t": "open",
-       "detail": {
-        "area": {
-         "c": 0,
-         "r": 2,
-         "w": 4,
-         "h": 1
-        }
-       }
-      }
-     ]
-    },
-    {
-     "key": " ",
-     "terminal": false,
-     "events": []
-    },
-    {
-     "key": "f",
-     "terminal": false,
-     "events": []
-    },
-    {
-     "key": "n",
-     "terminal": false,
-     "events": [
-      {
-       "e": "click",
-       "s": "x",
-       "t": "new",
-       "detail": {
-        "area": {
-         "c": 0,
-         "r": 1,
-         "w": 4,
-         "h": 1
-        }
-       }
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "name": "the focused element keeps the keys it uses: Space presses a button, and a field types (SPEC \u00a710.5)",
-   "requires": "keys",
-   "steps": [
-    {
-     "send": {
-      "a": "doc",
-      "s": "x",
-      "q": "2"
-     },
-     "payload": "<style>body{margin:0}button,input,div[tabindex]{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}[hidden]{display:none}</style><button id=k>k</button><input id=i data-on=input><button id=b data-key=\"<leader> b\">b</button><button id=g data-key=\"g\">g</button>"
-    },
-    {
-     "send": {
-      "a": "place",
-      "s": "x",
-      "c": "20",
-      "r": "6",
-      "q": "2"
-     }
-    },
-    {
-     "send": {
-      "a": "focus",
-      "s": "x",
-      "t": "k",
-      "q": "2"
-     },
-     "events": []
-    },
-    {
-     "key": " ",
-     "terminal": false,
-     "events": [
-      {
-       "e": "click",
-       "s": "x",
-       "t": "k",
-       "detail": {
-        "area": {
-         "c": 0,
-         "r": 0,
-         "w": 4,
-         "h": 1
-        }
-       }
-      }
-     ]
-    },
-    {
-     "send": {
-      "a": "focus",
-      "s": "x",
-      "t": "i",
-      "q": "2"
-     },
-     "events": []
-    },
-    {
-     "key": "g",
-     "terminal": false,
-     "events": [
-      {
-       "e": "input",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "value": "g"
-       }
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "name": "of two elements with one sequence, the one nearest the focus wins; a disabled element's does nothing, a hidden one's clicks with no area, and one that takes focus is focused (SPEC \u00a710.5)",
-   "requires": "keys",
-   "steps": [
-    {
-     "send": {
-      "a": "doc",
-      "s": "x",
-      "q": "2"
-     },
-     "payload": "<style>body{margin:0}button,input,div[tabindex]{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}[hidden]{display:none}</style><div><button id=a data-key=x>a</button></div><div><button id=f>f</button><button id=b data-key=x>b</button></div><button id=d disabled data-key=z>d</button><button id=h hidden data-key=h>h</button><input id=i data-key=\"/\">"
-    },
-    {
-     "send": {
-      "a": "place",
-      "s": "x",
-      "c": "20",
-      "r": "6",
-      "q": "2"
-     }
-    },
-    {
-     "send": {
-      "a": "focus",
-      "s": "x",
-      "t": "f",
-      "q": "2"
-     },
-     "events": []
-    },
-    {
-     "key": "x",
-     "terminal": false,
-     "events": [
-      {
-       "e": "click",
-       "s": "x",
-       "t": "b",
-       "detail": {
-        "area": {
-         "c": 0,
-         "r": 2,
-         "w": 4,
-         "h": 1
-        }
-       }
-      }
-     ]
-    },
-    {
-     "send": {
-      "a": "focus",
-      "s": "x",
-      "t": "a",
-      "q": "2"
-     },
-     "events": []
-    },
-    {
-     "key": "x",
-     "terminal": false,
-     "events": [
-      {
-       "e": "click",
-       "s": "x",
-       "t": "a",
-       "detail": {
-        "area": {
-         "c": 0,
-         "r": 0,
-         "w": 4,
-         "h": 1
-        }
-       }
-      }
-     ]
-    },
-    {
-     "key": "z",
-     "terminal": false,
-     "events": []
-    },
-    {
-     "key": "h",
-     "terminal": false,
-     "events": [
-      {
-       "e": "click",
-       "s": "x",
-       "t": "h",
-       "detail": {
-        "area": {
-         "c": 0,
-         "r": 0,
-         "w": 0,
-         "h": 0
-        }
-       }
-      }
-     ]
-    },
-    {
-     "key": "/",
-     "terminal": false,
-     "events": [
-      {
-       "e": "focus",
-       "s": "x",
-       "t": "i"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "name": "a sequence that finishes one and goes on to a longer one waits; a key the keymap gives the program never starts one, and an invalid data-key is ignored (SPEC \u00a710.5)",
-   "requires": "keys",
-   "steps": [
-    {
-     "send": {
-      "a": "doc",
-      "s": "x",
-      "q": "2"
-     },
-     "payload": "<style>body{margin:0}button,input,div[tabindex]{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}menu{margin:0;padding:0}[hidden]{display:none}</style><div data-keys=\"p=program\"><button id=k>k</button><button id=g1 data-key=g>g</button><button id=g2 data-key=\"g g\">gg</button><button id=p data-key=p>p</button><button id=t data-key=\"t Tab\">t</button></div>"
-    },
-    {
-     "send": {
-      "a": "place",
-      "s": "x",
-      "c": "20",
-      "r": "6",
-      "q": "2"
-     }
-    },
-    {
-     "send": {
-      "a": "focus",
-      "s": "x",
-      "t": "k",
-      "q": "2"
-     },
-     "events": []
-    },
-    {
-     "key": "g",
-     "terminal": false,
-     "events": []
-    },
-    {
-     "key": "g",
-     "terminal": false,
-     "events": [
-      {
-       "e": "click",
-       "s": "x",
-       "t": "g2",
-       "detail": {
-        "area": {
-         "c": 0,
-         "r": 2,
-         "w": 4,
-         "h": 1
-        }
-       }
-      }
-     ]
-    },
-    {
-     "key": "p",
-     "terminal": true,
-     "events": []
-    },
-    {
-     "key": "t",
-     "terminal": true,
-     "events": []
     }
    ]
   },
@@ -10646,6 +10732,1775 @@
      "events": []
     }
    ]
+  },
+  {
+   "name": "a delta's ops apply in order, as one: its reply, numbered, is one ok (SPEC \u00a76.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}p{margin:0}</style><p id=a>1</p><p id=b>2</p><p id=c>3</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "1"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "a",
+        "v": "one"
+       },
+       {
+        "op": "attr",
+        "t": "b",
+        "k": "class",
+        "v": "on"
+       },
+       {
+        "op": "after",
+        "t": "c",
+        "v": "<p id=d>4</p>"
+       },
+       {
+        "op": "remove",
+        "t": "a"
+       },
+       {
+        "op": "append",
+        "t": "d",
+        "v": "<i id=e>!</i>"
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "1",
+      "re": "delta",
+      "s": "x"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "a"
+     ],
+     "expect": null
+    },
+    {
+     "inspect": [
+      "x",
+      "b"
+     ],
+     "expect": {
+      "tag": "p",
+      "attrs": {
+       "id": "b",
+       "class": "on"
+      },
+      "text": "2"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "d"
+     ],
+     "expect": {
+      "tag": "p",
+      "text": "4!",
+      "children": [
+       [
+        "i",
+        "e",
+        "!"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "an op whose target is missing fails alone: the ops after it still apply, and the reply names it by its index, i, though the command asked for nothing (SPEC \u00a76.1, \u00a73.6)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=a>1</p><p id=b>2</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "a",
+        "v": "x"
+       },
+       {
+        "op": "text",
+        "t": "zz",
+        "v": "y"
+       },
+       {
+        "op": "text",
+        "t": "b",
+        "v": "z"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "re": "delta",
+      "s": "x",
+      "i": "1",
+      "code": "ENOTARGET",
+      "detail": "zz"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "a"
+     ],
+     "expect": {
+      "text": "x"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "b"
+     ],
+     "expect": {
+      "text": "z"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "morph",
+        "v": "<p id=b>w</p><p id=yy>.</p>"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "re": "delta",
+      "s": "x",
+      "i": "0",
+      "code": "ENOTARGET",
+      "detail": "yy"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "b"
+     ],
+     "expect": {
+      "text": "w"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a delta is checked whole before any op applies: an unknown op, a missing t or k, a bad reveal, an op that is no map, no ops, or a body that is no list of ops is EINVAL, and i names the first op at fault where one is (SPEC \u00a76.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=a>1</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "1"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "a",
+        "v": "x"
+       },
+       {
+        "op": "frob",
+        "t": "a"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "n": "1",
+      "re": "delta",
+      "i": "1",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "a",
+        "v": "x"
+       },
+       {
+        "op": "attr",
+        "t": "a",
+        "v": "y"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "n": "2",
+      "re": "delta",
+      "i": "1",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "3"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "a",
+        "v": "x"
+       },
+       {
+        "op": "text",
+        "v": "y"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "n": "3",
+      "re": "delta",
+      "i": "1",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "4"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "a",
+        "v": "middle"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "n": "4",
+      "re": "delta",
+      "i": "0",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "5"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "a",
+        "v": "x"
+       },
+       "text"
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "n": "5",
+      "re": "delta",
+      "i": "1",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "6"
+     },
+     "body": {
+      "ops": []
+     },
+     "reply": {
+      "a": "err",
+      "n": "6",
+      "re": "delta",
+      "i": null,
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "7"
+     },
+     "body": {
+      "op": "text",
+      "t": "a",
+      "v": "x"
+     },
+     "reply": {
+      "a": "err",
+      "n": "7",
+      "re": "delta",
+      "i": null,
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "8"
+     },
+     "body": [
+      "text",
+      "a",
+      "x"
+     ],
+     "reply": {
+      "a": "err",
+      "n": "8",
+      "re": "delta",
+      "i": null,
+      "code": "EINVAL"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "a"
+     ],
+     "expect": {
+      "text": "1"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "9"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "a",
+        "v": "y"
+       },
+       {
+        "op": "remove",
+        "t": "a",
+        "v": "ignored",
+        "x-vendor-key": "also"
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "9",
+      "re": "delta"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "a"
+     ],
+     "expect": null
+    }
+   ]
+  },
+  {
+   "name": "a delta's target travels as the document has it, so an id outside ASCII is addressed as it is (SPEC \u00a76.1, \u00a73.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=caf\u00e9>1</p><p id=\"a:b;c\">2</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "1"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "caf\u00e9",
+        "v": "Go"
+       },
+       {
+        "op": "text",
+        "t": "a:b;c",
+        "v": "on"
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "1",
+      "re": "delta"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "caf\u00e9"
+     ],
+     "expect": {
+      "text": "Go"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "a:b;c"
+     ],
+     "expect": {
+      "text": "on"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a delta's ops are one unit: the host never shows a state between them, so fit hears only the last (SPEC \u00a76.1, \u00a75.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><div id=d style=\"height: calc(var(--n, 2) * var(--hotty-cell-h))\"></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2",
+      "f": "1"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "4"
+       },
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "3"
+       }
+      ]
+     },
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "r": 3
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "5"
+       },
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "3"
+       }
+      ]
+     },
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a command without q is answered only with an error, unless it has n; a query always is (SPEC \u00a73.5, \u00a73.6)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x"
+     },
+     "payload": "<style>body{margin:0}p{margin:0}</style><p id=a>1</p>",
+     "reply": null
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "auto"
+     },
+     "reply": null
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "auto",
+      "n": "5"
+     },
+     "reply": {
+      "a": "ok",
+      "n": "5",
+      "re": "place",
+      "s": "x",
+      "c": "10",
+      "r": "1"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "auto",
+      "n": "6",
+      "q": "1"
+     },
+     "reply": null
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "zz",
+        "v": "y"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "re": "delta",
+      "s": "x",
+      "i": "0",
+      "code": "ENOTARGET"
+     }
+    },
+    {
+     "send": {
+      "a": "hide",
+      "s": "nope"
+     },
+     "reply": {
+      "a": "err",
+      "re": "hide",
+      "s": "nope",
+      "code": "ENOENT"
+     }
+    },
+    {
+     "send": {
+      "a": "hide",
+      "s": "nope",
+      "q": "2"
+     },
+     "reply": null
+    },
+    {
+     "send": {
+      "a": "blur",
+      "s": "x"
+     },
+     "reply": null
+    }
+   ]
+  },
+  {
+   "name": "p belongs to the surface: placing again without it keeps the presses coming, and p=0 stops them (SPEC \u00a75.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}p{margin:0}</style><p id=p>hi</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "p",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "p",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 30,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "p",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "p",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 30,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "p",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      20,
+      3
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": null,
+       "detail": null
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "v belongs to the surface: hover goes on across placements until v=0, starts from out when turned on, and a surface hidden sends none and goes on from what the program last heard (SPEC \u00a75.2, \u00a79.4)",
+   "requires": "hover",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h)}#a{height:calc(2*var(--hotty-cell-h))}</style><div id=a><i>x</i></div><div></div><div id=b></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      1
+     ],
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2",
+      "v": "1"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      3
+     ],
+     "events": [
+      {
+       "e": "hover",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 3,
+        "r": 3
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      1
+     ],
+     "events": [
+      {
+       "e": "hover",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 3,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      3
+     ],
+     "events": [
+      {
+       "e": "hover",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 3,
+        "r": 3
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2",
+      "v": "0"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      1
+     ],
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2",
+      "v": "1"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      0
+     ],
+     "events": [
+      {
+       "e": "hover",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "c": 3,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "hide",
+      "s": "x",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      3
+     ],
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      1
+     ],
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      3,
+      3
+     ],
+     "events": [
+      {
+       "e": "hover",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "c": 3,
+        "r": 3
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "f belongs to the surface: a placement without it keeps fit, counted from its own rows, and f=0 stops it (SPEC \u00a75.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><div id=d style=\"height: calc(var(--n, 2) * var(--hotty-cell-h))\"></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2",
+      "f": "1"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "3"
+       }
+      ]
+     },
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "r": 3
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "5"
+       }
+      ]
+     },
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "r": 5
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2",
+      "f": "0"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "var",
+        "t": "d",
+        "k": "n",
+        "v": "1"
+       }
+      ]
+     },
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a key the keymap binds to prefix reaches the program, and so does every key after it, whatever is focused, Space, Tab and Escape too, until the program sends a=focus, with or without t (SPEC \u00a710.5)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><button id=b data-keys=\"g=prefix\">B</button><button id=c>C</button>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Escape",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b"
+      }
+     ]
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "c"
+      }
+     ]
+    },
+    {
+     "key": "g",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "c"
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "c",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "c"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a prefix in a text field: the field takes no key after it, typing nor editing, until the program gives the keys back (SPEC \u00a710.5, \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<input id=f data-on=input data-keys=\"Control+k=prefix\">"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "f",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "a",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "value": "a"
+       }
+      }
+     ]
+    },
+    {
+     "key": "k",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "b",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Backspace",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "ArrowLeft",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "f",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "c",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "value": "ac"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a prefix ends when the surface loses the keyboard, and when the user focuses an element with a press (SPEC \u00a710.5)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><button id=b data-keys=\"g=prefix\">B</button><button id=c>C</button>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "blur",
+      "s": "x",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "blur",
+       "s": "x",
+       "t": null
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b"
+      }
+     ]
+    },
+    {
+     "key": "g",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "c",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "c"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 1,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "c"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a click carries the modifier keys held at its release, a press those at the press, as bits, left out when none is (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b{position:absolute;display:block;font-weight:normal}</style><b id=b data-on=click style=\"left:calc(2*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w));height:calc(2*var(--hotty-cell-h))\">B</b>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "4",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "keys": [
+      "shift"
+     ],
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "area": {
+         "c": 2,
+         "r": 1,
+         "w": 3,
+         "h": 2
+        },
+        "mods": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "keys": [
+      "shift",
+      "alt"
+     ],
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "area": {
+         "c": 2,
+         "r": 1,
+         "w": 3,
+         "h": 2
+        },
+        "mods": 3
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "area": {
+         "c": 2,
+         "r": 1,
+         "w": 3,
+         "h": 2
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "area": {
+         "c": 2,
+         "r": 1,
+         "w": 3,
+         "h": 2
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a submit carries the form's fields as pairs of a name and a value, in tree order, two of one name as two (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<form id=f><input type=checkbox id=x1 name=x value=a checked><input type=checkbox id=x2 name=x value=b checked><input type=checkbox id=x3 name=x value=c><input id=t name=q value=hi data-keys=\"Control+s=submit\"></form>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "s",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "submit",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "fields": [
+         [
+          "x",
+          "a"
+         ],
+         [
+          "x",
+          "b"
+         ],
+         [
+          "q",
+          "hi"
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a=menu shows a level, a=menu with no body hides it, and a body that is no level is EINVAL (SPEC \u00a710.5)",
+   "requires": "menu",
+   "steps": [
+    {
+     "send": {
+      "a": "menu",
+      "n": "1"
+     },
+     "body": {
+      "seq": [
+       "Space"
+      ],
+      "label": "Leader",
+      "items": [
+       {
+        "key": "f",
+        "label": "+file",
+        "group": true,
+        "enabled": true
+       },
+       {
+        "key": "q",
+        "label": "Quit",
+        "enabled": true
+       },
+       {
+        "key": "w",
+        "enabled": false
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "1",
+      "re": "menu"
+     }
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "2"
+     },
+     "reply": {
+      "a": "ok",
+      "n": "2",
+      "re": "menu"
+     }
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "3"
+     },
+     "body": [
+      "Space"
+     ],
+     "reply": {
+      "a": "err",
+      "n": "3",
+      "re": "menu",
+      "code": "EINVAL"
+     }
+    }
+   ]
   }
  ],
  "wire": [
@@ -10707,14 +12562,14 @@
   },
   {
    "name": "payloads are UTF-8",
-   "stream": "\u001b]7279;a=delta:s=x:op=text:t=p;4oiRIG9rIOKAlCDDvA==\u001b\\",
+   "stream": "\u001b]7279;a=doc:s=x;PHA+4oiRIG9rIOKAlCDDvDwvcD4=\u001b\\",
    "commands": [
     {
      "control": {
-      "a": "delta",
-      "op": "text"
+      "a": "doc",
+      "s": "x"
      },
-     "payload": "\u2211 ok \u2014 \u00fc"
+     "payload": "<p>\u2211 ok \u2014 \u00fc</p>"
     }
    ],
    "invalid": 0
@@ -10733,7 +12588,7 @@
       "control": {
        "a": "q",
        "n": "1",
-       "v": "0.2"
+       "v": "0.3"
       }
      }
     },
@@ -10757,7 +12612,7 @@
       "control": {
        "a": "q",
        "n": "1",
-       "v": "0.2",
+       "v": "0.3",
        "late": "1"
       }
      }
@@ -10783,7 +12638,7 @@
    ]
   },
   {
-   "name": "doc answers only errors by default (q=1)",
+   "name": "doc answers only errors by default, which the wire says without a q (SPEC \u00a73.5)",
    "build": "doc",
    "args": {
     "surface": "card",
@@ -10794,8 +12649,7 @@
      "cmd": {
       "control": {
        "a": "doc",
-       "s": "card",
-       "q": "1"
+       "s": "card"
       },
       "payload": "<p>hi</p>"
      }
@@ -10818,8 +12672,7 @@
       "control": {
        "a": "doc",
        "s": "card",
-       "d": "1",
-       "q": "1"
+       "d": "1"
       },
       "payload": "<p>hi</p>"
      }
@@ -10827,7 +12680,7 @@
    ]
   },
   {
-   "name": "n numbers a command and asks for its reply: q=0",
+   "name": "n numbers a command and asks for its reply: q=0, which n says without a q",
    "build": "doc",
    "args": {
     "surface": "card",
@@ -10842,8 +12695,7 @@
       "control": {
        "a": "doc",
        "s": "card",
-       "n": "4",
-       "q": "0"
+       "n": "4"
       },
       "payload": "<p>hi</p>"
      }
@@ -10894,8 +12746,7 @@
        "a": "place",
        "s": "card",
        "c": "40",
-       "r": "auto",
-       "q": "1"
+       "r": "auto"
       }
      }
     }
@@ -10936,8 +12787,7 @@
        "z": "-3",
        "p": "1",
        "f": "1",
-       "C": "1",
-       "q": "1"
+       "C": "1"
       }
      }
     }
@@ -10946,9 +12796,6 @@
   {
    "name": "place with hover: v=1",
    "build": "place",
-   "requires": [
-    "place.hover"
-   ],
    "args": {
     "surface": "card",
     "placement": {
@@ -10965,8 +12812,59 @@
        "s": "card",
        "c": "40",
        "r": "2",
-       "v": "1",
-       "q": "1"
+       "v": "1"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "place with press false: p=0, which turns presses off (SPEC \u00a75.2)",
+   "build": "place",
+   "args": {
+    "surface": "card",
+    "placement": {
+     "cols": 40,
+     "rows": 2,
+     "press": false
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "place",
+       "s": "card",
+       "c": "40",
+       "r": "2",
+       "p": "0"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "place with fit false and hover true: f=0 and v=1; a flag left absent sends no key",
+   "build": "place",
+   "args": {
+    "surface": "card",
+    "placement": {
+     "cols": 40,
+     "rows": 2,
+     "fit": false,
+     "hover": true
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "place",
+       "s": "card",
+       "c": "40",
+       "r": "2",
+       "f": "0",
+       "v": "1"
       }
      }
     }
@@ -10995,8 +12893,7 @@
        "a": "place",
        "s": "card",
        "c": "40",
-       "r": "3",
-       "q": "1"
+       "r": "3"
       }
      }
     }
@@ -11028,8 +12925,7 @@
        "x": "0",
        "y": "0",
        "w": "40",
-       "h": "3",
-       "q": "1"
+       "h": "3"
       }
      }
     }
@@ -11061,8 +12957,7 @@
        "c": "40",
        "r": "auto",
        "C": "1",
-       "n": "3",
-       "q": "0"
+       "n": "3"
       }
      }
     },
@@ -11111,13 +13006,17 @@
    ]
   },
   {
-   "name": "delta with a target",
+   "name": "delta with a target: the op in the body, its target t and its html v (SDK.md \u00a73.4.3)",
    "build": "delta",
    "args": {
     "surface": "x",
-    "op": "inner",
-    "target": "list",
-    "payload": "<li>a</li>"
+    "ops": [
+     {
+      "op": "inner",
+      "target": "list",
+      "value": "<li>a</li>"
+     }
+    ]
    },
    "out": [
     {
@@ -11125,11 +13024,18 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "inner",
-       "t": "list",
        "q": "2"
       },
-      "payload": "<li>a</li>"
+      "body": {
+       "ops": [
+        {
+         "op": "inner",
+         "t": "list",
+         "v": "<li>a</li>"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORg6JvcKVpbm5lcqF0pGxpc3Shdqo8bGk+YTwvbGk+"
      }
     }
    ]
@@ -11139,8 +13045,12 @@
    "build": "delta",
    "args": {
     "surface": "x",
-    "op": "morph",
-    "payload": "<p id=a>1</p>"
+    "ops": [
+     {
+      "op": "morph",
+      "value": "<p id=a>1</p>"
+     }
+    ]
    },
    "out": [
     {
@@ -11148,10 +13058,143 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "morph",
        "q": "2"
       },
-      "payload": "<p id=a>1</p>"
+      "body": {
+       "ops": [
+        {
+         "op": "morph",
+         "v": "<p id=a>1</p>"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORgqJvcKVtb3JwaKF2rTxwIGlkPWE+MTwvcD4="
+     }
+    }
+   ]
+  },
+  {
+   "name": "delta of several ops: t unless the target is empty, k for attr, unattr and var, v for an op that takes one even empty, and for reveal only with start or end (SDK.md \u00a73.4.3)",
+   "build": "delta",
+   "args": {
+    "surface": "x",
+    "ops": [
+     {
+      "op": "text",
+      "target": "a",
+      "value": "hi"
+     },
+     {
+      "op": "var",
+      "target": "bar",
+      "key": "w",
+      "value": "40%"
+     },
+     {
+      "op": "attr",
+      "target": "ok",
+      "key": "title",
+      "value": "Save"
+     },
+     {
+      "op": "unattr",
+      "target": "ok",
+      "key": "disabled"
+     },
+     {
+      "op": "remove",
+      "target": "old"
+     },
+     {
+      "op": "reveal",
+      "target": "s3"
+     },
+     {
+      "op": "reveal",
+      "target": "s4",
+      "value": "end"
+     },
+     {
+      "op": "morph",
+      "value": ""
+     }
+    ]
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "delta",
+       "s": "x",
+       "q": "2"
+      },
+      "body": {
+       "ops": [
+        {
+         "op": "text",
+         "t": "a",
+         "v": "hi"
+        },
+        {
+         "op": "var",
+         "t": "bar",
+         "k": "w",
+         "v": "40%"
+        },
+        {
+         "op": "attr",
+         "t": "ok",
+         "k": "title",
+         "v": "Save"
+        },
+        {
+         "op": "unattr",
+         "t": "ok",
+         "k": "disabled"
+        },
+        {
+         "op": "remove",
+         "t": "old"
+        },
+        {
+         "op": "reveal",
+         "t": "s3"
+        },
+        {
+         "op": "reveal",
+         "t": "s4",
+         "v": "end"
+        },
+        {
+         "op": "morph",
+         "v": ""
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHOYg6JvcKR0ZXh0oXShYaF2omhphKJvcKN2YXKhdKNiYXKha6F3oXajNDAlhKJvcKRhdHRyoXSib2uha6V0aXRsZaF2pFNhdmWDom9wpnVuYXR0cqF0om9roWuoZGlzYWJsZWSCom9wpnJlbW92ZaF0o29sZIKib3CmcmV2ZWFsoXSiczODom9wpnJldmVhbKF0onM0oXajZW5kgqJvcKVtb3JwaKF2oA=="
+     }
+    }
+   ]
+  },
+  {
+   "name": "a delta of no ops is still sent: {\"ops\": []}, and the host answers it EINVAL (SDK.md \u00a73.4.3)",
+   "build": "delta",
+   "args": {
+    "surface": "x",
+    "ops": []
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "delta",
+       "s": "x",
+       "q": "2"
+      },
+      "body": {
+       "ops": []
+      },
+      "payload_b64": "gaNvcHOQ"
      }
     }
    ]
@@ -11170,11 +13213,48 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "text",
-       "t": "clock",
        "q": "2"
       },
-      "payload": "12:00"
+      "body": {
+       "ops": [
+        {
+         "op": "text",
+         "t": "clock",
+         "v": "12:00"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORg6JvcKR0ZXh0oXSlY2xvY2uhdqUxMjowMA=="
+     }
+    }
+   ]
+  },
+  {
+   "name": "set_text with empty text still sends v",
+   "build": "set_text",
+   "args": {
+    "surface": "x",
+    "target": "clock",
+    "text": ""
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "delta",
+       "s": "x",
+       "q": "2"
+      },
+      "body": {
+       "ops": [
+        {
+         "op": "text",
+         "t": "clock",
+         "v": ""
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORg6JvcKR0ZXh0oXSlY2xvY2uhdqA="
      }
     }
    ]
@@ -11194,12 +13274,19 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "var",
-       "t": "bar",
-       "k": "w",
        "q": "2"
       },
-      "payload": "40%"
+      "body": {
+       "ops": [
+        {
+         "op": "var",
+         "t": "bar",
+         "k": "w",
+         "v": "40%"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORhKJvcKN2YXKhdKNiYXKha6F3oXajNDAl"
      }
     }
    ]
@@ -11219,18 +13306,25 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "attr",
-       "t": "ok",
-       "k": "title",
        "q": "2"
       },
-      "payload": "Save"
+      "body": {
+       "ops": [
+        {
+         "op": "attr",
+         "t": "ok",
+         "k": "title",
+         "v": "Save"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORhKJvcKRhdHRyoXSib2uha6V0aXRsZaF2pFNhdmU="
      }
     }
    ]
   },
   {
-   "name": "remove_attr is op=unattr with k and no payload",
+   "name": "remove_attr is op=unattr with k and no v",
    "build": "remove_attr",
    "args": {
     "surface": "x",
@@ -11243,12 +13337,18 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "unattr",
-       "t": "ok",
-       "k": "disabled",
        "q": "2"
       },
-      "payload": ""
+      "body": {
+       "ops": [
+        {
+         "op": "unattr",
+         "t": "ok",
+         "k": "disabled"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORg6JvcKZ1bmF0dHKhdKJva6FrqGRpc2FibGVk"
      }
     }
    ]
@@ -11267,20 +13367,24 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "morph",
-       "t": "card",
        "q": "2"
       },
-      "payload": "<div id=card>2</div>"
+      "body": {
+       "ops": [
+        {
+         "op": "morph",
+         "t": "card",
+         "v": "<div id=card>2</div>"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORg6JvcKVtb3JwaKF0pGNhcmShdrQ8ZGl2IGlkPWNhcmQ+MjwvZGl2Pg=="
      }
     }
    ]
   },
   {
-   "name": "reveal is op=reveal, where in the payload: start or end",
-   "requires": [
-    "reveal"
-   ],
+   "name": "reveal is op=reveal, where in v: start or end",
    "build": "reveal",
    "args": {
     "surface": "x",
@@ -11293,20 +13397,24 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "reveal",
-       "t": "s3",
        "q": "2"
       },
-      "payload": "start"
+      "body": {
+       "ops": [
+        {
+         "op": "reveal",
+         "t": "s3",
+         "v": "start"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORg6JvcKZyZXZlYWyhdKJzM6F2pXN0YXJ0"
      }
     }
    ]
   },
   {
-   "name": "reveal with no where sends no payload: as little as brings it into view",
-   "requires": [
-    "reveal"
-   ],
+   "name": "reveal with no where sends no v: as little as brings it into view",
    "build": "reveal",
    "args": {
     "surface": "x",
@@ -11318,11 +13426,17 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "reveal",
-       "t": "s3",
        "q": "2"
       },
-      "payload": ""
+      "body": {
+       "ops": [
+        {
+         "op": "reveal",
+         "t": "s3"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORgqJvcKZyZXZlYWyhdKJzMw=="
      }
     }
    ]
@@ -11507,11 +13621,18 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "text",
-       "t": "a",
        "q": "2"
       },
-      "payload": "1"
+      "body": {
+       "ops": [
+        {
+         "op": "text",
+         "t": "a",
+         "v": "1"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORg6JvcKR0ZXh0oXShYaF2oTE="
      }
     },
     {
@@ -11519,12 +13640,19 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "var",
-       "t": "b",
-       "k": "w",
        "q": "2"
       },
-      "payload": "2"
+      "body": {
+       "ops": [
+        {
+         "op": "var",
+         "t": "b",
+         "k": "w",
+         "v": "2"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORhKJvcKN2YXKhdKFioWuhd6F2oTI="
      }
     },
     {
@@ -11533,7 +13661,27 @@
    ]
   },
   {
-   "name": "values a builder is given are cleaned: each character outside printable ASCII is one _",
+   "name": "values a control carries are cleaned: each character outside printable ASCII is one _",
+   "build": "focus",
+   "args": {
+    "surface": "x",
+    "target": "caf\u00e9:\ud83d\ude00"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "focus",
+       "s": "x",
+       "t": "caf___",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "targets and values in a body are not cleaned: they travel as the document has them (SDK.md \u00a73.3, \u00a73.4.3)",
    "build": "set_text",
    "args": {
     "surface": "x",
@@ -11546,11 +13694,18 @@
       "control": {
        "a": "delta",
        "s": "x",
-       "op": "text",
-       "t": "caf___",
        "q": "2"
       },
-      "payload": "caf\u00e9"
+      "body": {
+       "ops": [
+        {
+         "op": "text",
+         "t": "caf\u00e9:\ud83d\ude00",
+         "v": "caf\u00e9"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORg6JvcKR0ZXh0oXSqY2Fmw6k68J+YgKF2pWNhZsOp"
      }
     }
    ]
@@ -11558,9 +13713,6 @@
   {
    "name": "doc that scrolls vertically: scroll=1",
    "build": "doc",
-   "requires": [
-    "doc.scroll"
-   ],
    "args": {
     "surface": "list",
     "html": "<ul><li>a</li></ul>"
@@ -11574,8 +13726,7 @@
       "control": {
        "a": "doc",
        "s": "list",
-       "scroll": "1",
-       "q": "1"
+       "scroll": "1"
       },
       "payload": "<ul><li>a</li></ul>"
      }
@@ -11585,9 +13736,6 @@
   {
    "name": "doc that scrolls both ways, detached: scroll=3 beside d=1",
    "build": "doc",
-   "requires": [
-    "doc.scroll"
-   ],
    "args": {
     "surface": "log",
     "html": "<pre>x</pre>"
@@ -11603,8 +13751,7 @@
        "a": "doc",
        "s": "log",
        "d": "1",
-       "scroll": "3",
-       "q": "1"
+       "scroll": "3"
       },
       "payload": "<pre>x</pre>"
      }
@@ -11614,9 +13761,6 @@
   {
    "name": "scroll 0 is the default and sends no key",
    "build": "doc",
-   "requires": [
-    "doc.scroll"
-   ],
    "args": {
     "surface": "card",
     "html": "<p>hi</p>"
@@ -11629,8 +13773,7 @@
      "cmd": {
       "control": {
        "a": "doc",
-       "s": "card",
-       "q": "1"
+       "s": "card"
       },
       "payload": "<p>hi</p>"
      }
@@ -11712,6 +13855,28 @@
       "control": {
        "a": "menu",
        "q": "2"
+      },
+      "body": {
+       "seq": [
+        "Space"
+       ],
+       "items": [
+        {
+         "key": "f",
+         "label": "+file",
+         "group": true,
+         "enabled": true
+        },
+        {
+         "key": "q",
+         "label": "Quit",
+         "enabled": true
+        },
+        {
+         "key": "w",
+         "enabled": false
+        }
+       ]
       },
       "payload_b64": "gqNzZXGRpVNwYWNlpWl0ZW1zk4Sja2V5oWalbGFiZWylK2ZpbGWlZ3JvdXDDp2VuYWJsZWTDg6NrZXmhcaVsYWJlbKRRdWl0p2VuYWJsZWTDgqNrZXmhd6dlbmFibGVkwg=="
      }
@@ -11808,7 +13973,7 @@
    "bytes": "\u001b]7279;a=res:id=x:q=2;3ybmnZobRASuYyt03FwtfGE8WCgzowL8Ig9kixPxj8g2/m1a/Fk0XfDQ0cJJiw8n1GcPzbDeWljFg8+sNqF6EBfHHmxQogK/b7IuBntHRe2YzH7nvarp5j509wNb1wgj/h7WcBSxYC0QPN03ytXFbuqsCQjE9it4nFoewrDWp//2e8I4976xNdK+Gb96dAm2Yb15xV3zdQlacmnV/WnG8/eQ668DXHN5MrKGZvSjeoh4rlpSxeWENU+HdlzcfEEVrR2ZKU00aSVkDBd68qeBI62jSAd7QJzrnz0Sj6Zuto1hI6llyp801LWg2Fg8J/2KbIHxqtwcUWTGNuR9RLqwXawDIf3V1lzQFMHmTZOCypY0yMmU6M3kCADIRx8XoYLWm/onssqu8tuf7gVOV3G2knxAQrMNthuCcC5MdYsuHaVB5MsU1558XNhyXSJVJ0BTZzWRWaoOC0SliUnqEqxu3cgvBqrfiyFuCeJPhOou9RYn4CG5M7O6sUMWLmKFEPKveo0QrvTmcNUujo8tWD2gqLgfNsDu12TkGhEVpgeTi12GJyYinbhczAfFq3vIvEAhyo7OnP1yeKXZnCHueFxxDabFdh43kQ+A5bjUwdMWiA26LcqZiQPvZvd91ZIy9cl9xDS1fp6AFzIYwGrSMtHlONWRCnqS5gW8uhDTAB8+JUOFdByM5J1Yu5TLWeAIc8G5SaKRx0KurWcJcPV04wvADBrx/08EVbiwd52+ZICN2GkC1Nz3TeeEKYkjpPVscRpVLl9BFfvDwX0hkzJXD/kwKvTbF+7GqVjVRMjur6qpDpUyTORHCwZQbLhjd1XkrhzlJJn5Tj0SDm5cFf+cbolFzOAPgYbluQTdDHsVd+VB0gfWiNOGZr+t/RfJnJ96D1bXnrrn1oGqgAgFZFYIh8/P9RXVswn9FESiUfDU5eZ+cmbgWHYpRybly9CPme2VITzzOnLjSv2r6oClQ5hKDfgdvr6J9FtKMKBwXbm+em7XooImpUpBAXV5fH1o6jI7n2Hpg4wIoKpi8kykv2lt2ocE98t3gjqkHMasZs3KuHyn1ihfMyCURnbJ/raHlYKNZndSa074lWKLPkZosOUw/ka1nWmk4l3soLmFKSkfQYhsh756DxGboE9H9FD9End85GgHaNXKOllZq7ixprUd1vhoj+Czs/nOFum2WvkXZ25kiQDuP5znmuxuaUz/MwAhcqMth+8XYc/VxfHJFhCfuaMmM+MSv53xn0SEtj5LxwqEMMxcYwj0hv1FyyKQ/WvG7hEaQk5LsnFgqGR2Xz7rU/d1swhVnZbHrDqL/nD6KkzcawrY7uFRtCemUriLCiX6iZkmAsCpHhnmQiyurr3hMP+P1LMDKg4M67QcjIGclaKu+PypMjnRxZ0uOwszy1POLNl7Ayj6pbd54KCeYUwVMN8L8Z/s+Fl42wmysGdAAG/iG+3+7tfGwZbeFIQqgPqvFUx6ub2P3vL0Wcnm1j4w4Ch4os0Ttaawv6Z7hC756BZI3kjDrumoc3lci8qX0iSFpgR7nwHatLbSET3kgq9kn0d4fq7pVq4bzzn9IxF2EAeCp90EY7yjzhHkDOAN3duWOYKa55TeEBBr2z4owXiWIwwqKyemcYi9gj0ukQCALhNsulTdK2sD1Akhbc7qT9gZPmgcJhhSvo2YSU07k8ZymRPu0ROqvIRXn1UsC90C5gLtOKG7UwQVrs7Zk3raUbs/OLAyBb2f8g4WHQW15gQ2kK+2XQfvU6ngkO3/tkN82jKZD27opAzWuX9wYCtp7Lq7s4LEl2kLyrrxFv2PDFm1SKDsY/dcBhE245XIF0L1Y5EqA1y87Qz2SYKe10/tHLdwmP4UP40EXULZsvwT3mXzu0PQB0G21OCYS2kMGrmc/T4qfzAtOCiXDFICBBlh3NIW1cXQOaJR45q37v8iYupH7OZ4p/91ODuK0SoxIewWLpB8LRnce1kgSwbiLMGELgaCd5T2BM4gKcn01wz3oIxWEoDHdmud6P/J4Mq/hY4Kfu3tqVYEkuUHKxnxXrD6yhBU1J0ZRSp20FkacL/dLkNQQQW7wqDeoLqCjFej0pGK1a8D1tvrMxQpd0PctFKG6XY0+fEpcPD5wh1tGDgUQu/gOgh4dJ/Jxin+nxtLsXHaObEFsRtgQz6fD7+7Ys3lcYHkxdMMfbhdYPCrdxuHYbiKMZ4GzZdsSJXjtjulDHpgERWYFEfCTVg4IH3pJQAjLIUQ7mrDLgSQrfgJSAYY6tU64PQn05OHlB7saMmJUFJbclwOgHAWGIx2k33w4tQ7VE9o92nZuHQRBh7z2ju7LzV6C/r9bynIksiED9N0vDPQKHStuXiuTMqjEH96xrQGpYI6BXe2TBW52MJX3/xiaLeVPSddJE3AOj8e75RemUzglkaSKwb9NAtUAairN0ZRKvPGepvA7ayCJ8wq/2fW5666E/zxnjg63lZuJlPre/w1dx17cjosaEqzz9aIotxhX5TI4h54KZlg/nYw6JgyAPWofceeU7Rf4BYUfUfNTQR5/d8QN1lhdBKLAGZr3oi/xwKHYJolESubBckVw+QrgY4Bmo4PjlN3LQHdH6en+XYY0SPn4x8fOWyawRzwPDb2fzpSKs7exyMRNGLqT6S86yb1uGZTwcdGh1iZKlmxEmOFp/666lkh/Nq0pdXcLfrfNDRhQn9yZDsQp/96ZMAa9E38nQHVtM+gv94WbR96KpnXmcQTj4D3H1G3wGvnZuFzarn5WUToyKw8Xjd6XWTP610snlu5LxVEYHItB3U/DOJpYXTL4PD1P+ynJq7XG0O+xUyNQDewFrmXdzeR7e6Kz9xnktk1IlFbU2FoShOsSzswqt2OYT/ouabNznJWtbYvku9fmXKl/L8MXq42fBplHpl8nEihe7aKKyS2Q8XHvIWIS9TF7Lecqp/iLtZ2NaIYhwPs4RvTUlHwCnqDcsLRPN2b93DEne8sMe0zYOXeML3nKySI792B81NQUNsmv6y0m6Mgsy05DX7bGkF2vS/8UxWqFPm4aaNxcHStRYU+z88Y0mDOCbJLcQYWJxaHj4b00NbvJg2rRQxP6mI+OLf19YkLbhm3ECF/WdU55d5hSKaACu6pkQjH/L5IUaG/HlDb1B7MFrvhWNaffN9F4f/JfgxCir4t210zhWevr4QD8jfVrWCexPMFyziQn3dx3JY78/1hq+gcB6fb/QTOEIdxcX4r3FaQ9QpC/4/ZqQ0pYaysl3uUoD2aq7dSigHin9KKaAJAao3TurOzcWWSiBw4O3+p8K1yB+/3HHhLU52HnU3SftNerSAIjdkagPLiaa2RKxfl+VroYyk4TJCA3OctVO5OBNQga/Ap/JNU2jdxVghx/oed3DEuvpGa8njGKJafNK5FsTBgx52zlfFfqtb/kseKn6MMluQmWzvm3NcPymQBdDlByQjsSzkELkyZMesgquT70olTRYAqLXh6noNyseFlut5vJRD1tuJWyUo/4BTuAXqvjcOG5PghyQW+CHgFpvRjgjBiys9P9pRNUCuzAq52mD6kFE09UL2mJRFZLElcxNJWMYmq3gvQaZ69JK4qA8YNh68XjgR5qrUoyP+I43WqUeVWlIkSQW7mmEoflxLiutsVxkSD2oarKhSPoIVBgoWNQ0vSlt0Ayq5QCrklZtxi6vno1aMug2GjWUBpeYIIXl/a9pTGSKfcCaT4N5saeXdr+7Cz6V1qPEvKkuiUBSaPsuMG5NEdj4zEUXxs74SVlWtn0hJo1oPlbgdNuY8Yp5xGE8ttaiRQ53TyCBYLEqMUtui4WAH6mdJKLNVcc37cMY1oRp6ohjXz7tmJpNuaHu6xZ+oEPHNOGQ1RKxKdrsH5PA6919bRkUO6oMxag0WLRPSx6t4PbMHn6BtMiFYtOwYeQrzM03IDn8TxHKkfMJy/Ryl0JrRmD2xjIhTpMiWt01o7buoFvw6yWhBOGjy5epsf5Gx/wOSMeLUw4oKfzFwUXjLeTtpLL6LRZWOPcVrLnYar7pCPLqveYkVJtbYiMGUAqXENs9IGqfB/ElMjpqJPl9QTOTW3X5GsX+No/w+MhgH6BZeiaApLV33ueba6nVN9h0Y+\u001b\\"
   },
   {
-   "name": "3073 bytes are chunked: the first carries the control and m=1, the last m=0 and q",
+   "name": "3073 bytes are chunked: the first carries the control and m=1, the last only m=0",
    "control": [
     [
      "a",
@@ -11830,7 +13995,7 @@
      "len": 4096
     },
     {
-     "control": "m=0:q=2",
+     "control": "m=0",
      "len": 4
     }
    ]
@@ -11882,11 +14047,11 @@
      "len": 4096
     },
     {
-     "control": "m=1:q=1",
+     "control": "m=1",
      "len": 4096
     },
     {
-     "control": "m=0:q=1",
+     "control": "m=0",
      "len": 3808
     }
    ]
@@ -12136,28 +14301,16 @@
    ]
   },
   {
-   "name": "the reply to q carries the capabilities",
+   "name": "the reply to q carries the capabilities, the cell's size in CSS pixels as the host sends it",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;iaF2ozAuMqNvcHOUpW1vcnBopWlubmVypHRleHSjdmFypmV2ZW50c5SlY2xpY2umY2hhbmdlpGRyYWejZml0pGNlbGyCoXcQoWggpXNjYWxly0AAAAAAAAAApnNjaGVtZaVsaWdodKZsaW1pdHOCqHN1cmZhY2VzQKlyZXNvdXJjZXPOAQAAAKNuZXSBp2ltZy1zcmORs2h0dHBzOi8vZXhhbXBsZS5jb22kaG9zdKF4\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;h6F2ozAuM6djZWxsY3NzgqF3y0AgAAAAAAAAoWjLQDAAAAAAAAClc2NhbGXLQAAAAAAAAACmc2NoZW1lpWxpZ2h0pmxpbWl0c4Koc3VyZmFjZXNAqXJlc291cmNlc84BAAAAo25ldIGnaW1nLXNyY5GzaHR0cHM6Ly9leGFtcGxlLmNvbaRob3N0oXg=\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.2",
-     "ops": [
-      "morph",
-      "inner",
-      "text",
-      "var"
-     ],
-     "events": [
-      "click",
-      "change",
-      "drag",
-      "fit"
-     ],
-     "cell": {
-      "w": 16,
-      "h": 32
+     "v": "0.3",
+     "cellcss": {
+      "w": 8.0,
+      "h": 16.0
      },
      "scale": 2.0,
      "scheme": "light",
@@ -12190,22 +14343,10 @@
       "n": 1
      },
      "caps": {
-      "v": "0.2",
-      "ops": [
-       "morph",
-       "inner",
-       "text",
-       "var"
-      ],
-      "events": [
-       "click",
-       "change",
-       "drag",
-       "fit"
-      ],
-      "cell": {
-       "w": 16,
-       "h": 32
+      "v": "0.3",
+      "cell_css": {
+       "w": 8.0,
+       "h": 16.0
       },
       "scale": 2.0,
       "scheme": "light",
@@ -12219,260 +14360,29 @@
        ]
       },
       "host": "x",
-      "supports": {
-       "morph": true,
-       "inner": true,
-       "after": false
-      },
-      "sends": {
-       "click": true,
-       "drag": true,
+      "has": {
        "hover": false
       },
-      "drags": true,
-      "hovers": false,
-      "light": true,
-      "cell_css": {
-       "w": 8,
-       "h": 16
-      }
+      "light": true
      }
     }
    ]
   },
   {
-   "name": "drag in events stands for dragstart, drag and dragend (SPEC \u00a74)",
+   "name": "capabilities: features, and the host's version",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqZldmVudHOSpWNsaWNrpGRyYWc=\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuM6hmZWF0dXJlc5GrcGFzc3Rocm91Z2ikaG9zdKtob3R0eS1ibGl0eqd2ZXJzaW9upjAuMC4xMA==\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.2",
-     "events": [
-      "click",
-      "drag"
-     ]
-    }
-   ],
-   "requires": [
-    "caps.drag-kinds"
-   ],
-   "results": [
-    "complete"
-   ],
-   "invalid": 0,
-   "messages": [
-    {
-     "control": {
-      "a": "ok",
-      "n": "1",
-      "re": "q"
-     },
-     "caps": {
-      "sends": {
-       "dragstart": true,
-       "drag": true,
-       "dragend": true
-      },
-      "drags": true
-     }
-    }
-   ]
-  },
-  {
-   "name": "steps says a drag of an element with data-steps carries where in it the pointer is (SPEC \u00a74, \u00a79.1); absent, it does not",
-   "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;g6F2ozAuMqZldmVudHORpGRyYWelc3RlcHPD\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuMqZldmVudHORpGRyYWc=\u001b\\"
-   ],
-   "bodies": [
-    {
-     "v": "0.2",
-     "events": [
-      "drag"
+     "v": "0.3",
+     "features": [
+      "passthrough"
      ],
-     "steps": true
-    },
-    {
-     "v": "0.2",
-     "events": [
-      "drag"
-     ]
-    }
-   ],
-   "results": [
-    "complete",
-    "complete"
-   ],
-   "invalid": 0,
-   "messages": [
-    {
-     "control": {
-      "a": "ok",
-      "n": "1",
-      "re": "q"
-     },
-     "caps": {
-      "steps": true,
-      "drags": true
-     }
-    },
-    {
-     "control": {
-      "a": "ok",
-      "n": "2",
-      "re": "q"
-     },
-     "caps": {
-      "steps": false,
-      "drags": true
-     }
-    }
-   ]
-  },
-  {
-   "name": "drop says an element with data-on~=drop can be a drag's t, and a drag says where in it the pointer is (SPEC \u00a74, \u00a79.1); absent, it does not",
-   "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;g6F2ozAuMqZldmVudHORpGRyYWekZHJvcMM=\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuMqZldmVudHORpGRyYWc=\u001b\\"
-   ],
-   "bodies": [
-    {
-     "v": "0.2",
-     "events": [
-      "drag"
-     ],
-     "drop": true
-    },
-    {
-     "v": "0.2",
-     "events": [
-      "drag"
-     ]
-    }
-   ],
-   "results": [
-    "complete",
-    "complete"
-   ],
-   "invalid": 0,
-   "messages": [
-    {
-     "control": {
-      "a": "ok",
-      "n": "1",
-      "re": "q"
-     },
-     "caps": {
-      "drop": true,
-      "drags": true
-     }
-    },
-    {
-     "control": {
-      "a": "ok",
-      "n": "2",
-      "re": "q"
-     },
-     "caps": {
-      "drop": false,
-      "drags": true
-     }
-    }
-   ],
-   "requires": [
-    "event.drop"
-   ]
-  },
-  {
-   "name": "a host that lists no ops supports them all, and no events sends them all, but neither drags nor hover; no cell is 9x18",
-   "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;g6F2ozAuMqZldmVudHORpWhvdmVypGNlbGyCoXcUoWgo\u001b\\"
-   ],
-   "bodies": [
-    {
-     "v": "0.2"
-    },
-    {
-     "v": "0.2",
-     "events": [
-      "hover"
-     ],
-     "cell": {
-      "w": 20,
-      "h": 40
-     }
-    }
-   ],
-   "results": [
-    "complete",
-    "complete"
-   ],
-   "invalid": 0,
-   "messages": [
-    {
-     "control": {
-      "a": "ok",
-      "n": "1",
-      "re": "q"
-     },
-     "caps": {
-      "supports": {
-       "morph": true,
-       "after": true
-      },
-      "sends": {
-       "click": true,
-       "zoom": true
-      },
-      "drags": false,
-      "hovers": false,
-      "light": false,
-      "cell_css": {
-       "w": 9,
-       "h": 18
-      }
-     }
-    },
-    {
-     "control": {
-      "a": "ok",
-      "n": "2",
-      "re": "q"
-     },
-     "caps": {
-      "sends": {
-       "hover": true,
-       "click": false
-      },
-      "drags": false,
-      "hovers": true,
-      "cell_css": {
-       "w": 20,
-       "h": 40
-      }
-     }
-    }
-   ]
-  },
-  {
-   "name": "capabilities: passthrough, and the host's version",
-   "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuMqtwYXNzdGhyb3VnaMOkaG9zdKtob3R0eS1ibGl0eqd2ZXJzaW9upjAuMC4xMA==\u001b\\"
-   ],
-   "bodies": [
-    {
-     "v": "0.2",
-     "passthrough": true,
      "host": "hotty-blitz",
      "version": "0.0.10"
     }
    ],
-   "requires": [
-    "caps.passthrough",
-    "caps.version"
-   ],
    "results": [
     "complete"
    ],
@@ -12485,8 +14395,14 @@
       "re": "q"
      },
      "caps": {
-      "v": "0.2",
-      "passthrough": true,
+      "v": "0.3",
+      "features": [
+       "passthrough"
+      ],
+      "has": {
+       "passthrough": true,
+       "hover": false
+      },
       "host": "hotty-blitz",
       "version": "0.0.10"
      }
@@ -12496,17 +14412,17 @@
   {
    "name": "a capability of another type: the capabilities do not decode, and the reply stands (SDK.md \u00a73.9)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqVzY2FsZaEy\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuMqZldmVudHOSpWNsaWNrAw==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuM6VzY2FsZaEy\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuM6hmZWF0dXJlc5KlY2xpY2sD\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.2",
+     "v": "0.3",
      "scale": "2"
     },
     {
-     "v": "0.2",
-     "events": [
+     "v": "0.3",
+     "features": [
       "click",
       3
      ]
@@ -12549,11 +14465,11 @@
   {
    "name": "fields a reader does not know are skipped, whatever their type: an array, a float, bin, a time, an extension no one defines (SDK.md \u00a72.7)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;haF2ozAuMqZmdXR1cmWBoXiUActABAAAAAAAAMPUBQChYsQCAP+hdNb/AAAAAKZzY3JvbGzD\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;haF2ozAuM6ZmdXR1cmWBoXiUActABAAAAAAAAMPUBQChYsQCAP+hdNb/AAAAAKZzY2hlbWWlbGlnaHQ=\u001b\\"
    ],
    "bodies": [
     {
-     "hex": "85a176a3302e32a666757475726581a1789401cb4004000000000000c3d40500a162c40200ffa174d6ff00000000a67363726f6c6cc3"
+     "hex": "85a176a3302e33a666757475726581a1789401cb4004000000000000c3d40500a162c40200ffa174d6ff00000000a6736368656d65a56c69676874"
     }
    ],
    "results": [
@@ -12568,8 +14484,9 @@
       "re": "q"
      },
      "caps": {
-      "v": "0.2",
-      "scroll": true
+      "v": "0.3",
+      "scheme": "light",
+      "light": true
      }
     }
    ]
@@ -12603,7 +14520,6 @@
       "value": "yes",
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "surface": "f",
@@ -12622,7 +14538,6 @@
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "surface": "f",
@@ -12633,10 +14548,10 @@
    ]
   },
   {
-   "name": "click on a link: href and url, t empty; url absent when there is none",
+   "name": "click on a link: href and url, no t; url absent when there is none",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=click:t=;gqRocmVmpS9kb2Nzo3VybLhodHRwczovL2V4YW1wbGUuY29tL2RvY3M=\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=click:t=;gaRocmVmpCN0b3A=\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=click;gqRocmVmpS9kb2Nzo3VybLhodHRwczovL2V4YW1wbGUuY29tL2RvY3M=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click;gaRocmVmpCN0b3A=\u001b\\"
    ],
    "bodies": [
     {
@@ -12657,8 +14572,7 @@
      "control": {
       "a": "ev",
       "s": "f",
-      "e": "click",
-      "t": ""
+      "e": "click"
      },
      "event": {
       "value": null,
@@ -12667,7 +14581,6 @@
        "href": "/docs",
        "url": "https://example.com/docs"
       },
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "surface": "f",
@@ -12679,8 +14592,7 @@
      "control": {
       "a": "ev",
       "s": "f",
-      "e": "click",
-      "t": ""
+      "e": "click"
      },
      "event": {
       "value": null,
@@ -12689,7 +14601,6 @@
        "href": "#top",
        "url": null
       },
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "surface": "f",
@@ -12705,7 +14616,7 @@
     "\u001b]7279;a=ev:s=f:e=change:t=agree;gqdjaGVja2Vkw6V2YWx1ZaJvbg==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=change:t=name;gaV2YWx1ZaNBZGE=\u001b\\",
     "\u001b]7279;a=ev:s=f:e=input:t=q;gaV2YWx1ZaJhYg==\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=submit:t=form;gqRuYW1lo0FkYaRwbGFuo3Bybw==\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=submit:t=form;gaZmaWVsZHOSkqRuYW1lo0FkYZKkcGxhbqNwcm8=\u001b\\"
    ],
    "bodies": [
     {
@@ -12719,8 +14630,16 @@
      "value": "ab"
     },
     {
-     "name": "Ada",
-     "plan": "pro"
+     "fields": [
+      [
+       "name",
+       "Ada"
+      ],
+      [
+       "plan",
+       "pro"
+      ]
+     ]
     }
    ],
    "results": [
@@ -12742,7 +14661,6 @@
       "value": "on",
       "checked": true,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "kind": "change",
@@ -12760,7 +14678,6 @@
       "value": "Ada",
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "kind": "change",
@@ -12778,7 +14695,6 @@
       "value": "ab",
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "kind": "input",
@@ -12796,15 +14712,20 @@
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "kind": "submit",
       "target": "form",
-      "fields": {
-       "name": "Ada",
-       "plan": "pro"
-      }
+      "fields": [
+       [
+        "name",
+        "Ada"
+       ],
+       [
+        "plan",
+        "pro"
+       ]
+      ]
      }
     }
    ]
@@ -12812,12 +14733,20 @@
   {
    "name": "a submit's field that is not a string: the detail does not decode, and the event stands",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=submit:t=form;gqRuYW1lo0FkYaFuAw==\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=submit:t=form;gaZmaWVsZHOSkqRuYW1lo0FkYZKhbgM=\u001b\\"
    ],
    "bodies": [
     {
-     "name": "Ada",
-     "n": 3
+     "fields": [
+      [
+       "name",
+       "Ada"
+      ],
+      [
+       "n",
+       3
+      ]
+     ]
     }
    ],
    "results": [
@@ -12844,8 +14773,8 @@
    "name": "press, focus and blur carry no detail",
    "seqs": [
     "\u001b]7279;a=ev:s=card:e=press:t=title\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=focus:t=\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=blur:t=\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=focus\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=blur\u001b\\"
    ],
    "results": [
     "complete",
@@ -12865,7 +14794,6 @@
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "surface": "card",
@@ -12877,14 +14805,12 @@
      "control": {
       "a": "ev",
       "s": "f",
-      "e": "focus",
-      "t": ""
+      "e": "focus"
      },
      "event": {
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "kind": "focus",
@@ -12895,14 +14821,12 @@
      "control": {
       "a": "ev",
       "s": "f",
-      "e": "blur",
-      "t": ""
+      "e": "blur"
      },
      "event": {
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "kind": "blur",
@@ -12912,15 +14836,17 @@
    ]
   },
   {
-   "name": "resize carries the size in CSS pixels; fit the rows",
+   "name": "a caps event carries the cell's size in CSS pixels as floats, and belongs to no surface; fit carries the rows",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=resize:t=;gqF3y0B0CAAAAAAAoWjLQEgAAAAAAAA=\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=fit:t=;gaFyBw==\u001b\\"
+    "\u001b]7279;a=ev:e=caps;gadjZWxsY3NzgqF3y0B0CAAAAAAAoWjLQEgAAAAAAAA=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=fit;gaFyBw==\u001b\\"
    ],
    "bodies": [
     {
-     "w": 320.5,
-     "h": 48.0
+     "cellcss": {
+      "w": 320.5,
+      "h": 48.0
+     }
     },
     {
      "r": 7
@@ -12935,35 +14861,33 @@
     {
      "control": {
       "a": "ev",
-      "s": "f",
-      "e": "resize",
-      "t": ""
+      "e": "caps"
      },
      "event": {
-      "value": null,
-      "checked": null,
-      "link": null,
-      "size": {
+      "surface": null,
+      "kind": "caps",
+      "target": ""
+     },
+     "changed": {
+      "fields": [
+       "cellcss"
+      ],
+      "cell_css": {
        "w": 320.5,
        "h": 48.0
-      },
-      "fit_rows": null,
-      "drag": null,
-      "kind": "resize"
+      }
      }
     },
     {
      "control": {
       "a": "ev",
       "s": "f",
-      "e": "fit",
-      "t": ""
+      "e": "fit"
      },
      "event": {
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": 7,
       "drag": null,
       "kind": "fit"
@@ -12972,32 +14896,26 @@
    ]
   },
   {
-   "name": "drags carry the cell and the keys held",
+   "name": "drags carry the cell and the modifiers held, as bits",
    "seqs": [
-    "\u001b]7279;a=ev:s=g:e=dragstart:t=c1;g6FjAaFyAKRrZXlzkA==\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=drag:t=;g6Fj/qFyBaRrZXlzkqVzaGlmdKNhbHQ=\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=dragend:t=c4;g6FjBKFyAKRrZXlzkaRjdHJs\u001b\\"
+    "\u001b]7279;a=ev:s=g:e=dragstart:t=c1;gqFjAaFyAA==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag;g6Fj/qFyBaRtb2RzAw==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=dragend:t=c4;g6FjBKFyAKRtb2RzBA==\u001b\\"
    ],
    "bodies": [
     {
      "c": 1,
-     "r": 0,
-     "keys": []
+     "r": 0
     },
     {
      "c": -2,
      "r": 5,
-     "keys": [
-      "shift",
-      "alt"
-     ]
+     "mods": 3
     },
     {
      "c": 4,
      "r": 0,
-     "keys": [
-      "ctrl"
-     ]
+     "mods": 4
     }
    ],
    "results": [
@@ -13018,12 +14936,10 @@
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": {
        "c": 1,
-       "r": 0,
-       "keys": []
+       "r": 0
       },
       "kind": "dragstart",
       "target": "c1"
@@ -13033,25 +14949,20 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "drag",
-      "t": ""
+      "e": "drag"
      },
      "event": {
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": {
        "c": -2,
-       "r": 5,
-       "keys": [
-        "shift",
-        "alt"
-       ]
+       "r": 5
       },
       "kind": "drag",
-      "target": ""
+      "target": "",
+      "mods": 3
      }
     },
     {
@@ -13065,17 +14976,14 @@
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": {
        "c": 4,
-       "r": 0,
-       "keys": [
-        "ctrl"
-       ]
+       "r": 0
       },
       "kind": "dragend",
-      "target": "c4"
+      "target": "c4",
+      "mods": 4
      }
     }
    ]
@@ -13083,11 +14991,11 @@
   {
    "name": "a number of cells sent as a float: the detail does not decode, and the event stands",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=fit:t=;gaFyy0AcAAAAAAAA\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=drag:t=;g6Fjyz/wAAAAAAAAoXLLwAAAAAAAAACka2V5c5A=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=fit;gaFyy0AcAAAAAAAA\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag;gqFjyz/wAAAAAAAAoXLLwAAAAAAAAAA=\u001b\\",
     "\u001b]7279;a=ev:s=g:e=hover:t=c1;gqFjy0AIAAAAAAAAoXLLP/AAAAAAAAA=\u001b\\",
     "\u001b]7279;a=ev:s=f:e=click:t=env;gqV2YWx1ZadzdGFnaW5npGFyZWGEoWPLQAAAAAAAAAChcssAAAAAAAAAAKF3y0AoAAAAAAAAoWjLP/AAAAAAAAA=\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=dragend:t=;hKFjAqFyAKRrZXlzkKF4y0AEAAAAAAAA\u001b\\"
+    "\u001b]7279;a=ev:s=g:e=dragend;g6FjAqFyAKF4y0AEAAAAAAAA\u001b\\"
    ],
    "bodies": [
     {
@@ -13095,8 +15003,7 @@
     },
     {
      "c": 1.0,
-     "r": -2.0,
-     "keys": []
+     "r": -2.0
     },
     {
      "c": 3.0,
@@ -13114,7 +15021,6 @@
     {
      "c": 2,
      "r": 0,
-     "keys": [],
      "x": 2.5
     }
    ],
@@ -13131,8 +15037,7 @@
      "control": {
       "a": "ev",
       "s": "f",
-      "e": "fit",
-      "t": ""
+      "e": "fit"
      },
      "event": {
       "kind": "fit",
@@ -13143,8 +15048,7 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "drag",
-      "t": ""
+      "e": "drag"
      },
      "event": {
       "kind": "drag",
@@ -13182,8 +15086,7 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "dragend",
-      "t": ""
+      "e": "dragend"
      },
      "event": {
       "kind": "dragend",
@@ -13195,10 +15098,10 @@
   {
    "name": "a drag of an element with steps carries x and y, 0 a step like any other; one the detail leaves out is absent (SPEC \u00a79.1)",
    "seqs": [
-    "\u001b]7279;a=ev:s=g:e=dragstart:t=track;hKFjBKFyAKRrZXlzkKF4AQ==\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=drag:t=;haFjAaFyAqRrZXlzkKF4AKF5BA==\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=drag:t=pad;hKFjAqFyAKRrZXlzkaVzaGlmdKF5Aw==\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=dragend:t=;hKFjAqFyAKRrZXlzkKF5Aw==\u001b\\"
+    "\u001b]7279;a=ev:s=g:e=dragstart:t=track;g6FjBKFyAKF4AQ==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag;hKFjAaFyAqF4AKF5BA==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag:t=pad;hKFjAqFyAKRtb2RzAaF5Aw==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=dragend;g6FjAqFyAKF5Aw==\u001b\\"
    ],
    "results": [
     "complete",
@@ -13221,7 +15124,6 @@
       "drag": {
        "c": 4,
        "r": 0,
-       "keys": [],
        "x": 1,
        "y": null
       }
@@ -13231,8 +15133,7 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "drag",
-      "t": ""
+      "e": "drag"
      },
      "event": {
       "kind": "drag",
@@ -13240,7 +15141,6 @@
       "drag": {
        "c": 1,
        "r": 2,
-       "keys": [],
        "x": 0,
        "y": 4
       }
@@ -13259,20 +15159,17 @@
       "drag": {
        "c": 2,
        "r": 0,
-       "keys": [
-        "shift"
-       ],
        "x": null,
        "y": 3
-      }
+      },
+      "mods": 1
      }
     },
     {
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "dragend",
-      "t": ""
+      "e": "dragend"
      },
      "event": {
       "kind": "dragend",
@@ -13280,7 +15177,6 @@
       "drag": {
        "c": 2,
        "r": 0,
-       "keys": [],
        "x": null,
        "y": 3
       }
@@ -13291,28 +15187,23 @@
     {
      "c": 4,
      "r": 0,
-     "keys": [],
      "x": 1
     },
     {
      "c": 1,
      "r": 2,
-     "keys": [],
      "x": 0,
      "y": 4
     },
     {
      "c": 2,
      "r": 0,
-     "keys": [
-      "shift"
-     ],
+     "mods": 1,
      "y": 3
     },
     {
      "c": 2,
      "r": 0,
-     "keys": [],
      "y": 3
     }
    ]
@@ -13320,31 +15211,27 @@
   {
    "name": "a drag's tx and ty are the pointer's step in a t with drop, beside x and y in the element dragged; one the detail leaves out is absent (SPEC \u00a79.1)",
    "seqs": [
-    "\u001b]7279;a=ev:s=g:e=drag:t=col;haFjAaFyAqRrZXlzkKJ0eAGidHkA\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=dragend:t=row;haFjAqFyBKRrZXlzkaVzaGlmdKF4A6J0eQE=\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=drag:t=;g6Fj/6FyAKRrZXlzkA==\u001b\\"
+    "\u001b]7279;a=ev:s=g:e=drag:t=col;hKFjAaFyAqJ0eAGidHkA\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=dragend:t=row;haFjAqFyBKRtb2RzAaF4A6J0eQE=\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag;gqFj/6FyAA==\u001b\\"
    ],
    "bodies": [
     {
      "c": 1,
      "r": 2,
-     "keys": [],
      "tx": 1,
      "ty": 0
     },
     {
      "c": 2,
      "r": 4,
-     "keys": [
-      "shift"
-     ],
+     "mods": 1,
      "x": 3,
      "ty": 1
     },
     {
      "c": -1,
-     "r": 0,
-     "keys": []
+     "r": 0
     }
    ],
    "results": [
@@ -13367,7 +15254,6 @@
       "drag": {
        "c": 1,
        "r": 2,
-       "keys": [],
        "x": null,
        "y": null,
        "tx": 1,
@@ -13388,22 +15274,19 @@
       "drag": {
        "c": 2,
        "r": 4,
-       "keys": [
-        "shift"
-       ],
        "x": 3,
        "y": null,
        "tx": null,
        "ty": 1
-      }
+      },
+      "mods": 1
      }
     },
     {
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "drag",
-      "t": ""
+      "e": "drag"
      },
      "event": {
       "kind": "drag",
@@ -13411,7 +15294,6 @@
       "drag": {
        "c": -1,
        "r": 0,
-       "keys": [],
        "x": null,
        "y": null,
        "tx": null,
@@ -13419,16 +15301,13 @@
       }
      }
     }
-   ],
-   "requires": [
-    "event.drop"
    ]
   },
   {
    "name": "hover carries the cell, or out",
    "seqs": [
     "\u001b]7279;a=ev:s=g:e=hover:t=c1;gqFjA6FyAQ==\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=hover:t=;gaNvdXTD\u001b\\"
+    "\u001b]7279;a=ev:s=g:e=hover;gaNvdXTD\u001b\\"
    ],
    "bodies": [
     {
@@ -13438,9 +15317,6 @@
     {
      "out": true
     }
-   ],
-   "requires": [
-    "event.hover"
    ],
    "results": [
     "complete",
@@ -13469,8 +15345,7 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "hover",
-      "t": ""
+      "e": "hover"
      },
      "event": {
       "kind": "hover",
@@ -13486,12 +15361,9 @@
   },
   {
    "name": "view carries each element in view by its id, with its area, and whether the document shows its end; another kind's is not read",
-   "requires": [
-    "event.view"
-   ],
    "seqs": [
-    "\u001b]7279;a=ev:s=g:e=view:t=;gqJpboKiczGEoWMAoXL+oXcooWgFonMyhKFjAKFyA6F3KKFoAqNlbmTC\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=view:t=;gqJpboCjZW5kww==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=view;gqJpboKiczGEoWMAoXL+oXcooWgFonMyhKFjAKFyA6F3KKFoAqNlbmTC\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=view;gqJpboCjZW5kww==\u001b\\",
     "\u001b]7279;a=ev:s=g:e=click:t=s1;gaRhcmVhhKFjAKFyAKF3BKFoAQ==\u001b\\"
    ],
    "bodies": [
@@ -13536,8 +15408,7 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "view",
-      "t": ""
+      "e": "view"
      },
      "event": {
       "kind": "view",
@@ -13565,8 +15436,7 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "view",
-      "t": ""
+      "e": "view"
      },
      "event": {
       "kind": "view",
@@ -13594,12 +15464,9 @@
   },
   {
    "name": "a view with an area that is not one does not decode, and the event stands: a cell sent as a float, or the areas as an array",
-   "requires": [
-    "event.view"
-   ],
    "seqs": [
-    "\u001b]7279;a=ev:s=g:e=view:t=;gqJpboGiczGEoWMAoXLLP/AAAAAAAAChdwShaAGjZW5kwg==\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=view:t=;gqJpbpGEoWMAoXIAoXcEoWgBo2VuZMM=\u001b\\"
+    "\u001b]7279;a=ev:s=g:e=view;gqJpboGiczGEoWMAoXLLP/AAAAAAAAChdwShaAGjZW5kwg==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=view;gqJpbpGEoWMAoXIAoXcEoWgBo2VuZMM=\u001b\\"
    ],
    "bodies": [
     {
@@ -13635,8 +15502,7 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "view",
-      "t": ""
+      "e": "view"
      },
      "event": {
       "kind": "view",
@@ -13648,8 +15514,7 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "view",
-      "t": ""
+      "e": "view"
      },
      "event": {
       "kind": "view",
@@ -13661,13 +15526,10 @@
   },
   {
    "name": "a view's area that lacks a field leaves its element out; with no in, no element is in view, and with no end, the end is not shown",
-   "requires": [
-    "event.view"
-   ],
    "seqs": [
-    "\u001b]7279;a=ev:s=g:e=view:t=;gqJpboKhYYOhYwChcgChdwShYoShYwChcgGhdwShaAGjZW5kwg==\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=view:t=;gaNlbmTD\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=view:t=;gA==\u001b\\"
+    "\u001b]7279;a=ev:s=g:e=view;gqJpboKhYYOhYwChcgChdwShYoShYwChcgGhdwShaAGjZW5kwg==\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=view;gaNlbmTD\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=view;gA==\u001b\\"
    ],
    "bodies": [
     {
@@ -13702,8 +15564,7 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "view",
-      "t": ""
+      "e": "view"
      },
      "event": {
       "kind": "view",
@@ -13724,8 +15585,7 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "view",
-      "t": ""
+      "e": "view"
      },
      "event": {
       "kind": "view",
@@ -13739,8 +15599,7 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "view",
-      "t": ""
+      "e": "view"
      },
      "event": {
       "kind": "view",
@@ -13778,7 +15637,6 @@
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "surface": "f",
@@ -13810,7 +15668,6 @@
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "kind": "click",
@@ -13822,12 +15679,17 @@
   {
    "name": "chunks are joined before their base64 is decoded, wherever they split it",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;gaRuYW\u001b\\",
-    "\u001b]7279;m=0;1loUE=\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;gaZmaW\u001b\\",
+    "\u001b]7279;m=0;VsZHORkqRuYW1loUE=\u001b\\"
    ],
    "bodies": [
     {
-     "name": "A"
+     "fields": [
+      [
+       "name",
+       "A"
+      ]
+     ]
     },
     null
    ],
@@ -13848,14 +15710,16 @@
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "kind": "submit",
       "target": "form",
-      "fields": {
-       "name": "A"
-      }
+      "fields": [
+       [
+        "name",
+        "A"
+       ]
+      ]
      }
     }
    ]
@@ -13863,13 +15727,18 @@
   {
    "name": "another OSC between chunks does not interrupt them",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;gaRuYW\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=submit:t=form:m=1;gaZmaW\u001b\\",
     "\u001b]11;?\u0007",
-    "\u001b]7279;m=0;1loUE=\u001b\\"
+    "\u001b]7279;m=0;VsZHORkqRuYW1loUE=\u001b\\"
    ],
    "bodies": [
     {
-     "name": "A"
+     "fields": [
+      [
+       "name",
+       "A"
+      ]
+     ]
     },
     null,
     null
@@ -13892,13 +15761,15 @@
       "value": null,
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "kind": "submit",
-      "fields": {
-       "name": "A"
-      }
+      "fields": [
+       [
+        "name",
+        "A"
+       ]
+      ]
      }
     }
    ]
@@ -14020,7 +15891,6 @@
       "value": "ab",
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "kind": "input"
@@ -14037,7 +15907,6 @@
       "value": "ab",
       "checked": null,
       "link": null,
-      "size": null,
       "fit_rows": null,
       "drag": null,
       "kind": "input"
@@ -14077,13 +15946,10 @@
   },
   {
    "name": "click and press carry the element's area; another kind's is not read",
-   "requires": [
-    "event.area"
-   ],
    "seqs": [
     "\u001b]7279;a=ev:s=f:e=click:t=env;gqV2YWx1ZadzdGFnaW5npGFyZWGEoWMCoXIAoXcMoWgB\u001b\\",
     "\u001b]7279;a=ev:s=f:e=press:t=title;gaRhcmVhhKFj/6FyA6F3BaFoAg==\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=press:t=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press\u001b\\",
     "\u001b]7279;a=ev:s=f:e=change:t=env;gqV2YWx1Zapwcm9kdWN0aW9upGFyZWGEoWMCoXIAoXcMoWgB\u001b\\"
    ],
    "results": [
@@ -14135,8 +16001,7 @@
      "control": {
       "a": "ev",
       "s": "f",
-      "e": "press",
-      "t": ""
+      "e": "press"
      },
      "event": {
       "kind": "press",
@@ -14190,24 +16055,31 @@
    ]
   },
   {
-   "name": "capabilities: scroll, false when absent",
+   "name": "click and press carry the modifiers held as bits; none leaves them out (SPEC \u00a79)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqZzY3JvbGzD\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMg==\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=click:t=ok;gaRtb2RzBQ==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press:t=title;gqRhcmVhhKFjAaFyAKF3A6FoAaRtb2RzCA==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=click:t=ok;gaV2YWx1ZaF4\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.2",
-     "scroll": true
+     "mods": 5
     },
     {
-     "v": "0.2"
+     "area": {
+      "c": 1,
+      "r": 0,
+      "w": 3,
+      "h": 1
+     },
+     "mods": 8
+    },
+    {
+     "value": "x"
     }
    ],
-   "requires": [
-    "caps.scroll"
-   ],
    "results": [
+    "complete",
     "complete",
     "complete"
    ],
@@ -14215,81 +16087,48 @@
    "messages": [
     {
      "control": {
-      "a": "ok",
-      "n": "1",
-      "re": "q"
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "ok"
      },
-     "caps": {
-      "v": "0.2",
-      "scroll": true
+     "event": {
+      "kind": "click",
+      "target": "ok",
+      "mods": 5
      }
     },
     {
      "control": {
-      "a": "ok",
-      "n": "2",
-      "re": "q"
+      "a": "ev",
+      "s": "f",
+      "e": "press",
+      "t": "title"
      },
-     "caps": {
-      "v": "0.2",
-      "scroll": false
-     }
-    }
-   ]
-  },
-  {
-   "name": "view in events: the host reports what is in view; one that lists no events is taken to send view but not to report it",
-   "requires": [
-    "caps.views"
-   ],
-   "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqZldmVudHOSpWNsaWNrpHZpZXc=\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMg==\u001b\\"
-   ],
-   "bodies": [
-    {
-     "v": "0.2",
-     "events": [
-      "click",
-      "view"
-     ]
-    },
-    {
-     "v": "0.2"
-    }
-   ],
-   "results": [
-    "complete",
-    "complete"
-   ],
-   "invalid": 0,
-   "messages": [
-    {
-     "control": {
-      "a": "ok",
-      "n": "1",
-      "re": "q"
-     },
-     "caps": {
-      "sends": {
-       "view": true,
-       "hover": false
-      },
-      "views": true,
-      "hovers": false
+     "event": {
+      "kind": "press",
+      "target": "title",
+      "mods": 8,
+      "area": {
+       "c": 1,
+       "r": 0,
+       "w": 3,
+       "h": 1
+      }
      }
     },
     {
      "control": {
-      "a": "ok",
-      "n": "2",
-      "re": "q"
+      "a": "ev",
+      "s": "f",
+      "e": "click",
+      "t": "ok"
      },
-     "caps": {
-      "sends": {
-       "view": true
-      },
-      "views": false
+     "event": {
+      "kind": "click",
+      "target": "ok",
+      "mods": 0,
+      "value": "x"
      }
     }
    ]
@@ -14552,88 +16391,88 @@
   {
    "name": "a body that holds, anywhere, what no host sends does not decode: a nil, a key that is not a string or is given twice in one map, a string that is not UTF-8, an int past 2^53 \u2212 1, a timestamp of another size, nanoseconds of a whole second, or seconds past 2^53 \u2212 1 (SDK.md \u00a73.9)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;g6F2ozAuMqZmdXR1cmXApnNjcm9sbMM=\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuMqVzY2FsZcA=\u001b\\",
-    "\u001b]7279;a=ok:n=3:re=q;g6F2ozAuMqZmdXR1cmWBAaFhpnNjcm9sbMM=\u001b\\",
-    "\u001b]7279;a=ok:n=4:re=q;g6F2ozAuMqZmdXR1cmWBxAF4oWGmc2Nyb2xsww==\u001b\\",
-    "\u001b]7279;a=ok:n=5:re=q;g6F2ozAuMgGhYaZzY3JvbGzD\u001b\\",
-    "\u001b]7279;a=ok:n=6:re=q;g6F2ozAuMqZmdXR1cmWiwyimc2Nyb2xsww==\u001b\\",
-    "\u001b]7279;a=ok:n=7:re=q;g6F2ozAuMqZmdXR1cmWj7aCApnNjcm9sbMM=\u001b\\",
-    "\u001b]7279;a=ok:n=8:re=q;g6F2ozAuMqLDKKFhpnNjcm9sbMM=\u001b\\",
-    "\u001b]7279;a=ok:n=9:re=q;g6F2ozAuMqZmdXR1cmXPACAAAAAAAACmc2Nyb2xsww==\u001b\\",
-    "\u001b]7279;a=ok:n=10:re=q;g6F2ozAuMqZmdXR1cmXT/+AAAAAAAACmc2Nyb2xsww==\u001b\\",
-    "\u001b]7279;a=ok:n=11:re=q;g6F2ozAuMqZmdXR1cmWSzwAf////////0//gAAAAAAABpnNjcm9sbMM=\u001b\\",
-    "\u001b]7279;a=ok:n=12:re=q;g6F2ozAuMqZmdXR1cmXV/wAApnNjcm9sbMM=\u001b\\",
-    "\u001b]7279;a=ok:n=13:re=q;g6F2ozAuMqZmdXR1cmXX/+5rKAAAAAAApnNjcm9sbMM=\u001b\\",
-    "\u001b]7279;a=ok:n=14:re=q;g6F2ozAuMqZmdXR1cmXHDP8AAAAAACAAAAAAAACmc2Nyb2xsww==\u001b\\",
-    "\u001b]7279;a=ok:n=15:re=q;g6F2ozAuMqZmdXR1cmXHDP87msn/AAAAAAAAAACmc2Nyb2xsww==\u001b\\",
-    "\u001b]7279;a=ok:n=16:re=q;g6F2ozAuMqF2ozAuMqZzY3JvbGzD\u001b\\",
-    "\u001b]7279;a=ok:n=17:re=q;g6F2ozAuMqZmdXR1cmWCoWEBoWEBpnNjcm9sbMM=\u001b\\",
-    "\u001b]7279;a=ok:n=18:re=q;g6F2ozAuMqVzY2FsZaF4pXNjYWxly0AAAAAAAAAA\u001b\\",
-    "\u001b]7279;a=ok:n=19:re=q;hKF2ozAuMqZmdXR1cmUB2QZmdXR1cmUCpnNjcm9sbMM=\u001b\\",
-    "\u001b]7279;a=ok:n=20:re=q;g6F2ozAuMqZmdXR1cmWBoXajMC4zpnNjcm9sbMM=\u001b\\",
+    "\u001b]7279;a=ok:n=1:re=q;g6F2ozAuM6ZmdXR1cmXApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuM6VzY2FsZcA=\u001b\\",
+    "\u001b]7279;a=ok:n=3:re=q;g6F2ozAuM6ZmdXR1cmWBAaFhpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=4:re=q;g6F2ozAuM6ZmdXR1cmWBxAF4oWGmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=5:re=q;g6F2ozAuMwGhYaZzY2hlbWWlbGlnaHQ=\u001b\\",
+    "\u001b]7279;a=ok:n=6:re=q;g6F2ozAuM6ZmdXR1cmWiwyimc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=7:re=q;g6F2ozAuM6ZmdXR1cmWj7aCApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=8:re=q;g6F2ozAuM6LDKKFhpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=9:re=q;g6F2ozAuM6ZmdXR1cmXPACAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=10:re=q;g6F2ozAuM6ZmdXR1cmXT/+AAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=11:re=q;g6F2ozAuM6ZmdXR1cmWSzwAf////////0//gAAAAAAABpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=12:re=q;g6F2ozAuM6ZmdXR1cmXV/wAApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=13:re=q;g6F2ozAuM6ZmdXR1cmXX/+5rKAAAAAAApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=14:re=q;g6F2ozAuM6ZmdXR1cmXHDP8AAAAAACAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=15:re=q;g6F2ozAuM6ZmdXR1cmXHDP87msn/AAAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=16:re=q;g6F2ozAuM6F2ozAuM6ZzY2hlbWWlbGlnaHQ=\u001b\\",
+    "\u001b]7279;a=ok:n=17:re=q;g6F2ozAuM6ZmdXR1cmWCoWEBoWEBpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=18:re=q;g6F2ozAuM6VzY2FsZaF4pXNjYWxly0AAAAAAAAAA\u001b\\",
+    "\u001b]7279;a=ok:n=19:re=q;hKF2ozAuM6ZmdXR1cmUB2QZmdXR1cmUCpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=20:re=q;g6F2ozAuM6ZmdXR1cmWBoXajMC4zpnNjaGVtZaVsaWdodA==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=change:t=box;gqdjaGVja2VkwKV2YWx1ZaFh\u001b\\"
    ],
    "bodies": [
     {
-     "hex": "83a176a3302e32a6667574757265c0a67363726f6c6cc3"
+     "hex": "83a176a3302e33a6667574757265c0a6736368656d65a56c69676874"
     },
     {
-     "hex": "82a176a3302e32a57363616c65c0"
+     "hex": "82a176a3302e33a57363616c65c0"
     },
     {
-     "hex": "83a176a3302e32a66675747572658101a161a67363726f6c6cc3"
+     "hex": "83a176a3302e33a66675747572658101a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a666757475726581c40178a161a67363726f6c6cc3"
+     "hex": "83a176a3302e33a666757475726581c40178a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e3201a161a67363726f6c6cc3"
+     "hex": "83a176a3302e3301a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a6667574757265a2c328a67363726f6c6cc3"
+     "hex": "83a176a3302e33a6667574757265a2c328a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a6667574757265a3eda080a67363726f6c6cc3"
+     "hex": "83a176a3302e33a6667574757265a3eda080a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a2c328a161a67363726f6c6cc3"
+     "hex": "83a176a3302e33a2c328a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a6667574757265cf0020000000000000a67363726f6c6cc3"
+     "hex": "83a176a3302e33a6667574757265cf0020000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a6667574757265d3ffe0000000000000a67363726f6c6cc3"
+     "hex": "83a176a3302e33a6667574757265d3ffe0000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a666757475726592cf001fffffffffffffd3ffe0000000000001a67363726f6c6cc3"
+     "hex": "83a176a3302e33a666757475726592cf001fffffffffffffd3ffe0000000000001a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a6667574757265d5ff0000a67363726f6c6cc3"
+     "hex": "83a176a3302e33a6667574757265d5ff0000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a6667574757265d7ffee6b280000000000a67363726f6c6cc3"
+     "hex": "83a176a3302e33a6667574757265d7ffee6b280000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a6667574757265c70cff000000000020000000000000a67363726f6c6cc3"
+     "hex": "83a176a3302e33a6667574757265c70cff000000000020000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a6667574757265c70cff3b9ac9ff0000000000000000a67363726f6c6cc3"
+     "hex": "83a176a3302e33a6667574757265c70cff3b9ac9ff0000000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a176a3302e32a67363726f6c6cc3"
+     "hex": "83a176a3302e33a176a3302e33a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a666757475726582a16101a16101a67363726f6c6cc3"
+     "hex": "83a176a3302e33a666757475726582a16101a16101a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a57363616c65a178a57363616c65cb4000000000000000"
+     "hex": "83a176a3302e33a57363616c65a178a57363616c65cb4000000000000000"
     },
     {
-     "hex": "84a176a3302e32a666757475726501d90666757475726502a67363726f6c6cc3"
+     "hex": "84a176a3302e33a666757475726501d90666757475726502a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e32a666757475726581a176a3302e33a67363726f6c6cc3"
+     "hex": "83a176a3302e33a666757475726581a176a3302e33a6736368656d65a56c69676874"
     },
     {
      "hex": "82a7636865636b6564c0a576616c7565a161"
@@ -14806,8 +16645,9 @@
       "n": 11
      },
      "caps": {
-      "v": "0.2",
-      "scroll": true
+      "v": "0.3",
+      "scheme": "light",
+      "light": true
      }
     },
     {
@@ -14861,8 +16701,9 @@
       "n": 15
      },
      "caps": {
-      "v": "0.2",
-      "scroll": true
+      "v": "0.3",
+      "scheme": "light",
+      "light": true
      }
     },
     {
@@ -14929,8 +16770,9 @@
       "n": 20
      },
      "caps": {
-      "v": "0.2",
-      "scroll": true
+      "v": "0.3",
+      "scheme": "light",
+      "light": true
      }
     },
     {
@@ -14953,12 +16795,12 @@
    "name": "a field a reader knows holding another kind of value than its type does not decode, as msgpack tells kinds apart: bin for a string, an array for a map, a map for an array, a timestamp for a map, an extension for a bool or a string (SPEC \u00a73.3, SDK.md \u00a73.9)",
    "seqs": [
     "\u001b]7279;a=ev:s=f:e=click:t=ok;gaV2YWx1ZcQBYQ==\u001b\\",
-    "\u001b]7279;a=ok:n=1:re=q;gaF2xAMwLjI=\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuMqRjZWxskA==\u001b\\",
-    "\u001b]7279;a=ok:n=3:re=q;gqF2ozAuMqZsaW1pdHOQ\u001b\\",
-    "\u001b]7279;a=ok:n=4:re=q;gqF2ozAuMqNvcHOA\u001b\\",
-    "\u001b]7279;a=ok:n=5:re=q;gqF2ozAuMqRjZWxs1v8AAAAA\u001b\\",
-    "\u001b]7279;a=ok:n=6:re=q;gqF2ozAuMqZldmVudHOSpWNsaWNr1AUA\u001b\\",
+    "\u001b]7279;a=ok:n=1:re=q;gaF2xAMwLjM=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuM6djZWxsY3NzkA==\u001b\\",
+    "\u001b]7279;a=ok:n=3:re=q;gqF2ozAuM6ZsaW1pdHOQ\u001b\\",
+    "\u001b]7279;a=ok:n=4:re=q;gqF2ozAuM6hmZWF0dXJlc4A=\u001b\\",
+    "\u001b]7279;a=ok:n=5:re=q;gqF2ozAuM6djZWxsY3Nz1v8AAAAA\u001b\\",
+    "\u001b]7279;a=ok:n=6:re=q;gqF2ozAuM6hmZWF0dXJlc5KlY2xpY2vUBQA=\u001b\\",
     "\u001b]7279;a=ev:s=f:e=change:t=box;gqdjaGVja2Vk1AUApXZhbHVloWE=\u001b\\"
    ],
    "bodies": [
@@ -14966,22 +16808,22 @@
      "hex": "81a576616c7565c40161"
     },
     {
-     "hex": "81a176c403302e32"
+     "hex": "81a176c403302e33"
     },
     {
-     "hex": "82a176a3302e32a463656c6c90"
+     "hex": "82a176a3302e33a763656c6c63737390"
     },
     {
-     "hex": "82a176a3302e32a66c696d69747390"
+     "hex": "82a176a3302e33a66c696d69747390"
     },
     {
-     "hex": "82a176a3302e32a36f707380"
+     "hex": "82a176a3302e33a8666561747572657380"
     },
     {
-     "hex": "82a176a3302e32a463656c6cd6ff00000000"
+     "hex": "82a176a3302e33a763656c6c637373d6ff00000000"
     },
     {
-     "hex": "82a176a3302e32a66576656e747392a5636c69636bd40500"
+     "hex": "82a176a3302e33a8666561747572657392a5636c69636bd40500"
     },
     {
      "hex": "82a7636865636b6564d40500a576616c7565a161"
@@ -15109,27 +16951,27 @@
   {
    "name": "any of msgpack's forms of a type is that type: ints of any size, a float of 32 bits, long strings, arrays and maps (SPEC \u00a73.3)",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=fit:t=;gaFyzQAH\u001b\\",
-    "\u001b]7279;a=ev:s=g:e=drag:t=;g6Fj0f/+oXLMBaRrZXlz3AAB2QVzaGlmdA==\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=resize:t=;gqF3ykOgQAChaMtASAAAAAAAAA==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=fit;gaFyzQAH\u001b\\",
+    "\u001b]7279;a=ev:s=g:e=drag;g6Fj0f/+oXLMBaRtb2RzzQAB\u001b\\",
+    "\u001b]7279;a=ev:e=caps;gadjZWxsY3NzgqF3ykOgQAChaMtASAAAAAAAAA==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=input:t=q;gaV2YWx1ZdoAAmFi\u001b\\",
-    "\u001b]7279;a=ok:n=1:re=q;3gACoXbbAAAAAzAuMqVzY2FsZcpAAAAA\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;3gADoXbbAAAAAzAuM6VzY2FsZcpAAAAAqGZlYXR1cmVz3AAB2QVob3Zlcg==\u001b\\"
    ],
    "bodies": [
     {
      "hex": "81a172cd0007"
     },
     {
-     "hex": "83a163d1fffea172cc05a46b657973dc0001d9057368696674"
+     "hex": "83a163d1fffea172cc05a46d6f6473cd0001"
     },
     {
-     "hex": "82a177ca43a04000a168cb4048000000000000"
+     "hex": "81a763656c6c63737382a177ca43a04000a168cb4048000000000000"
     },
     {
      "hex": "81a576616c7565da00026162"
     },
     {
-     "hex": "de0002a176db00000003302e32a57363616c65ca40000000"
+     "hex": "de0003a176db00000003302e33a57363616c65ca40000000a86665617475726573dc0001d905686f766572"
     }
    ],
    "results": [
@@ -15145,8 +16987,7 @@
      "control": {
       "a": "ev",
       "s": "f",
-      "e": "fit",
-      "t": ""
+      "e": "fit"
      },
      "event": {
       "kind": "fit",
@@ -15157,30 +16998,30 @@
      "control": {
       "a": "ev",
       "s": "g",
-      "e": "drag",
-      "t": ""
+      "e": "drag"
      },
      "event": {
       "kind": "drag",
       "drag": {
        "c": -2,
-       "r": 5,
-       "keys": [
-        "shift"
-       ]
-      }
+       "r": 5
+      },
+      "mods": 1
      }
     },
     {
      "control": {
       "a": "ev",
-      "s": "f",
-      "e": "resize",
-      "t": ""
+      "e": "caps"
      },
      "event": {
-      "kind": "resize",
-      "size": {
+      "kind": "caps"
+     },
+     "changed": {
+      "fields": [
+       "cellcss"
+      ],
+      "cell_css": {
        "w": 320.5,
        "h": 48.0
       }
@@ -15210,8 +17051,11 @@
       "n": 1
      },
      "caps": {
-      "v": "0.2",
-      "scale": 2.0
+      "v": "0.3",
+      "scale": 2.0,
+      "features": [
+       "hover"
+      ]
      }
     }
    ]
@@ -15413,24 +17257,23 @@
       "count": null
      }
     }
-   ],
-   "requires": [
-    "event.count"
    ]
   },
   {
-   "name": "count says a repeated click carries its count (SPEC \u00a74, \u00a79); absent, it does not",
+   "name": "features lists count: a repeated click carries its count (SPEC \u00a74, \u00a79); absent, it does not",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqVjb3VudMM=\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMg==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuM6hmZWF0dXJlc5GlY291bnQ=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMw==\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.2",
-     "count": true
+     "v": "0.3",
+     "features": [
+      "count"
+     ]
     },
     {
-     "v": "0.2"
+     "v": "0.3"
     }
    ],
    "results": [
@@ -15446,7 +17289,9 @@
       "re": "q"
      },
      "caps": {
-      "count": true
+      "has": {
+       "count": true
+      }
      }
     },
     {
@@ -15456,12 +17301,11 @@
       "re": "q"
      },
      "caps": {
-      "count": false
+      "has": {
+       "count": false
+      }
      }
     }
-   ],
-   "requires": [
-    "event.count"
    ]
   },
   {
@@ -15645,13 +17489,13 @@
    ]
   },
   {
-   "name": "the capabilities' mod, edit, keys and menu (SPEC \u00a74)",
+   "name": "the capabilities' mod, edit and features (SPEC \u00a74)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;haF2ozAuMqNtb2SkTWV0YaRlZGl0gqpzZWxlY3QtYWxskaZNZXRhK2GkY29weZGmTWV0YStjpGtleXOCpmxlYWRlcqVTcGFjZad0aW1lb3V0zQPopG1lbnXD\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuM6Ntb2SkTWV0YaRlZGl0gqpzZWxlY3QtYWxskaZNZXRhK2GkY29weZGmTWV0YStjqGZlYXR1cmVzkaRtZW51\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.2",
+     "v": "0.3",
      "mod": "Meta",
      "edit": {
       "select-all": [
@@ -15661,11 +17505,9 @@
        "Meta+c"
       ]
      },
-     "keys": {
-      "leader": "Space",
-      "timeout": 1000
-     },
-     "menu": true
+     "features": [
+      "menu"
+     ]
     }
    ],
    "results": [
@@ -15689,26 +17531,27 @@
         "Meta+c"
        ]
       },
-      "keys": {
-       "leader": "Space",
-       "timeout": 1000
-      },
-      "menu": true
+      "features": [
+       "menu"
+      ],
+      "has": {
+       "menu": true,
+       "count": false
+      }
      }
     }
    ]
   },
   {
-   "name": "a keys whose timeout is not an int fails the capabilities (SPEC \u00a73.3)",
+   "name": "a limit that is not an int fails the capabilities (SPEC \u00a73.3)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuMqRrZXlzgqZsZWFkZXKlU3BhY2WndGltZW91dKIxcw==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuM6ZsaW1pdHOBqHN1cmZhY2VzojY0\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.2",
-     "keys": {
-      "leader": "Space",
-      "timeout": "1s"
+     "v": "0.3",
+     "limits": {
+      "surfaces": "64"
      }
     }
    ],
@@ -15860,9 +17703,9 @@
     },
     {
      "at": 20,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
      "body": {
-      "v": "0.2"
+      "v": "0.3"
      },
      "took": true,
      "state": "native",
@@ -15885,7 +17728,7 @@
     }
    ],
    "caps": {
-    "v": "0.2"
+    "v": "0.3"
    }
   },
   {
@@ -15934,9 +17777,9 @@
     },
     {
      "at": 40,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
      "body": {
-      "v": "0.2"
+      "v": "0.3"
      },
      "took": true,
      "state": "native",
@@ -15981,9 +17824,9 @@
     },
     {
      "at": 10,
-     "osc": "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMg==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMw==\u001b\\",
      "body": {
-      "v": "0.2"
+      "v": "0.3"
      },
      "took": false,
      "state": "detecting"
@@ -16023,10 +17866,10 @@
     },
     {
      "at": 20,
-     "osc": "\u001b]7279;a=err:n=1:re=q;gqRjb2RlqEVWRVJTSU9OpmRldGFpbKMwLjM=\u001b\\",
+     "osc": "\u001b]7279;a=err:n=1:re=q;gqRjb2RlqEVWRVJTSU9OpmRldGFpbKMwLjQ=\u001b\\",
      "body": {
       "code": "EVERSION",
-      "detail": "0.3"
+      "detail": "0.4"
      },
      "took": true,
      "state": "text",
@@ -16143,11 +17986,9 @@
     },
     {
      "at": 20,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaNvcHORpW1vcnBo\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaZzY2hlbWWkZGFyaw==\u001b\\",
      "body": {
-      "ops": [
-       "morph"
-      ]
+      "scheme": "dark"
      },
      "took": true,
      "state": "text",
@@ -16187,10 +18028,10 @@
     },
     {
      "at": 60000,
-     "osc": "\u001b]7279;a=err:n=1:re=q;gqRjb2RlqEVWRVJTSU9OpmRldGFpbKMwLjM=\u001b\\",
+     "osc": "\u001b]7279;a=err:n=1:re=q;gqRjb2RlqEVWRVJTSU9OpmRldGFpbKMwLjQ=\u001b\\",
      "body": {
       "code": "EVERSION",
-      "detail": "0.3"
+      "detail": "0.4"
      },
      "took": true,
      "state": "text",
@@ -16208,9 +18049,9 @@
     },
     {
      "at": 60020,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
      "body": {
-      "v": "0.2"
+      "v": "0.3"
      },
      "took": true,
      "state": "native",
@@ -16220,7 +18061,7 @@
     }
    ],
    "caps": {
-    "v": "0.2"
+    "v": "0.3"
    }
   },
   {
@@ -16232,9 +18073,9 @@
     },
     {
      "at": 100,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
      "body": {
-      "v": "0.2"
+      "v": "0.3"
      },
      "took": true,
      "state": "native",
@@ -16263,9 +18104,9 @@
     },
     {
      "at": 1400,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
      "body": {
-      "v": "0.2"
+      "v": "0.3"
      },
      "took": true,
      "deadline": 1500
@@ -16291,9 +18132,9 @@
     },
     {
      "at": 200,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
      "body": {
-      "v": "0.2"
+      "v": "0.3"
      },
      "took": true,
      "state": "text",
@@ -16327,9 +18168,9 @@
     },
     {
      "at": 60000,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
      "body": {
-      "v": "0.2"
+      "v": "0.3"
      },
      "took": true,
      "state": "native",
@@ -16339,9 +18180,9 @@
     },
     {
      "at": 60010,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
      "body": {
-      "v": "0.2"
+      "v": "0.3"
      },
      "took": true,
      "state": "native",
@@ -16349,7 +18190,7 @@
     }
    ],
    "caps": {
-    "v": "0.2"
+    "v": "0.3"
    }
   },
   {
@@ -16400,9 +18241,9 @@
     },
     {
      "at": 10,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMg==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
      "body": {
-      "v": "0.2"
+      "v": "0.3"
      },
      "took": true
     },
@@ -17454,6 +19295,74 @@
    "scroll": {
     "Meta+k": "scroll-up",
     "Control+k": null
+   }
+  },
+  {
+   "name": "prefix is an action a keymap keeps (SPEC \u00a710.2, \u00a710.5)",
+   "parse": "g=prefix Control+k=prefix Mod+j=prefix",
+   "format": "g=prefix Control+k=prefix Mod+j=prefix"
+  },
+  {
+   "name": "outside a text field, a key bound to prefix is the program's, and Prefix says so of it alone, with the fallback without Shift (SPEC \u00a710.2, \u00a710.5)",
+   "keys": [
+    "g=prefix j=program ArrowDown=prefix",
+    "k=scroll-down"
+   ],
+   "program": {
+    "g": true,
+    "j": true,
+    "ArrowDown": true,
+    "Shift+ArrowDown": true,
+    "k": false
+   },
+   "prefix": {
+    "g": true,
+    "j": false,
+    "ArrowDown": true,
+    "Shift+ArrowDown": true,
+    "k": false,
+    "G": false
+   }
+  },
+  {
+   "name": "a nearer binding of the key takes it from a farther prefix (SPEC \u00a710.2)",
+   "keys": [
+    "g=prefix",
+    "g=program"
+   ],
+   "program": {
+    "g": true
+   },
+   "prefix": {
+    "g": false
+   }
+  },
+  {
+   "name": "a prefix's Mod is the platform's (SPEC \u00a710.4, \u00a710.5)",
+   "platform": {
+    "mod": "Meta"
+   },
+   "keys": [
+    "Mod+k=prefix"
+   ],
+   "prefix": {
+    "Meta+k": true,
+    "Control+k": false
+   },
+   "program": {
+    "Meta+k": true
+   }
+  },
+  {
+   "name": "in a text field, a key bound to prefix is not the field's: it reaches the program (SPEC \u00a710.2, \u00a710.5)",
+   "multiline": false,
+   "keys": [
+    "Control+k=prefix"
+   ],
+   "lookup": {
+    "Control+k": null,
+    "a": "insert",
+    "ArrowLeft": "char-backward"
    }
   }
  ],
