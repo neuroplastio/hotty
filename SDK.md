@@ -524,6 +524,7 @@ field as its type.
 | `Surface` | `s`; absent when the command named none |
 | `Cols`, `Rows` | `c` and `r`, as numbers, in a reply to `place` |
 | `Code`, `Detail` | the error's body, when not OK |
+| `Op` | `i`, as a number, in an error answering a delta: the op at fault (SPEC.md §6.1); absent otherwise |
 | `Caps` | the capabilities, the body of an ok reply to `q` |
 | `Err` | the reply as an error, carrying `Code` and `Detail`; none when OK |
 

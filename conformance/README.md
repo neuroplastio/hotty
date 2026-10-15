@@ -223,7 +223,7 @@ and `invalid` its count after the last. `messages` are the complete ones,
 in order:
 - `control`: exactly these keys and values;
 - `reply`: `Reply`'s fields (`ok`, `re`, `n`, `surface`, `cols`, `rows`,
-  `code`, `detail`);
+  `code`, `detail`, `op`);
 - `event`: `Event`'s fields and accessors (`surface`, `kind`, `target`,
   `value`, `checked`, `fields` as a list of `[name, value]`, `mods`, `link`
   with `href` and `url`, `fit_rows`, `drag` with `c`, `r`, `x`, `y`, `tx`

@@ -14185,10 +14185,10 @@
    ]
   },
   {
-   "name": "error replies carry the code, and the detail when there is one",
+   "name": "error replies carry the code, the detail when there is one, and, answering a delta, the op at fault (SPEC \u00a73.6, \u00a76.1)",
    "seqs": [
     "\u001b]7279;a=err:re=frob;gaRjb2RlpkVJTlZBTA==\u001b\\",
-    "\u001b]7279;a=err:n=3:s=x:re=delta;gqRjb2RlqUVOT1RBUkdFVKZkZXRhaWykbm9wZQ==\u001b\\",
+    "\u001b]7279;a=err:n=3:s=x:re=delta:i=2;gqRjb2RlqUVOT1RBUkdFVKZkZXRhaWykbm9wZQ==\u001b\\",
     "\u001b]7279;a=err:s=gone:re=place;gaRjb2RlpkVOT0VOVA==\u001b\\",
     "\u001b]7279;a=err:s=x:re=focus;gaRjb2RlqUVERVRBQ0hFRA==\u001b\\",
     "\u001b]7279;a=err:s=y:re=doc;gqRjb2RlpkVRVU9UQaZkZXRhaWyoc3VyZmFjZXM=\u001b\\",
@@ -14235,7 +14235,8 @@
       "ok": false,
       "re": "frob",
       "code": "EINVAL",
-      "detail": null
+      "detail": null,
+      "op": null
      }
     },
     {
@@ -14243,14 +14244,16 @@
       "a": "err",
       "n": "3",
       "s": "x",
-      "re": "delta"
+      "re": "delta",
+      "i": "2"
      },
      "reply": {
       "ok": false,
       "n": 3,
       "surface": "x",
       "code": "ENOTARGET",
-      "detail": "nope"
+      "detail": "nope",
+      "op": 2
      }
     },
     {
