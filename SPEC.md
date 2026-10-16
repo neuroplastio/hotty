@@ -660,9 +660,10 @@ they apply. Each op is a map:
   names an op the table does not have; `t` is missing where the op needs
   one (every op but `morph`), or `k` for `attr`, `unattr` and `var`; or
   `reveal` has a `v` other than `start` or `end`. Where one op is at
-  fault, the reply names the first such by its index, `i` (§3.6). A `v`
-  that an op does not take is ignored, as is a key of an op that this
-  table does not name (§15).
+  fault, the reply names the first such by its index, `i` (§3.6). An op
+  that takes a `v` and has none takes it as empty; a `v` that an op does
+  not take is ignored, as is a key of an op that this table does not name
+  (§15).
 - **A missing target** is `ENOTARGET`, with the id as the detail. That op
   changes nothing, and the ops after it still apply. The reply names the
   first op that failed by its index, `i`, and a host that answers with no
