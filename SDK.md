@@ -1079,8 +1079,9 @@ them. These are the places a port goes wrong:
   item has a `Name` and its own `Items` in place of `Group`. A program
   sends its tree when what it can do changes, `MenuShow(seq)` for each key
   of a sequence, and `MenuHide()` when it ends, where 0.2 sent a level for
-  each key and hid it with an empty `Menu`. A pick from the host's
-  palette reaches it as `command` with the item's name.
+  each key and hid it with an empty `Menu`. A pick, from a
+  multiplexer's palette or an agent, reaches it as `command` with the
+  item's name.
 - **Errors only, unless asked.** A builder sends no `q` where the wire
   implies it, and `N(n)` alone asks for the reply. A fake host must answer
   a command without `q` only with an error.

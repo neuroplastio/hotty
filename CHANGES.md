@@ -47,10 +47,10 @@ together. The list it folds is `vault/tasks/fold-0.3.md`.
   out of §10.5): `a=menu` sends the program's actions as a tree, kept per
   screen, each item with a key where one reaches it and a `name`;
   `a=menu:show=1` shows the level the keys typed reach, a few bytes a key,
-  and `show=0` hides it. A pick from the host's palette sends `command`
-  with the item's name. A 0.2 menu was one level, shown when sent. A host
-  that takes menus has the feature `menu`, for programs on surfaces as in
-  the cells.
+  and `show=0` hides it. A pick, from a multiplexer's palette or an agent,
+  sends `command` with the item's name. A 0.2 menu was one level, shown
+  when sent. A host that takes menus has the feature `menu`, for programs
+  on surfaces as in the cells.
 
 ### Upgrading from 0.2
 
@@ -73,7 +73,7 @@ together. The list it folds is `vault/tasks/fold-0.3.md`.
   until you send `a=focus` (§10.5). `data-key` is gone.
 - Send what you can do as a menu tree with a `name` per item, show a level
   with `a=menu:show=1` and hide it with `show=0`, and handle `command` with
-  a `name` from a palette pick (§10.7).
+  a `name` from a pick (§10.7).
 
 **A host:**
 - Decode a delta's op list and apply it as one unit. Reply to an op whose
@@ -87,9 +87,10 @@ together. The list it folds is `vault/tasks/fold-0.3.md`.
 - Send event details as §9 has them.
 - Route every key after a `prefix` to the program, until it sends
   `a=focus` or the surface loses the keyboard (§10.5).
-- Keep a program's menu per screen, show the level its keys reach, and
-  send a pick from a palette as `command` with the item's name. Report the
-  feature `menu` only if all of that holds (§10.7).
+- Keep a program's menu per screen and show the level its keys reach.
+  Report the feature `menu` only if both hold (§10.7). Add no palette for
+  it: where you already list commands of your own, you may list its named
+  items there, and send a pick as `command` with the item's name.
 
 **A multiplexer** is a host to the programs in its panes and a program to
 its terminal, so it does both lists. Besides them:
@@ -98,9 +99,10 @@ its terminal, so it does both lists. Besides them:
   differs from what it last heard (§4).
 - Replay a surface with its `p`, `f` and `v`: they are the surface's now,
   not a placement's.
-- Keep each pane's menu, offer it in your own palette, and send picks to
-  the pane as `command`; until you do, leave `menu` out of the features
-  you report, and answer a pane's `a=menu` with `EINVAL` (§10.7).
+- Keep each pane's menu and show its levels, or leave `menu` out of the
+  features you report and answer a pane's `a=menu` with `EINVAL` (§10.7).
+  You may offer the menu in a palette of your own, or to whatever drives
+  the pane, and send picks to the pane as `command`.
 - While a surface you relay has the keyboard, give its pane every key you
   read, after your own shortcuts. A prefix asks nothing of you, since the
   keys the surface uses never reach you (§10.5).

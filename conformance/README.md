@@ -162,7 +162,9 @@ the surface used it; absent, not checked. `"events"` as for a pointer step.
   "label", "group", "enabled"}`: the item's key and label as the program
   sent them, whether it is a group, and whether it is enabled; `null` when
   none shows.
-- `"pick"`: the user picks the item named `"name"`, as from a palette.
+- `"pick"`: the item named `"name"` is picked, as from a multiplexer's
+  palette or a command palette the host already has. A host that offers
+  no picks skips the vector.
   `"events"` as for a pointer step: what the pick makes the host send,
   `[]` for nothing.
 

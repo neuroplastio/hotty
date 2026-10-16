@@ -5,8 +5,9 @@
 
 The program sends what it can do as its menu. Space starts a sequence: the
 host shows the level the keys reach, `f` goes into File, and a key ends it.
-The actions without keys (Sort, Reload) are only in the host's palette,
-which picks any of them by name. Every action the program runs is printed;
+The actions without keys (Sort, Reload) are reached only by a pick: from
+a multiplexer's palette, such as plx's, or from whatever drives the
+program, by name. Every action the program runs is printed;
 q quits.
 """
 import os
@@ -61,7 +62,7 @@ def main():
             print("this host takes no menus (the feature menu, SPEC §4).")
             return
         lam.write("\x1b[?1049h\x1b[2J\x1b[1;1H")
-        lam.write("menu.py: Space for the leader, the palette for the rest, q to quit.\r\n")
+        lam.write("menu.py: Space for the leader, a pick for the rest, q to quit.\r\n")
         sorted_by = "name"
         lam.write(hotty.menu(tree(sorted_by)))
         seq = ()

@@ -1918,14 +1918,16 @@ ESC ] 7279 ; a=menu ; <base64 msgpack menu> ST
   their own, as edit commands are kept (§10.6), and a full reset (RIS)
   drops both. A program that ends clears its menu, as it pops the keyboard
   flags it pushed.
-- **A pick.** The host lets the user pick an item that has a name, in a
-  palette: a list it shows when the user asks for one. A multiplexer
-  **MAY** also give a pane's menu to whatever drives it, such as an agent,
-  to pick from. Each item is offered under its groups' labels, with the
-  keys that reach it if keys do, its name where it has no label, and one
-  that is not enabled as disabled, which is not sent. A pick sends
-  `command` (§10.6) with the item's name and no `key`, as the terminal's
-  own menus send theirs. An item that no key reaches is picked only so.
+- **A pick.** An item that has a name can be picked from a list of the
+  menu. A multiplexer **MAY** offer a pane's menu in a palette of its own,
+  or give it to whatever drives the pane, such as an agent. A terminal
+  **MAY** list the items where it already lists commands of its own, such
+  as its command palette, and adds no list for them. Each item is offered
+  under its groups' labels, with the keys that reach it if keys do, its
+  name where it has no label, and one that is not enabled as disabled,
+  which is not sent. A pick sends `command` (§10.6) with the item's name
+  and no `key`, as the terminal's own menus send theirs. An item that no
+  key reaches is picked only so.
 
 **Showing a level.** While a sequence waits for its next key, or whenever
 it wants to say which keys do what, a program shows the level that the
@@ -2530,19 +2532,24 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
 - **Why the host draws menus.** A program in its cells would have to draw
   over its own output, and one on a surface a surface of its own. One menu
   drawn by the host serves both, looks the same in every program, and
-  tells the terminal which keys do what, which a terminal or a multiplexer
-  can show elsewhere, such as in a palette.
-- **Why a menu is what a program can do, not only its keys.** A palette
-  lists a program's actions and lets the user pick one without knowing
-  its keys, and a multiplexer can give the same list to an agent that
-  drives the program. So the menu holds every action the program offers
-  now, keyed or not, and a level of it is shown by the keys typed: the
-  tree is sent when it changes, and a key of a sequence costs a few bytes,
-  where 0.2 sent a whole level for each.
+  tells the terminal which keys do what, which a multiplexer can show
+  elsewhere, such as in its palette.
+- **Why a menu is what a program can do, not only its keys.** A
+  multiplexer's palette lists a program's actions and lets the user pick
+  one without knowing its keys, and the multiplexer can give the same list
+  to an agent that drives the program. So the menu holds every action the
+  program offers now, keyed or not, and a level of it is shown by the keys
+  typed: the tree is sent when it changes, and a key of a sequence costs a
+  few bytes, where 0.2 sent a whole level for each.
   - **A pick is a command,** as the terminal's own menus send, so a
     program reads one event for a key it took, an Edit menu and a palette.
   - **Kept per screen,** as edit commands are, so a full-screen program's
     actions go with it, and the shell's come back.
+  - **No palette of the host's own.** A terminal that has a command
+    palette may list the items beside its own commands. One that has none
+    adds none for a program's menu: the menu joins what the host already
+    has, and the lists that pick from it are a multiplexer's and an
+    agent's.
 - **Why a host may show no select list.** A select's list opens past its
   control, and a surface is a rectangle of cells: drawn inside, a list
   would force small surfaces to grow, and drawn outside, it is something
