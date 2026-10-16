@@ -1902,7 +1902,8 @@ ESC ] 7279 ; a=menu ; <base64 msgpack menu> ST
   - `name`, the command a pick sends (below); none for an item only its
     keys reach;
   - `enabled`, whether it does anything now;
-  - `items`, the items after it, which make it a group.
+  - `items`, the items after it, which make it a group; an empty list
+    makes none.
 
   It is myelin's `Tree`, with a name for each binding. The top level's
   items are one deep, and items nest at most eight deep: a deeper menu is
@@ -1937,7 +1938,9 @@ ESC ] 7279 ; a=menu:show=1 ; <base64 msgpack {"seq": [str]}> ST
   `mod` says (§10.4), and its label, a group's marked as one, and one that
   is not enabled as disabled. It **MAY** show only as many items as fit,
   and **MAY** wait a moment before it shows a level, so that a sequence
-  typed quickly shows none. Keys that reach no group show nothing.
+  typed quickly shows none. Keys that reach no group show nothing, and
+  stay the keys shown: a menu sent later that has the group shows its
+  level, and since nothing shown lists a key, any key hides it.
 - **Until** the program shows another, or sends `a=menu:show=0`, which
   hides it. Another value of `show` is `EINVAL`. The host also hides it on Escape, on a key the level does not
   list, when the screen changes and on a full reset (RIS), so that a
