@@ -46,10 +46,11 @@ HOTTY is designed around four constraints:
 
 ## Status
 
-**Version 0.2, a draft.** Versions 0.x may change incompatibly (§15 of the
-[spec](SPEC.md)), and 0.2 breaks 0.1: a host's bodies are msgpack, and a
-query lists the versions the program speaks. [`CHANGES.md`](CHANGES.md) says
-what changed and how to port. Two implementations that share no code pass the conformance
+**Version 0.3, a draft.** Versions 0.x may change incompatibly (§15 of the
+[spec](SPEC.md)), and 0.3 breaks 0.2: a delta is one list of ops, a
+surface keeps what it asked to hear, the capabilities name the features a
+host may lack, and key sequences are the program's.
+[`CHANGES.md`](CHANGES.md) says what changed and how to port. Two implementations that share no code pass the conformance
 vectors: [hotty-blitz](https://github.com/neuroplastio/hotty-blitz), a renderer
 with a C ABI and a polyfill for terminals that show images, and
 [xterm-addon-hotty](https://github.com/neuroplastio/xterm-addon-hotty), for
