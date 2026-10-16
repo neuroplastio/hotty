@@ -12437,6 +12437,54 @@
    ]
   },
   {
+   "name": "a submit of a form with no named field still carries fields, empty (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<form id=f><input id=t value=hi data-keys=\"Control+s=submit\"></form>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "s",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "submit",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "fields": []
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "a=menu shows a level, a=menu with no body hides it, and a body that is no level is EINVAL (SPEC \u00a710.5)",
    "requires": "menu",
    "steps": [
