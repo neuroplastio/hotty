@@ -97,7 +97,7 @@ browser through xterm-addon-hotty or natively in hottyterm.
 | [`CHANGES.md`](CHANGES.md) | what each version changed, and how to port to it |
 | [`conformance/`](conformance/) | the conformance vectors: what a host and an SDK must do, as data |
 | [`corpus/`](corpus/) | pages that exercise the HTML and CSS a surface is expected to handle |
-| [`examples/`](examples/) | programs that speak HOTTY: a card, a dashboard, a form, a large grid, a game |
+| [`examples/`](examples/) | programs that speak HOTTY: a card, a dashboard, a form, a large grid, a game, a menu |
 | [`clients/python/hotty.py`](clients/python/hotty.py) | a dependency-free reference client with SDK.md's whole wire layer, used by the examples and the hosts' tests; `test_vectors.py` runs the SDK vectors against it |
 
 ## Other hosts
