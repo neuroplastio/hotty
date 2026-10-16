@@ -351,7 +351,7 @@
    ]
   },
   {
-   "name": "reveal: a missing target is ENOTARGET with the id as detail, and a payload other than start, end or none is EINVAL; a surface not placed scrolls nothing and answers ok (SPEC \u00a76.1)",
+   "name": "reveal: a missing target is ENOTARGET with the id as detail, and a v other than start or end, an empty one too, is EINVAL; a surface not placed scrolls nothing and answers ok (SPEC \u00a76.1)",
    "steps": [
     {
      "send": {
@@ -412,6 +412,26 @@
         "op": "reveal",
         "t": "a",
         "v": "START"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL",
+      "i": "0"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "reveal",
+        "t": "a",
+        "v": ""
        }
       ]
      },

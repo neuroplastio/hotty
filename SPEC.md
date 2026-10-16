@@ -1854,9 +1854,10 @@ ESC ] 7279 ; a=menu ; <base64 msgpack menu> ST
   list, when the screen changes and on a full reset (RIS), so that a
   program that ends while it waits leaves none behind. The keys still go
   where they would without it.
-- A host that shows menus has the feature `menu` (§4). On one that does
-  not, a program shows its menu itself: in its cells, or as a surface at
-  a higher `z` (§5.2).
+- A host that shows menus has the feature `menu` (§4). One that does not
+  answers `a=menu` with `EINVAL`, as an action it does not take, and a
+  program shows its menu itself: in its cells, or as a surface at a
+  higher `z` (§5.2).
 
 ### 10.6 Commands in the cells
 
