@@ -1939,7 +1939,7 @@ ESC ] 7279 ; a=menu:show=1 ; <base64 msgpack {"seq": [str]}> ST
   and **MAY** wait a moment before it shows a level, so that a sequence
   typed quickly shows none. Keys that reach no group show nothing.
 - **Until** the program shows another, or sends `a=menu:show=0`, which
-  hides it. The host also hides it on Escape, on a key the level does not
+  hides it. Another value of `show` is `EINVAL`. The host also hides it on Escape, on a key the level does not
   list, when the screen changes and on a full reset (RIS), so that a
   program that ends while it waits leaves none behind. The keys still go
   where they would without it. A menu sent while a level shows replaces it

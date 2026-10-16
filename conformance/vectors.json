@@ -13166,7 +13166,7 @@
    ]
   },
   {
-   "name": "a menu that is no map, one nested past eight deep, a field of another type, and a seq that is no array of strings are EINVAL (SPEC \u00a73.3, \u00a710.7)",
+   "name": "a menu that is no map, one nested past eight deep, a field of another type, a seq that is no array of strings, and a show that is neither 0 nor 1 are EINVAL (SPEC \u00a73.3, \u00a710.7)",
    "requires": "menu",
    "steps": [
     {
@@ -13404,6 +13404,19 @@
      "reply": {
       "a": "err",
       "n": "7",
+      "re": "menu",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "8",
+      "show": "2"
+     },
+     "reply": {
+      "a": "err",
+      "n": "8",
       "re": "menu",
       "code": "EINVAL"
      }
