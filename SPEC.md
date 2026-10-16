@@ -656,10 +656,12 @@ they apply. Each op is a map:
   delta.
 - **Checked first.** The host checks the whole body before it applies any
   op, and answers `EINVAL`, applying nothing, when: the body does not
-  decode (§3.3), is not such a map, or has no ops; an op is not a map, or
-  names an op the table does not have; `t` is missing where the op needs
-  one (every op but `morph`), or `k` for `attr`, `unattr` and `var`; or
-  `reveal` has a `v` other than `start` or `end`. Where one op is at
+  decode (§3.3), is not such a map, or has no ops; an op is not a map,
+  names an op the table does not have, or holds `op`, `t`, `k` or `v` as
+  anything but a str; `t` is missing or empty where the op needs one
+  (every op but `morph`, for which an empty `t` is none), or `k` for
+  `attr`, `unattr` and `var`; or `reveal` has a `v` other than `start` or
+  `end`. Where one op is at
   fault, the reply names the first such by its index, `i` (§3.6). An op
   that takes a `v` and has none takes it as empty; a `v` that an op does
   not take is ignored, as is a key of an op that this table does not name

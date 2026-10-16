@@ -10940,7 +10940,7 @@
    ]
   },
   {
-   "name": "a delta is checked whole before any op applies: an unknown op, a missing t or k, a bad reveal, an op that is no map, no ops, or a body that is no list of ops is EINVAL, and i names the first op at fault where one is (SPEC \u00a76.1)",
+   "name": "a delta is checked whole before any op applies: an unknown op, a missing or empty t or k, a key that is no str, a bad reveal, an op that is no map, no ops, or a body that is no list of ops is EINVAL, and i names the first op at fault where one is (SPEC \u00a76.1)",
    "steps": [
     {
      "send": {
@@ -11150,6 +11150,86 @@
      ],
      "expect": {
       "text": "1"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "10"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "a",
+        "v": "x"
+       },
+       {
+        "op": "text",
+        "t": "",
+        "v": "y"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "n": "10",
+      "re": "delta",
+      "i": "1",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "11"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "text",
+        "t": "a",
+        "v": "x"
+       },
+       {
+        "op": "text",
+        "t": 5,
+        "v": "y"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "n": "11",
+      "re": "delta",
+      "i": "1",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "n": "12"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "a",
+        "k": "title",
+        "v": 7
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "n": "12",
+      "re": "delta",
+      "i": "0",
+      "code": "EINVAL"
      }
     },
     {
