@@ -12585,7 +12585,7 @@
    ]
   },
   {
-   "name": "a=menu keeps the program's menu and shows nothing; show=1 shows the keyed items of the level its keys reach, show=0 hides it, keys that reach no group show nothing, and an item whose items are empty is no group (SPEC \u00a710.7)",
+   "name": "a=menu keeps the program's menu and shows nothing; show=1 shows the keyed items of the level its keys reach, an item without enabled is shown disabled, show=0 hides it, keys that reach no group show nothing, and an item whose items are empty is no group (SPEC \u00a710.7)",
    "requires": "menu",
    "steps": [
     {
@@ -12617,6 +12617,11 @@
             "label": "Rename",
             "name": "file-rename",
             "enabled": false
+           },
+           {
+            "key": "d",
+            "label": "Delete",
+            "name": "file-delete"
            }
           ]
          },
@@ -12714,6 +12719,12 @@
       {
        "key": "r",
        "label": "Rename",
+       "group": false,
+       "enabled": false
+      },
+      {
+       "key": "d",
+       "label": "Delete",
        "group": false,
        "enabled": false
       }
@@ -12896,7 +12907,7 @@
    ]
   },
   {
-   "name": "a pick sends command with the item's name and no key, a keyless one too; a disabled item, an unknown name and a menu left none send nothing (SPEC \u00a710.7)",
+   "name": "a pick sends command with the item's name and no key, a keyless one too; a disabled item, one without enabled, an unknown name and a menu left none send nothing (SPEC \u00a710.7)",
    "requires": "menu",
    "steps": [
     {
@@ -12928,6 +12939,11 @@
             "label": "Rename",
             "name": "file-rename",
             "enabled": false
+           },
+           {
+            "key": "d",
+            "label": "Delete",
+            "name": "file-delete"
            }
           ]
          },
@@ -13002,6 +13018,11 @@
     {
      "menu": "pick",
      "name": "file-rename",
+     "events": []
+    },
+    {
+     "menu": "pick",
+     "name": "file-delete",
      "events": []
     },
     {

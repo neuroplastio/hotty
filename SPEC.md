@@ -1829,6 +1829,10 @@ the keys that follow.
 - **Nothing waits in the host.** The program keeps the sequence's time, and
   once it ends, by a key, a timeout or Escape, gives the keys back with
   `a=focus`. The keys typed before that are the program's.
+- **A multiplexer that relays the surface** needs no word of it: the keys
+  the surface uses never reach it, so while the surface has the keyboard it
+  gives the pane every key it reads, after its own shortcuts, as it does in
+  the cells.
 
 ### 10.6 Commands in the cells
 
@@ -1901,7 +1905,8 @@ ESC ] 7279 ; a=menu ; <base64 msgpack menu> ST
   - `label`, what it does;
   - `name`, the command a pick sends (below); none for an item only its
     keys reach;
-  - `enabled`, whether it does anything now;
+  - `enabled`, whether it does anything now; an item without it is
+    disabled;
   - `items`, the items after it, which make it a group; an empty list
     makes none.
 

@@ -99,7 +99,11 @@ its terminal, so it does both lists. Besides them:
 - Replay a surface with its `p`, `f` and `v`: they are the surface's now,
   not a placement's.
 - Keep each pane's menu, offer it in your own palette, and send picks to
-  the pane as `command`.
+  the pane as `command`; until you do, leave `menu` out of the features
+  you report, and answer a pane's `a=menu` with `EINVAL` (§10.7).
+- While a surface you relay has the keyboard, give its pane every key you
+  read, after your own shortcuts. A prefix asks nothing of you, since the
+  keys the surface uses never reach you (§10.5).
 
 ## 0.2
 
