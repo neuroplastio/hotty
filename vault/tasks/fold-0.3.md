@@ -2,8 +2,9 @@
 
 What a pass over SPEC 0.2 found for bandwidth and protocol complexity
 (2026-10-14), to fold into the spec. Folding them makes HOTTY 0.3 (the
-maintainer, 2026-10-14). The list grows until folding starts; nothing is
-folded yet. The measurements behind it are in
+maintainer, 2026-10-14). Folded on the branch `v0.3` across the stack on
+2026-10-16, all but FOLD-07, which waits for the code to land; nothing is
+pushed or released. The measurements, before and after, are in
 [`../knowledge/wire-sizes.md`](../knowledge/wire-sizes.md).
 
 Item template:
@@ -19,15 +20,16 @@ Item template:
 Statuses: `proposed`, `accepted`, `rejected`, `folded`. An item marked
 `needs: maintainer` is a scope decision, not the agent's to make.
 
-When folding starts, each item lands in SPEC.md, SDK.md and the vectors
-together (AGENTS.md), and the stack moves to 0.3 together: the three SDKs,
-the Python client, hotty-blitz, hottyterm, xterm-addon-hotty and their
-consumers.
+Each item lands in SPEC.md, SDK.md and the vectors together (AGENTS.md),
+and the stack moves to 0.3 together. On `v0.3`: the spec, the Python
+client, hotty-go, hotty-blitz, xterm-addon-hotty, hottyterm and
+hotty-a2ui. Still on 0.2: hotty-ts, hotty-lua and the other consumers
+(plexos, web, margin).
 
 ## Wire (0.3)
 
-- [ ] **FOLD-01** Deltas are one list of ops
-      status: proposed | added: 2026-10-14
+- [x] **FOLD-01** Deltas are one list of ops
+      status: folded (2026-10-16, branch v0.3) | added: 2026-10-14
       problem: every delta is a message of its own, with an envelope and a
       control: 49 B to set `--p: 42`. A frame of 15 small deltas is 755 B,
       and zlib cannot see across messages.
@@ -42,11 +44,11 @@ consumers.
       for `a=menu` today; the `build`, `encode` and delta vectors.
       notes: ops are maps keyed by name, as every HOTTY body is. Positional
       tuples would make one op 52 B, but need an exception to gov P-3:
-      not proposed. Deltas move to msgpack, so gov hears of it under P-3
-      when folding starts.
+      not proposed. Deltas move to msgpack, so gov hears of it under P-3;
+      not yet, as no agent hears of 0.3 until the maintainer says (2026-10-16).
 
-- [ ] **FOLD-02** Subscriptions stay on the surface
-      status: proposed | added: 2026-10-14
+- [x] **FOLD-02** Subscriptions stay on the surface
+      status: folded (2026-10-16, branch v0.3) | added: 2026-10-14
       problem: `p`, `f` and `v` end with every new placement, and the spec
       says so for each flag, then again for hover (§9.4) and view (§9.5). A
       program that places its surfaces every frame, as Appendix B expects,
@@ -61,10 +63,10 @@ consumers.
       changes nothing. About six lifetime paragraphs become one table.
       notes: the flags could also be named as the events they ask for
       (`ev=press,hover,fit`), which retires "`v`, because `h` is taken".
-      Optional.
+      Not taken.
 
-- [ ] **FOLD-03** What 0.2 added becomes 0.3's baseline
-      status: proposed | added: 2026-10-14
+- [x] **FOLD-03** What 0.2 added becomes 0.3's baseline
+      status: folded (2026-10-16, branch v0.3) | added: 2026-10-14
       problem: each feature added within 0.2 got a flag of its own
       (`passthrough`, `scroll`, `steps`, `drop`, `count`, `menu`), beside the
       `ops` and `events` lists, whose absence means opposite things: no
@@ -74,7 +76,8 @@ consumers.
       and `drop`; `ops`, `events` and those flags go. One list,
       `features: [str]`, names what a host may lack, with the names the
       conformance markers use; absent means none. In 0.3 it holds
-      `passthrough`, `hover` and `count`, and later additions.
+      `passthrough`, `hover`, `count` and `menu` (FOLD-09), and later
+      additions.
       gain: one mechanism. The SDKs' `Supports`, `Sends`, `Drags`, `Hovers`,
       `Views` and the flags become one `Has(name)`.
       cost: checked 2026-10-14, both hosts already do every op and event
@@ -83,8 +86,8 @@ consumers.
       `passthrough` and `count` only when its embedder supplies them. Those
       three stay features unless the hosts catch up before the fold.
 
-- [ ] **FOLD-04** Geometry without `resize`
-      status: proposed | added: 2026-10-14
+- [x] **FOLD-04** Geometry without `resize`
+      status: folded (2026-10-16, branch v0.3) | added: 2026-10-14
       problem: the cell is reported in device pixels, beside `scale`. A new
       font sends `resize` to every surface, and the program asks again
       (`a=q`) for the cell. A zoom changes `scale` and the program hears
@@ -98,9 +101,12 @@ consumers.
       the resolution of images, is decided when folding.
       gain: one event kind and a round trip fewer; device-pixel snapping is
       CSS, and right after a zoom.
+      folded as: the field is `cellcss` (a new name, as SPEC §15 has for a
+      changed type), and `scale` stays as a hint for images; a zoom sends
+      nothing.
 
-- [ ] **FOLD-05** Event details
-      status: proposed | added: 2026-10-14
+- [x] **FOLD-05** Event details
+      status: folded (2026-10-16, branch v0.3) | added: 2026-10-14
       problem and proposal, three parts:
       - `submit` carries the form's names as the detail's own keys
         (`{str: str}`). Two checkboxes with one name lose a value, since a
@@ -115,8 +121,8 @@ consumers.
       - `t` is absent, not empty, where no element is meant (`fit`, `view`,
         `blur`, `hover` when the pointer leaves).
 
-- [ ] **FOLD-06** Envelope trims
-      status: proposed | added: 2026-10-14
+- [x] **FOLD-06** Envelope trims
+      status: folded (2026-10-16, branch v0.3) | added: 2026-10-14
       - `q` defaults to 1 (errors only), and `n` implies 0. That is the
         rule SDK.md §3.4.2 already follows, moved onto the wire: most
         commands then carry no `q`, and a program that forgets one does not
@@ -134,6 +140,13 @@ consumers.
       events and security. A normative companion takes keyboard routing,
       text fields and key names. Appendix B keeps one entry per mechanism.
       Prose only; folded last.
+      notes (2026-10-16): held back from the v0.3 fold, so that the
+      maintainer reviews what 0.3 changes apart from where text moves.
+      About 400 comments in the stack cite §10.2 and §10.4 (hotty-go 93,
+      hotty-blitz 84, xterm-addon-hotty 74, hotty-a2ui 77, hotty 34,
+      hottyterm 13), besides hotty-ts, hotty-lua, plexos and web; a split
+      that keeps §10's numbers, the moved parts left as pointers, spares
+      them.
 
 ## Scope decisions
 
@@ -147,8 +160,8 @@ consumers.
       offers can show them in a contextual palette, and to AI agents that
       drive a TUI without knowing its keys.
 
-- [ ] **FOLD-09** Key sequences are resolved by the program
-      status: accepted (the maintainer, 2026-10-16) | added: 2026-10-14
+- [x] **FOLD-09** Key sequences are resolved by the program
+      status: accepted (the maintainer, 2026-10-16), folded (2026-10-16, branch v0.3) | added: 2026-10-14
       problem: §10.5 puts a sequence engine in the host: `data-key`, groups,
       the nearest-to-focus rule, `<leader>`, a timeout, `keys` in the
       capabilities, and a which-key menu the host draws from the document.
@@ -174,15 +187,15 @@ consumers.
 
 ## SDKs (any time, not tied to 0.3)
 
-- [ ] **FOLD-10** Compress at zlib's default level
-      status: proposed | added: 2026-10-14
+- [x] **FOLD-10** Compress at zlib's default level
+      status: folded (2026-10-16, branch v0.3) | added: 2026-10-14
       hotty-go compresses at `BestSpeed`, the Python client at level 1.
       hotty-a2ui's `kit.css` is 26,708 B of base64 at level 1 and 17,452 B
       at level 6, 35% less, for about a millisecond. SDK.md §3.3 can name
       the level; the `encode` vectors already leave compression out.
 
-- [ ] **FOLD-11** Diff before morphing
-      status: proposed | added: 2026-10-14
+- [x] **FOLD-11** Diff before morphing
+      status: folded (2026-10-16, branch v0.3) | added: 2026-10-14
       Morphing the whole tree sends the whole tree: 930 B for one changed
       cell of `corpus/04-table.html`, where a `text` delta is 56 B. SDK.md
       says to diff first (hotty-a2ui's `rendition/html/diff.go` does), with
