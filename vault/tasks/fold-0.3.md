@@ -3,8 +3,8 @@
 What a pass over SPEC 0.2 found for bandwidth and protocol complexity
 (2026-10-14), to fold into the spec. Folding them makes HOTTY 0.3 (the
 maintainer, 2026-10-14). Folded on the branch `v0.3` across the stack on
-2026-10-16, all but FOLD-07, which waits for the code to land; nothing is
-pushed or released. The measurements, before and after, are in
+2026-10-16, FOLD-12 with them; FOLD-07 and FOLD-08 were rejected. Nothing
+is pushed or released. The measurements, before and after, are in
 [`../knowledge/wire-sizes.md`](../knowledge/wire-sizes.md).
 
 Item template:
@@ -130,23 +130,12 @@ hotty-a2ui. Still on 0.2: hotty-ts, hotty-lua and the other consumers
       - Continuation chunks carry only `m`. Their `q` does nothing: replies
         are per message.
 
-- [ ] **FOLD-07** Split the document
-      status: proposed | added: 2026-10-14
-      problem: §10 is 576 of SPEC's 2,482 lines (23%), and most of it is
-      how a host behaves (text fields' keymaps and actions, key names from
-      a terminal's bytes), not the wire. Appendix B (365 lines) grows an
-      entry per feature.
-      proposal: SPEC.md keeps the envelope, surfaces, deltas, resources,
-      events and security. A normative companion takes keyboard routing,
-      text fields and key names. Appendix B keeps one entry per mechanism.
-      Prose only; folded last.
-      notes (2026-10-16): held back from the v0.3 fold, so that the
-      maintainer reviews what 0.3 changes apart from where text moves.
-      About 400 comments in the stack cite §10.2 and §10.4 (hotty-go 93,
-      hotty-blitz 84, xterm-addon-hotty 74, hotty-a2ui 77, hotty 34,
-      hottyterm 13), besides hotty-ts, hotty-lua, plexos and web; a split
-      that keeps §10's numbers, the moved parts left as pointers, spares
-      them.
+- **FOLD-07** Split the document
+      status: rejected (the maintainer, 2026-10-16: "do not split") | added: 2026-10-14
+      proposal was: SPEC.md keeps the envelope, surfaces, deltas,
+      resources, events and security, and a normative companion takes
+      keyboard routing, text fields and key names (§10 is 23% of SPEC).
+      About 400 comments in the stack cite §10.2 and §10.4.
 
 ## Scope decisions
 
@@ -184,6 +173,24 @@ hotty-a2ui. Still on 0.2: hotty-ts, hotty-lua and the other consumers
       not the terminal's. It reverses what shipped on 2026-10-14 (hottyterm
       26.10.14-dev.740d7f8, xterm-addon-hotty 0.1.0-next.17). No consumer
       uses `data-key` yet, so it is cheapest now.
+
+- [x] **FOLD-12** A menu is what a program can do
+      status: accepted (the maintainer, 2026-10-16), folded (2026-10-16, branch v0.3) | added: 2026-10-16
+      problem: a 0.2 menu is one which-key level, shown when sent, and
+      every item needs a key. A palette that lists a pane's actions, in
+      plx or hottyterm, or an agent that drives a TUI without its keys
+      (FOLD-08's reason), has nothing to list or to pick.
+      proposal: §10.7. `a=menu` sends the program's actions as a tree,
+      myelin's `Tree` with a name for each binding: items keyed where a
+      key reaches them, nested at most eight deep, kept per screen. The
+      host shows a level with `a=menu:show=1` and the keys typed,
+      `show=0` hides it, and a pick from the host's palette sends
+      `command` with the item's name, as the terminal's own menus do. The
+      feature `menu` now means a host keeps, shows and picks.
+      gain: keyless actions, one tree for which-key and palette, a few
+      bytes a key in a sequence where 0.2 sent a level. cost: the tree
+      goes again when what the program can do changes; hosts walk it and
+      draw a palette.
 
 ## SDKs (any time, not tied to 0.3)
 

@@ -12585,7 +12585,7 @@
    ]
   },
   {
-   "name": "a=menu shows a level, a=menu with no body hides it, and a body that is no level is EINVAL (SPEC \u00a710.5)",
+   "name": "a=menu keeps the program's menu and shows nothing; show=1 shows the keyed items of the level its keys reach, show=0 hides it, and keys that reach no group show nothing (SPEC \u00a710.7)",
    "requires": "menu",
    "steps": [
     {
@@ -12594,25 +12594,49 @@
       "n": "1"
      },
      "body": {
-      "seq": [
-       "Space"
-      ],
-      "label": "Leader",
+      "label": "Files",
       "items": [
        {
-        "key": "f",
-        "label": "+file",
-        "group": true,
-        "enabled": true
+        "key": "Space",
+        "label": "Leader",
+        "enabled": true,
+        "items": [
+         {
+          "key": "f",
+          "label": "File",
+          "enabled": true,
+          "items": [
+           {
+            "key": "n",
+            "label": "New file",
+            "name": "file-new",
+            "enabled": true
+           },
+           {
+            "key": "r",
+            "label": "Rename",
+            "name": "file-rename",
+            "enabled": false
+           }
+          ]
+         },
+         {
+          "key": "q",
+          "label": "Quit",
+          "name": "quit",
+          "enabled": true
+         },
+         {
+          "label": "Sort by name",
+          "name": "sort-name",
+          "enabled": true
+         }
+        ]
        },
        {
-        "key": "q",
-        "label": "Quit",
+        "label": "Reload",
+        "name": "reload",
         "enabled": true
-       },
-       {
-        "key": "w",
-        "enabled": false
        }
       ]
      },
@@ -12621,6 +12645,303 @@
       "n": "1",
       "re": "menu"
      }
+    },
+    {
+     "menu": "shown",
+     "expect": null
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "2",
+      "show": "1"
+     },
+     "body": {
+      "seq": [
+       "Space"
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "2",
+      "re": "menu"
+     }
+    },
+    {
+     "menu": "shown",
+     "expect": [
+      {
+       "key": "f",
+       "label": "File",
+       "group": true,
+       "enabled": true
+      },
+      {
+       "key": "q",
+       "label": "Quit",
+       "group": false,
+       "enabled": true
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "3",
+      "show": "1"
+     },
+     "body": {
+      "seq": [
+       "Space",
+       "f"
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "3",
+      "re": "menu"
+     }
+    },
+    {
+     "menu": "shown",
+     "expect": [
+      {
+       "key": "n",
+       "label": "New file",
+       "group": false,
+       "enabled": true
+      },
+      {
+       "key": "r",
+       "label": "Rename",
+       "group": false,
+       "enabled": false
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "4",
+      "show": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "n": "4",
+      "re": "menu"
+     }
+    },
+    {
+     "menu": "shown",
+     "expect": null
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "5",
+      "show": "1"
+     },
+     "reply": {
+      "a": "ok",
+      "n": "5",
+      "re": "menu"
+     }
+    },
+    {
+     "menu": "shown",
+     "expect": [
+      {
+       "key": "Space",
+       "label": "Leader",
+       "group": true,
+       "enabled": true
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "6",
+      "show": "1"
+     },
+     "body": {
+      "seq": []
+     },
+     "reply": {
+      "a": "ok",
+      "n": "6",
+      "re": "menu"
+     }
+    },
+    {
+     "menu": "shown",
+     "expect": [
+      {
+       "key": "Space",
+       "label": "Leader",
+       "group": true,
+       "enabled": true
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "7",
+      "show": "1"
+     },
+     "body": {
+      "seq": [
+       "Space",
+       "q"
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "7",
+      "re": "menu"
+     }
+    },
+    {
+     "menu": "shown",
+     "expect": null
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "8",
+      "show": "1"
+     },
+     "body": {
+      "seq": [
+       "x"
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "8",
+      "re": "menu"
+     }
+    },
+    {
+     "menu": "shown",
+     "expect": null
+    }
+   ]
+  },
+  {
+   "name": "a pick sends command with the item's name and no key, a keyless one too; a disabled item, an unknown name and a menu left none send nothing (SPEC \u00a710.7)",
+   "requires": "menu",
+   "steps": [
+    {
+     "send": {
+      "a": "menu",
+      "n": "1"
+     },
+     "body": {
+      "label": "Files",
+      "items": [
+       {
+        "key": "Space",
+        "label": "Leader",
+        "enabled": true,
+        "items": [
+         {
+          "key": "f",
+          "label": "File",
+          "enabled": true,
+          "items": [
+           {
+            "key": "n",
+            "label": "New file",
+            "name": "file-new",
+            "enabled": true
+           },
+           {
+            "key": "r",
+            "label": "Rename",
+            "name": "file-rename",
+            "enabled": false
+           }
+          ]
+         },
+         {
+          "key": "q",
+          "label": "Quit",
+          "name": "quit",
+          "enabled": true
+         },
+         {
+          "label": "Sort by name",
+          "name": "sort-name",
+          "enabled": true
+         }
+        ]
+       },
+       {
+        "label": "Reload",
+        "name": "reload",
+        "enabled": true
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "1",
+      "re": "menu"
+     }
+    },
+    {
+     "menu": "pick",
+     "name": "sort-name",
+     "events": [
+      {
+       "e": "command",
+       "s": null,
+       "t": null,
+       "detail": {
+        "name": "sort-name"
+       }
+      }
+     ]
+    },
+    {
+     "menu": "pick",
+     "name": "reload",
+     "events": [
+      {
+       "e": "command",
+       "s": null,
+       "t": null,
+       "detail": {
+        "name": "reload"
+       }
+      }
+     ]
+    },
+    {
+     "menu": "pick",
+     "name": "file-new",
+     "events": [
+      {
+       "e": "command",
+       "s": null,
+       "t": null,
+       "detail": {
+        "name": "file-new"
+       }
+      }
+     ]
+    },
+    {
+     "menu": "pick",
+     "name": "file-rename",
+     "events": []
+    },
+    {
+     "menu": "pick",
+     "name": "nothing",
+     "events": []
     },
     {
      "send": {
@@ -12634,16 +12955,455 @@
      }
     },
     {
+     "menu": "pick",
+     "name": "reload",
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "the level shown hides on Escape and on a key it does not list, not on one it lists, and a new menu shows the same keys' level of it (SPEC \u00a710.7)",
+   "requires": "menu",
+   "steps": [
+    {
      "send": {
       "a": "menu",
-      "n": "3"
+      "n": "1"
+     },
+     "body": {
+      "label": "Files",
+      "items": [
+       {
+        "key": "Space",
+        "label": "Leader",
+        "enabled": true,
+        "items": [
+         {
+          "key": "f",
+          "label": "File",
+          "enabled": true,
+          "items": [
+           {
+            "key": "n",
+            "label": "New file",
+            "name": "file-new",
+            "enabled": true
+           },
+           {
+            "key": "r",
+            "label": "Rename",
+            "name": "file-rename",
+            "enabled": false
+           }
+          ]
+         },
+         {
+          "key": "q",
+          "label": "Quit",
+          "name": "quit",
+          "enabled": true
+         },
+         {
+          "label": "Sort by name",
+          "name": "sort-name",
+          "enabled": true
+         }
+        ]
+       },
+       {
+        "label": "Reload",
+        "name": "reload",
+        "enabled": true
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "1",
+      "re": "menu"
+     }
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "2",
+      "show": "1"
+     },
+     "body": {
+      "seq": [
+       "Space"
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "2",
+      "re": "menu"
+     }
+    },
+    {
+     "key": "Escape"
+    },
+    {
+     "menu": "shown",
+     "expect": null
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "3",
+      "show": "1"
+     },
+     "body": {
+      "seq": [
+       "Space"
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "3",
+      "re": "menu"
+     }
+    },
+    {
+     "key": "z"
+    },
+    {
+     "menu": "shown",
+     "expect": null
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "4",
+      "show": "1"
+     },
+     "body": {
+      "seq": [
+       "Space"
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "4",
+      "re": "menu"
+     }
+    },
+    {
+     "key": "f"
+    },
+    {
+     "menu": "shown",
+     "expect": [
+      {
+       "key": "f",
+       "label": "File",
+       "group": true,
+       "enabled": true
+      },
+      {
+       "key": "q",
+       "label": "Quit",
+       "group": false,
+       "enabled": true
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "5"
+     },
+     "body": {
+      "label": "Files",
+      "items": [
+       {
+        "key": "Space",
+        "label": "Leader",
+        "enabled": true,
+        "items": [
+         {
+          "key": "q",
+          "label": "Quit",
+          "name": "quit",
+          "enabled": false
+         }
+        ]
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "5",
+      "re": "menu"
+     }
+    },
+    {
+     "menu": "shown",
+     "expect": [
+      {
+       "key": "q",
+       "label": "Quit",
+       "group": false,
+       "enabled": false
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "6"
+     },
+     "reply": {
+      "a": "ok",
+      "n": "6",
+      "re": "menu"
+     }
+    },
+    {
+     "menu": "shown",
+     "expect": null
+    }
+   ]
+  },
+  {
+   "name": "a menu that is no map, one nested past eight deep, a field of another type, and a seq that is no array of strings are EINVAL (SPEC \u00a73.3, \u00a710.7)",
+   "requires": "menu",
+   "steps": [
+    {
+     "send": {
+      "a": "menu",
+      "n": "1"
      },
      "body": [
       "Space"
      ],
      "reply": {
       "a": "err",
+      "n": "1",
+      "re": "menu",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "2"
+     },
+     "body": {
+      "items": [
+       {
+        "key": "a",
+        "label": "Group",
+        "enabled": true,
+        "items": [
+         {
+          "key": "a",
+          "label": "Group",
+          "enabled": true,
+          "items": [
+           {
+            "key": "a",
+            "label": "Group",
+            "enabled": true,
+            "items": [
+             {
+              "key": "a",
+              "label": "Group",
+              "enabled": true,
+              "items": [
+               {
+                "key": "a",
+                "label": "Group",
+                "enabled": true,
+                "items": [
+                 {
+                  "key": "a",
+                  "label": "Group",
+                  "enabled": true,
+                  "items": [
+                   {
+                    "key": "a",
+                    "label": "Group",
+                    "enabled": true,
+                    "items": [
+                     {
+                      "key": "a",
+                      "label": "Leaf",
+                      "name": "leaf",
+                      "enabled": true
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "n": "2",
+      "re": "menu"
+     }
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "3"
+     },
+     "body": {
+      "items": [
+       {
+        "key": "a",
+        "label": "Group",
+        "enabled": true,
+        "items": [
+         {
+          "key": "a",
+          "label": "Group",
+          "enabled": true,
+          "items": [
+           {
+            "key": "a",
+            "label": "Group",
+            "enabled": true,
+            "items": [
+             {
+              "key": "a",
+              "label": "Group",
+              "enabled": true,
+              "items": [
+               {
+                "key": "a",
+                "label": "Group",
+                "enabled": true,
+                "items": [
+                 {
+                  "key": "a",
+                  "label": "Group",
+                  "enabled": true,
+                  "items": [
+                   {
+                    "key": "a",
+                    "label": "Group",
+                    "enabled": true,
+                    "items": [
+                     {
+                      "key": "a",
+                      "label": "Group",
+                      "enabled": true,
+                      "items": [
+                       {
+                        "key": "a",
+                        "label": "Leaf",
+                        "name": "leaf",
+                        "enabled": true
+                       }
+                      ]
+                     }
+                    ]
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
       "n": "3",
+      "re": "menu",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "4"
+     },
+     "body": {
+      "items": [
+       {
+        "key": 5,
+        "label": "Five",
+        "enabled": true
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "n": "4",
+      "re": "menu",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "5"
+     },
+     "body": {
+      "items": [
+       {
+        "label": "Off",
+        "name": "off",
+        "enabled": "no"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "n": "5",
+      "re": "menu",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "6",
+      "show": "1"
+     },
+     "body": {
+      "seq": "Space"
+     },
+     "reply": {
+      "a": "err",
+      "n": "6",
+      "re": "menu",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "menu",
+      "n": "7",
+      "show": "1"
+     },
+     "body": {
+      "seq": [
+       1
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "n": "7",
       "re": "menu",
       "code": "EINVAL"
      }
@@ -13970,29 +14730,40 @@
    ]
   },
   {
-   "name": "menu: a=menu and the level as msgpack, myelin's names and order, an empty label and a false group left out (SPEC \u00a710.6, SDK.md \u00a73.4)",
+   "name": "menu: a=menu and the tree as msgpack; an empty label, key or name left out, enabled always, items only where there are some (SPEC \u00a710.7, SDK.md \u00a73.4)",
    "build": "menu",
    "args": {
     "menu": {
-     "seq": [
-      "Space"
-     ],
      "label": "",
      "items": [
       {
-       "key": "f",
-       "label": "+file",
-       "group": true,
-       "enabled": true
+       "key": "Space",
+       "label": "Leader",
+       "name": "",
+       "enabled": true,
+       "items": [
+        {
+         "key": "q",
+         "label": "Quit",
+         "name": "quit",
+         "enabled": true,
+         "items": []
+        },
+        {
+         "key": "",
+         "label": "",
+         "name": "sort-name",
+         "enabled": false,
+         "items": []
+        }
+       ]
       },
       {
-       "key": "q",
-       "label": "Quit",
-       "enabled": true
-      },
-      {
-       "key": "w",
-       "enabled": false
+       "key": "",
+       "label": "Reload",
+       "name": "reload",
+       "enabled": true,
+       "items": []
       }
      ]
     }
@@ -14005,34 +14776,38 @@
        "q": "2"
       },
       "body": {
-       "seq": [
-        "Space"
-       ],
        "items": [
         {
-         "key": "f",
-         "label": "+file",
-         "group": true,
-         "enabled": true
+         "key": "Space",
+         "label": "Leader",
+         "enabled": true,
+         "items": [
+          {
+           "key": "q",
+           "label": "Quit",
+           "name": "quit",
+           "enabled": true
+          },
+          {
+           "name": "sort-name",
+           "enabled": false
+          }
+         ]
         },
         {
-         "key": "q",
-         "label": "Quit",
+         "label": "Reload",
+         "name": "reload",
          "enabled": true
-        },
-        {
-         "key": "w",
-         "enabled": false
         }
        ]
       },
-      "payload_b64": "gqNzZXGRpVNwYWNlpWl0ZW1zk4Sja2V5oWalbGFiZWylK2ZpbGWlZ3JvdXDDp2VuYWJsZWTDg6NrZXmhcaVsYWJlbKRRdWl0p2VuYWJsZWTDgqNrZXmhd6dlbmFibGVkwg=="
+      "payload_b64": "gaVpdGVtc5KEo2tleaVTcGFjZaVsYWJlbKZMZWFkZXKnZW5hYmxlZMOlaXRlbXOShKNrZXmhcaVsYWJlbKRRdWl0pG5hbWWkcXVpdKdlbmFibGVkw4KkbmFtZalzb3J0LW5hbWWnZW5hYmxlZMKDpWxhYmVsplJlbG9hZKRuYW1lpnJlbG9hZKdlbmFibGVkww=="
      }
     }
    ]
   },
   {
-   "name": "menu with none: no payload, which hides it",
+   "name": "menu with none: no payload, which leaves the program none",
    "build": "menu",
    "args": {},
    "out": [
@@ -14040,6 +14815,68 @@
      "cmd": {
       "control": {
        "a": "menu",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "menu_show: a=menu:show=1 and the keys typed as {\"seq\": [str]} (SPEC \u00a710.7)",
+   "build": "menu_show",
+   "args": {
+    "keys": [
+     "Space",
+     "f"
+    ]
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "menu",
+       "show": "1",
+       "q": "2"
+      },
+      "body": {
+       "seq": [
+        "Space",
+        "f"
+       ]
+      },
+      "payload_b64": "gaNzZXGSpVNwYWNloWY="
+     }
+    }
+   ]
+  },
+  {
+   "name": "menu_show with no keys: no payload, the top level",
+   "build": "menu_show",
+   "args": {
+    "keys": []
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "menu",
+       "show": "1",
+       "q": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "menu_hide: a=menu:show=0",
+   "build": "menu_hide",
+   "args": {},
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "menu",
+       "show": "0",
        "q": "2"
       }
      }

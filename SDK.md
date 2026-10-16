@@ -271,7 +271,9 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | `Sync` | `CSI ? 2026 h`, the commands, `CSI ? 2026 l` (SPEC.md §6.3) | commands | — |
 | `WithdrawLate` | `a=q:q=2`: withdraws a query that asked for a late answer (SPEC.md §4) | — | — |
 | `Edit` | `a=edit:take=<names>`, the names joined by `,`, in the order given; `take=` empty takes none (SPEC.md §10.6) | names | 2 |
-| `Menu` | `a=menu` and the menu as msgpack (below); with no menu, no payload, which hides it (SPEC.md §10.5) | menu | 2 |
+| `Menu` | `a=menu` and the menu as msgpack (below); with no menu, no payload, which leaves the program none (SPEC.md §10.7) | menu | 2 |
+| `MenuShow` | `a=menu:show=1` and `{"seq": [str]}`, the keys typed; with none, no payload, which shows the top level (SPEC.md §10.7) | keys | 2 |
+| `MenuHide` | `a=menu:show=0` | — | 2 |
 
 - **`Doc` and `Place` answer errors**, since a refused document or placement
   (`EQUOTA`, `ENOENT`) is something a program must hear. Everything else
@@ -281,12 +283,13 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
   leaves the cursor where it was: for a full-screen program, which places
   surfaces where it draws them. The coordinates have no leading zeros.
 - **`Sync`** takes commands already built, and brackets them.
-- **`Menu`** takes a `MenuLevel`: `Seq`, `Label` and `Items`, each item a
-  `MenuItem` with `Key`, `Label`, `Group` and `Enabled`. It writes one
-  msgpack map, each value in the smallest of its type's forms: `seq`,
-  `label` unless it is empty, `items`; each item `key`, `label` unless it
-  is empty, `group` only when true, `enabled`. These are myelin's names
-  and order, so a program on myelin hands its menu over as it is.
+- **`Menu`** takes a `MenuTree`: `Label` and `Items`, each item a
+  `MenuItem` with `Key`, `Label`, `Name`, `Enabled` and `Items`, its own.
+  It writes one msgpack map, each value in the smallest of its type's
+  forms: `label` unless it is empty, `items`; each item `key`, `label` and
+  `name` unless they are empty, `enabled`, and `items` unless there are
+  none. A program on myelin names each binding of its `Tree` and hands it
+  over. The program keeps it within eight levels (SPEC.md §10.7).
 
 #### 3.4.1 Placement
 
@@ -975,8 +978,8 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Del`, `DelAll` | `Del`, `DelAll` | `delete`, `del_all` | `del`, `del_all` | `del`, `del_all` | `del`, `delAll` |
 | `Detach`, `Focus`, `Blur`, `Sync` | the same | `detach`, `focus`, `blur`, `sync` | as Python | as Python | `detach`, `focus`, `blur`, `sync` |
 | `WithdrawLate` | `hotty.WithdrawLate` | `withdraw_late` | `withdraw_late` | `withdraw_late` | `withdrawLate` |
-| `Edit`, `Menu` | `hotty.Edit`, `hotty.Menu` | `edit`, `menu` | as Python | as Python | `edit`, `menu` |
-| `MenuLevel`, `MenuItem` and their fields | `hotty.MenuLevel{Seq, Label, Items}`, `hotty.MenuItem{Key, Label, Group, Enabled}` | `MenuLevel(seq, label, items)`, `MenuItem(key, label, group, enabled)` | tables with those keys | `MenuLevel { seq, … }` | `{ seq, label, items }` |
+| `Edit`, `Menu`, `MenuShow`, `MenuHide` | `hotty.Edit`, `hotty.Menu`, `hotty.MenuShow`, `hotty.MenuHide` | `edit`, `menu`, `menu_show`, `menu_hide` | as Python | as Python | `edit`, `menu`, `menuShow`, `menuHide` |
+| `MenuTree`, `MenuItem` and their fields | `hotty.MenuTree{Label, Items}`, `hotty.MenuItem{Key, Label, Name, Enabled, Items}` | `MenuTree(label, items)`, `MenuItem(key, label, name, enabled, items)` | tables with those keys | `MenuTree { label, items }` | `{ label, items }` |
 | `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor }` |
 | a flag on, off or absent (`Press`, `Fit`, `Hover`) | `hotty.On`, `hotty.Off`, the zero value | `True`, `False`, `None` | `true`, `false`, `nil` | `Option<bool>` | `true`, `false`, `undefined` |
 | `N`, `Q`, `Detached`, `Scroll`, `Late` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)`, `hotty.Late()` | `n=`, `q=`, `detached=`, `scroll=`, `late=` | `{ n = …, q = …, detached = …, scroll = …, late = … }` | builder methods | `{ n, q, detached, scroll, late }` |
@@ -1071,7 +1074,13 @@ them. These are the places a port goes wrong:
 - **No key sequences in the host.** `data-key` and the capabilities'
   `Keys` are gone. A program binds its leader to `prefix` (SPEC.md §10.5),
   reads the keys after it, and sends `a=focus` when the sequence ends. Its
-  menu goes to `Menu`, as in the cells.
+  menu goes to `Menu` and `MenuShow`, as in the cells.
+- **A menu is a tree.** `MenuLevel` is `MenuTree`, with no `Seq`, and an
+  item has a `Name` and its own `Items` in place of `Group`. A program
+  sends its tree when what it can do changes, `MenuShow(seq)` for each key
+  of a sequence, and `MenuHide()` when it ends, where 0.2 sent a level for
+  each key and hid it with an empty `Menu`. A pick from the host's
+  palette reaches it as `command` with the item's name.
 - **Errors only, unless asked.** A builder sends no `q` where the wire
   implies it, and `N(n)` alone asks for the reply. A fake host must answer
   a command without `q` only with an error.

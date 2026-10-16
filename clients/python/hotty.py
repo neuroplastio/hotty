@@ -212,43 +212,61 @@ def edit(names, n=None, q=None):
 
 @dataclass
 class MenuItem:
-    """A key that can follow a menu's sequence (SPEC §10.5)."""
+    """One of a program's actions in its menu (SPEC §10.7): the key that
+    reaches it after its group's, what it does, the command a pick sends,
+    whether it does anything now, and the items after it."""
 
-    key: str
+    key: str = ""
     label: str = ""
-    group: bool = False
+    name: str = ""
     enabled: bool = True
+    items: list = field(default_factory=list)
 
 
 @dataclass
-class MenuLevel:
-    """A which-key level (SPEC §10.5): the keys typed, their group's label,
-    and the keys that can follow them."""
+class MenuTree:
+    """A program's menu (SPEC §10.7): what it is for, and its items."""
 
-    seq: list = field(default_factory=list)
     label: str = ""
     items: list = field(default_factory=list)
 
 
-def menu(level=None, n=None, q=None):
-    """Shows a program's which-key menu, or with none hides it (SPEC
-    §10.5). The map has myelin's names and order (SDK.md §3.4)."""
-    if level is None:
+def _menu_item(it):
+    i = {}
+    if it.key:
+        i["key"] = it.key
+    if it.label:
+        i["label"] = it.label
+    if it.name:
+        i["name"] = it.name
+    i["enabled"] = bool(it.enabled)
+    if it.items:
+        i["items"] = [_menu_item(c) for c in it.items]
+    return i
+
+
+def menu(tree=None, n=None, q=None):
+    """Sends a program's menu, what it can do now, or with none leaves it
+    none (SPEC §10.7). The map's order is SDK.md §3.4's."""
+    if tree is None:
         return _command([("a", "menu")], b"", NO_REPLY, n, q)
-    m = {"seq": list(level.seq)}
-    if level.label:
-        m["label"] = level.label
-    items = []
-    for it in level.items:
-        i = {"key": it.key}
-        if it.label:
-            i["label"] = it.label
-        if it.group:
-            i["group"] = True
-        i["enabled"] = bool(it.enabled)
-        items.append(i)
-    m["items"] = items
+    m = {}
+    if tree.label:
+        m["label"] = tree.label
+    m["items"] = [_menu_item(i) for i in tree.items]
     return _command([("a", "menu")], pack(m), NO_REPLY, n, q)
+
+
+def menu_show(seq=(), n=None, q=None):
+    """Shows the level of the menu the keys typed reach; with none, its top
+    level (SPEC §10.7)."""
+    body = pack({"seq": list(seq)}) if seq else b""
+    return _command([("a", "menu"), ("show", "1")], body, NO_REPLY, n, q)
+
+
+def menu_hide(n=None, q=None):
+    """Hides the level of the menu shown (SPEC §10.7)."""
+    return _command([("a", "menu"), ("show", "0")], b"", NO_REPLY, n, q)
 
 
 SCROLL_VERTICAL = 1
@@ -599,7 +617,8 @@ class Area:
 
 @dataclass
 class Command:
-    """An edit command (SPEC §10.6): its name, its key, empty from a menu,
+    """An edit command (SPEC §10.6), or a pick from the program's menu
+    (§10.7): its name, its key, empty from a menu,
     and a paste's text, has_text telling an empty one from none."""
 
     name: str

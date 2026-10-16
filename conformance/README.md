@@ -48,7 +48,7 @@ edit shortcuts (SPEC §10.2, §10.4), whatever its platform. A vector with
 `"requires"` applies only to a host that has what it names, and others skip
 it. A list names several, all required:
 - a feature (SPEC §4): `"passthrough"` (§9.3), `"hover"` (§9.4),
-  `"count"` (§9), `"menu"` (§10.5);
+  `"count"` (§9), `"menu"` (§10.7);
 - `"touch"`, a host that takes touch (SPEC §9.1, §16);
 - `"commands"`, a host with a terminal that takes edit commands (§10.6);
 - `"undo"`, a host whose text fields keep a history and cut (§10.2);
@@ -57,7 +57,7 @@ it. A list names several, all required:
   out, an SDK's test host (SDK.md §4.4), skips it. Nor do test hosts keep a
   history, so they skip `"undo"`.
 
-Its steps come in five kinds.
+Its steps come in six kinds.
 
 **Send** `{ "send": {control}, "payload": text?, "body": value?, "reply":
 …, "events": … }`: the command goes to the host as the program would send
@@ -154,6 +154,17 @@ name; one that presses keys on a terminal gets it from the terminal's
 encoding, which, for the keys the vectors press, is the same. `"terminal"`:
 `true` if the key reached the program as terminal input (§10.2), `false` if
 the surface used it; absent, not checked. `"events"` as for a pointer step.
+
+**Menu** `{ "menu": "shown" | "pick", "expect": …, "name": str, "events":
+[ … ] }`: the program's menu, in a host that has `menu` (SPEC §10.7, §16).
+- `"shown"`: the level the host shows, once any wait it makes before
+  showing one has passed. `"expect"` is its items in order, each `{"key",
+  "label", "group", "enabled"}`: the item's key and label as the program
+  sent them, whether it is a group, and whether it is enabled; `null` when
+  none shows.
+- `"pick"`: the user picks the item named `"name"`, as from a palette.
+  `"events"` as for a pointer step: what the pick makes the host send,
+  `[]` for nothing.
 
 The documents of pointer steps size their elements in cells
 (`--hotty-cell-w`, `--hotty-cell-h`, SPEC §8), and point at centres that lie

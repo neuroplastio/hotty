@@ -125,15 +125,20 @@ def build(b):
         "focus": lambda: hotty.focus(a["surface"], a.get("target", ""), **ro),
         "blur": lambda: hotty.blur(a["surface"], **ro),
         "edit": lambda: hotty.edit(a.get("names", []), **ro),
-        "menu": lambda: hotty.menu(menu_level(a["menu"]) if "menu" in a else None, **ro),
+        "menu": lambda: hotty.menu(menu_tree(a["menu"]) if "menu" in a else None, **ro),
+        "menu_show": lambda: hotty.menu_show(a.get("keys", []), **ro),
+        "menu_hide": lambda: hotty.menu_hide(**ro),
     }[name]
     return fn()
 
 
-def menu_level(m):
-    items = [hotty.MenuItem(i["key"], i.get("label", ""), i.get("group", False), i.get("enabled", True))
-             for i in m.get("items", [])]
-    return hotty.MenuLevel(m.get("seq", []), m.get("label", ""), items)
+def menu_item(i):
+    return hotty.MenuItem(i.get("key", ""), i.get("label", ""), i.get("name", ""), i.get("enabled", True),
+                          [menu_item(c) for c in i.get("items", [])])
+
+
+def menu_tree(m):
+    return hotty.MenuTree(m.get("label", ""), [menu_item(i) for i in m.get("items", [])])
 
 
 def payload_of(seg):

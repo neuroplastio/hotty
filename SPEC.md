@@ -164,7 +164,7 @@ alphabet).
   ([MessagePack](https://github.com/msgpack/msgpack/blob/master/spec.md)).
   The body of a reply (§3.6, §4) or an event (§9) is one msgpack map, with
   nothing after it, and so are a program's deltas (§6.1) and menus
-  (§10.5). Documents are text, and resources bytes.
+  (§10.7). Documents are text, and resources bytes.
 - **Each field has a type.** This document shows a body as JSON with types
   in place of values: `{"c": int, "keys": [str]}` is a map with an int
   `c` and an array of strings `keys`, and `{str: int}` a map from strings
@@ -357,7 +357,7 @@ a **feature**, and `features` lists those it has:
 | `passthrough` | lets the pointer pass through the parts of a surface that take none (§9.3). Without it, every window takes the pointer wherever it is |
 | `hover` | says where the pointer is, with `hover` (§9.4). Without it, a program never hears that the pointer has left |
 | `count` | says that a click repeats one before it, with `count` (§9). Without it, every click reads as the first of its run, and a program offers another way to do what a double click would |
-| `menu` | shows a program's menus (§10.5) |
+| `menu` | keeps a program's menu, shows its levels and lets the user pick from it (§10.7). Without it, a program shows its menus itself |
 
 A program **MUST** ignore a feature it does not know: later versions add
 them (§15).
@@ -928,7 +928,7 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
 | `fit` | on a surface whose `f` is on (§5.2), the rows the document needs at the placement's width changed | `{"r": int}`: the rows `r=auto` would choose now |
 | `hover` | on a surface whose `v` is on (§5.2), the element the pointer is over changed, or the pointer left the window (§9.4) | `{"c": int, "r": int}`: the pointer's cell (§9.1); `{"out": true}` when it left |
 | `view` | which elements with `data-on~=view` are in view, or where they are, changed, or whether the document shows its end (§9.5) | `{"in": {str: area}, "end": bool}`: each element in view by its id, with its cells (below) |
-| `command` | a key of an edit command the program takes, or a menu of the terminal (§10.6) | `{"name": str, "key": str}`, with `"text": str` for a paste |
+| `command` | a key of an edit command the program takes, a menu of the terminal (§10.6), or a pick from the program's menu (§10.7) | `{"name": str, "key": str}`, with `"text": str` for a paste |
 | `caps` | a capability changed (§4) | the fields that changed, as the capabilities have them. One that became absent comes as its type's empty value: `"edit": {}`, the host takes no edit commands now (§10.6), and `"features": []`, it has none of them |
 
 - **`t` names an element**, by its id, and is absent where none is meant:
@@ -953,7 +953,7 @@ the program asked for it, and as often as this table says:
 | `hover` | `v=1` on the surface (§5.2) | until `v=0` | each change, at most one a frame (§9.4) |
 | `fit` | `f=1` on the surface (§5.2) | until `f=0` | at most one a frame, with the rows of the layout drawn in it |
 | `view` | the element: `view` in its `data-on` (§9.5) | while it has it | once a scroll rests, else at most one a frame |
-| `command` | `a=edit` (§10.6) | until the program takes others, or leaves the screen | each key |
+| `command` | `a=edit` (§10.6), and an item with a name in the program's menu (§10.7) | until the program takes others, or sends another menu, or leaves the screen | each key, each pick |
 | `caps` | the query (§4) | the session | each change |
 
 - **What needs a window.** A surface's `press`, drags, `hover`, `fit` and
@@ -1799,9 +1799,9 @@ after a prefix (§10.5):
 
 A program reads its key sequences itself, a leader and the keys after it,
 or `g g`, with the keymap it uses in its cells (myelin's, say), and shows
-which keys can follow one in a menu. On a surface it needs two things of
-the host: the keys after the first, whatever is focused, and a place to
-show the menu.
+which keys can follow one with its menu (§10.7). On a surface it needs two
+things of the host: the keys after the first, whatever is focused, and a
+place to show the menu.
 
 **A prefix.** A key that the focused element's keymap binds to `prefix`
 (§10.2) reaches the program, as one bound to `program` does, and so does
@@ -1829,35 +1829,6 @@ the keys that follow.
 - **Nothing waits in the host.** The program keeps the sequence's time, and
   once it ends, by a key, a timeout or Escape, gives the keys back with
   `a=focus`. The keys typed before that are the program's.
-
-**Menus.** While a sequence waits for its next key, or whenever it wants
-to say which keys do what, a program shows its menu by sending it to the
-host:
-
-```
-ESC ] 7279 ; a=menu ; <base64 msgpack menu> ST
-```
-
-- **The menu** is one msgpack map (§3.3), myelin's which-key level:
-  `{"seq": [str], "label": str, "items": [item]}`. `seq` is the keys typed
-  so far, as §10.4 names them, `Mod` included, and `label` their group's
-  label. Each item is a key that can follow them, `{"key": str, "label":
-  str, "group": bool, "enabled": bool}`: the key, what it does, whether
-  more keys follow it, and whether it does anything now.
-- **The host shows it** over its cells and surfaces, where it likes: each
-  item's key, read as `mod` says (§10.4), and its label, a group's marked
-  as one, and one that does nothing now as disabled. It **MAY** show only
-  as many items as fit, and **MAY** wait a moment before it shows a menu,
-  so that a sequence typed quickly shows none.
-- **Until** the program sends another, or `a=menu` with no body, which
-  hides it. The host also hides it on Escape, on a key the menu does not
-  list, when the screen changes and on a full reset (RIS), so that a
-  program that ends while it waits leaves none behind. The keys still go
-  where they would without it.
-- A host that shows menus has the feature `menu` (§4). One that does not
-  answers `a=menu` with `EINVAL`, as an action it does not take, and a
-  program shows its menu itself: in its cells, or as a surface at a
-  higher `z` (§5.2).
 
 ### 10.6 Commands in the cells
 
@@ -1900,7 +1871,9 @@ ESC ] 7279 ; a=edit:take=copy,paste,undo,redo ST
   key it does not use reaches the program as the command.
 - **The terminal's menus,** such as an Edit menu or a context menu, send
   the command they name, with no `key`, where its key would send one. Their
-  copy copies the terminal's selection first, as above.
+  copy copies the terminal's selection first, as above. A pick from the
+  program's own menu (§10.7) is one of them, and is sent whether or not
+  the program takes the command it names.
 - **In order.** A command reaches the program on its input, among the keys
   typed around it, as every event does (§9): a paste never overtakes what
   was typed before it. The terminal's own paste, by a key that is no edit
@@ -1909,6 +1882,73 @@ ESC ] 7279 ; a=edit:take=copy,paste,undo,redo ST
 - **A host that takes `a=edit`** reports its edit shortcuts as `edit`
   (§4). When they change, or `mod` does (§10.4), as when a multiplexer's
   viewer changes to one on another platform, it sends `caps` (§9).
+
+### 10.7 Menus
+
+A program tells the host what it can do now by sending its menu: its
+actions, with the keys that reach them where keys do.
+
+```
+ESC ] 7279 ; a=menu ; <base64 msgpack menu> ST
+```
+
+- **The menu** is one msgpack map (§3.3), `{"label": str, "items":
+  [item]}`: what it is for, and its items in the order to show them. Each
+  item is `{"key": str, "label": str, "name": str, "enabled": bool,
+  "items": [item]}`:
+  - `key`, the key that reaches it after its group's, as §10.4 names it,
+    `Mod` included; none for an item no key reaches;
+  - `label`, what it does;
+  - `name`, the command a pick sends (below); none for an item only its
+    keys reach;
+  - `enabled`, whether it does anything now;
+  - `items`, the items after it, which make it a group.
+
+  It is myelin's `Tree`, with a name for each binding. The top level's
+  items are one deep, and items nest at most eight deep: a deeper menu is
+  `EINVAL`.
+- **It lasts** until the program sends another, or `a=menu` with no body,
+  which leaves it none. The main screen and the alternate screen each keep
+  their own, as edit commands are kept (§10.6), and a full reset (RIS)
+  drops both. A program that ends clears its menu, as it pops the keyboard
+  flags it pushed.
+- **A pick.** The host lets the user pick an item that has a name, in a
+  palette: a list it shows when the user asks for one. A multiplexer
+  **MAY** also give a pane's menu to whatever drives it, such as an agent,
+  to pick from. Each item is offered under its groups' labels, with the
+  keys that reach it if keys do, its name where it has no label, and one
+  that is not enabled as disabled, which is not sent. A pick sends
+  `command` (§10.6) with the item's name and no `key`, as the terminal's
+  own menus send theirs. An item that no key reaches is picked only so.
+
+**Showing a level.** While a sequence waits for its next key, or whenever
+it wants to say which keys do what, a program shows the level that the
+keys typed reach:
+
+```
+ESC ] 7279 ; a=menu:show=1 ; <base64 msgpack {"seq": [str]}> ST
+```
+
+- **`seq`** is the keys typed so far, as §10.4 names them, `Mod` included,
+  read against the items' keys as the host reads a binding (§10.4). With
+  none, or no body, the level is the menu's top one.
+- **The host shows it** over its cells and surfaces, where it likes: the
+  items of the group the keys reach that have a key, each its key, read as
+  `mod` says (§10.4), and its label, a group's marked as one, and one that
+  is not enabled as disabled. It **MAY** show only as many items as fit,
+  and **MAY** wait a moment before it shows a level, so that a sequence
+  typed quickly shows none. Keys that reach no group show nothing.
+- **Until** the program shows another, or sends `a=menu:show=0`, which
+  hides it. The host also hides it on Escape, on a key the level does not
+  list, when the screen changes and on a full reset (RIS), so that a
+  program that ends while it waits leaves none behind. The keys still go
+  where they would without it. A menu sent while a level shows replaces it
+  with the same keys' level of the new menu.
+
+A host that takes menus has the feature `menu` (§4). One that does not
+answers `a=menu` with `EINVAL`, as an action it does not take, and a
+program shows its menu itself: in its cells, or as a surface at a higher
+`z` (§5.2).
 
 ## 11. Text
 
@@ -2068,10 +2108,10 @@ A host conforms to HOTTY version 0.3 when:
 
 The vectors check replies, error codes, every delta op, morph, context
 parsing, resources, drags and their steps, presses with Alt, `fit`, hover,
-`area`, scrolling, `reveal` and `view`, prefixes, edit commands, keymaps
-and the envelope, and their `keys`, `keymap` and `edit` sections a host's
-key names (§10.4), keymaps and actions (§10.2). They inspect documents and
-events, not pixels. The vectors marked with a feature (`"passthrough"`,
+`area`, scrolling, `reveal` and `view`, prefixes, edit commands, menus,
+keymaps and the envelope, and their `keys`, `keymap` and `edit` sections a
+host's key names (§10.4), keymaps and actions (§10.2). They inspect
+documents and events, not pixels. The vectors marked with a feature (`"passthrough"`,
 `"hover"`, `"count"`, `"menu"`, §4) apply to a host that has it, and those
 marked `"commands"` to a host with a terminal that takes edit commands
 (§10.6).
@@ -2090,7 +2130,8 @@ touch also lets a test touch a cell of a surface with one finger, move it,
 and lift it, and tells it whether a touch went on to the terminal. A host
 with `passthrough` also tells the test whether each of those reached the
 surface or passed through it, and whether a wheel or a key went on to the
-terminal.
+terminal. A host with `menu` also tells a test the level of the program's
+menu it shows, and lets it pick an item by its name.
 
 This is a test interface, not part of the wire protocol.
 
@@ -2483,6 +2524,17 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
   drawn by the host serves both, looks the same in every program, and
   tells the terminal which keys do what, which a terminal or a multiplexer
   can show elsewhere, such as in a palette.
+- **Why a menu is what a program can do, not only its keys.** A palette
+  lists a program's actions and lets the user pick one without knowing
+  its keys, and a multiplexer can give the same list to an agent that
+  drives the program. So the menu holds every action the program offers
+  now, keyed or not, and a level of it is shown by the keys typed: the
+  tree is sent when it changes, and a key of a sequence costs a few bytes,
+  where 0.2 sent a whole level for each.
+  - **A pick is a command,** as the terminal's own menus send, so a
+    program reads one event for a key it took, an Edit menu and a palette.
+  - **Kept per screen,** as edit commands are, so a full-screen program's
+    actions go with it, and the shell's come back.
 - **Why a host may show no select list.** A select's list opens past its
   control, and a surface is a rectangle of cells: drawn inside, a list
   would force small surfaces to grow, and drawn outside, it is something

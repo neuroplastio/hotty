@@ -42,9 +42,15 @@ together. The list it folds is `vault/tasks/fold-0.3.md`.
 - **Key sequences are the program's** (SPEC.md §10.5): `data-key`, the
   capabilities' `keys`, and the hosts' sequence engines are gone. A keymap
   action, `prefix`, sends the program every key after it, whatever is
-  focused, until it sends `a=focus`. `a=menu` stays, now for a program on
-  a surface as in the cells, and a host that shows menus has the feature
-  `menu`.
+  focused, until it sends `a=focus`.
+- **A menu is what a program can do** (SPEC.md §10.7, which takes menus
+  out of §10.5): `a=menu` sends the program's actions as a tree, kept per
+  screen, each item with a key where one reaches it and a `name`;
+  `a=menu:show=1` shows the level the keys typed reach, a few bytes a key,
+  and `show=0` hides it. A pick from the host's palette sends `command`
+  with the item's name. A 0.2 menu was one level, shown when sent. A host
+  that takes menus has the feature `menu`, for programs on surfaces as in
+  the cells.
 
 ## 0.2
 
