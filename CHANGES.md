@@ -52,6 +52,55 @@ together. The list it folds is `vault/tasks/fold-0.3.md`.
   that takes menus has the feature `menu`, for programs on surfaces as in
   the cells.
 
+### Upgrading from 0.2
+
+**A program:**
+- Send a frame's changes to a surface as one `a=delta` whose `ops` list
+  holds them all (§6.1), not one message per change. Deltas no longer take
+  `op`, `t` or `k` in the control.
+- Send `p`, `f` and `v` when they change, not with every placement: they
+  hold until the program sends them again (§5.2).
+- Lay out with `cellcss`, in CSS pixels, and stop handling `resize`: a new
+  font sends `caps` with the new `cellcss` (§4). A document that needs a
+  device pixel reads `--hotty-px` (§8).
+- Ask `features` for `passthrough`, `hover`, `count` and `menu` only, and
+  count on every op, every event, scrolling, steps and drops.
+- Read a submit's `fields` as pairs, a click's, press's or drag's `mods` as
+  bits, and an absent `t` as no element (§9).
+- Leave `q` out unless you want more than errors (§3.5).
+- Resolve key sequences yourself: bind the keys that start one to `prefix`
+  in the keymap, and the keys after it come to you, whatever is focused,
+  until you send `a=focus` (§10.5). `data-key` is gone.
+- Send what you can do as a menu tree with a `name` per item, show a level
+  with `a=menu:show=1` and hide it with `show=0`, and handle `command` with
+  a `name` from a palette pick (§10.7).
+
+**A host:**
+- Decode a delta's op list and apply it as one unit. Reply to an op whose
+  target is missing with its index `i`, and reject a malformed op's whole
+  delta (§6.1).
+- Keep `p`, `f` and `v` per surface (§5.2).
+- Report `cellcss` and `features`, and send `caps` with every field that
+  changed. Send no `resize` (§4).
+- Take `q` as 1 when it is absent, and read only `m` on continuation
+  chunks (§3.5, §3.6).
+- Send event details as §9 has them.
+- Route every key after a `prefix` to the program, until it sends
+  `a=focus` or the surface loses the keyboard (§10.5).
+- Keep a program's menu per screen, show the level its keys reach, and
+  send a pick from a palette as `command` with the item's name. Report the
+  feature `menu` only if all of that holds (§10.7).
+
+**A multiplexer** is a host to the programs in its panes and a program to
+its terminal, so it does both lists. Besides them:
+- Answer a pane's query for the terminal whose keys reach that pane, and
+  when that terminal changes, send the pane `caps` with every field that
+  differs from what it last heard (§4).
+- Replay a surface with its `p`, `f` and `v`: they are the surface's now,
+  not a placement's.
+- Keep each pane's menu, offer it in your own palette, and send picks to
+  the pane as `command`.
+
 ## 0.2
 
 A draft, as every 0.x is. It breaks 0.1 (SPEC.md §15): programs and hosts
