@@ -18,6 +18,8 @@ the base64 payload and `ST`.
 | `view` with 20 elements in view | 582 | 579 |
 | `corpus/04-table.html` (1,131 B) morphed whole for one changed cell | 930 | 781 |
 | hotty-a2ui's `kit.css` (about 50 KB) as a resource | 26,858 (zlib 1) | 17,704 (zlib 6) |
+| a menu of 24 keyed actions under a leader and 10 with no key | — (0.2 sent levels) | 496, once per change |
+| the sequence `Space g a` shown: two levels and the hide | 619 | 116 |
 
 What the numbers say:
 - **The bytes go from the program to the host.** Events come at the user's
@@ -33,6 +35,10 @@ What the numbers say:
 - **A whole-tree morph still sends the tree.** One changed cell is a `text`
   op, or 781 B as a morph of the whole table: SDK.md §2.9 says to diff
   first.
+- **A menu is sent when it changes, not a key at a time** (FOLD-12). 0.2
+  sent each level whole as the user typed; 0.3 sends the tree, then the
+  keys typed, so a sequence costs a fifth, and the tree also holds what
+  no key reaches.
 - **Compression level matters for large payloads.** At zlib's default
   level `kit.css` is a third smaller than at level 1, for about a
   millisecond.

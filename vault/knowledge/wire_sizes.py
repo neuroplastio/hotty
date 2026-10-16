@@ -47,6 +47,16 @@ def main():
     changed = doc.replace(b"</td>", b" </td>", 1).decode()
     print("04-table.html  ", len(doc), "B; morphed whole:", len(h.morph_to("t", "", changed)))
 
+    # A leader with four groups of six actions, and ten actions no key
+    # reaches: the tree once, then a few bytes a key of a sequence.
+    groups = [("f", "File"), ("b", "Buffer"), ("g", "Git"), ("w", "Window")]
+    tree = h.MenuTree("Editor", [h.MenuItem("Space", "Leader", items=[
+        h.MenuItem(k, l, items=[h.MenuItem(c, f"{l} action {c}", f"{l.lower()}-{c}") for c in "abcdef"])
+        for k, l in groups])] + [h.MenuItem(label=f"Action {i}", name=f"action-{i}") for i in range(10)])
+    print("menu tree      ", len(h.menu(tree)))
+    seq = len(h.menu_show(["Space"])) + len(h.menu_show(["Space", "g"])) + len(h.menu_hide())
+    print("Space g a      ", seq, "B: show, show, hide")
+
     if len(sys.argv) > 1:
         css = open(sys.argv[1], "rb").read()
         print("kit.css        ", len(css), "B; as a resource:", len(h.res("kit", "text/css", css)))
