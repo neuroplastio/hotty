@@ -1,6 +1,6 @@
 # HOTTY SDKs
 
-    Version:  0.3, with SPEC.md 0.3
+    Version:  0.4, with SPEC.md 0.4
     Status:   Draft. It changes with SPEC.md (§15 there).
     Licence:  CC BY 4.0
 
@@ -179,7 +179,7 @@ An SDK **MUST** provide every component of this section.
 | Scanner (§3.7) | HOTTY sequences out of a byte stream | — | `scan` |
 | Detector (§3.8) | whether the terminal is a host | `internal/detect` | `detect` |
 | messages (§3.9) | replies, events, capabilities, errors | `Reply`, `Event`, `Caps`, `Error` | `decode` |
-| keys (§3.10) | key names, keymaps, the SDK's keymap | `ParseKey`, `DecodeKeys`, `Keymap`, `TerminalKeys` | `keys`, `keymap` |
+| keys (§3.10) | key names, keymaps, the SDK's keymap | `ParseKey`, `DecodeKeys`, `KeyText`, `Keymap`, `TerminalKeys` | `keys`, `keymap` |
 
 ### 3.1 Constants and named sets
 
@@ -189,7 +189,7 @@ An SDK **MUST** provide every component of this section.
 | `Chunk` | 4096, the most base64 bytes in one sequence |
 | `MaxSize` | 1000, the most columns or rows of a surface |
 | `MaxName` | 64, the longest surface name |
-| `Version` | `"0.3"`, the protocol version the SDK speaks, which its query lists (SPEC.md §4) |
+| `Version` | `"0.4"`, the protocol version the SDK speaks, which its query lists (SPEC.md §4) |
 | `DefaultMax` | 16777216 (16 MiB), the most bytes a Decoder decodes one message to unless its `Max` says otherwise (§3.6) |
 
 And these sets, each value under its canonical name:
@@ -197,7 +197,7 @@ And these sets, each value under its canonical name:
   `blur`, `fit`, `hover`, `view`, `dragstart`, `drag`, `dragend`,
   `command`, `caps` (SPEC.md §9);
 - **features**: `passthrough`, `hover`, `count`, `menu` (SPEC.md §4);
-- **modifier bits**: `ModShift` 1, `ModAlt` 2, `ModControl` 4, `ModMeta` 8
+- **modifier bits**: `ModShift` 1, `ModAlt` 2, `ModCtrl` 4, `ModSuper` 8
   (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
   `EBUDGET`, `EVERSION` (SPEC.md §3.6);
@@ -575,52 +575,66 @@ surface, and the keymap it gives a surface is the one it uses in cells. And
 which keys any other element gives the program, or scrolls with, for a
 host.
 
-- **`ParseKey(name)`** reads a key's name in any of the forms SPEC.md §10.4
-  allows (`Shift+Control+a`, `Control+ `) and returns it in the canonical
-  one (`Control+A`, `Control+Space`): modifiers in the order `Mod`,
-  `Control`, `Alt`, `Meta`, `Shift`, Shift shown in a character where the
-  character can show it, `Space` for a space. `Mod` is kept as written: a
-  keymap reads it (below). A name that does not parse (empty, an unknown
-  modifier, `Control+` with no key) is absent.
-- **`Platform`** is how a host reads bindings: `Mod`, `Control` or `Meta`
-  (SPEC.md §10.4), and `Edit`, its edit shortcuts, from each action to its
-  keys (SPEC.md §10.2). The zero Platform is `Control` with the default
-  edit shortcuts. `PlatformOf(caps)` takes both from the capabilities,
-  each the zero Platform's when absent. `DefaultEdit(mod)` returns the
-  default edit shortcuts for a `Mod`, in SPEC.md §10.2's order, the keys
-  canonical with `Mod` read: `Control+Z` and `Control+y` for `redo` where
-  it is Control.
+- **`ParseKey(name)`** reads a key's name as SPEC.md §10.4 has hosts read
+  one, with myelin key names' default reading (`Shift+Ctrl+A`, `PageDown`,
+  `esc`), and returns the key, its canonical name (`ctrl+shift+a`,
+  `page_down`, `escape`). A name the reading refuses (empty, `meta+a`,
+  `ctrl+`, a modifier given twice) is absent, and so is one with `mod`,
+  which only a Platform reads (`ReadKey`). Its vectors are that
+  document's: the keys section carries its `read` vectors.
+- **`Platform`** is how a host reads bindings: `Mod`, `ctrl` or `super`,
+  what `mod` stands for (SPEC.md §10.4), and `Edit`, its edit shortcuts,
+  from each action to its keys (SPEC.md §10.2). The zero Platform is
+  `ctrl` with the default edit shortcuts. `PlatformOf(caps)` takes both
+  from the capabilities, each the zero Platform's when absent.
+  `DefaultEdit(mod)` returns the default edit shortcuts for a `mod`, in
+  SPEC.md §10.2's order, each key read: `ctrl+shift+z` and `ctrl+y` for
+  `redo` where it is `ctrl`.
+- **`ReadKey(platform, name)`** reads a key's name as `ParseKey` does,
+  with `mod` standing for the Platform's (myelin key names §4.4): on
+  `ctrl`, `mod+s` is `ctrl+s`, and `mod+ctrl+s` is absent. The keys
+  section carries that document's `mod` vectors for it.
 - **`DecodeKeys(input)`** reads input from the terminal, the bytes a
   program reads, as SPEC.md §10.4 names it: a list with one entry for each
-  key, the key's canonical name, or absent for input that is no key it
-  names (a mouse report, a sequence it does not know). It is pure: an `ESC`
-  at the end of the input is `Escape`, and the caller passes each read
-  whole (a framework's parser has already cut the input into keys).
+  key, its name, or absent for input that is no key it names (a mouse
+  report, a sequence it does not know). It is pure: an `ESC` at the end of
+  the input is `escape`, and the caller passes each read whole (a
+  framework's parser has already cut the input into keys).
+- **`KeyText(key)`** is the text a key types in a field (SPEC.md §10.2): a
+  character's, a letter with `shift` as its capital, a space for `space`,
+  and none for any other key, or a key with `ctrl`, `alt` or `super`.
 - **`Keymap`** is a set of bindings, key to action, read on a Platform.
   `ParseKeymap(platform, value)` reads a `data-keys` value as SPEC.md
-  §10.2 has hosts read it, dropping the bindings a host ignores, and `Mod`
-  as the Platform's: on Control, `Mod+a` and `Control+a` are one key, the
-  later binding's. `Format()` writes one back: each key once, where it was
-  first bound, as its last binding wrote it (`Mod` kept), with its last
-  action, as `key=action`, separated by a space.
+  §10.2 has hosts read it, dropping the bindings a host ignores, each key
+  with `ReadKey`: on `ctrl`, `mod+a` and `ctrl+a` are one key, the later
+  binding's. `Format()` writes one back: each key once, where it was
+  first bound, as its last binding wrote it, with its last action, as
+  `key=action`, separated by a space. A key is written canonical, and one
+  written with `mod` keeps it, first (`mod+shift+z`).
 - **`Resolve(platform, multiline, values…)`** builds a field's keymap:
-  SPEC.md's default keymap for the Platform's `Mod`, with its `Edit`, for
+  SPEC.md's default keymap for the Platform's `mod`, with its `Edit`, for
   an `input` or for a multi-line field, then each `data-keys` value in
   turn, the root's first. A binding to a scroll action is left out where
   it stands, in its own value too: it neither acts nor overrides an
   earlier binding of its key (SPEC.md §10.2).
+- **`Binds(key)`** says whether a keymap binds the key, or, for a key with
+  `shift` that is not a character and that it does not bind, the key
+  without `shift` (SPEC.md §10.2). A host that has two names for a press
+  (SPEC.md §10.4) asks what follows of the physical one where the keymap
+  binds it, and of the other one otherwise.
 - **`Lookup(key)`** on a resolved keymap returns what the field does with
-  the key: an action; `insert` for a character it types; or absent when the
-  key is not the field's (it reaches the program, or Tab moves focus). Tab,
-  Shift+Tab and Escape are never the field's, nor a key bound to `program`
-  or `prefix`, or to an action the field does not have.
+  the key: an action; `insert` for a key it types (`KeyText`); or absent
+  when the key is not the field's (it reaches the program, or `tab` moves
+  focus). `tab`, `shift+tab` and `escape` are never the field's, nor a key
+  bound to `program` or `prefix`, or to an action the field does not
+  have.
 - **`Selects(key)`** says whether the field selects with the key (SPEC.md
-  §10.2, Shift selects): `Lookup` returns a move for it, and its canonical
-  name has `Shift` (`Shift+ArrowLeft`, `Control+Shift+End`, not `Alt+<`).
-  A field then does the move with `Extend` (§4.6).
+  §10.2, Shift selects): `Lookup` returns a move for it, and its name has
+  `shift` (`shift+arrow_left`, `ctrl+shift+end`, not `alt+<`). A field
+  then does the move with `Extend` (§4.6).
 - **`Program(key)`** says whether a keymap gives the key to the program: it
-  binds the key to `program` or `prefix`, or, for a key with Shift it does
-  not bind, the key without Shift. On an element that is not a text field, a host asks it
+  binds the key to `program` or `prefix`, with the fallback of `Binds`. On
+  an element that is not a text field, a host asks it
   of the element's keymap, `ParseKeymap` of its `data-keys` values joined
   with a space, the root's first, on the host's Platform, with no default
   keymap; a key it gives
@@ -631,35 +645,35 @@ host.
   the program, and from then on gives the program every key (SPEC.md
   §10.5).
 - **`Scroll(key)`** returns the scroll action a keymap binds the key to,
-  with the same fallback without Shift, or absent. A host asks it of the
+  with the same fallback, or absent. A host asks it of the
   keymap it asks `Program` of, for a key the element does not use (SPEC.md
   §10.2, scrolling keys).
 - **`TerminalKeys`** is the SDK's keymap, the same in every SDK (§2.3): the
   keys of Bubble Tea's text input and text area (bubbles), which a program
-  that edits fields in cells is likely to share, but for Mod+a, which
-  selects all, as in a GUI field and SPEC.md's default keymap: Control+a
-  on Linux, while on macOS Control+a stays the line's start. A program puts it in the
+  that edits fields in cells is likely to share, but for `mod+a`, which
+  selects all, as in a GUI field and SPEC.md's default keymap: `ctrl+a`
+  on Linux, while on macOS `ctrl+a` stays the line's start. A program puts it in the
   `data-keys` of an element that holds its fields, and gives its cells
   rendition the same keymap, `Resolve(platform, multiline, TerminalKeys)`.
 
   | action | keys |
   | --- | --- |
-  | `char-backward`, `char-forward` | ArrowLeft, Control+b; ArrowRight, Control+f |
-  | `word-backward` | Alt+ArrowLeft, Control+ArrowLeft, Alt+b |
-  | `word-forward` | Alt+ArrowRight, Control+ArrowRight, Alt+f |
-  | `line-start`, `line-end` | Home; End, Control+e |
-  | `delete-char-backward` | Backspace, Control+h |
-  | `delete-char-forward` | Delete, Control+d |
-  | `delete-word-backward` | Alt+Backspace, Control+w, Control+Backspace |
-  | `delete-word-forward` | Alt+Delete, Alt+d, Control+Delete |
-  | `delete-to-line-start`, `delete-to-line-end` | Control+u; Control+k |
-  | `line-previous`, `line-next` | ArrowUp, Control+p; ArrowDown, Control+n |
-  | `page-up`, `page-down` | PageUp; PageDown |
-  | `input-start`, `input-end` | Alt+<, Control+Home; Alt+>, Control+End |
-  | `select-all` | Mod+a |
-  | `newline` | Control+m |
+  | `char-backward`, `char-forward` | `arrow_left`, `ctrl+b`; `arrow_right`, `ctrl+f` |
+  | `word-backward` | `alt+arrow_left`, `ctrl+arrow_left`, `alt+b` |
+  | `word-forward` | `alt+arrow_right`, `ctrl+arrow_right`, `alt+f` |
+  | `line-start`, `line-end` | `home`; `end`, `ctrl+e` |
+  | `delete-char-backward` | `backspace`, `ctrl+h` |
+  | `delete-char-forward` | `delete`, `ctrl+d` |
+  | `delete-word-backward` | `alt+backspace`, `ctrl+w`, `ctrl+backspace` |
+  | `delete-word-forward` | `alt+delete`, `alt+d`, `ctrl+delete` |
+  | `delete-to-line-start`, `delete-to-line-end` | `ctrl+u`; `ctrl+k` |
+  | `line-previous`, `line-next` | `arrow_up`, `ctrl+p`; `arrow_down`, `ctrl+n` |
+  | `page-up`, `page-down` | `page_up`; `page_down` |
+  | `input-start`, `input-end` | `alt+<`, `ctrl+home`; `alt+>`, `ctrl+end` |
+  | `select-all` | `mod+a` |
+  | `newline` | `ctrl+m` |
 
-  It leaves Enter to SPEC.md's default (`submit` in an `input`, `newline`
+  It leaves `enter` to SPEC.md's default (`submit` in an `input`, `newline`
   in a multi-line field). In the order of this table, it is the value
   vectors call `terminal_keys`.
 
@@ -897,8 +911,8 @@ grapheme segmentation.
   started from; any other action, typing, or `Select` ends it.
 - **`Type(text)`** types text at the caret, in place of the selection.
 - **`Key(keymap, key)`**, where an SDK has it, does what the keymap says
-  of the key: types it, does its action, or, when `Selects(key)`, extends
-  with it.
+  of the key: types its `KeyText`, does its action, or, when
+  `Selects(key)`, extends with it.
 
 An SDK whose language has no grapheme segmentation **MAY** count code
 points instead, CR LF still one, and says so (§5.3); it then skips the
@@ -948,7 +962,7 @@ every SDK section, `edit` where it provides a Field.
 | --- | --- | --- | --- |
 | [hotty-go](https://github.com/neuroplastio/hotty-go) | Go | the reference; complete, with what a relay writes as a host (replies, events, `Message.Placement`, `CursorBelow`) | `hottyterm`, `hottytea`, `hottytest`, `hottyedit` (§4.6) |
 | `clients/python` (this repository) | Python | complete | `Hotty`, for the examples |
-| [hotty-lua](https://github.com/neuroplastio/hotty-lua) | Lua | complete for 0.2, under LuaJIT, Lua 5.1, Neovim and gopher-lua (plx's); 0.3 to come | `hotty.nvim` (§4.2) |
+| [hotty-lua](https://github.com/neuroplastio/hotty-lua) | Lua | complete, under LuaJIT, Lua 5.1, Neovim and gopher-lua (plx's) | `hotty.nvim` (§4.2) |
 
 hotty-go's runners (`vectors_test.go`, and `hottyedit`'s for `edit`) run
 every SDK section and skip nothing. hotty-lua's (`tests/vectors.lua`, under
@@ -990,15 +1004,15 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Holding`, `InSequence` | `(*Scanner).Holding`, `.InSequence` | `Scanner.holding`, `.in_sequence` | `scanner:holding`, `:in_sequence` | `Scanner::holding`, `::in_sequence` | `Scanner.holding`, `.inSequence` |
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |
 | `FitRows`, `Mods`, `CellCSS` | `FitRows`, `Mods`, `CellCSS` | `fit_rows`, `mods`, `cell_css` | as Python | as Python | `fitRows`, `mods`, `cellCss` |
-| `ModShift`, `ModAlt`, `ModControl`, `ModMeta` | `hotty.ModShift`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … |
+| `ModShift`, `ModAlt`, `ModCtrl`, `ModSuper` | `hotty.ModShift`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … |
 | a message as a `Reply` or an `Event`, `Err` | `hotty.ReplyOf(m)`, `hotty.EventOf(m)`, `hotty.Err(r)` | `m.reply()`, `m.event()`, `r.err()` | `m:reply()`, `m:event()`, `r:err()` | methods | `m.reply()`, `m.event()`, `r.err()` |
 | `Has`, `Light`, `Merge` | `hotty.HasFeature(c, feature)` (`hotty.Has` asks a control), `hotty.Light(c)`, `hotty.Merge(c, changed)` | `c.has(feature)`, `c.light()`, `c.merge(changed)` | `c:has(feature)`, … | methods | `c.has(feature)`, … |
 | `Command`, `Changed` | `Event.Command`, `Event.Changed` | `e.command`, `e.changed` | as Python | methods | `e.command`, `e.changed` |
 | a control's `get` and `with` | `hotty.Get(ctl, k)`, `hotty.With(ctl, k, v)` | the SDK's own | the SDK's own | the SDK's own | the SDK's own |
-| `ParseKey`, `DecodeKeys` | `hotty.ParseKey`, `hotty.DecodeKeys` | `parse_key`, `decode_keys` | as Python | as Python | `parseKey`, `decodeKeys` |
-| `Keymap`, `ParseKeymap`, `Resolve`, `Lookup`, `Program`, `Prefix`, `Scroll`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Lookup`, `.Program`, `.Prefix`, `.Scroll`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.lookup`, `.program`, `.prefix`, `.scroll`, `.format` | `parse_keymap`, `resolve`, `keymap:lookup`, `:program`, `:prefix`, `:scroll`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.lookup`, `.program`, `.prefix`, `.scroll`, `.format` |
+| `ParseKey`, `DecodeKeys`, `KeyText` | `hotty.ParseKey`, `hotty.DecodeKeys`, `hotty.KeyText` | `parse_key`, `decode_keys`, `key_text` | as Python | as Python | `parseKey`, `decodeKeys`, `keyText` |
+| `Keymap`, `ParseKeymap`, `Resolve`, `Binds`, `Lookup`, `Program`, `Prefix`, `Scroll`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Binds`, `.Lookup`, `.Program`, `.Prefix`, `.Scroll`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.binds`, `.lookup`, `.program`, `.prefix`, `.scroll`, `.format` | `parse_keymap`, `resolve`, `keymap:binds`, `:lookup`, `:program`, `:prefix`, `:scroll`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.binds`, `.lookup`, `.program`, `.prefix`, `.scroll`, `.format` |
 | `TerminalKeys` | `hotty.TerminalKeys` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` |
-| `Platform`, `PlatformOf`, `DefaultEdit` | `hotty.Platform{Mod, Edit}`, `hotty.PlatformOf`, `hotty.DefaultEdit` | `Platform(mod, edit)`, `platform_of`, `default_edit` | a table `{ mod = …, edit = … }`, `platform_of`, `default_edit` | as Python | `{ mod, edit }`, `platformOf`, `defaultEdit` |
+| `Platform`, `PlatformOf`, `DefaultEdit`, `ReadKey` | `hotty.Platform{Mod, Edit}`, `hotty.PlatformOf`, `hotty.DefaultEdit`, `(Platform).ReadKey` | `Platform(mod, edit)`, `platform_of`, `default_edit`, `read_key` | a table `{ mod = …, edit = … }`, `platform_of`, `default_edit`, `read_key` | as Python | `{ mod, edit }`, `platformOf`, `defaultEdit`, `readKey` |
 | `Field`, `Do`, `Type` | `hottyedit.Field`, `(*Field).Do`, `.Type` | `Field`, `.do`, `.type` | `field`, `:do_action` (`do` is a keyword), `:type` | `Field`, `do_action`, `type_text` | `Field`, `.do`, `.type` |
 
 In the vectors, every name is in snake case: `place_at`, `keep_cursor`,
@@ -1085,3 +1099,34 @@ them. These are the places a port goes wrong:
 - **Errors only, unless asked.** A builder sends no `q` where the wire
   implies it, and `N(n)` alone asks for the reply. A fake host must answer
   a command without `q` only with an error.
+
+## Appendix D. Moving from 0.3
+
+Informative. HOTTY 0.4 breaks 0.3 (SPEC.md §15): it names keys as *myelin
+key names* 0.1 does (SPEC.md §10.4). A program and its SDK move together,
+and its tests' fake hosts with them. These are the places a port goes
+wrong:
+
+- **Every key's name changes.** `Control+a` is `ctrl+a`, `Meta` is
+  `super`, `ArrowLeft` is `arrow_left`, `PageDown` is `page_down`, `Enter`
+  is `enter` and `Space` is `space`. A program's `data-keys`, its menu's
+  keys and `seq`, and the keys its tests expect all move. myelinkey's
+  `ParseHotty` reads the 0.3 names, for a script that ports them.
+- **`mod`, not `Mod`.** A binding writes `mod+s`, and one with `mod` and
+  `ctrl` or `super` as well is refused. The capabilities' `mod` is
+  `"ctrl"` or `"super"`, and `edit` names its keys the new way. `ParseKey`
+  refuses `mod`: a binding read on a host's Platform goes through
+  `ReadKey`.
+- **A capital is no Shift.** A host reads `G` as `g`, so a binding of
+  Shift with a letter writes `shift+g`, and a 0.3 `Control+A` is
+  `ctrl+shift+a`. The text a key types is its `KeyText`: `shift+a` types
+  `A`.
+- **Shift falls back only from a key that is not a character.** An
+  unbound `shift+arrow_left` is looked up as `arrow_left`, but `shift+g`
+  is a key of its own.
+- **A press can have two names.** A host that sees the key itself names
+  it by its place and by what it types (`ctrl+key_w`, `ctrl+w`), and
+  looks the place up first (`Binds`). A host that reads bytes names what
+  they carry.
+- **The modifier bits keep their values,** under myelin's names:
+  `ModControl` is `ModCtrl`, and `ModMeta` is `ModSuper`.

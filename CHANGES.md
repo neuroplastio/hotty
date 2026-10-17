@@ -1,5 +1,57 @@
 # Changes
 
+## 0.4
+
+A draft, as every 0.x is, built on the branch `hotty-0.4` and not
+released. It breaks 0.3 (SPEC.md §15), and collects what else does before
+it is released: `vault/tasks/0.4.md`.
+
+### What changed
+
+- **Keys are named by *myelin key names* 0.1** (SPEC.md §10.4), which this
+  document cites at the tag `myelinkey/v0.1.0` rather than naming keys
+  itself. The modifiers are `super`, `ctrl`, `alt` and `shift`. A physical
+  key is its W3C code in snake case (`arrow_left`, `page_down`, `key_w`).
+  A character is what the key types, a letter written small with `shift`
+  as a modifier (`shift+g`). The W3C key values (`Control+a`, `ArrowLeft`,
+  `Meta+Enter`) are gone.
+- **`mod` is myelin's command modifier** (its §4.4): a binding writes
+  `mod+s`. The capabilities' `mod` is `"ctrl"` or `"super"`, and `edit`
+  names its keys the new way (§4).
+- **A host reads a key a program writes** with myelin's default reading,
+  so `G` is `g`, and `meta` is refused (§10.4).
+- **A press can have two names,** its physical key and the character it
+  types, and a keymap is looked up by the physical one first (§10.4). A
+  host that reads bytes names what they carry.
+- **Shift falls back only from a key that is not a character** (§10.2):
+  `shift+g` is a key of its own. A field types what a key types, a letter
+  with `shift` as its capital.
+- **`mods` keeps its bits,** and 8 is `super` (§9).
+
+### Upgrading from 0.3
+
+**A program:**
+- Write keys in the new names: in `data-keys`, in a menu's item keys and
+  `seq`, and wherever you compare a `command`'s `key`. `Mod+s` is
+  `mod+s`, and `Control+A` is `ctrl+shift+a` (§10.4).
+- Read the capabilities' `mod` as `"ctrl"` or `"super"`, and `edit` in the
+  new names (§4).
+- Bind Shift with a letter as `shift+<letter>`: a host reads `G` as `g`.
+
+**A host:**
+- Read a written key with myelin's default reading, `mod` standing for
+  your `mod`. Refuse `meta`, and a binding with `mod` and `ctrl` or
+  `super` as well (§10.4).
+- Name a press seen as pressed by its physical key and by the character
+  it types, and look the physical one up first. Name keys from bytes as
+  §10.4's table has them.
+- Report `mod`, `edit` and a `command`'s `key` in the new names.
+- Fall back without `shift` only from a key that is not a character
+  (§10.2).
+
+**A multiplexer** does both lists. A keymap of its own that is myelin's
+already speaks these names.
+
 ## 0.3
 
 A draft, as every 0.x is. It breaks 0.2 (SPEC.md §15): it folds what 0.2

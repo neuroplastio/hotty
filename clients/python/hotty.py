@@ -20,6 +20,7 @@ import dataclasses
 import datetime
 import os
 import re
+import unicodedata
 import select
 import struct
 import sys
@@ -37,7 +38,7 @@ OSC_NUMBER = NUMBER  # the name this client had first
 CHUNK = 4096
 MAX_SIZE = 1000
 MAX_NAME = 64
-VERSION = "0.3"
+VERSION = "0.4"
 COMPRESS_FROM = 256
 SCAN_MAX = 64 << 10
 
@@ -74,8 +75,8 @@ FEATURE_MENU = "menu"
 # The modifier bits of an event's `mods` (SPEC §9).
 MOD_SHIFT = 1
 MOD_ALT = 2
-MOD_CONTROL = 4
-MOD_META = 8
+MOD_CTRL = 4
+MOD_SUPER = 8
 
 OPS = ("morph", "inner", "replace", "append", "prepend", "before", "after", "remove", "attr", "unattr", "text", "var", "reveal")
 
@@ -1392,10 +1393,44 @@ class Detector:
 
 # --- keys (SDK.md §3.10; SPEC.md §10.2, §10.4) --------------------------------
 
-MODIFIERS = ("Control", "Alt", "Meta", "Shift")
-# Mod, in a binding, is the platform's modifier for commands (SPEC.md
-# §10.4), written first.
-_ALL_MODS = ("Mod",) + MODIFIERS
+# The key names (SPEC.md §10.4): myelin key names 0.1.
+# https://github.com/neuroplastio/myelin/blob/main/myelinkey/SPEC.md
+
+MODIFIERS = ("super", "ctrl", "alt", "shift")
+# The modifiers' names and aliases, as the default reading takes them.
+_MOD_NAMES = {"super": "super", "cmd": "super", "command": "super", "ctrl": "ctrl", "control": "ctrl",
+              "alt": "alt", "opt": "alt", "option": "alt", "shift": "shift"}
+# The physical keys (myelin key names, Appendix A).
+PHYSICAL = (
+    "backquote", "backslash", "bracket_left", "bracket_right", "comma", "digit_0", "digit_1", "digit_2",
+    "digit_3", "digit_4", "digit_5", "digit_6", "digit_7", "digit_8", "digit_9", "equal",
+    "intl_backslash", "intl_ro", "intl_yen", "key_a", "key_b", "key_c", "key_d", "key_e", "key_f",
+    "key_g", "key_h", "key_i", "key_j", "key_k", "key_l", "key_m", "key_n", "key_o", "key_p", "key_q",
+    "key_r", "key_s", "key_t", "key_u", "key_v", "key_w", "key_x", "key_y", "key_z", "minus", "period",
+    "quote", "semicolon", "slash", "alt_left", "alt_right", "backspace", "caps_lock", "context_menu",
+    "control_left", "control_right", "enter", "meta_left", "meta_right", "shift_left", "shift_right",
+    "space", "tab", "convert", "kana_mode", "non_convert", "delete", "end", "help", "home", "insert",
+    "page_down", "page_up", "arrow_down", "arrow_left", "arrow_right", "arrow_up", "num_lock",
+    "numpad_0", "numpad_1", "numpad_2", "numpad_3", "numpad_4", "numpad_5", "numpad_6", "numpad_7",
+    "numpad_8", "numpad_9", "numpad_add", "numpad_backspace", "numpad_clear", "numpad_clear_entry",
+    "numpad_comma", "numpad_decimal", "numpad_divide", "numpad_enter", "numpad_equal",
+    "numpad_memory_add", "numpad_memory_clear", "numpad_memory_recall", "numpad_memory_store",
+    "numpad_memory_subtract", "numpad_multiply", "numpad_paren_left", "numpad_paren_right",
+    "numpad_subtract", "numpad_separator", "numpad_up", "numpad_down", "numpad_right", "numpad_left",
+    "numpad_begin", "numpad_home", "numpad_end", "numpad_insert", "numpad_delete", "numpad_page_up",
+    "numpad_page_down", "escape", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11",
+    "f12", "f13", "f14", "f15", "f16", "f17", "f18", "f19", "f20", "f21", "f22", "f23", "f24", "f25",
+    "fn", "fn_lock", "print_screen", "scroll_lock", "pause", "browser_back", "browser_favorites",
+    "browser_forward", "browser_home", "browser_refresh", "browser_search", "browser_stop", "eject",
+    "launch_app_1", "launch_app_2", "launch_mail", "media_play_pause", "media_select", "media_stop",
+    "media_track_next", "media_track_previous", "power", "sleep", "audio_volume_down",
+    "audio_volume_mute", "audio_volume_up", "wake_up", "copy", "cut", "paste",
+)
+_PHYSICAL = frozenset(PHYSICAL)
+# Other keymaps' names for physical keys, which the default reading takes.
+_OTHER = {"up": "arrow_up", "down": "arrow_down", "left": "arrow_left", "right": "arrow_right",
+          "pageup": "page_up", "pagedown": "page_down", "pgup": "page_up", "pgdn": "page_down", "esc": "escape"}
+_ALIAS = re.compile(r"<[A-Za-z0-9_-]+>\Z")
 
 ACTIONS = (
     "char-backward", "char-forward", "word-backward", "word-forward", "line-start", "line-end",
@@ -1416,29 +1451,29 @@ MOVES = frozenset(("char-backward", "char-forward", "word-backward", "word-forwa
                    "line-previous", "line-next", "page-up", "page-down", "input-start", "input-end"))
 # The moves that go back or up, which start from a selection's start.
 _BACK = frozenset(("char-backward", "word-backward", "line-start", "line-previous", "page-up", "input-start"))
-# What Lookup returns for a character the field types.
+# What Lookup returns for a key the field types.
 INSERT = "insert"
+# The keys a keymap never binds (SPEC.md §10.2).
+_UNBOUND = ("tab", "shift+tab", "escape")
 
 # The SDK's keymap (SDK.md §3.10): Bubble Tea's text input and text area, but
-# Mod+a selects all.
+# mod+a selects all.
 TERMINAL_KEYS = " ".join((
-    "ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward",
-    "Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward",
-    "Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward",
-    "Home=line-start End=line-end Control+e=line-end",
-    "Backspace=delete-char-backward Control+h=delete-char-backward",
-    "Delete=delete-char-forward Control+d=delete-char-forward",
-    "Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward",
-    "Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward",
-    "Control+u=delete-to-line-start Control+k=delete-to-line-end",
-    "ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next",
-    "PageUp=page-up PageDown=page-down",
-    "Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end",
-    "Mod+a=select-all",
-    "Control+m=newline",
+    "arrow_left=char-backward ctrl+b=char-backward arrow_right=char-forward ctrl+f=char-forward",
+    "alt+arrow_left=word-backward ctrl+arrow_left=word-backward alt+b=word-backward",
+    "alt+arrow_right=word-forward ctrl+arrow_right=word-forward alt+f=word-forward",
+    "home=line-start end=line-end ctrl+e=line-end",
+    "backspace=delete-char-backward ctrl+h=delete-char-backward",
+    "delete=delete-char-forward ctrl+d=delete-char-forward",
+    "alt+backspace=delete-word-backward ctrl+w=delete-word-backward ctrl+backspace=delete-word-backward",
+    "alt+delete=delete-word-forward alt+d=delete-word-forward ctrl+delete=delete-word-forward",
+    "ctrl+u=delete-to-line-start ctrl+k=delete-to-line-end",
+    "arrow_up=line-previous ctrl+p=line-previous arrow_down=line-next ctrl+n=line-next",
+    "page_up=page-up page_down=page-down",
+    "alt+<=input-start ctrl+home=input-start alt+>=input-end ctrl+end=input-end",
+    "mod+a=select-all",
+    "ctrl+m=newline",
 ))
-
-_NAMED = re.compile(r"[A-Z][A-Za-z0-9]+\Z")
 
 
 def chars(s):
@@ -1452,69 +1487,190 @@ def chars(s):
     return out
 
 
+def _lower(c):
+    """Each code point's simple lowercase mapping."""
+    return "".join(x.lower() if len(x.lower()) == 1 else x for x in c)
+
+
+def _upper(c):
+    return "".join(x.upper() if len(x.upper()) == 1 else x for x in c)
+
+
 def _is_char(v):
-    c = chars(v)
-    return len(c) == 1 and ord(v[0]) >= 0x20 and v[0] != "\x7f"
+    """Whether v is one character (myelin key names §2.4): its first code
+    point neither a space nor a control."""
+    return len(chars(v)) == 1 and v[0] != " " and unicodedata.category(v[0]) != "Cc"
 
 
-def _split_key(name):
-    """A key's name as (modifiers, value), or None when it does not parse."""
-    if name.endswith("++") and len(name) > 2:
-        head, value = name[:-2], "+"
-    elif name == "+":
-        head, value = "", "+"
-    else:
-        i = name.rfind("+")
-        head, value = (name[:i], name[i + 1:]) if i >= 0 else ("", name)
-    mods = head.split("+") if head else []
-    if any(m not in _ALL_MODS for m in mods) or len(set(mods)) != len(mods):
+def _is_capital(c):
+    return len(c) == 1 and _lower(c) != c and _upper(_lower(c)) == c
+
+
+def _is_letter(c):
+    """A character with case: its simple uppercase mapping differs."""
+    return _upper(c) != c or _is_capital(c)
+
+
+def _physical(part):
+    """A physical key as the default reading takes it, or None."""
+    low = part.lower()
+    if low in _PHYSICAL:
+        return low
+    if low in _OTHER:
+        return _OTHER[low]
+    out = []
+    for i, c in enumerate(part):
+        if not (c.isascii() and c.isalnum()):
+            return None
+        if i > 0 and (c.isupper() or c.isdigit()):
+            out.append("_")
+        out.append(c.lower())
+    n = "".join(out)
+    return n if n in _PHYSICAL else None
+
+
+def _join(mods, value):
+    return "+".join([m for m in ("mod",) + MODIFIERS if m in mods] + [value])
+
+
+def parse_key(text):
+    """A key's name read with myelin key names' default reading (SPEC.md
+    §10.4), in its canonical form, or None where the reading refuses it,
+    `mod` included."""
+    return _read(text, None, False)
+
+
+def read_key(platform, text):
+    """A key's name read with the default reading and the command modifier
+    (myelin key names §4.4): `mod` stands for the platform's. None where
+    the reading refuses it."""
+    return _read(text, platform.mod, False)
+
+
+def _read(text, mod, keep):
+    """The default reading of a key's name, `mod` standing for that
+    modifier, or refused when None. With `keep`, the key keeps `mod` first
+    where it was written with it."""
+    if not text or _ALIAS.match(text):
         return None
-    if value == "Space":
-        value = " "
-    if not (_is_char(value) or _NAMED.match(value)):
+    parts, i = [], 0
+    while True:
+        j = text.find("+", i)
+        if j < 0:
+            parts.append(text[i:])
+            break
+        parts.append(text[i:j])
+        i = j + 1
+        if i == len(text):
+            if parts[-1] != "":
+                return None  # ctrl+, a+
+            break
+    mods, order, value, written, named = set(), [], None, set(), set()
+    for p in parts:
+        m = _MOD_NAMES.get(p.lower())
+        if p.lower() == "meta":
+            return None
+        if p.lower() == "mod":
+            if mod is None:
+                return None
+            # `mod` with `super` or `ctrl`, whichever it stands for, is
+            # refused (SPEC.md §10.4), and `mod` twice, as any modifier is.
+            if "mod" in named or {"super", "ctrl"} & named:
+                return None
+            named.add("mod")
+            m = mod
+            written.add(m)
+        elif m is not None:
+            if m in ("super", "ctrl") and "mod" in named:
+                return None
+            named.add(m)
+        if m is not None:
+            if m in mods:
+                return None
+            mods.add(m)
+            order.append(m)
+            continue
+        if value is not None:
+            return None
+        if p == "":
+            value = "+"
+        elif _is_char(p):
+            value = _lower(p)
+        else:
+            value = _physical(p)
+            if value is None:
+                return None
+    if value is None:
+        if not order:
+            return None
+        value = order[-1]
+        mods.discard(value)
+        written.discard(value)
+    if keep and written:
+        return _join((mods - written) | {"mod"}, value)
+    return _join(mods, value)
+
+
+def _split(k):
+    """A canonical key as (modifiers, value, kind): kind is "character",
+    "physical" or "modifier" (myelin key names §2.1)."""
+    parts = k.split("+")
+    mods = []
+    while len(parts) > 1 and parts[0] in MODIFIERS:
+        mods.append(parts.pop(0))
+    value = "+".join(parts)
+    if value == "" and k.endswith("+"):
+        value = "+"
+    kind = "physical" if value in _PHYSICAL else "modifier" if value in MODIFIERS else "character"
+    return mods, value, kind
+
+
+def key_text(key):
+    """The text a key types in a field (SDK.md §3.10), or None."""
+    k = parse_key(key)
+    if k is None:
         return None
-    return mods, value
+    mods, value, kind = _split(k)
+    if {"super", "ctrl", "alt"} & set(mods):
+        return None
+    if value == "space":
+        return " "
+    if kind != "character":
+        return None
+    return _upper(value) if "shift" in mods and _is_letter(value) else value
 
 
-def _key_name(mods, value):
-    """The canonical name of a key: modifiers in order, Shift shown in a
-    letter where it can be, Space for a space."""
+def _char(c, mods=()):
+    """The key of a character with modifiers: a capital is shift with its
+    letter."""
     mods = set(mods)
-    if "Shift" in mods and _is_char(value) and len(value) == 1:
-        up, low = value.upper(), value.lower()
-        if len(up) == 1 and up != value:
-            value, mods = up, mods - {"Shift"}
-        elif len(low) == 1 and low != value:
-            mods = mods - {"Shift"}
-    return "+".join([m for m in _ALL_MODS if m in mods] + ["Space" if value == " " else value])
+    if c == " ":
+        return _join(mods, "space")
+    if _is_capital(c):
+        mods.add("shift")
+        c = _lower(c)
+    return _join(mods, c)
 
 
-def parse_key(name):
-    """A key's name in its canonical form (SDK.md §3.10), or None."""
-    k = _split_key(name)
-    return None if k is None else _key_name(*k)
-
-
-_C0 = {0x00: "Control+Space", 0x08: "Control+h", 0x09: "Tab", 0x0D: "Enter", 0x1B: "Escape", 0x7F: "Backspace",
-       0x1C: "Control+\\", 0x1D: "Control+]", 0x1E: "Control+^", 0x1F: "Control+_"}
-_CSI_FINAL = {"A": "ArrowUp", "B": "ArrowDown", "C": "ArrowRight", "D": "ArrowLeft", "H": "Home", "F": "End"}
-_TILDE = {1: "Home", 7: "Home", 4: "End", 8: "End", 2: "Insert", 3: "Delete", 5: "PageUp", 6: "PageDown"}
-_CODES = {9: "Tab", 13: "Enter", 27: "Escape", 8: "Backspace", 127: "Backspace"}
-# The kitty keyboard protocol's codes from 57344 that name keys.
+_C0 = {0x00: "ctrl+space", 0x08: "ctrl+h", 0x09: "tab", 0x0D: "enter", 0x1B: "escape", 0x7F: "backspace",
+       0x1C: "ctrl+\\", 0x1D: "ctrl+]", 0x1E: "ctrl+^", 0x1F: "ctrl+_"}
+_CSI_FINAL = {"A": "arrow_up", "B": "arrow_down", "C": "arrow_right", "D": "arrow_left", "H": "home", "F": "end"}
+_TILDE = {1: "home", 7: "home", 4: "end", 8: "end", 2: "insert", 3: "delete", 5: "page_up", 6: "page_down"}
+_CODES = {9: "tab", 13: "enter", 27: "escape", 8: "backspace", 127: "backspace", 32: "space"}
+# The kitty keyboard protocol's keypad codes, as a legacy terminal sends
+# the keys (SPEC.md §10.4).
 _KITTY = {57399 + i: str(i) for i in range(10)}
-_KITTY.update({57409: ".", 57410: "/", 57411: "*", 57412: "-", 57413: "+", 57414: "Enter", 57415: "=",
-               57417: "ArrowLeft", 57418: "ArrowRight", 57419: "ArrowUp", 57420: "ArrowDown",
-               57421: "PageUp", 57422: "PageDown", 57423: "Home", 57424: "End", 57425: "Insert", 57426: "Delete",
-               57441: "Shift", 57442: "Control", 57443: "Alt", 57444: "Meta", 57447: "Shift", 57448: "Control",
-               57449: "Alt", 57450: "Meta"})
+_KITTY.update({57409: ".", 57410: "/", 57411: "*", 57412: "-", 57413: "+", 57414: "enter", 57415: "=",
+               57417: "arrow_left", 57418: "arrow_right", 57419: "arrow_up", 57420: "arrow_down",
+               57421: "page_up", 57422: "page_down", 57423: "home", 57424: "end", 57425: "insert", 57426: "delete"})
 
 
 def _with(name, add):
     """A key's name with more modifiers."""
     if name is None:
         return None
-    mods, value = _split_key(name)
-    return _key_name(mods + [m for m in add if m not in mods], value)
+    mods, value, _ = _split(name)
+    return _join(set(mods) | set(add), value)
 
 
 def _mods(field):
@@ -1527,31 +1683,30 @@ def _mods(field):
     except ValueError:
         return None, False
     bits = max(m - 1, 0)
-    mods = [n for n, b in (("Shift", 1), ("Alt", 2), ("Control", 4)) if bits & b]
-    if bits & (8 | 32):
-        mods.append("Meta")
+    mods = {n for n, b in (("shift", 1), ("alt", 2), ("ctrl", 4), ("super", 8 | 32)) if bits & b}
     return mods, e == 3
 
 
 def _code_key(code, mods, shifted=None, text=None):
     """The key a kitty or modifyOtherKeys code names."""
     if code in _CODES:
-        return _key_name(mods, _CODES[code])
+        return _join(mods, _CODES[code])
     if code >= 57344:
-        return _key_name(mods, _KITTY[code]) if code in _KITTY else None
+        if code not in _KITTY:
+            return None
+        v = _KITTY[code]
+        return _join(mods, v)
     if code < 0x20 or code == 0x7F:
         return None
-    value = chr(code)
-    if "Shift" in mods:
+    c = chr(code)
+    if _is_letter(c):
+        return _join(mods, _lower(c))
+    if "shift" in mods:
         if shifted:
-            value = chr(shifted)
-        elif text:
-            value = text
-        elif len(value.upper()) == 1:
-            value = value.upper()
-        if value != chr(code):
-            mods = [m for m in mods if m != "Shift"]
-    return "+".join([m for m in MODIFIERS if m in mods] + ["Space" if value == " " else value])
+            return _char(chr(shifted), mods - {"shift"})
+        if text:
+            return _char(text, mods - {"shift"})
+    return _join(mods, c)
 
 
 def _csi(params, final):
@@ -1562,7 +1717,7 @@ def _csi(params, final):
     try:
         if final == "u":
             codes = [int(x) if x else 0 for x in fields[0].split(":")]
-            mods, release = _mods(fields[1]) if len(fields) > 1 else ([], False)
+            mods, release = _mods(fields[1]) if len(fields) > 1 else (set(), False)
             if release or mods is None:
                 return None
             text = "".join(chr(int(x)) for x in fields[2].split(":") if x) if len(fields) > 2 else None
@@ -1574,13 +1729,13 @@ def _csi(params, final):
                 return None if release or mods is None else _code_key(int(fields[2]), mods)
             if n not in _TILDE:
                 return None
-            mods, release = _mods(fields[1]) if len(fields) > 1 else ([], False)
-            return None if release or mods is None else _key_name(mods, _TILDE[n])
+            mods, release = _mods(fields[1]) if len(fields) > 1 else (set(), False)
+            return None if release or mods is None else _join(mods, _TILDE[n])
         if final in _CSI_FINAL:
-            mods, release = _mods(fields[1]) if len(fields) > 1 else ([], False)
-            return None if release or mods is None else _key_name(mods, _CSI_FINAL[final])
+            mods, release = _mods(fields[1]) if len(fields) > 1 else (set(), False)
+            return None if release or mods is None else _join(mods, _CSI_FINAL[final])
         if final == "Z":
-            return "Shift+Tab"
+            return "shift+tab"
     except ValueError:
         return None
     return None
@@ -1590,7 +1745,7 @@ def _one(data, i):
     """The key of a control byte or a character at data[i], and its length."""
     b = data[i]
     if b < 0x20 or b == 0x7F:
-        return (_C0[b] if b in _C0 else "Control+" + chr(b + 0x60)), 1
+        return (_C0[b] if b in _C0 else "ctrl+" + chr(b + 0x60)), 1
     n = 1 if b < 0x80 else 2 if b >> 5 == 6 else 3 if b >> 4 == 14 else 4 if b >> 3 == 30 else 0
     try:
         c = data[i:i + n].decode() if n else None
@@ -1598,12 +1753,12 @@ def _one(data, i):
         c = None
     if c is None or len(c) != 1:
         return None, 1
-    return ("Space" if c == " " else c), n
+    return _char(c), n
 
 
 def decode_keys(data):
     """The keys in input from the terminal (SDK.md §3.10, SPEC.md §10.4): a
-    canonical name for each, None for input that is no key."""
+    name for each, None for input that is no key."""
     if isinstance(data, str):
         data = data.encode()
     out, i = [], 0
@@ -1614,7 +1769,7 @@ def decode_keys(data):
             i += n
             continue
         if i + 1 == len(data):
-            out.append("Escape")
+            out.append("escape")
             break
         nxt = data[i + 1]
         if nxt in (0x5B, 0x4F) and i + 2 < len(data):
@@ -1635,39 +1790,36 @@ def decode_keys(data):
             i = j + 1
             continue
         k, n = _one(data, i + 1)
-        out.append(_with(k, ["Alt"]))
+        out.append(_with(k, ["alt"]))
         i += 1 + n
     return out
 
 
 class Platform:
-    """How a host reads bindings (SDK.md §3.10): Mod, Control or Meta, and
-    its edit shortcuts, from action to keys; None for the defaults."""
+    """How a host reads bindings (SDK.md §3.10): `mod`, "ctrl" or "super",
+    what `mod` stands for, and its edit shortcuts, from action to keys;
+    None for the defaults."""
 
-    def __init__(self, mod="Control", edit=None):
-        self.mod = mod if mod in ("Control", "Meta") else "Control"
+    def __init__(self, mod="ctrl", edit=None):
+        self.mod = mod if mod in ("ctrl", "super") else "ctrl"
         self.edit = edit
 
 
 def platform_of(caps):
     """The Platform of a host's capabilities, the defaults where absent."""
-    return Platform(caps.mod or "Control", caps.edit)
+    return Platform(caps.mod or "ctrl", caps.edit)
 
 
 _EDIT_ACTIONS = ("select-all", "copy", "cut", "paste", "undo", "redo")
 
 
-def _read_mod(key, mod):
-    """A canonical key's name with Mod read as mod."""
-    mods, value = _split_key(key)
-    return _key_name([mod if m == "Mod" else m for m in mods], value)
-
-
-def default_edit(mod="Control"):
-    """The default edit shortcuts for a Mod (SPEC.md §10.2), Mod read."""
-    e = {"select-all": ["Mod+a"], "copy": ["Mod+c"], "cut": ["Mod+x"], "paste": ["Mod+v"], "undo": ["Mod+z"],
-         "redo": ["Mod+Z"] + (["Control+y"] if mod == "Control" else [])}
-    return {a: [_read_mod(k, mod) for k in ks] for a, ks in e.items()}
+def default_edit(mod="ctrl"):
+    """The default edit shortcuts for a `mod` (SPEC.md §10.2), each key
+    read."""
+    p = Platform(mod)
+    e = {"select-all": ["mod+a"], "copy": ["mod+c"], "cut": ["mod+x"], "paste": ["mod+v"], "undo": ["mod+z"],
+         "redo": ["mod+shift+z"] + (["ctrl+y"] if p.mod == "ctrl" else [])}
+    return {a: [read_key(p, k) for k in ks] for a, ks in e.items()}
 
 
 class Keymap:
@@ -1676,32 +1828,41 @@ class Keymap:
     does with a key."""
 
     def __init__(self, multiline=False, platform=None):
-        self.bindings = {}  # key, Mod read, to action
-        self.written = {}  # key, Mod read, to its last binding's key
+        self.bindings = {}  # key, mod read, to action
+        self.written = {}  # key, mod read, to its last binding's key, canonical
         self.multiline = multiline
         self.platform = platform or Platform()
 
-    def bind(self, key, action):
-        k = _read_mod(key, self.platform.mod)
-        self.bindings[k] = action
-        self.written[k] = key
+    def bind(self, key, action, written=None):
+        """Binds a canonical key, mod read; `written` is the key with `mod`
+        where it was written with it."""
+        self.bindings[key] = action
+        self.written[key] = written or key
 
     def format(self):
         return " ".join(f"{self.written[k]}={a}" for k, a in self.bindings.items())
 
     def _key(self, key):
-        """A key's canonical name with Mod read, or None."""
-        k = parse_key(key)
-        return None if k is None else _read_mod(k, self.platform.mod)
+        """A pressed key's canonical name, or None."""
+        return parse_key(key)
 
     def _bound(self, k):
-        """The action bound to canonical key k, or to k without Shift when k
-        has Shift and is not bound itself."""
-        mods, value = _split_key(k)
+        """The action bound to canonical key k, or, for a key with shift
+        that is not a character and is not bound itself, to k without
+        shift."""
         a = self.bindings.get(k)
-        if a is None and "Shift" in mods:
-            a = self.bindings.get(_key_name([m for m in mods if m != "Shift"], value))
+        if a is None:
+            mods, value, kind = _split(k)
+            if "shift" in mods and kind != "character":
+                a = self.bindings.get(_join(set(mods) - {"shift"}, value))
         return a
+
+    def binds(self, key):
+        """Whether the keymap binds the key, with the fallback without
+        shift. A host with two names for a press asks of the physical one
+        first (SPEC.md §10.4)."""
+        k = self._key(key)
+        return k is not None and self._bound(k) is not None
 
     def program(self, key):
         """Whether the keymap gives the key to the program (SPEC.md §10.2):
@@ -1727,67 +1888,67 @@ class Keymap:
         return a if a in SCROLL_ACTIONS else None
 
     def lookup(self, key):
-        """An action, INSERT for a character the field types, or None when
-        the key is not the field's."""
+        """An action, INSERT for a key the field types (key_text), or None
+        when the key is not the field's."""
         k = self._key(key)
-        if k is None or k in ("Tab", "Shift+Tab", "Escape"):
+        if k is None or k in _UNBOUND:
             return None
-        mods, value = _split_key(k)
         a = self._bound(k)
         if a is not None:
             return None if a in ("program", "prefix") or (a in MULTILINE_ACTIONS and not self.multiline) else a
-        if _is_char(value) and not {"Control", "Alt", "Meta"} & set(mods):
-            return INSERT
-        return None
+        return INSERT if key_text(k) is not None else None
 
     def selects(self, key):
         """Whether the field selects with the key (SPEC.md §10.2): it looks
-        up a move, and its name has Shift. The field then extends with it."""
+        up a move, and its name has shift. The field then extends with it."""
         k = self._key(key)
-        return k is not None and self.lookup(k) in MOVES and "Shift" in _split_key(k)[0]
+        return k is not None and self.lookup(k) in MOVES and "shift" in _split(k)[0]
 
 
-def _bindings(value):
-    """A data-keys value's bindings, in order, without those a host ignores."""
+def _bindings(platform, value):
+    """A data-keys value's bindings, in order, without those a host ignores:
+    each key read, and written with `mod` where it was, and the action."""
     for b in re.split(r"[ \t\n\f\r]+", value):
         i = b.rfind("=")
         if i < 0:
             continue
-        k, a = parse_key(b[:i]), b[i + 1:]
-        if k is None or a not in ACTIONS or k in ("Tab", "Shift+Tab", "Escape"):
+        text, a = b[:i], b[i + 1:]
+        k, w = read_key(platform, text), _read(text, platform.mod, True)
+        if k is None or a not in ACTIONS or k in _UNBOUND:
             continue
-        yield k, a
+        yield k, a, w
 
 
 def parse_keymap(platform, value):
-    """A data-keys value's bindings, without those a host ignores, Mod read
-    as the platform's."""
+    """A data-keys value's bindings, without those a host ignores, each key
+    read on the platform."""
     m = Keymap(platform=platform)
-    for k, a in _bindings(value):
-        m.bind(k, a)
+    for k, a, w in _bindings(platform, value):
+        m.bind(k, a, w)
     return m
 
 
 # The default keymap (SPEC.md §10.2): every host's keys, then those of its
-# Mod; the edit shortcuts come last.
-_DEFAULT = (("ArrowLeft", "char-backward"), ("ArrowRight", "char-forward"),
-            ("Alt+ArrowLeft", "word-backward"), ("Alt+ArrowRight", "word-forward"),
-            ("Home", "line-start"), ("End", "line-end"),
-            ("Backspace", "delete-char-backward"), ("Delete", "delete-char-forward"),
-            ("Alt+Backspace", "delete-word-backward"), ("Alt+Delete", "delete-word-forward"),
-            ("ArrowUp", "line-previous"), ("ArrowDown", "line-next"), ("PageUp", "page-up"), ("PageDown", "page-down"))
+# `mod`; the edit shortcuts come last.
+_DEFAULT = (("arrow_left", "char-backward"), ("arrow_right", "char-forward"),
+            ("alt+arrow_left", "word-backward"), ("alt+arrow_right", "word-forward"),
+            ("home", "line-start"), ("end", "line-end"),
+            ("backspace", "delete-char-backward"), ("delete", "delete-char-forward"),
+            ("alt+backspace", "delete-word-backward"), ("alt+delete", "delete-word-forward"),
+            ("arrow_up", "line-previous"), ("arrow_down", "line-next"), ("page_up", "page-up"),
+            ("page_down", "page-down"))
 _DEFAULT_MOD = {
-    "Control": (("Control+ArrowLeft", "word-backward"), ("Control+ArrowRight", "word-forward"),
-                ("Control+Home", "input-start"), ("Control+End", "input-end"),
-                ("Control+Backspace", "delete-word-backward"), ("Control+Delete", "delete-word-forward")),
-    "Meta": (("Meta+ArrowLeft", "line-start"), ("Meta+ArrowRight", "line-end"),
-             ("Meta+ArrowUp", "input-start"), ("Meta+ArrowDown", "input-end"),
-             ("Meta+Backspace", "delete-to-line-start"),
-             ("Control+a", "line-start"), ("Control+e", "line-end"),
-             ("Control+b", "char-backward"), ("Control+f", "char-forward"),
-             ("Control+p", "line-previous"), ("Control+n", "line-next"),
-             ("Control+h", "delete-char-backward"), ("Control+d", "delete-char-forward"),
-             ("Control+k", "delete-to-line-end")),
+    "ctrl": (("ctrl+arrow_left", "word-backward"), ("ctrl+arrow_right", "word-forward"),
+             ("ctrl+home", "input-start"), ("ctrl+end", "input-end"),
+             ("ctrl+backspace", "delete-word-backward"), ("ctrl+delete", "delete-word-forward")),
+    "super": (("super+arrow_left", "line-start"), ("super+arrow_right", "line-end"),
+              ("super+arrow_up", "input-start"), ("super+arrow_down", "input-end"),
+              ("super+backspace", "delete-to-line-start"),
+              ("ctrl+a", "line-start"), ("ctrl+e", "line-end"),
+              ("ctrl+b", "char-backward"), ("ctrl+f", "char-forward"),
+              ("ctrl+p", "line-previous"), ("ctrl+n", "line-next"),
+              ("ctrl+h", "delete-char-backward"), ("ctrl+d", "delete-char-forward"),
+              ("ctrl+k", "delete-to-line-end")),
 }
 
 
@@ -1796,20 +1957,20 @@ def resolve(platform, multiline, *values):
     data-keys value, the root's first, less their scroll actions."""
     platform = platform or Platform()
     m = Keymap(multiline, platform)
-    for k, a in _DEFAULT + (("Enter", "newline" if multiline else "submit"),) + _DEFAULT_MOD[platform.mod]:
+    for k, a in _DEFAULT + (("enter", "newline" if multiline else "submit"),) + _DEFAULT_MOD[platform.mod]:
         m.bind(k, a)
     edit = platform.edit if platform.edit is not None else default_edit(platform.mod)
     for a, keys in edit.items():
         if a not in _EDIT_ACTIONS:
             continue
         for key in keys:
-            k = parse_key(key)
-            if k is not None and k not in ("Tab", "Shift+Tab", "Escape"):
-                m.bind(k, a)
+            k = read_key(platform, key)
+            if k is not None and k not in _UNBOUND:
+                m.bind(k, a, _read(key, platform.mod, True))
     for v in values:
-        for k, a in _bindings(v):
+        for k, a, w in _bindings(platform, v):
             if a not in SCROLL_ACTIONS:
-                m.bind(k, a)
+                m.bind(k, a, w)
     return m
 
 

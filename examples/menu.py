@@ -31,7 +31,7 @@ def tree(sorted_by):
     """The menu: what the program can do now. Sorting by what it is sorted
     by already does nothing, so that item is not enabled."""
     return MenuTree("Files", [
-        MenuItem("Space", "Leader", items=[
+        MenuItem("space", "Leader", items=[
             MenuItem("f", "File", items=[
                 MenuItem("n", "New file", "file-new"),
                 MenuItem("r", "Rename", "file-rename"),
@@ -47,8 +47,8 @@ def tree(sorted_by):
 
 
 # The keys that run an action at the end of a sequence.
-SEQUENCES = {("Space", "f", "n"): "file-new", ("Space", "f", "r"): "file-rename", ("Space", "q"): "quit"}
-GROUPS = {("Space",), ("Space", "f")}
+SEQUENCES = {("space", "f", "n"): "file-new", ("space", "f", "r"): "file-rename", ("space", "q"): "quit"}
+GROUPS = {("space",), ("space", "f")}
 
 
 def main():
@@ -83,12 +83,12 @@ def main():
                 for m in msgs:
                     if m["a"] == "ev" and m["e"] == "command":
                         done = run(m.body["name"]) or done
-                for ch in keys.decode("utf-8", "replace"):
-                    key = {" ": "Space", "\x1b": "Escape"}.get(ch, ch)
+                # The keys as SPEC §10.4 names them: a space is "space".
+                for key in hotty.decode_keys(keys):
                     if not seq and key == "q":
                         done = True
                         break
-                    if not seq and key != "Space":
+                    if not seq and key != "space":
                         continue
                     seq += (key,)
                     if seq in GROUPS:

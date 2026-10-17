@@ -1,6 +1,6 @@
 # HOTTY — HTML Over The TTY
 
-    Version:  0.3
+    Version:  0.4
     Status:   Draft. Versions 0.x may change incompatibly (§15).
     Licence:  CC BY 4.0 (this document); the conformance vectors are
               Apache-2.0.
@@ -270,7 +270,7 @@ A program finds out whether it has a host by sending a query, then Primary
 Device Attributes as a fence:
 
 ```
-ESC ] 7279 ; a=q:n=1:v=0.3 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.4 ST   CSI c
 ```
 
 Every terminal answers DA1. A host answers the query first:
@@ -283,7 +283,7 @@ If the DA1 answer arrives with no HOTTY reply before it, there is no host. The
 program **SHOULD** then fall back (§14).
 
 **Versions.** `v` lists the HOTTY versions the program speaks,
-comma-separated: `v=0.3` for this document, and `v=0.2,0.3` for a
+comma-separated: `v=0.4` for this document, and `v=0.3,0.4` for a
 program that speaks 0.2 as well. A version is `major.minor`, two numbers written without
 leading zeros, and versions compare as those numbers, the major first.
 - A host answers in the highest version it shares with the program: `a=ok`,
@@ -310,7 +310,7 @@ terminal attached. A program that can start using HOTTY after it has fallen
 back asks for a late answer with `late=1`:
 
 ```
-ESC ] 7279 ; a=q:n=1:v=0.3:late=1 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.4:late=1 ST   CSI c
 ```
 
 - A host answers it as any query, at once.
@@ -332,15 +332,15 @@ The capabilities, the body of that reply, are a map of these fields (§3.3):
 
 | field | type | meaning |
 | --- | --- | --- |
-| `v` | str | the HOTTY version the host answers in (Versions, above): `"0.3"` for this document |
+| `v` | str | the HOTTY version the host answers in (Versions, above): `"0.4"` for this document |
 | `cellcss` | `{"w": float, "h": float}` | one cell's size in CSS pixels (§5.3) |
 | `scale` | float | device pixels per CSS pixel when the host answers: a hint for the resolution of images, which a zoom changes without telling (§5.3) |
 | `scheme` | str | `"dark"` or `"light"`: the terminal's colour scheme |
-| `mod` | str | `"Control"` or `"Meta"`: the modifier `Mod` stands for in bindings (§10.4) |
+| `mod` | str | `"ctrl"` or `"super"`: the modifier `mod` stands for in bindings (§10.4) |
 | `features` | [str] | the optional features the host has (below). Absent: none |
 | `limits` | `{str: int}` | the host's limits (§13), such as `{"resources": <bytes>, "surfaces": <count>, "message": <bytes>}` |
 | `net` | `{str: [str]}` | the host's network policy (§7.2), from directive to sources, such as `{"img-src": ["https://example.com"]}`. Absent or empty: the host fetches nothing from the network |
-| `edit` | `{str: [str]}` | the host's edit shortcuts (§10.2), from each action to its keys as §10.4 names them: `{"copy": ["Control+c"], …}`. A host that reports them takes edit commands from a program in the cells (§10.6) |
+| `edit` | `{str: [str]}` | the host's edit shortcuts (§10.2), from each action to its keys as §10.4 names them: `{"copy": ["ctrl+c"], …}`. A host that reports them takes edit commands from a program in the cells (§10.6) |
 | `host` | str | optional: a name for the implementation |
 | `version` | str | optional, with `host`: the implementation's version, as dot-separated numbers compared one by one (`"0.0.10"` is after `"0.0.9"`) |
 
@@ -936,8 +936,8 @@ reads HOTTY messages from its input. A detached surface sends none (§5.5).
   and where the element found has no id (below).
 - **Events of the terminal,** `command` and `caps`, belong to no surface,
   and have neither `s` nor `t`.
-- **Modifiers.** `mods` is the modifier keys held, as bits: 1 Shift, 2
-  Alt, 4 Control and 8 Meta (§10.4), left out when none is. A press and a
+- **Modifiers.** `mods` is the modifier keys held, as bits: 1 `shift`,
+  2 `alt`, 4 `ctrl` and 8 `super` (§10.4), left out when none is. A press and a
   drag's events carry those held at that moment, a click those held at its
   release, or with the key that clicked.
 
@@ -1416,15 +1416,15 @@ is offered the second time as the key that input reads as.
 | focused element | keys it uses |
 | --- | --- |
 | text field: an `input` of type `text`, `search`, `url`, `tel`, `email`, `password` or `number` (or a type the host does not know, which is `text`), a `textarea`, an editing host (`contenteditable`) | the keys its keymap binds, and printable characters (below) |
-| an `input` of a date or time type | printable characters, Space, Backspace, Delete, the arrows, Home, End, Page Up, Page Down, Enter, unmodified or with Shift only |
-| `select` | printable characters, Space, Up, Down, Home, End, Page Up, Page Down, Enter, unmodified or with Shift only |
-| `button`, `a`, `summary`, checkbox, radio button | Space and Enter, unmodified or with Shift only |
+| an `input` of a date or time type | characters, `space`, `backspace`, `delete`, the arrows, `home`, `end`, `page_up`, `page_down`, `enter`, unmodified or with `shift` only |
+| `select` | characters, `space`, `arrow_up`, `arrow_down`, `home`, `end`, `page_up`, `page_down`, `enter`, unmodified or with `shift` only |
+| `button`, `a`, `summary`, checkbox, radio button | `space` and `enter`, unmodified or with `shift` only |
 
-- **Tab and Shift+Tab** move between the surface's focusable elements, and
+- **`tab` and `shift+tab`** move between the surface's focusable elements, and
   the host sends `focus` for the one they move to (§10.1). Past the last
   one, or before the first, the surface loses the keyboard: the host sends
   `blur` and the terminal has the keyboard again.
-- **Escape** is never used by the surface, except by a select's open list
+- **`escape`** is never used by the surface, except by a select's open list
   (below). It reaches the program, which decides, for instance by sending
   `a=blur`.
 - **After a prefix** (§10.5), every key reaches the program, before
@@ -1479,12 +1479,12 @@ only that.
 `data-keys` is a list of bindings separated by ASCII white space (space,
 tab, line feed, form feed, carriage return), as HTML's space-separated
 tokens are. A binding is
-`key=action`, split at its last `=`: the key is named as §10.4 has it
-(`Control+a`, `Mod+s`, `Alt+ArrowLeft`, `Alt+==line-start` binds `Alt+=`), and the
+`key=action`, split at its last `=`: the key is read as §10.4 reads one
+(`ctrl+a`, `mod+s`, `alt+arrow_left`; `alt+==line-start` binds `alt+=`), and the
 action is one of the table below or a scroll action (*Scrolling keys*). A
 host **MUST** ignore a binding whose key does not parse or whose action it
-does not know, and bindings of Tab,
-Shift+Tab and Escape, which keep their meaning above.
+does not know, and bindings of `tab`, `shift+tab` and `escape`, which keep
+their meaning above.
 
 The default keymap is the keys every host binds, then those of the host's
 platform modifier, `Mod` (§10.4), then the host's edit shortcuts. Every
@@ -1492,35 +1492,35 @@ host binds:
 
 | key | action |
 | --- | --- |
-| ArrowLeft, ArrowRight | `char-backward`, `char-forward` |
-| Alt+ArrowLeft, Alt+ArrowRight | `word-backward`, `word-forward` |
-| Home, End | `line-start`, `line-end` |
-| Backspace, Delete | `delete-char-backward`, `delete-char-forward` |
-| Alt+Backspace, Alt+Delete | `delete-word-backward`, `delete-word-forward` |
-| ArrowUp, ArrowDown | `line-previous`, `line-next` |
-| PageUp, PageDown | `page-up`, `page-down` |
-| Enter | `submit` in an `input`, `newline` in a multi-line field |
+| `arrow_left`, `arrow_right` | `char-backward`, `char-forward` |
+| `alt+arrow_left`, `alt+arrow_right` | `word-backward`, `word-forward` |
+| `home`, `end` | `line-start`, `line-end` |
+| `backspace`, `delete` | `delete-char-backward`, `delete-char-forward` |
+| `alt+backspace`, `alt+delete` | `delete-word-backward`, `delete-word-forward` |
+| `arrow_up`, `arrow_down` | `line-previous`, `line-next` |
+| `page_up`, `page_down` | `page-up`, `page-down` |
+| `enter` | `submit` in an `input`, `newline` in a multi-line field |
 
-Where `Mod` is Control:
-
-| key | action |
-| --- | --- |
-| Control+ArrowLeft, Control+ArrowRight | `word-backward`, `word-forward` |
-| Control+Home, Control+End | `input-start`, `input-end` |
-| Control+Backspace, Control+Delete | `delete-word-backward`, `delete-word-forward` |
-
-Where `Mod` is Meta:
+Where `mod` is `ctrl`:
 
 | key | action |
 | --- | --- |
-| Meta+ArrowLeft, Meta+ArrowRight | `line-start`, `line-end` |
-| Meta+ArrowUp, Meta+ArrowDown | `input-start`, `input-end` |
-| Meta+Backspace | `delete-to-line-start` |
-| Control+a, Control+e | `line-start`, `line-end` |
-| Control+b, Control+f | `char-backward`, `char-forward` |
-| Control+p, Control+n | `line-previous`, `line-next` |
-| Control+h, Control+d | `delete-char-backward`, `delete-char-forward` |
-| Control+k | `delete-to-line-end` |
+| `ctrl+arrow_left`, `ctrl+arrow_right` | `word-backward`, `word-forward` |
+| `ctrl+home`, `ctrl+end` | `input-start`, `input-end` |
+| `ctrl+backspace`, `ctrl+delete` | `delete-word-backward`, `delete-word-forward` |
+
+Where `mod` is `super`:
+
+| key | action |
+| --- | --- |
+| `super+arrow_left`, `super+arrow_right` | `line-start`, `line-end` |
+| `super+arrow_up`, `super+arrow_down` | `input-start`, `input-end` |
+| `super+backspace` | `delete-to-line-start` |
+| `ctrl+a`, `ctrl+e` | `line-start`, `line-end` |
+| `ctrl+b`, `ctrl+f` | `char-backward`, `char-forward` |
+| `ctrl+p`, `ctrl+n` | `line-previous`, `line-next` |
+| `ctrl+h`, `ctrl+d` | `delete-char-backward`, `delete-char-forward` |
+| `ctrl+k` | `delete-to-line-end` |
 
 The **edit shortcuts** are the host's, and the user's to change; a host
 reports them as `edit` (§4). The same keys send a program in the cells the
@@ -1528,34 +1528,38 @@ edit commands it takes (§10.6). Unless the user changes them, they are:
 
 | key | action |
 | --- | --- |
-| Mod+a | `select-all` |
-| Mod+c | `copy` |
-| Mod+x | `cut` |
-| Mod+v | `paste` |
-| Mod+z | `undo` |
-| Mod+Z; Control+y where `Mod` is Control | `redo` |
+| `mod+a` | `select-all` |
+| `mod+c` | `copy` |
+| `mod+x` | `cut` |
+| `mod+v` | `paste` |
+| `mod+z` | `undo` |
+| `mod+shift+z`; `ctrl+y` where `mod` is `ctrl` | `redo` |
 
 These are a text field's keys in a browser on Linux and Windows, where
-`Mod` is Control, and on macOS, where it is Meta: the Command key is Meta,
-the Option key Alt (§10.4), and Control+a and the keys after it are
-Cocoa's. Mod+Z is Mod+Shift+z (§10.4). Shift selects with each move
-(below). A program that wants one of them binds it to `program`. A host
-that sees only what the program would read (§10.4) can offer a key only as
-that: in the legacy encoding a terminal may send Control+Backspace as
-`0x08`, which is Control+h, and a macOS terminal sends Command+ArrowLeft as
-`0x01`, which is Control+a.
+`mod` is `ctrl`, and on macOS, where it is `super`: the Command key is
+`super`, the Option key `alt` (§10.4), and `ctrl+a` and the keys after it
+are Cocoa's. Shift selects with each move (below). A program that wants
+one of them binds it to `program`. A host that sees only what the program
+would read (§10.4) can offer a key only as that: in the legacy encoding a
+terminal may send Control with Backspace as `0x08`, which is `ctrl+h`, and
+a macOS terminal sends Command with the left arrow as `0x01`, which is
+`ctrl+a`. It also names a character only by what it types, so a binding of
+a physical key of the writing system (`ctrl+key_w`) holds only where the
+host sees the key itself: one that should hold everywhere names the
+character (`ctrl+w`).
 
 A key goes to the field's keymap:
 - **Bound:** the field does the action. A key bound to `program` or
   `prefix`, or to an action the field does not have (a multi-line one in
   an `input`, or `copy`, `cut` and `paste` where they have nothing to do,
   below), reaches the program.
-- **Not bound, with Shift:** the key is looked up again without Shift, so
-  Shift+ArrowLeft does what ArrowLeft does, and selects (below). A
-  character shows Shift in itself (`A`, §10.4), so this concerns the other
-  keys.
-- **Not bound, a printable character** without Control, Alt and Meta: the
-  field types it at the caret.
+- **Not bound, with `shift`:** a key that is not a character is looked up
+  again without `shift`, so `shift+arrow_left` does what `arrow_left` does,
+  and selects (below). A character with `shift` is not: `shift+g` is a key
+  of its own, as `G` is in a browser.
+- **Not bound, a character or `space`,** with no modifier but `shift`: the
+  field types it at the caret. It types the text the key types: the
+  character, a letter with `shift` as its capital, and a space.
 - **Otherwise** the key reaches the program.
 
 So a field uses only the keys its keymap names, and the characters it types:
@@ -1606,12 +1610,12 @@ The actions:
 - **Shift selects.** The moves are `char-backward`, `char-forward`,
   `word-backward`, `word-forward`, `line-start`, `line-end`,
   `line-previous`, `line-next`, `page-up`, `page-down`, `input-start` and
-  `input-end`. A move done by a key whose name has Shift (§10.4), bound
-  with Shift or looked up without it, moves the caret from where it is and
-  keeps the anchor, which is where the caret was if nothing was selected.
-  Shift+ArrowLeft selects the character before the caret.
-  Control+Shift+ArrowRight, Shift+End and, in a `textarea`,
-  Shift+ArrowDown go on by a word, to the line's end and by a row. When the
+  `input-end`. A move done by a key whose name has `shift` (§10.4), bound
+  with `shift` or looked up without it, moves the caret from where it is
+  and keeps the anchor, which is where the caret was if nothing was
+  selected. `shift+arrow_left` selects the character before the caret.
+  `ctrl+shift+arrow_right`, `shift+end` and, in a `textarea`,
+  `shift+arrow_down` go on by a word, to the line's end and by a row. When the
   caret comes back to the anchor, nothing is selected.
 - **Every edit** is an edit for the `input` and `change` events (§9).
 - **The clipboard** is the host's: the platform's, where there is one. A
@@ -1644,9 +1648,9 @@ program's own `a=focus`.
 - **Every focused element has a keymap**, read as a text field's is, but
   with its scroll actions: the `data-keys` of each element from the
   document's root down to it, the element's own last, each overriding what
-  came before it key by key. A
-  key with Shift that is not bound is looked up again without it. Only a
-  text field starts from the default keymap.
+  came before it key by key. A key with `shift` that is not a character
+  and is not bound is looked up again without it. Only a text field starts
+  from the default keymap.
 - **Outside a text field,** a keymap gives only `program`, `prefix` and
   the scroll actions (below). Its other bindings still override farther
   ones key by key, but do nothing there: the element uses those keys as
@@ -1657,7 +1661,7 @@ program's own `a=focus`.
 
 So a program that works a list, a menu or a table with the arrows keeps
 them on the element that holds it. On a button in a scrolling surface,
-`data-keys="ArrowUp=program ArrowDown=program"` sends the arrows to the
+`data-keys="arrow_up=program arrow_down=program"` sends the arrows to the
 program, where they would otherwise scroll the surface.
 
 #### Scrolling keys
@@ -1668,11 +1672,11 @@ surfaces where the host scrolls them (§5.3):
 
 | action | scrolls |
 | --- | --- |
-| `scroll-up`, `scroll-down` | up, or down, as far as the host scrolls with ArrowUp and ArrowDown |
-| `scroll-left`, `scroll-right` | left, or right, as far as with ArrowLeft and ArrowRight |
-| `scroll-page-up`, `scroll-page-down` | up, or down, as far as with Page Up and Page Down |
+| `scroll-up`, `scroll-down` | up, or down, as far as the host scrolls with `arrow_up` and `arrow_down` |
+| `scroll-left`, `scroll-right` | left, or right, as far as with `arrow_left` and `arrow_right` |
+| `scroll-page-up`, `scroll-page-down` | up, or down, as far as with `page_up` and `page_down` |
 | `scroll-half-page-up`, `scroll-half-page-down` | up, or down, by half the height of the box it scrolls (its scrollport) |
-| `scroll-start`, `scroll-end` | to the top, or the bottom, as Home and End |
+| `scroll-start`, `scroll-end` | to the top, or the bottom, as `home` and `end` |
 
 - **What scrolls** is the nearest element that scrolls (the root, or an
   element whose `overflow` is `auto` or `scroll`), from the focused element
@@ -1683,7 +1687,7 @@ surfaces where the host scrolls them (§5.3):
   a key a browser scrolls with, which then goes on to the program (§5.3).
 - **Order.** A key bound to `program` or `prefix` is the program's
   (above). Any other key the focused element uses (the table at the start
-  of §10.2) stays the element's: Space on a button presses it, and a
+  of §10.2) stays the element's: `space` on a button presses it, and a
   character on a select picks. A key the element does not use and its keymap binds to a scroll
   action scrolls, before the surface's own scrolling keys (§5.3), and does
   not reach the program.
@@ -1693,16 +1697,16 @@ surfaces where the host scrolls them (§5.3):
 - **A text field's keymap leaves scroll actions out.** A binding to one
   neither acts nor overrides the bindings before it, so a field inside an
   element that scrolls with `j` still types `j`, and a `textarea` keeps
-  `page-down` on Page Down. A farther binding of the key still holds: under
+  `page-down` on `page_down`. A farther binding of the key still holds: under
   `j=program` on the root, `j` in that field reaches the program. A field's
   own text follows its caret (§5.3).
 
 So a program that pages its cells with `j`, `k`, `g`, `G`, Space and `b`
 binds the same keys on the element that scrolls on a surface:
-`data-keys="j=scroll-down k=scroll-up g=scroll-start G=scroll-end
-Space=scroll-page-down Shift+Space=scroll-page-up b=scroll-page-up"`
-(Shift+Space, or it would page down as Space does). Its buttons keep Space,
-and its fields type every letter.
+`data-keys="j=scroll-down k=scroll-up g=scroll-start shift+g=scroll-end
+space=scroll-page-down shift+space=scroll-page-up b=scroll-page-up"`
+(`shift+space`, or it would page down as `space` does). Its buttons keep
+`space`, and its fields type every letter.
 
 ### 10.3 Key releases
 
@@ -1716,82 +1720,122 @@ without HOTTY.
 
 ### 10.4 Key names
 
-A key is named by its W3C UI Events key value, after the modifier keys held,
-each followed by `+`: `a`, `A`, `Enter`, `ArrowLeft`, `Control+a`,
-`Alt+Backspace`, `Control+Shift+ArrowRight`.
-- **Modifiers** are `Control`, `Alt`, `Meta` and `Shift`, written in that
-  order. A name read from a document may have them in any order.
-- **A character** is the one the key types. Shift shows in the character
-  (`A`, `!`), and is written only where it does not: `Shift+Enter`,
-  `Shift+Tab`. With Control, Alt or Meta, a letter with Shift is its capital
-  (`Control+A`), and `Shift` with a small letter is the capital
-  (`Control+Shift+a` reads as `Control+A`).
-- **`Space`** is the space bar's key value, a space, written so that it can
-  stand in a list (`Control+Space`). `+` is the plus key (`Control++`).
-- **`Mod`**, in a binding (§10.2), is the platform's modifier for
-  commands: Meta on macOS, whose Command key is Meta, and Control
-  elsewhere, unless the user sets it otherwise. A host reports it as `mod`
-  (§4), and reads `Mod` as that modifier wherever it reads a binding, so
-  `Mod+c` is `Meta+c` on macOS and `Control+c` on Linux. It is written
-  before the other modifiers (`Mod+Shift+ArrowLeft`), and no key pressed
-  is named with it.
+A key is named as *myelin key names* 0.1 names it
+([myelinkey/SPEC.md](https://github.com/neuroplastio/myelin/blob/myelinkey/v0.1.0/myelinkey/SPEC.md)
+at the tag `myelinkey/v0.1.0`), in Ghostty's vocabulary: its modifiers,
+each followed by `+`, then a physical key, a character or a modifier key.
+`a`, `shift+a`, `?`, `enter`, `arrow_left`, `ctrl+a`, `alt+backspace`,
+`ctrl+shift+arrow_right`, `super+enter` and `shift` are keys. That
+document is part of this one for:
+- **The names** (its §2):
+  - the modifiers `super`, `ctrl`, `alt` and `shift`, written in that
+    order, `super` being the platform's command key (Command on macOS,
+    Super or the Windows key elsewhere), which the W3C calls Meta;
+  - a physical key, a place on the keyboard: its W3C code value in snake
+    case (`page_down`, `key_w`, `numpad_enter`);
+  - a character, what the key types, as the layout makes it: a letter
+    written small, with `shift` as a modifier (`shift+g`), and any other
+    character with Shift in it (`?`);
+  - a modifier key, a modifier tapped on its own (`shift`, `ctrl+shift`).
+
+  The space bar, Enter, Tab, Backspace and Escape are physical keys only
+  (`space`, `enter`, `tab`, `backspace`, `escape`), Caps Lock is no
+  modifier, and `+` is the plus key (`ctrl++`).
+- **Matching** (its §3): two keys are the same exactly when their names
+  are, and keys of different kinds never match.
+- **Reading** (its §4.1 and §4.4): a host reads a key a program writes
+  (`data-keys`, §10.2; a menu, §10.7) with the default reading and the
+  command modifier. It takes the modifiers in any order and case, with
+  `cmd`, `opt` and `control`; physical keys as W3C code values
+  (`PageDown`) and as `esc`, `pgdn`, `up` and the like; and a letter in
+  either case, so `G` is `g`, not `shift+g`. It refuses `meta`, which some
+  programs use for `super` and others for `alt`. Neither strict reading
+  nor shifted capitals applies.
+- **`mod`** is the command modifier (its §4.4), the platform's modifier
+  for commands: `super` on macOS and `ctrl` elsewhere, unless the user
+  sets it otherwise. A host reports which as `mod` (§4), and reads a
+  binding with `mod` standing for it, so `mod+c` is `super+c` on macOS and
+  `ctrl+c` on Linux. A binding with `mod` and `super` or `ctrl` as well
+  is refused, so a keymap reads on every platform or on none. No key
+  pressed is named with `mod`.
 
 A host offers a surface that has the keyboard each key at most twice
-(§10.2). The surface uses a key that its focused element uses, Tab and
-Shift+Tab, which move focus, and a key it scrolls with (§5.3), but none
-after a prefix (§10.5):
+(§10.2), named as below each time. The surface uses a key that its focused
+element uses, `tab` and `shift+tab`, which move focus, and a key it scrolls
+with (§5.3), but none after a prefix (§10.5). A press with two names, a
+physical key and a character, or a sided modifier key and a modifier key,
+is looked up by its physical name first, as myelin key names §3 has it:
+the surface uses the press if it uses either name, and where a keymap
+binds both, the physical binding wins.
 - **As pressed, first.** A host that sees the key the user pressed (a
   terminal emulator, a browser) offers it before the terminal's own
   shortcuts and before the bindings that translate keys, named from the key
   itself: the modifiers held, with the platform's command key (Command on
-  macOS, Super or the Windows key elsewhere) as Meta, and the key's value.
-  It does so for the keys that type no text: a key that is not a character
-  (`ArrowLeft`, `Home`, `Backspace`, `Enter`), and a character with Control
-  or Meta. Typing goes only the second way, through the platform's input
-  methods. If the surface uses the key, it is the surface's, and the
-  terminal does nothing with it, not even a shortcut bound to it. A host
-  **MAY** keep keys it reserves for itself, as a browser keeps Control+t.
+  macOS, Super or the Windows key elsewhere) as `super`; the physical key;
+  and the character it types, when it types one (a browser's `code` and
+  `key`, myelin key names §7). It does so for the keys that type no text:
+  a key that is only physical (`arrow_left`, `home`, `backspace`,
+  `enter`), and a key with `ctrl` or `super`, which has both names
+  (`ctrl+key_w` and `ctrl+w`, on a US layout). A modifier tapped on its
+  own is named on its release, as its sided key and as a modifier key
+  (`shift_left`, `shift`). Typing goes only the second way, through the
+  platform's input methods. If the surface uses the key, it is the
+  surface's, and the terminal does nothing with it, not even a shortcut
+  bound to it. A host **MAY** keep keys it reserves for itself, as a
+  browser keeps `ctrl+t`.
 - **As the program would read it, otherwise.** A key the surface does not
   use goes on as it would with no surface: the terminal's shortcuts take
   the keys they bind, and the rest is what the terminal would send the
   program, the bytes of the keyboard encoding the program has set (legacy,
   xterm's `modifyOtherKeys`, or the kitty keyboard protocol) after the
   terminal's own bindings. The host names it from those bytes, read as
-  this table says, and offers it. Input that is several keys (a binding
-  that sends text) is each of them in turn. A host that has only those
-  bytes, such as one that runs as a program in a terminal, offers keys
-  this way alone.
+  this table says, with one name: the character the bytes carry, or the
+  physical key the table names. Input that is several keys (a binding that
+  sends text) is each of them in turn. A host that has only those bytes,
+  such as one that runs as a program in a terminal, offers keys this way
+  alone.
 
 | input | key |
 | --- | --- |
-| a printable character: one grapheme cluster, in UTF-8 | that character; `Space` for `0x20` |
-| `0x00` | `Control+Space` |
-| `0x01`–`0x1a`, but those below | `Control+a` … `Control+z` |
-| `0x08` | `Control+h` |
-| `0x09`, `0x0d`, `0x1b`, `0x7f` | `Tab`, `Enter`, `Escape`, `Backspace` |
-| `0x1c`–`0x1f` | `Control+\`, `Control+]`, `Control+^`, `Control+_` |
-| `ESC` before one of the above | that key, with Alt: `ESC b` is `Alt+b`, `ESC 0x7f` is `Alt+Backspace` |
-| `CSI A`, `B`, `C`, `D`; `SS3 A` … `D` | `ArrowUp`, `ArrowDown`, `ArrowRight`, `ArrowLeft` |
-| `CSI H`, `SS3 H`, `CSI 1 ~`, `CSI 7 ~` | `Home` |
-| `CSI F`, `SS3 F`, `CSI 4 ~`, `CSI 8 ~` | `End` |
-| `CSI 2 ~`, `CSI 3 ~`, `CSI 5 ~`, `CSI 6 ~` | `Insert`, `Delete`, `PageUp`, `PageDown` |
-| `CSI Z` | `Shift+Tab` |
+| a printable character: one grapheme cluster, in UTF-8 | that character, as myelin key names writes it: a capital letter is `shift` with its letter (`A` is `shift+a`) |
+| `0x20` | `space` |
+| `0x00` | `ctrl+space` |
+| `0x01`–`0x1a`, but those below | `ctrl+a` … `ctrl+z` |
+| `0x08` | `ctrl+h` |
+| `0x09`, `0x0d`, `0x1b`, `0x7f` | `tab`, `enter`, `escape`, `backspace` |
+| `0x1c`–`0x1f` | `ctrl+\`, `ctrl+]`, `ctrl+^`, `ctrl+_` |
+| `ESC` before one of the above | that key, with `alt`: `ESC b` is `alt+b`, `ESC 0x7f` is `alt+backspace` |
+| `CSI A`, `B`, `C`, `D`; `SS3 A` … `D` | `arrow_up`, `arrow_down`, `arrow_right`, `arrow_left` |
+| `CSI H`, `SS3 H`, `CSI 1 ~`, `CSI 7 ~` | `home` |
+| `CSI F`, `SS3 F`, `CSI 4 ~`, `CSI 8 ~` | `end` |
+| `CSI 2 ~`, `CSI 3 ~`, `CSI 5 ~`, `CSI 6 ~` | `insert`, `delete`, `page_up`, `page_down` |
+| `CSI Z` | `shift+tab` |
 | `CSI 1 ; m X`, for each `X` above; `CSI n ; m ~` | the key above, with the modifiers in `m` |
 | `CSI 27 ; m ; c ~` (`modifyOtherKeys`) | the key whose code is `c`, with the modifiers in `m` |
 | `CSI c [: s [: b]] [; m [: e] [; t]] u`, and the kitty protocol's `CSI 1 ; m : e X` and `CSI n ; m : e ~` | the key whose code is `c`, with the modifiers in `m`; a release (`e` = 3) is no key |
 
-- **Modifiers `m`:** absent, empty or below 2, no modifier. Otherwise `m` − 1
-  is a sum of bits: 1 Shift, 2 Alt, 4 Control, 8 Meta (the kitty protocol's
-  Super) and 32 Meta. Other bits (Hyper, Caps Lock, Num Lock) name no
+- **Modifiers `m`:** absent, empty or below 2, no modifier. Otherwise
+  `m` − 1 is a sum of bits: 1 `shift`, 2 `alt`, 4 `ctrl`, and 8 and 32
+  `super` (8 is xterm's Meta and the kitty protocol's Super, 32 the kitty
+  protocol's Meta). Other bits (Hyper, Caps Lock, Num Lock) name no
   modifier.
-- **Codes `c`:** 9 is Tab, 13 Enter, 27 Escape, 8 and 127 Backspace; another
-  code below 57344 is the character with that code point, and the kitty
-  protocol's codes from 57344 are the keys it gives them. A character key
-  with Shift is the shifted key `s` when given, else the text `t` when
-  given, else the capital of `c`; Shift is written only when that is `c`
-  itself (`Shift+1`).
-- **`ESC [` and `ESC O`** begin CSI and SS3. Alone, they are `Alt+[` and
-  `Alt+O`.
+- **Codes `c`:** 9 is `tab`, 13 `enter`, 27 `escape`, 8 and 127
+  `backspace`, and 32 `space`. Another code below 57344 is the character
+  with that code point, a capital without Shift being its small letter, as
+  Caps Lock makes it. Of the kitty protocol's codes from 57344, those of
+  its keypad name what a legacy terminal sends for the key: 57399–57408 the
+  digits `0` … `9`, 57409–57413 `.`, `/`, `*`, `-` and `+`, 57414 `enter`,
+  57415 `=`, and 57417–57426 `arrow_left`, `arrow_right`, `arrow_up`,
+  `arrow_down`, `page_up`, `page_down`, `home`, `end`, `insert` and
+  `delete`. Its other codes, its modifier keys' among them, are no key: a
+  host that reads bytes names no modifier key.
+- **A character with Shift:** a letter with Shift is `shift` and the
+  letter (`CSI 97 ; 2 u` is `shift+a`). Any other character is the one
+  Shift types, without `shift`: the shifted key `s` when given, else the
+  text `t` when given. When neither is, it is `shift` and the character
+  `c` (`shift+1`). The base layout key `b` names nothing here.
+- **`ESC [` and `ESC O`** begin CSI and SS3. Alone, they are `alt+[` and
+  `alt+shift+o`.
 - **Anything else,** such as a sequence this table does not name, is no key
   a field uses: it reaches the program.
 
@@ -1806,15 +1850,15 @@ place to show the menu.
 **A prefix.** A key that the focused element's keymap binds to `prefix`
 (§10.2) reaches the program, as one bound to `program` does, and so does
 every key after it, whatever the focused element or the scrolling (§5.3)
-would do with it: Tab, Shift+Tab and Escape too.
+would do with it: `tab`, `shift+tab` and `escape` too.
 
 ```html
-<main data-keys="Mod+k=prefix">
+<main data-keys="mod+k=prefix">
   <ul id=files tabindex=0 data-keys="g=prefix">…</ul>
 </main>
 ```
 
-Above, `Mod+k` anywhere in `main`, and `g` on the list, hand the program
+Above, `mod+k` anywhere in `main`, and `g` on the list, hand the program
 the keys that follow.
 - **The keys** reach the program as any key the surface does not use
   (§10.2, §10.4): after the terminal's own shortcuts, as terminal input in
@@ -1837,7 +1881,7 @@ the keys that follow.
 ### 10.6 Commands in the cells
 
 A program in the cells reads keys as bytes, and to it an edit shortcut
-(§10.2) is a key like any other: Control+c interrupts, Control+v quotes the
+(§10.2) is a key like any other: `ctrl+c` interrupts, `ctrl+v` quotes the
 next key. A program that selects, edits or undoes in its cells, as a text
 field does on a surface, takes the edit commands instead:
 
@@ -1867,7 +1911,7 @@ ESC ] 7279 ; a=edit:take=copy,paste,undo,redo ST
   read it.
 - **The program decides** what the command means. It copies what it has
   selected, and with nothing selected takes the command as its key, as a
-  text field does (§10.2): Control+c still interrupts.
+  text field does (§10.2): `ctrl+c` still interrupts.
 - **The terminal's selection comes first.** While the user has text
   selected in the cells, a key of `copy` copies it, as the terminal's own
   copy does, and is not sent. A surface's selection is copied as §11 says.
@@ -1901,7 +1945,7 @@ ESC ] 7279 ; a=menu ; <base64 msgpack menu> ST
   item is `{"key": str, "label": str, "name": str, "enabled": bool,
   "items": [item]}`:
   - `key`, the key that reaches it after its group's, as §10.4 names it,
-    `Mod` included; none for an item no key reaches;
+    `mod` included; none for an item no key reaches;
   - `label`, what it does;
   - `name`, the command a pick sends (below); none for an item only its
     keys reach;
@@ -1937,7 +1981,7 @@ keys typed reach:
 ESC ] 7279 ; a=menu:show=1 ; <base64 msgpack {"seq": [str]}> ST
 ```
 
-- **`seq`** is the keys typed so far, as §10.4 names them, `Mod` included,
+- **`seq`** is the keys typed so far, as §10.4 names them, `mod` included,
   read against the items' keys as the host reads a binding (§10.4). With
   none, or no body, the level is the menu's top one.
 - **The host shows it** over its cells and surfaces, where it likes: the
@@ -1984,7 +2028,7 @@ document, and therefore its text.
   offers it each key first, before the surface that has the keyboard and
   the terminal's own shortcuts, whether or not the surface has the
   keyboard. A key it does not bind to `copy`, `program` included, goes on
-  as if nothing were selected: under `Mod+c=program`, Control+c on Linux
+  as if nothing were selected: under `mod+c=program`, `ctrl+c` on Linux
   interrupts the program while text is selected.
 - **The terminal's own copy** and paste, from its own keys or its menu,
   are the user's whatever the keymaps say. Its copy **SHOULD** copy a
@@ -2112,7 +2156,7 @@ the text of §11.
 
 ## 16. Conformance
 
-A host conforms to HOTTY version 0.3 when:
+A host conforms to HOTTY version 0.4 when:
 - it meets every **MUST** of this document;
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
@@ -2157,7 +2201,7 @@ fields (SDK.md §4.6).
 Detection (payload shortened):
 
 ```
-program → ESC ] 7279 ; a=q:n=1:v=0.3 ST  CSI c
+program → ESC ] 7279 ; a=q:n=1:v=0.4 ST  CSI c
 host    → ESC ] 7279 ; a=ok:n=1:re=q ; haF2ozAuM6djZWxsY3Nz… ST  CSI ? 62 ; 22 c
 ```
 
@@ -2473,19 +2517,19 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
     focused field on a surface is a GUI control, and gets the keys a GUI
     field gets, before the terminal's shortcuts, as a page gets them
     before a browser's. The terminal's translations exist for programs in
-    cells: a macOS terminal sends Control+a for Command+ArrowLeft, which a
-    field would read as select all. What the field does not use goes on as
+    cells: a macOS terminal sends `ctrl+a` for Command with the left
+    arrow, which a field would read as select all. What the field does not use goes on as
     before, so the terminal's shortcuts keep their keys elsewhere, and the
     user's remapping still reaches the program and the field as bytes. In
-    cells a program reads only bytes, and Command+ArrowLeft stays
-    Control+a there.
+    cells a program reads only bytes, and Command with the left arrow
+    stays `ctrl+a` there.
   - **Inherited,** because a program has one keymap and many fields: it is
     set once, and overridden where a field differs.
   - **A default with a GUI field's keys,** Shift selecting included:
     people's hands know them from every text field, whatever draws it. The
     default takes few of the program's keys: those of a terminal's line
     editor are mostly Control and Alt with a letter, and the one it does
-    take, Control+a, readline's line start, is also Home. A program that
+    take, `ctrl+a`, readline's line start, is also Home. A program that
     needs one binds it to `program`.
   - **Readline's actions,** with the words and lines of Bubble Tea's text
     input and text area. Terminal programs share them, more or less, so a
@@ -2495,17 +2539,17 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
     select. A program that draws a field in cells shows a selection as it
     shows a selected row, and an SDK's field keeps one (SDK.md §4.6).
   - **Copying, cutting, pasting and undo are the keymap's,** with a
-    browser's keys: Control+c, Control+x, Control+v and Control+z edit in
+    browser's keys: `ctrl+c`, `ctrl+x`, `ctrl+v` and `ctrl+z` edit in
     every GUI, and where nothing is selected, or outside a text field,
     they keep their terminal meanings (interrupting, nano's exit, quoting
     the next key, suspending). A program that needs one binds it to
-    `program`, as a REPL that always interrupts with Control+c. The
+    `program`, as a REPL that always interrupts with `ctrl+c`. The
     terminal's own copy and paste stay the user's, so no document makes
     its text uncopyable.
-  - **One key per platform, `Mod`,** because binding both Control+c and
-    Command+c takes a key from the program on each platform for nothing.
-    The rows around it follow the platform too: Control+a is a line's
-    start on macOS and Command+a selects all.
+  - **One key per platform, `mod`,** because binding both `ctrl+c` and
+    `super+c` takes a key from the program on each platform for nothing.
+    The rows around it follow the platform too: `ctrl+a` is a line's
+    start on macOS and `super+a` selects all.
 - **Why edit commands in the cells.** A program that selects and edits in
   its cells needs the same keys as a field, and those keys mean something
   in a terminal. Neither side can decide alone: the terminal does not know
@@ -2550,6 +2594,24 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
     adds none for a program's menu: the menu joins what the host already
     has, and the lists that pick from it are a multiplexer's and an
     agent's.
+- **Why myelin's key names.** A program shares one keymap between its
+  cells, its surfaces and its other tools, and the terminal it most often
+  runs in, Ghostty, already has a spelling for keys: modifiers in lower
+  case, physical keys by where they are, characters by what they type.
+  HOTTY wrote the W3C's key values until 0.4.
+  - **Cited, not copied,** so that HOTTY, plx and myelin cannot drift: a
+    change to the names is a new version of that document, with its
+    vectors, and of this one.
+  - **Physical keys and characters both,** because some bindings follow
+    the layout (`ctrl+w` deletes a word wherever W is) and others the
+    place (`ctrl+key_z` is under the same finger on every layout). A press
+    with both looks the place up first, as Ghostty does.
+  - **Shift written with a letter,** so a binding says whether Shift is
+    held, whatever Caps Lock does.
+  - **From bytes, one name.** A terminal's encodings carry what a key
+    types. Only the kitty protocol says where the key is, for some keys
+    and only when asked, so a binding that must hold in cells names the
+    character.
 - **Why a host may show no select list.** A select's list opens past its
   control, and a surface is a rectangle of cells: drawn inside, a list
   would force small surfaces to grow, and drawn outside, it is something
@@ -2619,10 +2681,10 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
   since a refused document leaves a hole in the screen; a numbered command
   asks for its reply by its number. Continuation chunks carried `q` until
   0.3, which did nothing: replies are per message.
-- **Why `mods`.** Drags spelt their modifiers `"ctrl"`, `"shift"`, while
-  key names spell `Control`, `Shift` (§10.4), and clicks and presses
-  carried none, so Shift with a click could not extend a selection. One
-  number, with §10.4's bits, is both shorter and the same everywhere.
+- **Why `mods`.** Drags spelt their modifiers as names, `"ctrl"` and
+  `"shift"`, and clicks and presses carried none, so Shift with a click
+  could not extend a selection. One number, with §10.4's bits, is both
+  shorter and the same everywhere.
 - **Why a submit's fields are pairs.** A form may give two controls one
   name, as two checkboxes for one setting do, and a map holds a name once.
   Pairs in tree order are what a browser's `FormData` holds.

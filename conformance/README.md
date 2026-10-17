@@ -29,7 +29,7 @@ too little.
 ## Format
 
 ```
-{ "version": "0.3",
+{ "version": "0.4",
   "vectors": [ { "name": …, "steps": [ step, … ] } ],
   "wire":    [ { "name": …, "stream": …, "commands": [ … ], "invalid": n } ],
   "build":   [ … ], "encode": [ … ], "decode": [ … ], "scan": [ … ],
@@ -43,7 +43,7 @@ runner reads the file keeping the two apart: Python's `json` does, Go's
 with `UseNumber`, Rust's `serde_json` (`is_f64`), and JavaScript's
 `JSON.parse` with a reviver that reads the source text.
 
-Each vector starts on a fresh host, with `mod` Control and the default
+Each vector starts on a fresh host, with `mod` `ctrl` and the default
 edit shortcuts (SPEC §10.2, §10.4), whatever its platform. A vector with
 `"requires"` applies only to a host that has what it names, and others skip
 it. A list names several, all required:
@@ -112,7 +112,7 @@ checked).
   before the next step, so each wheel step is a gesture of its own.
 - `"leave"` takes the pointer out of the terminal's window.
 - `"keys"`: the modifier keys held during the step (`shift`, `ctrl`, `alt`,
-  `meta`); none when absent.
+  `super`); none when absent.
 - `"count"`, for `"down"` and `"up"`: the platform's count of this press
   and its release in a run of clicks, as an OS hands it over with them
   (macOS's `clickCount`, GTK's `n_press`, the DOM's `detail`); 1 when
@@ -147,11 +147,13 @@ scroll (SPEC §9), `false` if the surface took it; absent, not checked.
 key pressed and released where the keyboard is (SPEC §10): on the surface
 that has it, or else on the terminal. `name` is the key as the DOM's
 `KeyboardEvent.key` has it (`"Enter"`, `"Tab"`, `"End"`, `"ArrowDown"`,
-`"B"`). `"keys"` are the modifier keys held, as for a pointer step. The host
-names the key as SPEC §10.4 does: the modifiers before `name`, Shift left
-out before a character. A runner that gives the host keys by name uses that
-name; one that presses keys on a terminal gets it from the terminal's
-encoding, which, for the keys the vectors press, is the same. `"terminal"`:
+`"B"`), on a US layout, where its physical key is the one a US keyboard
+has it on. `"keys"` are the modifier keys held, as for a pointer step. The
+host names the key as SPEC §10.4 does. A runner that gives the host keys by
+name names them so; one that presses keys on a terminal gets them from the
+terminal's encoding, which, for the keys the vectors press, names the same
+key, but the physical name of a character's key (`ctrl+key_w`, beside
+`ctrl+w`). `"terminal"`:
 `true` if the key reached the program as terminal input (§10.2), `false` if
 the surface used it; absent, not checked. `"events"` as for a pointer step.
 
@@ -279,14 +281,22 @@ holds after the stream `held` (none when absent), what `Flush` returns
 (0 when absent). A segment is `{ "pass": text }`, `{ "osc": text }` or `{
 "da1": text }`.
 
-**Keys** checks key names (SPEC §10.4, SDK.md §3.10), in two forms:
+**Keys** checks key names (SPEC §10.4, SDK.md §3.10), in four forms:
 - `{ "input": text, "keys": [ … ] }`: `DecodeKeys(input)` must return
   `keys`, one entry for each key, `null` for input that is no key;
 - `{ "key": text, "canon": text | null }`: `ParseKey(key)` must return
-  `canon`, `null` when the name does not parse.
+  `canon`, `null` when the name does not parse. These are myelin key
+  names 0.1's `read` vectors (its conformance/keys.json), as they are;
+- `{ "key": text, "mod": "ctrl" | "super", "canon": text | null }`:
+  `ReadKey` on a Platform whose `mod` is `mod` must return `canon`, `null`
+  when the name does not parse. These are myelin key names 0.1's `mod`
+  vectors that set no other option (strict reading or shifted capitals,
+  which §10.4 does not use), as they are;
+- `{ "key": text, "text": text | null }`: `KeyText(key)` must return
+  `text`, `null` for none.
 
 **Keymap** checks keymaps (SPEC §10.2, SDK.md §3.10), each on the
-Platform in `"platform": { "mod"?, "edit"? }`, the zero Platform (Control,
+Platform in `"platform": { "mod"?, "edit"? }`, the zero Platform (`ctrl`,
 the default edit shortcuts) where absent, in three forms:
 - `{ "parse": text, "format": text }`: `ParseKeymap(platform, parse).Format()` must be
   `format`; with `"terminal_keys": true` and no `parse`, `TerminalKeys`
@@ -295,8 +305,8 @@ the default edit shortcuts) where absent, in three forms:
   key: action | null } }`: `Resolve(platform, multiline, …)` with `TerminalKeys`
   first when `terminal_keys` is true, then each of `keys`. `Lookup` of each
   key of `lookup` must return its value: an action, `"insert"`, or `null`
-  when the key is not the field's. `Selects` of each key of `selects`, if
-  there is one, must return its value;
+  when the key is not the field's. `Selects` of each key of `selects`, and
+  `Binds` of each key of `binds`, if there is one, must return its value;
 - `{ "keys": [ … ], "program"?: { key: bool }, "prefix"?: { key: bool },
   "scroll"?: { key: action | null } }`: an element's keymap outside a text
   field, with no default keymap: `ParseKeymap` of `keys` joined with a

@@ -1,6 +1,6 @@
 {
- "version": "0.3",
- "protocol": "SPEC.md version 0.3",
+ "version": "0.4",
+ "protocol": "SPEC.md version 0.4",
  "vectors": [
   {
    "name": "a=q answers ok and echoes n",
@@ -9,7 +9,7 @@
      "send": {
       "a": "q",
       "n": "7",
-      "v": "0.3"
+      "v": "0.4"
      },
      "reply": {
       "a": "ok",
@@ -26,14 +26,14 @@
      "send": {
       "a": "q",
       "n": "1",
-      "v": "0.3,99.0"
+      "v": "0.4,99.0"
      },
      "reply": {
       "a": "ok",
       "re": "q",
       "n": "1",
       "body": {
-       "v": "0.3"
+       "v": "0.4"
       }
      }
     },
@@ -41,14 +41,14 @@
      "send": {
       "a": "q",
       "n": "2",
-      "v": "99.0,0.3"
+      "v": "99.0,0.4"
      },
      "reply": {
       "a": "ok",
       "re": "q",
       "n": "2",
       "body": {
-       "v": "0.3"
+       "v": "0.4"
       }
      }
     },
@@ -56,14 +56,14 @@
      "send": {
       "a": "q",
       "n": "3",
-      "v": "0.2,0.3"
+      "v": "0.3,0.4"
      },
      "reply": {
       "a": "ok",
       "re": "q",
       "n": "3",
       "body": {
-       "v": "0.3"
+       "v": "0.4"
       }
      }
     }
@@ -82,7 +82,7 @@
       "re": "q",
       "n": "1",
       "code": "EVERSION",
-      "detail": "0.3"
+      "detail": "0.4"
      }
     },
     {
@@ -96,7 +96,7 @@
       "re": "q",
       "n": "2",
       "code": "EVERSION",
-      "detail": "0.3"
+      "detail": "0.4"
      }
     },
     {
@@ -110,21 +110,21 @@
       "re": "q",
       "n": "3",
       "code": "EVERSION",
-      "detail": "0.3"
+      "detail": "0.4"
      }
     },
     {
      "send": {
       "a": "q",
       "n": "4",
-      "v": "0.30"
+      "v": "0.40"
      },
      "reply": {
       "a": "err",
       "re": "q",
       "n": "4",
       "code": "EVERSION",
-      "detail": "0.3"
+      "detail": "0.4"
      }
     },
     {
@@ -138,7 +138,7 @@
       "re": "q",
       "n": "5",
       "code": "EVERSION",
-      "detail": "0.3"
+      "detail": "0.4"
      }
     },
     {
@@ -157,7 +157,7 @@
      "send": {
       "a": "q",
       "n": "1",
-      "v": "0.3"
+      "v": "0.4"
      },
      "reply": {
       "a": "ok",
@@ -202,7 +202,7 @@
      "send": {
       "a": "q",
       "n": "5",
-      "v": "0.3",
+      "v": "0.4",
       "late": "1"
      },
      "reply": {
@@ -8092,7 +8092,7 @@
    ]
   },
   {
-   "name": "the user moving focus sends focus naming the element focused, or the nearest one outward with an id: on a click, on Tab and Shift+Tab, after the change it commits; focus the program gives sends none, and Tab past the last sends blur (SPEC \u00a710.1, \u00a710.2)",
+   "name": "the user moving focus sends focus naming the element focused, or the nearest one outward with an id: on a click, on tab and shift+tab, after the change it commits; focus the program gives sends none, and tab past the last sends blur (SPEC \u00a710.1, \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -8100,7 +8100,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,div,button{display:block;box-sizing:border-box;margin:0;padding:0;border:0;font:inherit;width:calc(8*var(--hotty-cell-w));height:var(--hotty-cell-h)}</style><input id=a><div id=list tabindex=0 data-keys=\"ArrowDown=program\">list</div><div id=w><button>ok</button></div>"
+     "payload": "<style>body{margin:0}input,div,button{display:block;box-sizing:border-box;margin:0;padding:0;border:0;font:inherit;width:calc(8*var(--hotty-cell-w));height:var(--hotty-cell-h)}</style><input id=a><div id=list tabindex=0 data-keys=\"arrow_down=program\">list</div><div id=w><button>ok</button></div>"
     },
     {
      "send": {
@@ -8134,6 +8134,9 @@
     },
     {
      "key": "B",
+     "keys": [
+      "shift"
+     ],
      "terminal": false,
      "events": []
     },
@@ -8254,7 +8257,7 @@
    ]
   },
   {
-   "name": "with no data-keys, a text input uses the default keymap only: a browser field's keys, Shift selecting with a move and Control+a selecting all; Control and Alt keys it does not bind reach the program (SPEC \u00a710.2)",
+   "name": "with no data-keys, a text input uses the default keymap only: a browser field's keys, shift selecting with a move and ctrl+a selecting all; ctrl and alt keys it does not bind reach the program (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -8450,7 +8453,7 @@
    ]
   },
   {
-   "name": "a key is offered as pressed first: where Mod is Control, Control+Backspace deletes a word, Control+Home goes to the start, Shift+End selects and Control+a selects all, and Command (Meta) keys are not the field's (SPEC \u00a710.2, \u00a710.4)",
+   "name": "a key is offered as pressed first: where mod is ctrl, ctrl+backspace deletes a word, ctrl+home goes to the start, shift+end selects and ctrl+a selects all, and Command (super) keys are not the field's (SPEC \u00a710.2, \u00a710.4)",
    "steps": [
     {
      "send": {
@@ -8569,7 +8572,7 @@
     {
      "key": "Backspace",
      "keys": [
-      "meta"
+      "super"
      ],
      "terminal": true,
      "events": []
@@ -8577,7 +8580,7 @@
     {
      "key": "ArrowLeft",
      "keys": [
-      "meta"
+      "super"
      ],
      "terminal": true,
      "events": []
@@ -8585,7 +8588,7 @@
    ]
   },
   {
-   "name": "data-keys on an ancestor binds keys to actions in the fields under it: Control+a and Control+e to the line's ends, Alt+b and Alt+f by words, Control+w and Alt+d delete words, Control+u and Control+k to the line's ends; an unbound Control key still reaches the program (SPEC \u00a710.2)",
+   "name": "data-keys on an ancestor binds keys to actions in the fields under it: ctrl+a and ctrl+e to the line's ends, alt+b and alt+f by words, ctrl+w and alt+d delete words, ctrl+u and ctrl+k to the line's ends; an unbound ctrl key still reaches the program (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -8593,7 +8596,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form id=f data-keys=\"Control+a=line-start Control+e=line-end Alt+b=word-backward Alt+f=word-forward Control+w=delete-word-backward Alt+d=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end\"><input id=t data-on=input value=\"foo bar baz\"></form>"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form id=f data-keys=\"ctrl+a=line-start ctrl+e=line-end alt+b=word-backward alt+f=word-forward ctrl+w=delete-word-backward alt+d=delete-word-forward ctrl+u=delete-to-line-start ctrl+k=delete-to-line-end\"><input id=t data-on=input value=\"foo bar baz\"></form>"
     },
     {
      "send": {
@@ -8721,7 +8724,7 @@
    ]
   },
   {
-   "name": "a nearer data-keys overrides a farther one key by key, and program gives a key back to the program: the field's Control+a and ArrowLeft reach the program, its form's Control+e still moves the caret (SPEC \u00a710.2)",
+   "name": "a nearer data-keys overrides a farther one key by key, and program gives a key back to the program: the field's ctrl+a and arrow_left reach the program, its form's ctrl+e still moves the caret (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -8729,7 +8732,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form data-keys=\"Control+a=line-start Control+e=line-end\"><input id=t data-on=input value=ab data-keys=\"Control+a=program ArrowLeft=program\"></form>"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form data-keys=\"ctrl+a=line-start ctrl+e=line-end\"><input id=t data-on=input value=ab data-keys=\"ctrl+a=program arrow_left=program\"></form>"
     },
     {
      "send": {
@@ -8792,7 +8795,7 @@
    ]
   },
   {
-   "name": "Escape and Tab cannot be bound, and a binding whose action is unknown or whose key does not parse is ignored; a binding splits at its last =, so Alt+==line-start binds Alt+= (SPEC \u00a710.2)",
+   "name": "escape and tab cannot be bound, and a binding whose action is unknown or whose key does not parse is ignored; a binding splits at its last =, so alt+==line-start binds alt+= (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -8800,7 +8803,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t data-on=input value=ab data-keys=\"Escape=line-start Tab=line-end Control+e=frobnicate Hyper+b=line-start Control+=line-end Alt+==line-start\">"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t data-on=input value=ab data-keys=\"escape=line-start tab=line-end ctrl+e=frobnicate Hyper+b=line-start ctrl+=line-end alt+==line-start\">"
     },
     {
      "send": {
@@ -8898,7 +8901,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t data-on=input value=abc data-keys=\"Shift+ArrowLeft=program\">"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t data-on=input value=abc data-keys=\"shift+arrow_left=program\">"
     },
     {
      "send": {
@@ -9322,7 +9325,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys=\"Control+p=line-previous Control+n=line-next Alt+<=input-start Alt+>=input-end\"><input id=i data-on=input><textarea id=t data-on=input cols=20 rows=3></textarea></div>"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys=\"ctrl+p=line-previous ctrl+n=line-next alt+<=input-start alt+>=input-end\"><input id=i data-on=input><textarea id=t data-on=input cols=20 rows=3></textarea></div>"
     },
     {
      "send": {
@@ -9541,7 +9544,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t type=password data-on=input value=\"hunter two\" data-keys=\"Alt+b=word-backward Control+w=delete-word-backward\">"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><input id=t type=password data-on=input value=\"hunter two\" data-keys=\"alt+b=word-backward ctrl+w=delete-word-backward\">"
     },
     {
      "send": {
@@ -9621,7 +9624,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form id=f data-keys=\"Control+s=submit\"><input id=t name=q value=hi></form>"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form id=f data-keys=\"ctrl+s=submit\"><input id=t name=q value=hi></form>"
     },
     {
      "send": {
@@ -9666,7 +9669,7 @@
    ]
   },
   {
-   "name": "SDK.md's TerminalKeys as data-keys: Control+ArrowLeft and Alt+ArrowRight move by words, Alt+Backspace and Control+Delete delete them, Control+Home and Control+End go to the ends of a textarea's value, and Control+a selects all (SPEC \u00a710.2, SDK.md \u00a73.10)",
+   "name": "SDK.md's TerminalKeys as data-keys: ctrl+arrow_left and alt+arrow_right move by words, alt+backspace and ctrl+delete delete them, ctrl+home and ctrl+end go to the ends of a textarea's value, and ctrl+a selects all (SPEC \u00a710.2, SDK.md \u00a73.10)",
    "steps": [
     {
      "send": {
@@ -9674,7 +9677,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys=\"ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward Home=line-start End=line-end Control+e=line-end Backspace=delete-char-backward Control+h=delete-char-backward Delete=delete-char-forward Control+d=delete-char-forward Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next PageUp=page-up PageDown=page-down Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end Control+a=select-all Control+m=newline\"><textarea id=t data-on=input cols=24 rows=3>one two\nthree four</textarea></div>"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys=\"arrow_left=char-backward ctrl+b=char-backward arrow_right=char-forward ctrl+f=char-forward alt+arrow_left=word-backward ctrl+arrow_left=word-backward alt+b=word-backward alt+arrow_right=word-forward ctrl+arrow_right=word-forward alt+f=word-forward home=line-start end=line-end ctrl+e=line-end backspace=delete-char-backward ctrl+h=delete-char-backward delete=delete-char-forward ctrl+d=delete-char-forward alt+backspace=delete-word-backward ctrl+w=delete-word-backward ctrl+backspace=delete-word-backward alt+delete=delete-word-forward alt+d=delete-word-forward ctrl+delete=delete-word-forward ctrl+u=delete-to-line-start ctrl+k=delete-to-line-end arrow_up=line-previous ctrl+p=line-previous arrow_down=line-next ctrl+n=line-next page_up=page-up page_down=page-down alt+<=input-start ctrl+home=input-start alt+>=input-end ctrl+end=input-end ctrl+a=select-all ctrl+m=newline\"><textarea id=t data-on=input cols=24 rows=3>one two\nthree four</textarea></div>"
     },
     {
      "send": {
@@ -9809,6 +9812,9 @@
     },
     {
      "key": "Z",
+     "keys": [
+      "shift"
+     ],
      "terminal": false,
      "events": [
       {
@@ -9832,7 +9838,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}</style><select id=s><option>a<option value=bee>b<option disabled>x<option>c<option>cat</select><select id=t data-keys=\"ArrowDown=program\"><option>a<option>b</select>"
+     "payload": "<style>body{margin:0}</style><select id=s><option>a<option value=bee>b<option disabled>x<option>c<option>cat</select><select id=t data-keys=\"arrow_down=program\"><option>a<option>b</select>"
     },
     {
      "send": {
@@ -10014,7 +10020,7 @@
       "scroll": "1",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div data-keys=\"ArrowDown=program End=program\"><button id=k data-keys=\"End=line-end\">k</button></div><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div>"
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div data-keys=\"arrow_down=program end=program\"><button id=k data-keys=\"end=line-end\">k</button></div><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div>"
     },
     {
      "send": {
@@ -10124,7 +10130,7 @@
       "scroll": "1",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}#v{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#t{height:var(--hotty-cell-h)}</style><div id=v tabindex=0 data-keys=\"j=scroll-down l=scroll-right g=scroll-start G=scroll-end Space=scroll-page-down\"><button id=b0>0</button><button id=b1>1</button><button id=b2>2</button><button id=b3>3</button><button id=b4>4</button><button id=b5>5</button></div><div id=t>t</div>"
+     "payload": "<style>body{margin:0}#v{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#t{height:var(--hotty-cell-h)}</style><div id=v tabindex=0 data-keys=\"j=scroll-down l=scroll-right g=scroll-start shift+g=scroll-end space=scroll-page-down\"><button id=b0>0</button><button id=b1>1</button><button id=b2>2</button><button id=b3>3</button><button id=b4>4</button><button id=b5>5</button></div><div id=t>t</div>"
     },
     {
      "send": {
@@ -10146,6 +10152,9 @@
     },
     {
      "key": "G",
+     "keys": [
+      "shift"
+     ],
      "terminal": false,
      "events": []
     },
@@ -10188,6 +10197,9 @@
     },
     {
      "key": "G",
+     "keys": [
+      "shift"
+     ],
      "terminal": false,
      "events": []
     },
@@ -10315,7 +10327,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}#v{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#t{height:var(--hotty-cell-h)}</style><div id=v tabindex=0 data-keys=\"G=scroll-end\"><button id=b0 data-keys=\"j=scroll-down\">0</button></div>"
+     "payload": "<style>body{margin:0}#v{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#t{height:var(--hotty-cell-h)}</style><div id=v tabindex=0 data-keys=\"shift+g=scroll-end\"><button id=b0 data-keys=\"j=scroll-down\">0</button></div>"
     },
     {
      "send": {
@@ -10337,6 +10349,9 @@
     },
     {
      "key": "G",
+     "keys": [
+      "shift"
+     ],
      "terminal": true,
      "events": []
     },
@@ -10356,6 +10371,9 @@
     },
     {
      "key": "G",
+     "keys": [
+      "shift"
+     ],
      "terminal": true,
      "events": []
     }
@@ -10707,7 +10725,7 @@
        "e": "command",
        "detail": {
         "name": "copy",
-        "key": "Control+c"
+        "key": "ctrl+c"
        }
       }
      ]
@@ -10723,7 +10741,7 @@
        "e": "command",
        "detail": {
         "name": "undo",
-        "key": "Control+z"
+        "key": "ctrl+z"
        }
       }
      ]
@@ -12014,7 +12032,7 @@
    ]
   },
   {
-   "name": "a key the keymap binds to prefix reaches the program, and so does every key after it, whatever is focused, Space, Tab and Escape too, until the program sends a=focus, with or without t (SPEC \u00a710.5)",
+   "name": "a key the keymap binds to prefix reaches the program, and so does every key after it, whatever is focused, space, tab and escape too, until the program sends a=focus, with or without t (SPEC \u00a710.5)",
    "steps": [
     {
      "send": {
@@ -12163,7 +12181,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<input id=f data-on=input data-keys=\"Control+k=prefix\">"
+     "payload": "<input id=f data-on=input data-keys=\"ctrl+k=prefix\">"
     },
     {
      "send": {
@@ -12484,7 +12502,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<form id=f><input type=checkbox id=x1 name=x value=a checked><input type=checkbox id=x2 name=x value=b checked><input type=checkbox id=x3 name=x value=c><input id=t name=q value=hi data-keys=\"Control+s=submit\"></form>"
+     "payload": "<form id=f><input type=checkbox id=x1 name=x value=a checked><input type=checkbox id=x2 name=x value=b checked><input type=checkbox id=x3 name=x value=c><input id=t name=q value=hi data-keys=\"ctrl+s=submit\"></form>"
     },
     {
      "send": {
@@ -12545,7 +12563,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<form id=f><input id=t value=hi data-keys=\"Control+s=submit\"></form>"
+     "payload": "<form id=f><input id=t value=hi data-keys=\"ctrl+s=submit\"></form>"
     },
     {
      "send": {
@@ -12597,7 +12615,7 @@
       "label": "Files",
       "items": [
        {
-        "key": "Space",
+        "key": "space",
         "label": "Leader",
         "enabled": true,
         "items": [
@@ -12663,7 +12681,7 @@
      },
      "body": {
       "seq": [
-       "Space"
+       "space"
       ]
      },
      "reply": {
@@ -12697,7 +12715,7 @@
      },
      "body": {
       "seq": [
-       "Space",
+       "space",
        "f"
       ]
      },
@@ -12762,7 +12780,7 @@
      "menu": "shown",
      "expect": [
       {
-       "key": "Space",
+       "key": "space",
        "label": "Leader",
        "group": true,
        "enabled": true
@@ -12788,7 +12806,7 @@
      "menu": "shown",
      "expect": [
       {
-       "key": "Space",
+       "key": "space",
        "label": "Leader",
        "group": true,
        "enabled": true
@@ -12803,7 +12821,7 @@
      },
      "body": {
       "seq": [
-       "Space",
+       "space",
        "q"
       ]
      },
@@ -12919,7 +12937,7 @@
       "label": "Files",
       "items": [
        {
-        "key": "Space",
+        "key": "space",
         "label": "Leader",
         "enabled": true,
         "items": [
@@ -13049,7 +13067,7 @@
    ]
   },
   {
-   "name": "the level shown hides on Escape and on a key it does not list, not on one it lists; a new menu shows the same keys' level of it, and keys that reach no group stay the keys shown until a key hides them (SPEC \u00a710.7)",
+   "name": "the level shown hides on escape and on a key it does not list, not on one it lists; a new menu shows the same keys' level of it, and keys that reach no group stay the keys shown until a key hides them (SPEC \u00a710.7)",
    "requires": "menu",
    "steps": [
     {
@@ -13061,7 +13079,7 @@
       "label": "Files",
       "items": [
        {
-        "key": "Space",
+        "key": "space",
         "label": "Leader",
         "enabled": true,
         "items": [
@@ -13118,7 +13136,7 @@
      },
      "body": {
       "seq": [
-       "Space"
+       "space"
       ]
      },
      "reply": {
@@ -13142,7 +13160,7 @@
      },
      "body": {
       "seq": [
-       "Space"
+       "space"
       ]
      },
      "reply": {
@@ -13166,7 +13184,7 @@
      },
      "body": {
       "seq": [
-       "Space"
+       "space"
       ]
      },
      "reply": {
@@ -13204,7 +13222,7 @@
       "label": "Files",
       "items": [
        {
-        "key": "Space",
+        "key": "space",
         "label": "Leader",
         "enabled": true,
         "items": [
@@ -13259,7 +13277,7 @@
       "label": "Files",
       "items": [
        {
-        "key": "Space",
+        "key": "space",
         "label": "Leader",
         "enabled": true,
         "items": [
@@ -13316,7 +13334,7 @@
      },
      "body": {
       "seq": [
-       "Space"
+       "space"
       ]
      },
      "reply": {
@@ -13352,7 +13370,7 @@
       "label": "Files",
       "items": [
        {
-        "key": "Space",
+        "key": "space",
         "label": "Leader",
         "enabled": true,
         "items": [
@@ -13444,7 +13462,7 @@
       "label": "Files",
       "items": [
        {
-        "key": "Space",
+        "key": "space",
         "label": "Leader",
         "enabled": true,
         "items": [
@@ -13509,7 +13527,7 @@
       "n": "1"
      },
      "body": [
-      "Space"
+      "space"
      ],
      "reply": {
       "a": "err",
@@ -13715,7 +13733,7 @@
       "show": "1"
      },
      "body": {
-      "seq": "Space"
+      "seq": "space"
      },
      "reply": {
       "a": "err",
@@ -13843,7 +13861,7 @@
       "control": {
        "a": "q",
        "n": "1",
-       "v": "0.3"
+       "v": "0.4"
       }
      }
     },
@@ -13867,7 +13885,7 @@
       "control": {
        "a": "q",
        "n": "1",
-       "v": "0.3",
+       "v": "0.4",
        "late": "1"
       }
      }
@@ -15084,7 +15102,7 @@
      "label": "",
      "items": [
       {
-       "key": "Space",
+       "key": "space",
        "label": "Leader",
        "name": "",
        "enabled": true,
@@ -15125,7 +15143,7 @@
       "body": {
        "items": [
         {
-         "key": "Space",
+         "key": "space",
          "label": "Leader",
          "enabled": true,
          "items": [
@@ -15148,7 +15166,7 @@
         }
        ]
       },
-      "payload_b64": "gaVpdGVtc5KEo2tleaVTcGFjZaVsYWJlbKZMZWFkZXKnZW5hYmxlZMOlaXRlbXOShKNrZXmhcaVsYWJlbKRRdWl0pG5hbWWkcXVpdKdlbmFibGVkw4KkbmFtZalzb3J0LW5hbWWnZW5hYmxlZMKDpWxhYmVsplJlbG9hZKRuYW1lpnJlbG9hZKdlbmFibGVkww=="
+      "payload_b64": "gaVpdGVtc5KEo2tleaVzcGFjZaVsYWJlbKZMZWFkZXKnZW5hYmxlZMOlaXRlbXOShKNrZXmhcaVsYWJlbKRRdWl0pG5hbWWkcXVpdKdlbmFibGVkw4KkbmFtZalzb3J0LW5hbWWnZW5hYmxlZMKDpWxhYmVsplJlbG9hZKRuYW1lpnJlbG9hZKdlbmFibGVkww=="
      }
     }
    ]
@@ -15173,7 +15191,7 @@
    "build": "menu_show",
    "args": {
     "keys": [
-     "Space",
+     "space",
      "f"
     ]
    },
@@ -15187,11 +15205,11 @@
       },
       "body": {
        "seq": [
-        "Space",
+        "space",
         "f"
        ]
       },
-      "payload_b64": "gaNzZXGSpVNwYWNloWY="
+      "payload_b64": "gaNzZXGSpXNwYWNloWY="
      }
     }
    ]
@@ -15638,11 +15656,11 @@
   {
    "name": "the reply to q carries the capabilities, the cell's size in CSS pixels as the host sends it",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;h6F2ozAuM6djZWxsY3NzgqF3y0AgAAAAAAAAoWjLQDAAAAAAAAClc2NhbGXLQAAAAAAAAACmc2NoZW1lpWxpZ2h0pmxpbWl0c4Koc3VyZmFjZXNAqXJlc291cmNlc84BAAAAo25ldIGnaW1nLXNyY5GzaHR0cHM6Ly9leGFtcGxlLmNvbaRob3N0oXg=\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;h6F2ozAuNKdjZWxsY3NzgqF3y0AgAAAAAAAAoWjLQDAAAAAAAAClc2NhbGXLQAAAAAAAAACmc2NoZW1lpWxpZ2h0pmxpbWl0c4Koc3VyZmFjZXNAqXJlc291cmNlc84BAAAAo25ldIGnaW1nLXNyY5GzaHR0cHM6Ly9leGFtcGxlLmNvbaRob3N0oXg=\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.3",
+     "v": "0.4",
      "cellcss": {
       "w": 8.0,
       "h": 16.0
@@ -15678,7 +15696,7 @@
       "n": 1
      },
      "caps": {
-      "v": "0.3",
+      "v": "0.4",
       "cell_css": {
        "w": 8.0,
        "h": 16.0
@@ -15706,11 +15724,11 @@
   {
    "name": "capabilities: features, and the host's version",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuM6hmZWF0dXJlc5GrcGFzc3Rocm91Z2ikaG9zdKtob3R0eS1ibGl0eqd2ZXJzaW9upjAuMC4xMA==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuNKhmZWF0dXJlc5GrcGFzc3Rocm91Z2ikaG9zdKtob3R0eS1ibGl0eqd2ZXJzaW9upjAuMC4xMA==\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.3",
+     "v": "0.4",
      "features": [
       "passthrough"
      ],
@@ -15730,7 +15748,7 @@
       "re": "q"
      },
      "caps": {
-      "v": "0.3",
+      "v": "0.4",
       "features": [
        "passthrough"
       ],
@@ -15747,16 +15765,16 @@
   {
    "name": "a capability of another type: the capabilities do not decode, and the reply stands (SDK.md \u00a73.9)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuM6VzY2FsZaEy\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuM6hmZWF0dXJlc5KlY2xpY2sD\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuNKVzY2FsZaEy\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuNKhmZWF0dXJlc5KlY2xpY2sD\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.3",
+     "v": "0.4",
      "scale": "2"
     },
     {
-     "v": "0.3",
+     "v": "0.4",
      "features": [
       "click",
       3
@@ -15800,11 +15818,11 @@
   {
    "name": "fields a reader does not know are skipped, whatever their type: an array, a float, bin, a time, an extension no one defines (SDK.md \u00a72.7)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;haF2ozAuM6ZmdXR1cmWBoXiUActABAAAAAAAAMPUBQChYsQCAP+hdNb/AAAAAKZzY2hlbWWlbGlnaHQ=\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;haF2ozAuNKZmdXR1cmWBoXiUActABAAAAAAAAMPUBQChYsQCAP+hdNb/AAAAAKZzY2hlbWWlbGlnaHQ=\u001b\\"
    ],
    "bodies": [
     {
-     "hex": "85a176a3302e33a666757475726581a1789401cb4004000000000000c3d40500a162c40200ffa174d6ff00000000a6736368656d65a56c69676874"
+     "hex": "85a176a3302e34a666757475726581a1789401cb4004000000000000c3d40500a162c40200ffa174d6ff00000000a6736368656d65a56c69676874"
     }
    ],
    "results": [
@@ -15819,7 +15837,7 @@
       "re": "q"
      },
      "caps": {
-      "v": "0.3",
+      "v": "0.4",
       "scheme": "light",
       "light": true
      }
@@ -17726,88 +17744,88 @@
   {
    "name": "a body that holds, anywhere, what no host sends does not decode: a nil, a key that is not a string or is given twice in one map, a string that is not UTF-8, an int past 2^53 \u2212 1, a timestamp of another size, nanoseconds of a whole second, or seconds past 2^53 \u2212 1 (SDK.md \u00a73.9)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;g6F2ozAuM6ZmdXR1cmXApnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuM6VzY2FsZcA=\u001b\\",
-    "\u001b]7279;a=ok:n=3:re=q;g6F2ozAuM6ZmdXR1cmWBAaFhpnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=4:re=q;g6F2ozAuM6ZmdXR1cmWBxAF4oWGmc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=5:re=q;g6F2ozAuMwGhYaZzY2hlbWWlbGlnaHQ=\u001b\\",
-    "\u001b]7279;a=ok:n=6:re=q;g6F2ozAuM6ZmdXR1cmWiwyimc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=7:re=q;g6F2ozAuM6ZmdXR1cmWj7aCApnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=8:re=q;g6F2ozAuM6LDKKFhpnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=9:re=q;g6F2ozAuM6ZmdXR1cmXPACAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=10:re=q;g6F2ozAuM6ZmdXR1cmXT/+AAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=11:re=q;g6F2ozAuM6ZmdXR1cmWSzwAf////////0//gAAAAAAABpnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=12:re=q;g6F2ozAuM6ZmdXR1cmXV/wAApnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=13:re=q;g6F2ozAuM6ZmdXR1cmXX/+5rKAAAAAAApnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=14:re=q;g6F2ozAuM6ZmdXR1cmXHDP8AAAAAACAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=15:re=q;g6F2ozAuM6ZmdXR1cmXHDP87msn/AAAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=16:re=q;g6F2ozAuM6F2ozAuM6ZzY2hlbWWlbGlnaHQ=\u001b\\",
-    "\u001b]7279;a=ok:n=17:re=q;g6F2ozAuM6ZmdXR1cmWCoWEBoWEBpnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=18:re=q;g6F2ozAuM6VzY2FsZaF4pXNjYWxly0AAAAAAAAAA\u001b\\",
-    "\u001b]7279;a=ok:n=19:re=q;hKF2ozAuM6ZmdXR1cmUB2QZmdXR1cmUCpnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=20:re=q;g6F2ozAuM6ZmdXR1cmWBoXajMC4zpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=1:re=q;g6F2ozAuNKZmdXR1cmXApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuNKVzY2FsZcA=\u001b\\",
+    "\u001b]7279;a=ok:n=3:re=q;g6F2ozAuNKZmdXR1cmWBAaFhpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=4:re=q;g6F2ozAuNKZmdXR1cmWBxAF4oWGmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=5:re=q;g6F2ozAuNAGhYaZzY2hlbWWlbGlnaHQ=\u001b\\",
+    "\u001b]7279;a=ok:n=6:re=q;g6F2ozAuNKZmdXR1cmWiwyimc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=7:re=q;g6F2ozAuNKZmdXR1cmWj7aCApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=8:re=q;g6F2ozAuNKLDKKFhpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=9:re=q;g6F2ozAuNKZmdXR1cmXPACAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=10:re=q;g6F2ozAuNKZmdXR1cmXT/+AAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=11:re=q;g6F2ozAuNKZmdXR1cmWSzwAf////////0//gAAAAAAABpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=12:re=q;g6F2ozAuNKZmdXR1cmXV/wAApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=13:re=q;g6F2ozAuNKZmdXR1cmXX/+5rKAAAAAAApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=14:re=q;g6F2ozAuNKZmdXR1cmXHDP8AAAAAACAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=15:re=q;g6F2ozAuNKZmdXR1cmXHDP87msn/AAAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=16:re=q;g6F2ozAuNKF2ozAuNKZzY2hlbWWlbGlnaHQ=\u001b\\",
+    "\u001b]7279;a=ok:n=17:re=q;g6F2ozAuNKZmdXR1cmWCoWEBoWEBpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=18:re=q;g6F2ozAuNKVzY2FsZaF4pXNjYWxly0AAAAAAAAAA\u001b\\",
+    "\u001b]7279;a=ok:n=19:re=q;hKF2ozAuNKZmdXR1cmUB2QZmdXR1cmUCpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=20:re=q;g6F2ozAuNKZmdXR1cmWBoXajMC40pnNjaGVtZaVsaWdodA==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=change:t=box;gqdjaGVja2VkwKV2YWx1ZaFh\u001b\\"
    ],
    "bodies": [
     {
-     "hex": "83a176a3302e33a6667574757265c0a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a6667574757265c0a6736368656d65a56c69676874"
     },
     {
-     "hex": "82a176a3302e33a57363616c65c0"
+     "hex": "82a176a3302e34a57363616c65c0"
     },
     {
-     "hex": "83a176a3302e33a66675747572658101a161a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a66675747572658101a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a666757475726581c40178a161a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a666757475726581c40178a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e3301a161a6736368656d65a56c69676874"
+     "hex": "83a176a3302e3401a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a6667574757265a2c328a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a6667574757265a2c328a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a6667574757265a3eda080a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a6667574757265a3eda080a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a2c328a161a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a2c328a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a6667574757265cf0020000000000000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a6667574757265cf0020000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a6667574757265d3ffe0000000000000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a6667574757265d3ffe0000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a666757475726592cf001fffffffffffffd3ffe0000000000001a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a666757475726592cf001fffffffffffffd3ffe0000000000001a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a6667574757265d5ff0000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a6667574757265d5ff0000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a6667574757265d7ffee6b280000000000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a6667574757265d7ffee6b280000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a6667574757265c70cff000000000020000000000000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a6667574757265c70cff000000000020000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a6667574757265c70cff3b9ac9ff0000000000000000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a6667574757265c70cff3b9ac9ff0000000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a176a3302e33a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a176a3302e34a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a666757475726582a16101a16101a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a666757475726582a16101a16101a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a57363616c65a178a57363616c65cb4000000000000000"
+     "hex": "83a176a3302e34a57363616c65a178a57363616c65cb4000000000000000"
     },
     {
-     "hex": "84a176a3302e33a666757475726501d90666757475726502a6736368656d65a56c69676874"
+     "hex": "84a176a3302e34a666757475726501d90666757475726502a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e33a666757475726581a176a3302e33a6736368656d65a56c69676874"
+     "hex": "83a176a3302e34a666757475726581a176a3302e34a6736368656d65a56c69676874"
     },
     {
      "hex": "82a7636865636b6564c0a576616c7565a161"
@@ -17980,7 +17998,7 @@
       "n": 11
      },
      "caps": {
-      "v": "0.3",
+      "v": "0.4",
       "scheme": "light",
       "light": true
      }
@@ -18036,7 +18054,7 @@
       "n": 15
      },
      "caps": {
-      "v": "0.3",
+      "v": "0.4",
       "scheme": "light",
       "light": true
      }
@@ -18105,7 +18123,7 @@
       "n": 20
      },
      "caps": {
-      "v": "0.3",
+      "v": "0.4",
       "scheme": "light",
       "light": true
      }
@@ -18130,12 +18148,12 @@
    "name": "a field a reader knows holding another kind of value than its type does not decode, as msgpack tells kinds apart: bin for a string, an array for a map, a map for an array, a timestamp for a map, an extension for a bool or a string (SPEC \u00a73.3, SDK.md \u00a73.9)",
    "seqs": [
     "\u001b]7279;a=ev:s=f:e=click:t=ok;gaV2YWx1ZcQBYQ==\u001b\\",
-    "\u001b]7279;a=ok:n=1:re=q;gaF2xAMwLjM=\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuM6djZWxsY3NzkA==\u001b\\",
-    "\u001b]7279;a=ok:n=3:re=q;gqF2ozAuM6ZsaW1pdHOQ\u001b\\",
-    "\u001b]7279;a=ok:n=4:re=q;gqF2ozAuM6hmZWF0dXJlc4A=\u001b\\",
-    "\u001b]7279;a=ok:n=5:re=q;gqF2ozAuM6djZWxsY3Nz1v8AAAAA\u001b\\",
-    "\u001b]7279;a=ok:n=6:re=q;gqF2ozAuM6hmZWF0dXJlc5KlY2xpY2vUBQA=\u001b\\",
+    "\u001b]7279;a=ok:n=1:re=q;gaF2xAMwLjQ=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuNKdjZWxsY3NzkA==\u001b\\",
+    "\u001b]7279;a=ok:n=3:re=q;gqF2ozAuNKZsaW1pdHOQ\u001b\\",
+    "\u001b]7279;a=ok:n=4:re=q;gqF2ozAuNKhmZWF0dXJlc4A=\u001b\\",
+    "\u001b]7279;a=ok:n=5:re=q;gqF2ozAuNKdjZWxsY3Nz1v8AAAAA\u001b\\",
+    "\u001b]7279;a=ok:n=6:re=q;gqF2ozAuNKhmZWF0dXJlc5KlY2xpY2vUBQA=\u001b\\",
     "\u001b]7279;a=ev:s=f:e=change:t=box;gqdjaGVja2Vk1AUApXZhbHVloWE=\u001b\\"
    ],
    "bodies": [
@@ -18143,22 +18161,22 @@
      "hex": "81a576616c7565c40161"
     },
     {
-     "hex": "81a176c403302e33"
+     "hex": "81a176c403302e34"
     },
     {
-     "hex": "82a176a3302e33a763656c6c63737390"
+     "hex": "82a176a3302e34a763656c6c63737390"
     },
     {
-     "hex": "82a176a3302e33a66c696d69747390"
+     "hex": "82a176a3302e34a66c696d69747390"
     },
     {
-     "hex": "82a176a3302e33a8666561747572657380"
+     "hex": "82a176a3302e34a8666561747572657380"
     },
     {
-     "hex": "82a176a3302e33a763656c6c637373d6ff00000000"
+     "hex": "82a176a3302e34a763656c6c637373d6ff00000000"
     },
     {
-     "hex": "82a176a3302e33a8666561747572657392a5636c69636bd40500"
+     "hex": "82a176a3302e34a8666561747572657392a5636c69636bd40500"
     },
     {
      "hex": "82a7636865636b6564d40500a576616c7565a161"
@@ -18290,7 +18308,7 @@
     "\u001b]7279;a=ev:s=g:e=drag;g6Fj0f/+oXLMBaRtb2RzzQAB\u001b\\",
     "\u001b]7279;a=ev:e=caps;gadjZWxsY3NzgqF3ykOgQAChaMtASAAAAAAAAA==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=input:t=q;gaV2YWx1ZdoAAmFi\u001b\\",
-    "\u001b]7279;a=ok:n=1:re=q;3gADoXbbAAAAAzAuM6VzY2FsZcpAAAAAqGZlYXR1cmVz3AAB2QVob3Zlcg==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;3gADoXbbAAAAAzAuNKVzY2FsZcpAAAAAqGZlYXR1cmVz3AAB2QVob3Zlcg==\u001b\\"
    ],
    "bodies": [
     {
@@ -18306,7 +18324,7 @@
      "hex": "81a576616c7565da00026162"
     },
     {
-     "hex": "de0003a176db00000003302e33a57363616c65ca40000000a86665617475726573dc0001d905686f766572"
+     "hex": "de0003a176db00000003302e34a57363616c65ca40000000a86665617475726573dc0001d905686f766572"
     }
    ],
    "results": [
@@ -18386,7 +18404,7 @@
       "n": 1
      },
      "caps": {
-      "v": "0.3",
+      "v": "0.4",
       "scale": 2.0,
       "features": [
        "hover"
@@ -18597,18 +18615,18 @@
   {
    "name": "features lists count: a repeated click carries its count (SPEC \u00a74, \u00a79); absent, it does not",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuM6hmZWF0dXJlc5GlY291bnQ=\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMw==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuNKhmZWF0dXJlc5GlY291bnQ=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuNA==\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.3",
+     "v": "0.4",
      "features": [
       "count"
      ]
     },
     {
-     "v": "0.3"
+     "v": "0.4"
     }
    ],
    "results": [
@@ -18646,12 +18664,12 @@
   {
    "name": "command: an edit command with its key, which belongs to no surface (SPEC \u00a710.6)",
    "seqs": [
-    "\u001b]7279;a=ev:e=command;gqRuYW1lpGNvcHmja2V5qUNvbnRyb2wrYw==\u001b\\"
+    "\u001b]7279;a=ev:e=command;gqRuYW1lpGNvcHmja2V5pmN0cmwrYw==\u001b\\"
    ],
    "bodies": [
     {
      "name": "copy",
-     "key": "Control+c"
+     "key": "ctrl+c"
     }
    ],
    "results": [
@@ -18670,7 +18688,7 @@
       "target": "",
       "command": {
        "name": "copy",
-       "key": "Control+c",
+       "key": "ctrl+c",
        "text": "",
        "has_text": false
       }
@@ -18681,12 +18699,12 @@
   {
    "name": "command: a paste carries the clipboard's text",
    "seqs": [
-    "\u001b]7279;a=ev:e=command;g6RuYW1lpXBhc3Rlo2tleaZNZXRhK3akdGV4dKl0d28KbGluZXM=\u001b\\"
+    "\u001b]7279;a=ev:e=command;g6RuYW1lpXBhc3Rlo2tleadzdXBlcit2pHRleHSpdHdvCmxpbmVz\u001b\\"
    ],
    "bodies": [
     {
      "name": "paste",
-     "key": "Meta+v",
+     "key": "super+v",
      "text": "two\nlines"
     }
    ],
@@ -18704,7 +18722,7 @@
       "kind": "command",
       "command": {
        "name": "paste",
-       "key": "Meta+v",
+       "key": "super+v",
        "text": "two\nlines",
        "has_text": true
       }
@@ -18748,11 +18766,11 @@
   {
    "name": "command: a detail with no name is no command",
    "seqs": [
-    "\u001b]7279;a=ev:e=command;gaNrZXmpQ29udHJvbCtj\u001b\\"
+    "\u001b]7279;a=ev:e=command;gaNrZXmmY3RybCtj\u001b\\"
    ],
    "bodies": [
     {
-     "key": "Control+c"
+     "key": "ctrl+c"
     }
    ],
    "results": [
@@ -18775,17 +18793,17 @@
   {
    "name": "caps: the capabilities that changed, and only those (SPEC \u00a74)",
    "seqs": [
-    "\u001b]7279;a=ev:e=caps;gqNtb2SkTWV0YaRlZGl0gqRjb3B5kaZNZXRhK2OkcmVkb5GmTWV0YSta\u001b\\"
+    "\u001b]7279;a=ev:e=caps;gqNtb2Slc3VwZXKkZWRpdIKkY29weZGnc3VwZXIrY6RyZWRvka1zdXBlcitzaGlmdCt6\u001b\\"
    ],
    "bodies": [
     {
-     "mod": "Meta",
+     "mod": "super",
      "edit": {
       "copy": [
-       "Meta+c"
+       "super+c"
       ],
       "redo": [
-       "Meta+Z"
+       "super+shift+z"
       ]
      }
     }
@@ -18810,13 +18828,13 @@
        "mod",
        "edit"
       ],
-      "mod": "Meta",
+      "mod": "super",
       "edit": {
        "copy": [
-        "Meta+c"
+        "super+c"
        ],
        "redo": [
-        "Meta+Z"
+        "super+shift+z"
        ]
       }
      }
@@ -18826,18 +18844,18 @@
   {
    "name": "the capabilities' mod, edit and features (SPEC \u00a74)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuM6Ntb2SkTWV0YaRlZGl0gqpzZWxlY3QtYWxskaZNZXRhK2GkY29weZGmTWV0YStjqGZlYXR1cmVzkaRtZW51\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuNKNtb2Slc3VwZXKkZWRpdIKqc2VsZWN0LWFsbJGnc3VwZXIrYaRjb3B5kadzdXBlcitjqGZlYXR1cmVzkaRtZW51\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.3",
-     "mod": "Meta",
+     "v": "0.4",
+     "mod": "super",
      "edit": {
       "select-all": [
-       "Meta+a"
+       "super+a"
       ],
       "copy": [
-       "Meta+c"
+       "super+c"
       ]
      },
      "features": [
@@ -18857,13 +18875,13 @@
       "re": "q"
      },
      "caps": {
-      "mod": "Meta",
+      "mod": "super",
       "edit": {
        "select-all": [
-        "Meta+a"
+        "super+a"
        ],
        "copy": [
-        "Meta+c"
+        "super+c"
        ]
       },
       "features": [
@@ -18880,11 +18898,11 @@
   {
    "name": "a limit that is not an int fails the capabilities (SPEC \u00a73.3)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuM6ZsaW1pdHOBqHN1cmZhY2VzojY0\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuNKZsaW1pdHOBqHN1cmZhY2VzojY0\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.3",
+     "v": "0.4",
      "limits": {
       "surfaces": "64"
      }
@@ -19038,9 +19056,9 @@
     },
     {
      "at": 20,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
      "body": {
-      "v": "0.3"
+      "v": "0.4"
      },
      "took": true,
      "state": "native",
@@ -19063,7 +19081,7 @@
     }
    ],
    "caps": {
-    "v": "0.3"
+    "v": "0.4"
    }
   },
   {
@@ -19112,9 +19130,9 @@
     },
     {
      "at": 40,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
      "body": {
-      "v": "0.3"
+      "v": "0.4"
      },
      "took": true,
      "state": "native",
@@ -19159,9 +19177,9 @@
     },
     {
      "at": 10,
-     "osc": "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuMw==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuNA==\u001b\\",
      "body": {
-      "v": "0.3"
+      "v": "0.4"
      },
      "took": false,
      "state": "detecting"
@@ -19384,9 +19402,9 @@
     },
     {
      "at": 60020,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
      "body": {
-      "v": "0.3"
+      "v": "0.4"
      },
      "took": true,
      "state": "native",
@@ -19396,7 +19414,7 @@
     }
    ],
    "caps": {
-    "v": "0.3"
+    "v": "0.4"
    }
   },
   {
@@ -19408,9 +19426,9 @@
     },
     {
      "at": 100,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
      "body": {
-      "v": "0.3"
+      "v": "0.4"
      },
      "took": true,
      "state": "native",
@@ -19439,9 +19457,9 @@
     },
     {
      "at": 1400,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
      "body": {
-      "v": "0.3"
+      "v": "0.4"
      },
      "took": true,
      "deadline": 1500
@@ -19467,9 +19485,9 @@
     },
     {
      "at": 200,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
      "body": {
-      "v": "0.3"
+      "v": "0.4"
      },
      "took": true,
      "state": "text",
@@ -19503,9 +19521,9 @@
     },
     {
      "at": 60000,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
      "body": {
-      "v": "0.3"
+      "v": "0.4"
      },
      "took": true,
      "state": "native",
@@ -19515,9 +19533,9 @@
     },
     {
      "at": 60010,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
      "body": {
-      "v": "0.3"
+      "v": "0.4"
      },
      "took": true,
      "state": "native",
@@ -19525,7 +19543,7 @@
     }
    ],
    "caps": {
-    "v": "0.3"
+    "v": "0.4"
    }
   },
   {
@@ -19576,9 +19594,9 @@
     },
     {
      "at": 10,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMw==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
      "body": {
-      "v": "0.3"
+      "v": "0.4"
      },
      "took": true
     },
@@ -19601,17 +19619,17 @@
    ]
   },
   {
-   "name": "a capital shows Shift itself",
+   "name": "a capital is shift with its letter",
    "input": "A",
    "keys": [
-    "A"
+    "shift+a"
    ]
   },
   {
-   "name": "the space bar is Space",
+   "name": "the space bar is space",
    "input": " ",
    "keys": [
-    "Space"
+    "space"
    ]
   },
   {
@@ -19643,229 +19661,229 @@
    ]
   },
   {
-   "name": "NUL is Control+Space",
+   "name": "NUL is ctrl+space",
    "input": "\u0000",
    "keys": [
-    "Control+Space"
+    "ctrl+space"
    ]
   },
   {
-   "name": "C0 controls are Control with a letter",
+   "name": "C0 controls are ctrl with a letter",
    "input": "\u0001\u0005\u000b\u0015\u0017\u001a",
    "keys": [
-    "Control+a",
-    "Control+e",
-    "Control+k",
-    "Control+u",
-    "Control+w",
-    "Control+z"
+    "ctrl+a",
+    "ctrl+e",
+    "ctrl+k",
+    "ctrl+u",
+    "ctrl+w",
+    "ctrl+z"
    ]
   },
   {
-   "name": "BS is Control+h, LF Control+j",
+   "name": "BS is ctrl+h, LF ctrl+j",
    "input": "\b\n",
    "keys": [
-    "Control+h",
-    "Control+j"
+    "ctrl+h",
+    "ctrl+j"
    ]
   },
   {
-   "name": "HT, CR, ESC and DEL are Tab, Enter, Escape and Backspace",
+   "name": "HT, CR, ESC and DEL are tab, enter, escape and backspace",
    "input": "\t\r\u007f",
    "keys": [
-    "Tab",
-    "Enter",
-    "Backspace"
+    "tab",
+    "enter",
+    "backspace"
    ]
   },
   {
-   "name": "ESC at the end of the input is Escape",
+   "name": "ESC at the end of the input is escape",
    "input": "\u001b",
    "keys": [
-    "Escape"
+    "escape"
    ]
   },
   {
    "name": "0x1c to 0x1f",
    "input": "\u001c\u001d\u001e\u001f",
    "keys": [
-    "Control+\\",
-    "Control+]",
-    "Control+^",
-    "Control+_"
+    "ctrl+\\",
+    "ctrl+]",
+    "ctrl+^",
+    "ctrl+_"
    ]
   },
   {
    "name": "ESC before a key adds Alt",
    "input": "\u001bb\u001bf\u001bB\u001b<",
    "keys": [
-    "Alt+b",
-    "Alt+f",
-    "Alt+B",
-    "Alt+<"
+    "alt+b",
+    "alt+f",
+    "alt+shift+b",
+    "alt+<"
    ]
   },
   {
-   "name": "ESC before DEL is Alt+Backspace, before a control Control+Alt",
+   "name": "ESC before DEL is alt+backspace, before a control ctrl+alt",
    "input": "\u001b\u007f\u001b\u0001\u001b\r",
    "keys": [
-    "Alt+Backspace",
-    "Control+Alt+a",
-    "Alt+Enter"
+    "alt+backspace",
+    "ctrl+alt+a",
+    "alt+enter"
    ]
   },
   {
-   "name": "ESC before ESC is Alt+Escape, before a space Alt+Space",
+   "name": "ESC before ESC is alt+escape, before a space alt+space",
    "input": "\u001b\u001b\u001b ",
    "keys": [
-    "Alt+Escape",
-    "Alt+Space"
+    "alt+escape",
+    "alt+space"
    ]
   },
   {
-   "name": "ESC [ and ESC O alone are Alt+[ and Alt+O",
+   "name": "ESC [ alone is alt+[",
    "input": "\u001b[",
    "keys": [
-    "Alt+["
+    "alt+["
    ]
   },
   {
-   "name": "ESC O alone is Alt+O",
+   "name": "ESC O alone is alt+shift+o: a capital letter is shift with it",
    "input": "\u001bO",
    "keys": [
-    "Alt+O"
+    "alt+shift+o"
    ]
   },
   {
    "name": "the arrows, as CSI and as SS3",
    "input": "\u001b[A\u001b[B\u001b[C\u001b[D\u001bOA\u001bOB\u001bOC\u001bOD",
    "keys": [
-    "ArrowUp",
-    "ArrowDown",
-    "ArrowRight",
-    "ArrowLeft",
-    "ArrowUp",
-    "ArrowDown",
-    "ArrowRight",
-    "ArrowLeft"
+    "arrow_up",
+    "arrow_down",
+    "arrow_right",
+    "arrow_left",
+    "arrow_up",
+    "arrow_down",
+    "arrow_right",
+    "arrow_left"
    ]
   },
   {
    "name": "Home and End, every way",
    "input": "\u001b[H\u001bOH\u001b[1~\u001b[7~\u001b[F\u001bOF\u001b[4~\u001b[8~",
    "keys": [
-    "Home",
-    "Home",
-    "Home",
-    "Home",
-    "End",
-    "End",
-    "End",
-    "End"
+    "home",
+    "home",
+    "home",
+    "home",
+    "end",
+    "end",
+    "end",
+    "end"
    ]
   },
   {
-   "name": "Insert, Delete, PageUp, PageDown",
+   "name": "insert, delete, page_up, page_down",
    "input": "\u001b[2~\u001b[3~\u001b[5~\u001b[6~",
    "keys": [
-    "Insert",
-    "Delete",
-    "PageUp",
-    "PageDown"
+    "insert",
+    "delete",
+    "page_up",
+    "page_down"
    ]
   },
   {
-   "name": "CSI Z is Shift+Tab",
+   "name": "CSI Z is shift+tab",
    "input": "\u001b[Z",
    "keys": [
-    "Shift+Tab"
+    "shift+tab"
    ]
   },
   {
    "name": "xterm's modifiers on the arrows",
    "input": "\u001b[1;2D\u001b[1;3D\u001b[1;5C\u001b[1;6D\u001b[1;9D\u001b[1;7A",
    "keys": [
-    "Shift+ArrowLeft",
-    "Alt+ArrowLeft",
-    "Control+ArrowRight",
-    "Control+Shift+ArrowLeft",
-    "Meta+ArrowLeft",
-    "Control+Alt+ArrowUp"
+    "shift+arrow_left",
+    "alt+arrow_left",
+    "ctrl+arrow_right",
+    "ctrl+shift+arrow_left",
+    "super+arrow_left",
+    "ctrl+alt+arrow_up"
    ]
   },
   {
    "name": "xterm's modifiers on Home, End and the ~ keys",
    "input": "\u001b[1;5H\u001b[1;5F\u001b[3;5~\u001b[3;3~\u001b[5;2~",
    "keys": [
-    "Control+Home",
-    "Control+End",
-    "Control+Delete",
-    "Alt+Delete",
-    "Shift+PageUp"
+    "ctrl+home",
+    "ctrl+end",
+    "ctrl+delete",
+    "alt+delete",
+    "shift+page_up"
    ]
   },
   {
    "name": "modifyOtherKeys",
    "input": "\u001b[27;5;105~\u001b[27;5;13~\u001b[27;2;13~\u001b[27;5;127~\u001b[27;3;8~\u001b[27;5;9~",
    "keys": [
-    "Control+i",
-    "Control+Enter",
-    "Shift+Enter",
-    "Control+Backspace",
-    "Alt+Backspace",
-    "Control+Tab"
+    "ctrl+i",
+    "ctrl+enter",
+    "shift+enter",
+    "ctrl+backspace",
+    "alt+backspace",
+    "ctrl+tab"
    ]
   },
   {
-   "name": "the kitty protocol: Control with a letter, and Control+Shift with one",
+   "name": "the kitty protocol: ctrl with a letter, and ctrl+shift with one",
    "input": "\u001b[97;5u\u001b[97;6u\u001b[97:65;6u",
    "keys": [
-    "Control+a",
-    "Control+A",
-    "Control+A"
+    "ctrl+a",
+    "ctrl+shift+a",
+    "ctrl+shift+a"
    ]
   },
   {
    "name": "the kitty protocol: Enter, Backspace, Tab and Escape with modifiers",
    "input": "\u001b[13;2u\u001b[127;5u\u001b[9;5u\u001b[27u\u001b[13u",
    "keys": [
-    "Shift+Enter",
-    "Control+Backspace",
-    "Control+Tab",
-    "Escape",
-    "Enter"
+    "shift+enter",
+    "ctrl+backspace",
+    "ctrl+tab",
+    "escape",
+    "enter"
    ]
   },
   {
-   "name": "the kitty protocol: Super and Meta are Meta; Hyper and the locks name no modifier",
+   "name": "the kitty protocol: Super and Meta are super; Hyper and the locks name no modifier",
    "input": "\u001b[97;9u\u001b[97;33u\u001b[97;17u\u001b[97;65u\u001b[97;133u",
    "keys": [
-    "Meta+a",
-    "Meta+a",
+    "super+a",
+    "super+a",
     "a",
     "a",
-    "Control+a"
+    "ctrl+a"
    ]
   },
   {
    "name": "the kitty protocol: a character with Shift is the shifted key, else the text, else the capital",
    "input": "\u001b[97:65;2u\u001b[97;2;65u\u001b[97;2u\u001b[49:33;2u\u001b[49;2u",
    "keys": [
-    "A",
-    "A",
-    "A",
+    "shift+a",
+    "shift+a",
+    "shift+a",
     "!",
-    "Shift+1"
+    "shift+1"
    ]
   },
   {
    "name": "the kitty protocol: event types; a release is no key",
    "input": "\u001b[1;5:1D\u001b[1;5:2D\u001b[1;5:3D\u001b[3;5:1~\u001b[97;1:3u",
    "keys": [
-    "Control+ArrowLeft",
-    "Control+ArrowLeft",
+    "ctrl+arrow_left",
+    "ctrl+arrow_left",
     null,
-    "Control+Delete",
+    "ctrl+delete",
     null
    ]
   },
@@ -19873,9 +19891,9 @@
    "name": "a modifier field below 2 is no modifier",
    "input": "\u001b[1;0D\u001b[1;1C\u001b[1;D",
    "keys": [
-    "ArrowLeft",
-    "ArrowRight",
-    "ArrowLeft"
+    "arrow_left",
+    "arrow_right",
+    "arrow_left"
    ]
   },
   {
@@ -19888,201 +19906,801 @@
    ]
   },
   {
-   "name": "a character",
+   "name": "the kitty protocol: its keypad's codes name what a legacy terminal sends for the key; its modifier keys, and codes it has no name for here, are no key (SPEC \u00a710.4)",
+   "input": "\u001b[57400u\u001b[57413u\u001b[57414u\u001b[57417;5u\u001b[57441u\u001b[57442;5u\u001b[57376u",
+   "keys": [
+    "1",
+    "+",
+    "enter",
+    "ctrl+arrow_left",
+    null,
+    null,
+    null
+   ]
+  },
+  {
+   "name": "a code that is a capital is its letter: with Shift, shift and the letter; without, the small letter, as Caps Lock makes it (SPEC \u00a710.4)",
+   "input": "\u001b[27;6;65~\u001b[27;5;65~\u001b[65;5u",
+   "keys": [
+    "ctrl+shift+a",
+    "ctrl+a",
+    "ctrl+a"
+   ]
+  },
+  {
+   "name": "the kitty protocol: the base layout key names nothing; the key is its code's (SPEC \u00a710.4)",
+   "input": "\u001b[1092::97;5u",
+   "keys": [
+    "ctrl+\u0444"
+   ]
+  },
+  {
+   "name": "the kitty protocol: the space bar is space, with its modifiers",
+   "input": "\u001b[32;5u\u001b[32;2u",
+   "keys": [
+    "ctrl+space",
+    "shift+space"
+   ]
+  },
+  {
+   "name": "myelin key names 0.1, read: \"a\"",
    "key": "a",
    "canon": "a"
   },
   {
-   "name": "a capital",
-   "key": "A",
-   "canon": "A"
+   "name": "myelin key names 0.1, read: \"ctrl+d\"",
+   "key": "ctrl+d",
+   "canon": "ctrl+d"
   },
   {
-   "name": "Shift with a small letter is the capital",
-   "key": "Shift+a",
-   "canon": "A"
+   "name": "myelin key names 0.1, read: \"Ctrl+D\"",
+   "key": "Ctrl+D",
+   "canon": "ctrl+d"
   },
   {
-   "name": "Shift with a capital is the capital",
-   "key": "Shift+A",
-   "canon": "A"
+   "name": "myelin key names 0.1, read: \"shift+ctrl+d\"",
+   "key": "shift+ctrl+d",
+   "canon": "ctrl+shift+d"
   },
   {
-   "name": "modifiers in order, Shift shown in the letter",
-   "key": "Shift+Control+a",
-   "canon": "Control+A"
+   "name": "myelin key names 0.1, read: \"d+ctrl\"",
+   "key": "d+ctrl",
+   "canon": "ctrl+d"
   },
   {
-   "name": "Control+Shift+a",
-   "key": "Control+Shift+a",
-   "canon": "Control+A"
+   "name": "myelin key names 0.1, read: \"control+d\"",
+   "key": "control+d",
+   "canon": "ctrl+d"
   },
   {
-   "name": "modifiers in order",
-   "key": "Shift+Meta+Alt+Control+Enter",
-   "canon": "Control+Alt+Meta+Shift+Enter"
+   "name": "myelin key names 0.1, read: \"CONTROL+d\"",
+   "key": "CONTROL+d",
+   "canon": "ctrl+d"
   },
   {
-   "name": "Alt before Control",
-   "key": "Alt+Control+ArrowLeft",
-   "canon": "Control+Alt+ArrowLeft"
+   "name": "myelin key names 0.1, read: \"cmd+s\"",
+   "key": "cmd+s",
+   "canon": "super+s"
   },
   {
-   "name": "Shift that a key cannot show",
-   "key": "Shift+Enter",
-   "canon": "Shift+Enter"
+   "name": "myelin key names 0.1, read: \"command+s\"",
+   "key": "command+s",
+   "canon": "super+s"
   },
   {
-   "name": "Shift with a digit",
-   "key": "Shift+1",
-   "canon": "Shift+1"
+   "name": "myelin key names 0.1, read: \"opt+b\"",
+   "key": "opt+b",
+   "canon": "alt+b"
   },
   {
-   "name": "Space",
-   "key": "Space",
-   "canon": "Space"
+   "name": "myelin key names 0.1, read: \"option+b\"",
+   "key": "option+b",
+   "canon": "alt+b"
   },
   {
-   "name": "a space is Space",
-   "key": " ",
-   "canon": "Space"
+   "name": "myelin key names 0.1, read: \"super+ctrl+alt+shift+enter\"",
+   "key": "super+ctrl+alt+shift+enter",
+   "canon": "super+ctrl+alt+shift+enter"
   },
   {
-   "name": "Control with a space",
-   "key": "Control+ ",
-   "canon": "Control+Space"
+   "name": "myelin key names 0.1, read: \"shift+alt+ctrl+super+enter\"",
+   "key": "shift+alt+ctrl+super+enter",
+   "canon": "super+ctrl+alt+shift+enter"
   },
   {
-   "name": "Shift+Space",
-   "key": "Shift+Space",
-   "canon": "Shift+Space"
+   "name": "myelin key names 0.1, read: \"G\"",
+   "key": "G",
+   "canon": "g"
   },
   {
-   "name": "the plus key",
+   "name": "myelin key names 0.1, read: \"shift+G\"",
+   "key": "shift+G",
+   "canon": "shift+g"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"ctrl+\u00c9\"",
+   "key": "ctrl+\u00c9",
+   "canon": "ctrl+\u00e9"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"\u01c5\"",
+   "key": "\u01c5",
+   "canon": "\u01c6"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"\u03a3\"",
+   "key": "\u03a3",
+   "canon": "\u03c3"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"?\"",
+   "key": "?",
+   "canon": "?"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"!\"",
+   "key": "!",
+   "canon": "!"
+  },
+  {
+   "name": "myelin key names 0.1, read: \",\"",
+   "key": ",",
+   "canon": ","
+  },
+  {
+   "name": "myelin key names 0.1, read: \"<\"",
+   "key": "<",
+   "canon": "<"
+  },
+  {
+   "name": "myelin key names 0.1, read: \">\"",
+   "key": ">",
+   "canon": ">"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"1\"",
+   "key": "1",
+   "canon": "1"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"shift+1\"",
+   "key": "shift+1",
+   "canon": "shift+1"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"+\"",
    "key": "+",
    "canon": "+"
   },
   {
-   "name": "Control with the plus key",
-   "key": "Control++",
-   "canon": "Control++"
+   "name": "myelin key names 0.1, read: \"ctrl++\"",
+   "key": "ctrl++",
+   "canon": "ctrl++"
   },
   {
-   "name": "Alt with =",
-   "key": "Alt+=",
-   "canon": "Alt+="
+   "name": "myelin key names 0.1, read: \"alt+=\"",
+   "key": "alt+=",
+   "canon": "alt+="
   },
   {
-   "name": "a named key",
+   "name": "myelin key names 0.1, read: \"\u00e9\"",
+   "key": "\u00e9",
+   "canon": "\u00e9"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"e\u0301\"",
+   "key": "e\u0301",
+   "canon": "e\u0301",
+   "requires": [
+    "graphemes"
+   ]
+  },
+  {
+   "name": "myelin key names 0.1, read: \"\u4e2d\"",
+   "key": "\u4e2d",
+   "canon": "\u4e2d"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"\ud83d\udc69\u200d\ud83d\udcbb\"",
+   "key": "\ud83d\udc69\u200d\ud83d\udcbb",
+   "canon": "\ud83d\udc69\u200d\ud83d\udcbb",
+   "requires": [
+    "graphemes"
+   ]
+  },
+  {
+   "name": "myelin key names 0.1, read: \"\u00a0\"",
+   "key": "\u00a0",
+   "canon": "\u00a0"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"escape\"",
+   "key": "escape",
+   "canon": "escape"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"Escape\"",
+   "key": "Escape",
+   "canon": "escape"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"ESCAPE\"",
+   "key": "ESCAPE",
+   "canon": "escape"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"esc\"",
+   "key": "esc",
+   "canon": "escape"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"page_down\"",
+   "key": "page_down",
+   "canon": "page_down"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"PageDown\"",
+   "key": "PageDown",
+   "canon": "page_down"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"pagedown\"",
+   "key": "pagedown",
+   "canon": "page_down"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"pgdn\"",
+   "key": "pgdn",
+   "canon": "page_down"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"pgup\"",
+   "key": "pgup",
+   "canon": "page_up"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"pageup\"",
+   "key": "pageup",
+   "canon": "page_up"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"up\"",
+   "key": "up",
+   "canon": "arrow_up"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"down\"",
+   "key": "down",
+   "canon": "arrow_down"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"left\"",
+   "key": "left",
+   "canon": "arrow_left"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"right\"",
+   "key": "right",
+   "canon": "arrow_right"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"ArrowLeft\"",
+   "key": "ArrowLeft",
+   "canon": "arrow_left"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"ctrl+left\"",
+   "key": "ctrl+left",
+   "canon": "ctrl+arrow_left"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"KeyA\"",
+   "key": "KeyA",
+   "canon": "key_a"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"ctrl+key_w\"",
+   "key": "ctrl+key_w",
+   "canon": "ctrl+key_w"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"Digit1\"",
+   "key": "Digit1",
+   "canon": "digit_1"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"F12\"",
    "key": "F12",
-   "canon": "F12"
+   "canon": "f12"
   },
   {
-   "name": "no key after a modifier",
-   "key": "Control+",
-   "canon": null
+   "name": "myelin key names 0.1, read: \"f25\"",
+   "key": "f25",
+   "canon": "f25"
   },
   {
-   "name": "empty",
+   "name": "myelin key names 0.1, read: \"Numpad0\"",
+   "key": "Numpad0",
+   "canon": "numpad_0"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"NumpadEnter\"",
+   "key": "NumpadEnter",
+   "canon": "numpad_enter"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"ContextMenu\"",
+   "key": "ContextMenu",
+   "canon": "context_menu"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"LaunchApp1\"",
+   "key": "LaunchApp1",
+   "canon": "launch_app_1"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"ShiftLeft\"",
+   "key": "ShiftLeft",
+   "canon": "shift_left"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"shift_left\"",
+   "key": "shift_left",
+   "canon": "shift_left"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"space\"",
+   "key": "space",
+   "canon": "space"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"Space\"",
+   "key": "Space",
+   "canon": "space"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"ctrl+space\"",
+   "key": "ctrl+space",
+   "canon": "ctrl+space"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"shift+tab\"",
+   "key": "shift+tab",
+   "canon": "shift+tab"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"shift+key_a\"",
+   "key": "shift+key_a",
+   "canon": "shift+key_a"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"comma\"",
+   "key": "comma",
+   "canon": "comma"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"ctrl+comma\"",
+   "key": "ctrl+comma",
+   "canon": "ctrl+comma"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"shift\"",
+   "key": "shift",
+   "canon": "shift"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"Shift\"",
+   "key": "Shift",
+   "canon": "shift"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"ctrl+shift\"",
+   "key": "ctrl+shift",
+   "canon": "ctrl+shift"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"shift+ctrl\"",
+   "key": "shift+ctrl",
+   "canon": "shift+ctrl"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"cmd\"",
+   "key": "cmd",
+   "canon": "super"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"control\"",
+   "key": "control",
+   "canon": "ctrl"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"alt+super+ctrl\"",
+   "key": "alt+super+ctrl",
+   "canon": "super+alt+ctrl"
+  },
+  {
+   "name": "myelin key names 0.1, read: \"\"",
    "key": "",
    "canon": null
   },
   {
-   "name": "an unknown modifier",
-   "key": "Hyper+a",
+   "name": "myelin key names 0.1, read: \"ctrl+\"",
+   "key": "ctrl+",
    "canon": null
   },
   {
-   "name": "modifiers are case-sensitive",
-   "key": "control+a",
+   "name": "myelin key names 0.1, read: \"a+\"",
+   "key": "a+",
    "canon": null
   },
   {
-   "name": "Ctrl is not a modifier",
-   "key": "Ctrl+a",
+   "name": "myelin key names 0.1, read: \"shift+shift\"",
+   "key": "shift+shift",
    "canon": null
   },
   {
-   "name": "a modifier twice",
-   "key": "Control+Control+a",
+   "name": "myelin key names 0.1, read: \"ctrl+ctrl+a\"",
+   "key": "ctrl+ctrl+a",
    "canon": null
   },
   {
-   "name": "more than one character, not a name",
-   "key": "ab",
+   "name": "myelin key names 0.1, read: \"ctrl+control+a\"",
+   "key": "ctrl+control+a",
    "canon": null
   },
   {
-   "name": "a name starts with a capital",
+   "name": "myelin key names 0.1, read: \"meta+a\"",
+   "key": "meta+a",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"meta\"",
+   "key": "meta",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"hyper+a\"",
+   "key": "hyper+a",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"gg\"",
+   "key": "gg",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"g+g\"",
+   "key": "g+g",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"++\"",
+   "key": "++",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"return\"",
+   "key": "return",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"f0\"",
+   "key": "f0",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"f26\"",
+   "key": "f26",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"key_aa\"",
+   "key": "key_aa",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"<leader>\"",
+   "key": "<leader>",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"<my_key>\"",
+   "key": "<my_key>",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"<>\"",
+   "key": "<>",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \" \"",
+   "key": " ",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"\\u0001\"",
+   "key": "\u0001",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"\\t\"",
+   "key": "\t",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"ctrl+ \"",
+   "key": "ctrl+ ",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"mod+s\"",
+   "key": "mod+s",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, read: \"mod\"",
+   "key": "mod",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"mod+s\"",
+   "key": "mod+s",
+   "mod": "ctrl",
+   "canon": "ctrl+s"
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"Mod+s\"",
+   "key": "Mod+s",
+   "mod": "ctrl",
+   "canon": "ctrl+s"
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"MOD+S\"",
+   "key": "MOD+S",
+   "mod": "ctrl",
+   "canon": "ctrl+s"
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"Mod+Shift+ArrowLeft\"",
+   "key": "Mod+Shift+ArrowLeft",
+   "mod": "ctrl",
+   "canon": "ctrl+shift+arrow_left"
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"shift+mod+z\"",
+   "key": "shift+mod+z",
+   "mod": "ctrl",
+   "canon": "ctrl+shift+z"
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"mod+alt+s\"",
+   "key": "mod+alt+s",
+   "mod": "ctrl",
+   "canon": "ctrl+alt+s"
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"mod++\"",
+   "key": "mod++",
+   "mod": "ctrl",
+   "canon": "ctrl++"
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"mod+page_down\"",
+   "key": "mod+page_down",
+   "mod": "ctrl",
+   "canon": "ctrl+page_down"
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"mod\"",
+   "key": "mod",
+   "mod": "ctrl",
+   "canon": "ctrl"
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"shift+mod\"",
+   "key": "shift+mod",
+   "mod": "ctrl",
+   "canon": "shift+ctrl"
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"mod+shift\"",
+   "key": "mod+shift",
+   "mod": "ctrl",
+   "canon": "ctrl+shift"
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"mod+ctrl+s\"",
+   "key": "mod+ctrl+s",
+   "mod": "ctrl",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"ctrl+mod+s\"",
+   "key": "ctrl+mod+s",
+   "mod": "ctrl",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"control+mod+s\"",
+   "key": "control+mod+s",
+   "mod": "ctrl",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"mod+super+s\"",
+   "key": "mod+super+s",
+   "mod": "ctrl",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"cmd+mod+s\"",
+   "key": "cmd+mod+s",
+   "mod": "ctrl",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"mod+mod+s\"",
+   "key": "mod+mod+s",
+   "mod": "ctrl",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"mod+\"",
+   "key": "mod+",
+   "mod": "ctrl",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (super): \"mod+s\"",
+   "key": "mod+s",
+   "mod": "super",
+   "canon": "super+s"
+  },
+  {
+   "name": "myelin key names 0.1, mod (super): \"Mod+Shift+ArrowLeft\"",
+   "key": "Mod+Shift+ArrowLeft",
+   "mod": "super",
+   "canon": "super+shift+arrow_left"
+  },
+  {
+   "name": "myelin key names 0.1, mod (super): \"mod+alt+s\"",
+   "key": "mod+alt+s",
+   "mod": "super",
+   "canon": "super+alt+s"
+  },
+  {
+   "name": "myelin key names 0.1, mod (super): \"mod\"",
+   "key": "mod",
+   "mod": "super",
+   "canon": "super"
+  },
+  {
+   "name": "myelin key names 0.1, mod (super): \"mod+ctrl+s\"",
+   "key": "mod+ctrl+s",
+   "mod": "super",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (super): \"mod+cmd+s\"",
+   "key": "mod+cmd+s",
+   "mod": "super",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (super): \"super+mod+s\"",
+   "key": "super+mod+s",
+   "mod": "super",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (super): \"mod+control\"",
+   "key": "mod+control",
+   "mod": "super",
+   "canon": null
+  },
+  {
+   "name": "myelin key names 0.1, mod (ctrl): \"mod+S\"",
+   "key": "mod+S",
+   "mod": "ctrl",
+   "canon": "ctrl+s"
+  },
+  {
+   "name": "KeyText: a",
+   "key": "a",
+   "text": "a"
+  },
+  {
+   "name": "KeyText: shift+a",
+   "key": "shift+a",
+   "text": "A"
+  },
+  {
+   "name": "KeyText: shift+\u00e9",
+   "key": "shift+\u00e9",
+   "text": "\u00c9"
+  },
+  {
+   "name": "KeyText: ?",
+   "key": "?",
+   "text": "?"
+  },
+  {
+   "name": "KeyText: shift+1",
+   "key": "shift+1",
+   "text": "1"
+  },
+  {
+   "name": "KeyText: space",
+   "key": "space",
+   "text": " "
+  },
+  {
+   "name": "KeyText: shift+space",
+   "key": "shift+space",
+   "text": " "
+  },
+  {
+   "name": "KeyText: ctrl+a",
+   "key": "ctrl+a",
+   "text": null
+  },
+  {
+   "name": "KeyText: alt+space",
+   "key": "alt+space",
+   "text": null
+  },
+  {
+   "name": "KeyText: enter",
    "key": "enter",
-   "canon": null
+   "text": null
   },
   {
-   "name": "a modifier alone is a key",
-   "key": "Shift",
-   "canon": "Shift"
+   "name": "KeyText: arrow_left",
+   "key": "arrow_left",
+   "text": null
   },
   {
-   "name": "a binding's Mod is kept, first: 'Mod+a' (SPEC \u00a710.4)",
-   "key": "Mod+a",
-   "canon": "Mod+a"
+   "name": "KeyText: key_a",
+   "key": "key_a",
+   "text": null
   },
   {
-   "name": "a binding's Mod is kept, first: 'Shift+Mod+z' (SPEC \u00a710.4)",
-   "key": "Shift+Mod+z",
-   "canon": "Mod+Z"
+   "name": "KeyText: shift",
+   "key": "shift",
+   "text": null
   },
   {
-   "name": "a binding's Mod is kept, first: 'Control+Mod+a' (SPEC \u00a710.4)",
-   "key": "Control+Mod+a",
-   "canon": "Mod+Control+a"
-  },
-  {
-   "name": "a binding's Mod is kept, first: 'Alt+Mod+ArrowLeft' (SPEC \u00a710.4)",
-   "key": "Alt+Mod+ArrowLeft",
-   "canon": "Mod+Alt+ArrowLeft"
-  },
-  {
-   "name": "a binding's Mod is kept, first: 'Mod+Mod+a' (SPEC \u00a710.4)",
-   "key": "Mod+Mod+a",
-   "canon": null
-  },
-  {
-   "name": "a binding's Mod is kept, first: 'mod+a' (SPEC \u00a710.4)",
-   "key": "mod+a",
-   "canon": null
-  },
-  {
-   "name": "a binding's Mod is kept, first: 'Mod+' (SPEC \u00a710.4)",
-   "key": "Mod+",
-   "canon": null
+   "name": "KeyText: +",
+   "key": "+",
+   "text": "+"
   }
  ],
  "keymap": [
   {
    "name": "TerminalKeys, formatted",
    "terminal_keys": true,
-   "format": "ArrowLeft=char-backward Control+b=char-backward ArrowRight=char-forward Control+f=char-forward Alt+ArrowLeft=word-backward Control+ArrowLeft=word-backward Alt+b=word-backward Alt+ArrowRight=word-forward Control+ArrowRight=word-forward Alt+f=word-forward Home=line-start End=line-end Control+e=line-end Backspace=delete-char-backward Control+h=delete-char-backward Delete=delete-char-forward Control+d=delete-char-forward Alt+Backspace=delete-word-backward Control+w=delete-word-backward Control+Backspace=delete-word-backward Alt+Delete=delete-word-forward Alt+d=delete-word-forward Control+Delete=delete-word-forward Control+u=delete-to-line-start Control+k=delete-to-line-end ArrowUp=line-previous Control+p=line-previous ArrowDown=line-next Control+n=line-next PageUp=page-up PageDown=page-down Alt+<=input-start Control+Home=input-start Alt+>=input-end Control+End=input-end Mod+a=select-all Control+m=newline"
+   "format": "arrow_left=char-backward ctrl+b=char-backward arrow_right=char-forward ctrl+f=char-forward alt+arrow_left=word-backward ctrl+arrow_left=word-backward alt+b=word-backward alt+arrow_right=word-forward ctrl+arrow_right=word-forward alt+f=word-forward home=line-start end=line-end ctrl+e=line-end backspace=delete-char-backward ctrl+h=delete-char-backward delete=delete-char-forward ctrl+d=delete-char-forward alt+backspace=delete-word-backward ctrl+w=delete-word-backward ctrl+backspace=delete-word-backward alt+delete=delete-word-forward alt+d=delete-word-forward ctrl+delete=delete-word-forward ctrl+u=delete-to-line-start ctrl+k=delete-to-line-end arrow_up=line-previous ctrl+p=line-previous arrow_down=line-next ctrl+n=line-next page_up=page-up page_down=page-down alt+<=input-start ctrl+home=input-start alt+>=input-end ctrl+end=input-end mod+a=select-all ctrl+m=newline"
   },
   {
    "name": "a key bound twice keeps its first place and its last action; ASCII white space separates, other white space does not",
-   "parse": "Control+a=line-start  Alt+b=word-backward\tControl+a=line-end\n\u00a0Control+e=line-end\fAlt+f=word-forward\r",
-   "format": "Control+a=line-end Alt+b=word-backward Alt+f=word-forward"
+   "parse": "ctrl+a=line-start  alt+b=word-backward\tctrl+a=line-end\n\u00a0ctrl+e=line-end\falt+f=word-forward\r",
+   "format": "ctrl+a=line-end alt+b=word-backward alt+f=word-forward"
   },
   {
-   "name": "bindings a host ignores are dropped, and keys are canonical",
-   "parse": "Escape=line-start Tab=line-end Shift+Tab=line-end Control+a=frobnicate Hyper+b=line-start Control+=line-end =line-start Control+a line-start Alt+==line-start Shift+Control+a=line-end Control+b=program",
-   "format": "Alt+==line-start Control+A=line-end Control+b=program"
+   "name": "bindings a host ignores are dropped: escape, tab and shift+tab, an unknown action, a key the default reading refuses (an unknown modifier, a modifier with no key, meta), a binding with no =; keys are canonical",
+   "parse": "escape=line-start Esc=line-end tab=line-end shift+tab=line-end ctrl+a=frobnicate hyper+b=line-start ctrl+=line-end =line-start ctrl+a line-start meta+a=line-start alt+==line-start Shift+Ctrl+A=line-end ctrl+b=program",
+   "format": "alt+==line-start ctrl+shift+a=line-end ctrl+b=program"
   },
   {
    "name": "select-all is an action",
-   "parse": "Control+a=select-all Alt+a=select-all",
-   "format": "Control+a=select-all Alt+a=select-all"
+   "parse": "ctrl+a=select-all alt+a=select-all",
+   "format": "ctrl+a=select-all alt+a=select-all"
   },
   {
    "name": "copy, cut, paste, undo and redo are actions",
-   "parse": "Control+c=copy Control+x=cut Control+v=paste Control+z=undo Control+y=redo",
-   "format": "Control+c=copy Control+x=cut Control+v=paste Control+z=undo Control+y=redo"
+   "parse": "ctrl+c=copy ctrl+x=cut ctrl+v=paste ctrl+z=undo ctrl+y=redo",
+   "format": "ctrl+c=copy ctrl+x=cut ctrl+v=paste ctrl+z=undo ctrl+y=redo"
   },
   {
    "name": "nothing",
@@ -20090,136 +20708,135 @@
    "format": ""
   },
   {
-   "name": "the default keymap, in an input, where Mod is Control: a browser field's keys on Linux, and Shift selects with a move (SPEC \u00a710.2)",
+   "name": "the default keymap, in an input, where mod is ctrl: a browser field's keys on Linux, and Shift selects with a move (SPEC \u00a710.2)",
    "multiline": false,
    "keys": [],
    "lookup": {
-    "ArrowLeft": "char-backward",
-    "ArrowRight": "char-forward",
-    "Home": "line-start",
-    "End": "line-end",
-    "Backspace": "delete-char-backward",
-    "Delete": "delete-char-forward",
-    "Enter": "submit",
-    "ArrowUp": null,
-    "ArrowDown": null,
-    "PageUp": null,
-    "PageDown": null,
+    "arrow_left": "char-backward",
+    "arrow_right": "char-forward",
+    "home": "line-start",
+    "end": "line-end",
+    "backspace": "delete-char-backward",
+    "delete": "delete-char-forward",
+    "enter": "submit",
+    "arrow_up": null,
+    "arrow_down": null,
+    "page_up": null,
+    "page_down": null,
     "a": "insert",
-    "A": "insert",
-    "Space": "insert",
+    "shift+a": "insert",
+    "space": "insert",
     "\u00e9": "insert",
     "!": "insert",
-    "Shift+ArrowLeft": "char-backward",
-    "Shift+Enter": "submit",
-    "Shift+Backspace": "delete-char-backward",
-    "Control+a": "select-all",
-    "Alt+b": null,
-    "Meta+a": null,
-    "Control+Space": null,
-    "Alt+Space": null,
-    "Tab": null,
-    "Shift+Tab": null,
-    "Escape": null,
-    "F1": null,
-    "Insert": null,
-    "Control+ArrowLeft": "word-backward",
-    "Alt+ArrowLeft": "word-backward",
-    "Control+ArrowRight": "word-forward",
-    "Alt+ArrowRight": "word-forward",
-    "Control+Backspace": "delete-word-backward",
-    "Alt+Backspace": "delete-word-backward",
-    "Control+Delete": "delete-word-forward",
-    "Alt+Delete": "delete-word-forward",
-    "Control+Home": "input-start",
-    "Control+End": "input-end",
-    "Control+Shift+ArrowLeft": "word-backward",
-    "Shift+End": "line-end",
-    "Control+Shift+Home": "input-start",
-    "Control+h": null,
-    "Control+A": null,
-    "Shift+ArrowUp": null,
-    "Meta+A": null,
-    "Meta+ArrowLeft": null,
-    "Meta+ArrowRight": null,
-    "Meta+ArrowUp": null,
-    "Meta+ArrowDown": null,
-    "Meta+Backspace": null,
-    "Meta+Shift+ArrowLeft": null,
-    "Control+x": "cut",
-    "Meta+x": null,
-    "Control+v": "paste",
-    "Meta+v": null,
-    "Control+z": "undo",
-    "Meta+z": null,
-    "Control+Z": "redo",
-    "Control+Shift+z": "redo",
-    "Control+y": "redo",
-    "Meta+Z": null,
-    "Control+X": null,
-    "Control+V": null,
-    "Control+Y": null,
-    "Alt+z": null,
-    "Control+c": "copy",
-    "Meta+c": null,
-    "Control+C": null,
-    "Control+e": null,
-    "Control+k": null,
-    "Control+b": null,
-    "Control+d": null
+    "shift+arrow_left": "char-backward",
+    "shift+enter": "submit",
+    "shift+backspace": "delete-char-backward",
+    "ctrl+a": "select-all",
+    "alt+b": null,
+    "super+a": null,
+    "ctrl+space": null,
+    "alt+space": null,
+    "tab": null,
+    "shift+tab": null,
+    "escape": null,
+    "f1": null,
+    "insert": null,
+    "ctrl+arrow_left": "word-backward",
+    "alt+arrow_left": "word-backward",
+    "ctrl+arrow_right": "word-forward",
+    "alt+arrow_right": "word-forward",
+    "ctrl+backspace": "delete-word-backward",
+    "alt+backspace": "delete-word-backward",
+    "ctrl+delete": "delete-word-forward",
+    "alt+delete": "delete-word-forward",
+    "ctrl+home": "input-start",
+    "ctrl+end": "input-end",
+    "ctrl+shift+arrow_left": "word-backward",
+    "shift+end": "line-end",
+    "ctrl+shift+home": "input-start",
+    "ctrl+h": null,
+    "ctrl+shift+a": null,
+    "shift+arrow_up": null,
+    "super+shift+a": null,
+    "super+arrow_left": null,
+    "super+arrow_right": null,
+    "super+arrow_up": null,
+    "super+arrow_down": null,
+    "super+backspace": null,
+    "super+shift+arrow_left": null,
+    "ctrl+x": "cut",
+    "super+x": null,
+    "ctrl+v": "paste",
+    "super+v": null,
+    "ctrl+z": "undo",
+    "super+z": null,
+    "ctrl+shift+z": "redo",
+    "ctrl+y": "redo",
+    "super+shift+z": null,
+    "ctrl+shift+x": null,
+    "ctrl+shift+v": null,
+    "ctrl+shift+y": null,
+    "alt+z": null,
+    "ctrl+c": "copy",
+    "super+c": null,
+    "ctrl+shift+c": null,
+    "ctrl+e": null,
+    "ctrl+k": null,
+    "ctrl+b": null,
+    "ctrl+d": null
    },
    "selects": {
-    "Shift+ArrowLeft": true,
-    "ArrowLeft": false,
-    "Control+Shift+ArrowRight": true,
-    "Alt+Shift+ArrowLeft": true,
-    "Shift+Home": true,
-    "Shift+End": true,
-    "Control+Shift+End": true,
-    "Shift+Backspace": false,
-    "Control+Shift+Delete": false,
-    "Shift+Enter": false,
-    "Shift+ArrowUp": false,
-    "Shift+PageDown": false,
-    "Control+A": false,
-    "A": false,
-    "Shift+Tab": false,
-    "Control+Z": false,
-    "Control+x": false
+    "shift+arrow_left": true,
+    "arrow_left": false,
+    "ctrl+shift+arrow_right": true,
+    "alt+shift+arrow_left": true,
+    "shift+home": true,
+    "shift+end": true,
+    "ctrl+shift+end": true,
+    "shift+backspace": false,
+    "ctrl+shift+delete": false,
+    "shift+enter": false,
+    "shift+arrow_up": false,
+    "shift+page_down": false,
+    "ctrl+shift+a": false,
+    "shift+a": false,
+    "shift+tab": false,
+    "ctrl+shift+z": false,
+    "ctrl+x": false
    }
   },
   {
-   "name": "the default keymap, in a multi-line field, where Mod is Control",
+   "name": "the default keymap, in a multi-line field, where mod is ctrl",
    "multiline": true,
    "keys": [],
    "lookup": {
-    "Enter": "newline",
-    "Shift+Enter": "newline",
-    "ArrowUp": "line-previous",
-    "ArrowDown": "line-next",
-    "PageUp": "page-up",
-    "PageDown": "page-down",
-    "Shift+ArrowDown": "line-next",
-    "Control+Home": "input-start",
-    "Control+End": "input-end",
-    "Control+a": "select-all",
-    "Shift+PageUp": "page-up",
-    "Meta+ArrowUp": null,
-    "Meta+ArrowDown": null,
-    "Meta+ArrowLeft": null,
-    "Control+v": "paste",
-    "Control+z": "undo",
-    "Meta+Z": null,
-    "Control+c": "copy",
-    "Control+p": null,
-    "Control+n": null
+    "enter": "newline",
+    "shift+enter": "newline",
+    "arrow_up": "line-previous",
+    "arrow_down": "line-next",
+    "page_up": "page-up",
+    "page_down": "page-down",
+    "shift+arrow_down": "line-next",
+    "ctrl+home": "input-start",
+    "ctrl+end": "input-end",
+    "ctrl+a": "select-all",
+    "shift+page_up": "page-up",
+    "super+arrow_up": null,
+    "super+arrow_down": null,
+    "super+arrow_left": null,
+    "ctrl+v": "paste",
+    "ctrl+z": "undo",
+    "super+shift+z": null,
+    "ctrl+c": "copy",
+    "ctrl+p": null,
+    "ctrl+n": null
    },
    "selects": {
-    "Shift+ArrowDown": true,
-    "Shift+ArrowUp": true,
-    "Shift+PageUp": true,
-    "Control+Shift+Home": true,
-    "Shift+Enter": false
+    "shift+arrow_down": true,
+    "shift+arrow_up": true,
+    "shift+page_up": true,
+    "ctrl+shift+home": true,
+    "shift+enter": false
    }
   },
   {
@@ -20228,41 +20845,41 @@
    "terminal_keys": true,
    "keys": [],
    "lookup": {
-    "Control+a": "select-all",
-    "Control+e": "line-end",
-    "Control+b": "char-backward",
-    "Control+f": "char-forward",
-    "Alt+b": "word-backward",
-    "Alt+f": "word-forward",
-    "Control+ArrowLeft": "word-backward",
-    "Alt+ArrowRight": "word-forward",
-    "Control+w": "delete-word-backward",
-    "Alt+Backspace": "delete-word-backward",
-    "Control+Backspace": "delete-word-backward",
-    "Alt+d": "delete-word-forward",
-    "Alt+Delete": "delete-word-forward",
-    "Control+Delete": "delete-word-forward",
-    "Control+h": "delete-char-backward",
-    "Control+d": "delete-char-forward",
-    "Control+u": "delete-to-line-start",
-    "Control+k": "delete-to-line-end",
-    "Control+p": null,
-    "Control+n": null,
-    "ArrowUp": null,
-    "Alt+<": "input-start",
-    "Control+Home": "input-start",
-    "Control+m": null,
-    "Enter": "submit",
-    "Control+Shift+ArrowLeft": "word-backward",
-    "Control+A": null,
-    "Control+v": "paste"
+    "ctrl+a": "select-all",
+    "ctrl+e": "line-end",
+    "ctrl+b": "char-backward",
+    "ctrl+f": "char-forward",
+    "alt+b": "word-backward",
+    "alt+f": "word-forward",
+    "ctrl+arrow_left": "word-backward",
+    "alt+arrow_right": "word-forward",
+    "ctrl+w": "delete-word-backward",
+    "alt+backspace": "delete-word-backward",
+    "ctrl+backspace": "delete-word-backward",
+    "alt+d": "delete-word-forward",
+    "alt+delete": "delete-word-forward",
+    "ctrl+delete": "delete-word-forward",
+    "ctrl+h": "delete-char-backward",
+    "ctrl+d": "delete-char-forward",
+    "ctrl+u": "delete-to-line-start",
+    "ctrl+k": "delete-to-line-end",
+    "ctrl+p": null,
+    "ctrl+n": null,
+    "arrow_up": null,
+    "alt+<": "input-start",
+    "ctrl+home": "input-start",
+    "ctrl+m": null,
+    "enter": "submit",
+    "ctrl+shift+arrow_left": "word-backward",
+    "ctrl+shift+a": null,
+    "ctrl+v": "paste"
    },
    "selects": {
-    "Control+Shift+ArrowLeft": true,
-    "Shift+Home": true,
-    "Control+B": false,
-    "Alt+<": false,
-    "Shift+ArrowUp": false
+    "ctrl+shift+arrow_left": true,
+    "shift+home": true,
+    "ctrl+shift+b": false,
+    "alt+<": false,
+    "shift+arrow_up": false
    }
   },
   {
@@ -20271,392 +20888,391 @@
    "terminal_keys": true,
    "keys": [],
    "lookup": {
-    "Control+p": "line-previous",
-    "Control+n": "line-next",
-    "ArrowUp": "line-previous",
-    "PageDown": "page-down",
-    "Alt+<": "input-start",
-    "Alt+>": "input-end",
-    "Control+Home": "input-start",
-    "Control+End": "input-end",
-    "Control+m": "newline",
-    "Enter": "newline"
+    "ctrl+p": "line-previous",
+    "ctrl+n": "line-next",
+    "arrow_up": "line-previous",
+    "page_down": "page-down",
+    "alt+<": "input-start",
+    "alt+>": "input-end",
+    "ctrl+home": "input-start",
+    "ctrl+end": "input-end",
+    "ctrl+m": "newline",
+    "enter": "newline"
    }
   },
   {
    "name": "a nearer value overrides key by key; program gives a key back",
    "multiline": false,
    "keys": [
-    "Control+a=line-start Control+e=line-end",
-    "Control+a=program ArrowLeft=program"
+    "ctrl+a=line-start ctrl+e=line-end",
+    "ctrl+a=program arrow_left=program"
    ],
    "lookup": {
-    "Control+a": null,
-    "ArrowLeft": null,
-    "Control+e": "line-end",
-    "ArrowRight": "char-forward"
+    "ctrl+a": null,
+    "arrow_left": null,
+    "ctrl+e": "line-end",
+    "arrow_right": "char-forward"
    }
   },
   {
    "name": "a binding with Shift wins over the fallback",
    "multiline": false,
    "keys": [
-    "Shift+ArrowLeft=program"
+    "shift+arrow_left=program"
    ],
    "lookup": {
-    "Shift+ArrowLeft": null,
-    "ArrowLeft": "char-backward",
-    "Shift+Home": "line-start"
+    "shift+arrow_left": null,
+    "arrow_left": "char-backward",
+    "shift+home": "line-start"
    },
    "selects": {
-    "Shift+ArrowLeft": false,
-    "Shift+Home": true
+    "shift+arrow_left": false,
+    "shift+home": true
    }
   },
   {
    "name": "a move bound with Shift selects as one looked up without it; a key without Shift does not, whatever its action (SPEC \u00a710.2)",
    "multiline": false,
    "keys": [
-    "Shift+ArrowUp=line-start Control+e=input-end Shift+Delete=delete-word-forward"
+    "shift+arrow_up=line-start ctrl+e=input-end shift+delete=delete-word-forward"
    ],
    "lookup": {
-    "Shift+ArrowUp": "line-start",
-    "Control+e": "input-end",
-    "Control+E": null,
-    "Shift+Delete": "delete-word-forward"
+    "shift+arrow_up": "line-start",
+    "ctrl+e": "input-end",
+    "ctrl+shift+e": null,
+    "shift+delete": "delete-word-forward"
    },
    "selects": {
-    "Shift+ArrowUp": true,
-    "Control+e": false,
-    "Control+E": false,
-    "Shift+Delete": false
+    "shift+arrow_up": true,
+    "ctrl+e": false,
+    "ctrl+shift+e": false,
+    "shift+delete": false
    }
   },
   {
    "name": "a character can be bound, or given to the program",
    "multiline": false,
    "keys": [
-    "a=line-start x=program Space=program"
+    "a=line-start x=program space=program"
    ],
    "lookup": {
     "a": "line-start",
     "x": null,
-    "A": "insert",
-    "Space": null
+    "shift+a": "insert",
+    "space": null
    }
   },
   {
-   "name": "Tab and Escape cannot be bound",
+   "name": "tab and escape cannot be bound",
    "multiline": false,
    "keys": [
-    "Tab=line-end Escape=line-start Shift+Tab=line-end"
+    "tab=line-end escape=line-start shift+tab=line-end"
    ],
    "lookup": {
-    "Tab": null,
-    "Escape": null,
-    "Shift+Tab": null
+    "tab": null,
+    "escape": null,
+    "shift+tab": null
    }
   },
   {
    "name": "a binding splits at its last =",
    "multiline": false,
    "keys": [
-    "Alt+==line-start"
+    "alt+==line-start"
    ],
    "lookup": {
-    "Alt+=": "line-start"
+    "alt+=": "line-start"
    }
   },
   {
    "name": "an action the field does not have, in an input",
    "multiline": false,
    "keys": [
-    "Control+j=newline Control+s=submit"
+    "ctrl+j=newline ctrl+s=submit"
    ],
    "lookup": {
-    "Control+j": null,
-    "Control+s": "submit"
+    "ctrl+j": null,
+    "ctrl+s": "submit"
    }
   },
   {
    "name": "the same, in a multi-line field",
    "multiline": true,
    "keys": [
-    "Control+j=newline Control+s=submit Enter=submit"
+    "ctrl+j=newline ctrl+s=submit enter=submit"
    ],
    "lookup": {
-    "Control+j": "newline",
-    "Control+s": "submit",
-    "Enter": "submit"
+    "ctrl+j": "newline",
+    "ctrl+s": "submit",
+    "enter": "submit"
    }
   },
   {
-   "name": "outside a text field a keymap has no default, and only program gives keys to the program: a key bound to it, or an unbound key with Shift whose key without it is; a nearer binding of the key to another action cancels it, and Escape and Tab cannot be bound (SPEC \u00a710.2)",
+   "name": "outside a text field a keymap has no default, and only program gives keys to the program: a key bound to it, or an unbound key with Shift whose key without it is; a nearer binding of the key to another action cancels it, and escape and tab cannot be bound (SPEC \u00a710.2)",
    "keys": [
-    "ArrowDown=program End=program PageUp=program Control+n=program Escape=program Tab=program",
-    "End=line-end"
+    "arrow_down=program end=program page_up=program ctrl+n=program escape=program tab=program",
+    "end=line-end"
    ],
    "program": {
-    "ArrowDown": true,
-    "Shift+ArrowDown": true,
-    "PageUp": true,
-    "Control+n": true,
-    "End": false,
-    "ArrowUp": false,
-    "Control+ArrowDown": false,
-    "Enter": false,
-    "Escape": false,
-    "Tab": false
+    "arrow_down": true,
+    "shift+arrow_down": true,
+    "page_up": true,
+    "ctrl+n": true,
+    "end": false,
+    "arrow_up": false,
+    "ctrl+arrow_down": false,
+    "enter": false,
+    "escape": false,
+    "tab": false
    }
   },
   {
    "name": "a nearer binding with Shift takes that key, and leaves the key without Shift to the farther program (SPEC \u00a710.2)",
    "keys": [
-    "ArrowDown=program",
-    "Shift+ArrowDown=line-next"
+    "arrow_down=program",
+    "shift+arrow_down=line-next"
    ],
    "program": {
-    "ArrowDown": true,
-    "Shift+ArrowDown": false
+    "arrow_down": true,
+    "shift+arrow_down": false
    }
   },
   {
    "name": "scroll actions parse, and a binding to an action no host knows is dropped (SPEC \u00a710.2)",
-   "parse": "j=scroll-down k=scroll-up h=scroll-left l=scroll-right Space=scroll-page-down b=scroll-page-up d=scroll-half-page-down u=scroll-half-page-up g=scroll-start G=scroll-end x=scroll-sideways",
-   "format": "j=scroll-down k=scroll-up h=scroll-left l=scroll-right Space=scroll-page-down b=scroll-page-up d=scroll-half-page-down u=scroll-half-page-up g=scroll-start G=scroll-end"
+   "parse": "j=scroll-down k=scroll-up h=scroll-left l=scroll-right space=scroll-page-down b=scroll-page-up d=scroll-half-page-down u=scroll-half-page-up g=scroll-start shift+g=scroll-end x=scroll-sideways",
+   "format": "j=scroll-down k=scroll-up h=scroll-left l=scroll-right space=scroll-page-down b=scroll-page-up d=scroll-half-page-down u=scroll-half-page-up g=scroll-start shift+g=scroll-end"
   },
   {
-   "name": "a text field's keymap leaves scroll actions out: they neither act nor override what came before, so j is typed, a farther program keeps k, and PageDown keeps page-down (SPEC \u00a710.2)",
+   "name": "a text field's keymap leaves scroll actions out: they neither act nor override what came before, so j is typed, a farther program keeps k, and page_down keeps page-down (SPEC \u00a710.2)",
    "multiline": true,
    "keys": [
     "k=program",
-    "j=scroll-down k=scroll-up PageDown=scroll-page-down"
+    "j=scroll-down k=scroll-up page_down=scroll-page-down"
    ],
    "lookup": {
     "j": "insert",
     "k": null,
-    "PageDown": "page-down"
+    "page_down": "page-down"
    }
   },
   {
    "name": "a field leaves a scroll binding out where it stands: in the same value, it does not override an earlier binding of its key (SPEC \u00a710.2)",
    "multiline": false,
    "keys": [
-    "Control+d=delete-char-forward Control+d=scroll-half-page-down"
+    "ctrl+d=delete-char-forward ctrl+d=scroll-half-page-down"
    ],
    "lookup": {
-    "Control+d": "delete-char-forward"
+    "ctrl+d": "delete-char-forward"
    }
   },
   {
    "name": "outside a text field, Scroll gives the action a key is bound to, with the fallback without Shift; a nearer scroll binding takes the key from a farther program (SPEC \u00a710.2)",
    "keys": [
-    "k=program j=program ArrowDown=scroll-up",
-    "j=scroll-down ArrowDown=scroll-down"
+    "k=program j=program arrow_down=scroll-up",
+    "j=scroll-down arrow_down=scroll-down"
    ],
    "program": {
     "k": true,
     "j": false,
-    "ArrowDown": false
+    "arrow_down": false
    },
    "scroll": {
     "j": "scroll-down",
     "k": null,
-    "ArrowDown": "scroll-down",
-    "Shift+ArrowDown": "scroll-down",
-    "Control+ArrowDown": null,
+    "arrow_down": "scroll-down",
+    "shift+arrow_down": "scroll-down",
+    "ctrl+arrow_down": null,
     "x": null
    }
   },
   {
-   "name": "the default keymap where Mod is Meta: macOS's field keys, Command as Meta, and Cocoa's Control keys (SPEC \u00a710.2)",
+   "name": "the default keymap where mod is super: macOS's field keys, Command as super, and Cocoa's ctrl keys (SPEC \u00a710.2)",
    "platform": {
-    "mod": "Meta"
+    "mod": "super"
    },
    "multiline": false,
    "keys": [],
    "lookup": {
-    "Meta+a": "select-all",
-    "Meta+c": "copy",
-    "Meta+x": "cut",
-    "Meta+v": "paste",
-    "Meta+z": "undo",
-    "Meta+Z": "redo",
-    "Meta+Shift+z": "redo",
-    "Control+y": null,
-    "Control+c": null,
-    "Control+v": null,
-    "Control+z": null,
-    "Control+Z": null,
-    "Meta+ArrowLeft": "line-start",
-    "Meta+ArrowRight": "line-end",
-    "Meta+ArrowUp": "input-start",
-    "Meta+ArrowDown": "input-end",
-    "Meta+Backspace": "delete-to-line-start",
-    "Control+a": "line-start",
-    "Control+e": "line-end",
-    "Control+b": "char-backward",
-    "Control+f": "char-forward",
-    "Control+p": null,
-    "Control+n": null,
-    "Control+h": "delete-char-backward",
-    "Control+d": "delete-char-forward",
-    "Control+k": "delete-to-line-end",
-    "Alt+ArrowLeft": "word-backward",
-    "Alt+Backspace": "delete-word-backward",
-    "Control+ArrowLeft": null,
-    "Control+Home": null,
-    "Control+Backspace": null,
-    "ArrowLeft": "char-backward",
-    "Home": "line-start",
-    "Enter": "submit",
+    "super+a": "select-all",
+    "super+c": "copy",
+    "super+x": "cut",
+    "super+v": "paste",
+    "super+z": "undo",
+    "super+shift+z": "redo",
+    "ctrl+y": null,
+    "ctrl+c": null,
+    "ctrl+v": null,
+    "ctrl+z": null,
+    "ctrl+shift+z": null,
+    "super+arrow_left": "line-start",
+    "super+arrow_right": "line-end",
+    "super+arrow_up": "input-start",
+    "super+arrow_down": "input-end",
+    "super+backspace": "delete-to-line-start",
+    "ctrl+a": "line-start",
+    "ctrl+e": "line-end",
+    "ctrl+b": "char-backward",
+    "ctrl+f": "char-forward",
+    "ctrl+p": null,
+    "ctrl+n": null,
+    "ctrl+h": "delete-char-backward",
+    "ctrl+d": "delete-char-forward",
+    "ctrl+k": "delete-to-line-end",
+    "alt+arrow_left": "word-backward",
+    "alt+backspace": "delete-word-backward",
+    "ctrl+arrow_left": null,
+    "ctrl+home": null,
+    "ctrl+backspace": null,
+    "arrow_left": "char-backward",
+    "home": "line-start",
+    "enter": "submit",
     "a": "insert"
    },
    "selects": {
-    "Meta+Shift+ArrowLeft": true,
-    "Meta+Shift+ArrowUp": true,
-    "Control+A": false,
-    "Alt+Shift+ArrowLeft": true,
-    "Meta+Backspace": false,
-    "Meta+a": false
+    "super+shift+arrow_left": true,
+    "super+shift+arrow_up": true,
+    "ctrl+shift+a": false,
+    "alt+shift+arrow_left": true,
+    "super+backspace": false,
+    "super+a": false
    }
   },
   {
-   "name": "the same in a multi-line field: Control+p and Control+n move by a row",
+   "name": "the same in a multi-line field: ctrl+p and ctrl+n move by a row",
    "platform": {
-    "mod": "Meta"
+    "mod": "super"
    },
    "multiline": true,
    "keys": [],
    "lookup": {
-    "Control+p": "line-previous",
-    "Control+n": "line-next",
-    "Enter": "newline",
-    "Meta+ArrowUp": "input-start",
-    "Control+Home": null
+    "ctrl+p": "line-previous",
+    "ctrl+n": "line-next",
+    "enter": "newline",
+    "super+arrow_up": "input-start",
+    "ctrl+home": null
    }
   },
   {
    "name": "the edit shortcuts are the host's: its own replace the defaults, and the keys they leave are not bound (SPEC \u00a710.2)",
    "platform": {
-    "mod": "Control",
+    "mod": "ctrl",
     "edit": {
      "copy": [
-      "Control+C"
+      "ctrl+shift+c"
      ],
      "paste": [
-      "Control+V",
-      "Shift+Insert"
+      "ctrl+shift+v",
+      "shift+insert"
      ],
      "frobnicate": [
-      "Control+q"
+      "ctrl+q"
      ]
     }
    },
    "multiline": false,
    "keys": [],
    "lookup": {
-    "Control+C": "copy",
-    "Control+V": "paste",
-    "Shift+Insert": "paste",
-    "Control+c": null,
-    "Control+v": null,
-    "Control+a": null,
-    "Control+z": null,
-    "Control+q": null,
-    "Control+ArrowLeft": "word-backward"
+    "ctrl+shift+c": "copy",
+    "ctrl+shift+v": "paste",
+    "shift+insert": "paste",
+    "ctrl+c": null,
+    "ctrl+v": null,
+    "ctrl+a": null,
+    "ctrl+z": null,
+    "ctrl+q": null,
+    "ctrl+arrow_left": "word-backward"
    }
   },
   {
-   "name": "TerminalKeys where Mod is Meta: Command+a selects all, and Control+a goes to the line's start (SDK.md \u00a73.10)",
+   "name": "TerminalKeys where mod is super: super+a selects all, and ctrl+a goes to the line's start (SDK.md \u00a73.10)",
    "platform": {
-    "mod": "Meta"
+    "mod": "super"
    },
    "multiline": false,
    "terminal_keys": true,
    "keys": [],
    "lookup": {
-    "Meta+a": "select-all",
-    "Control+a": "line-start",
-    "Control+e": "line-end",
-    "Control+ArrowLeft": "word-backward",
-    "Meta+c": "copy"
+    "super+a": "select-all",
+    "ctrl+a": "line-start",
+    "ctrl+e": "line-end",
+    "ctrl+arrow_left": "word-backward",
+    "super+c": "copy"
    }
   },
   {
-   "name": "Mod reads as the platform's modifier: on Control, Mod+a and Control+a are one key, the later binding's, and Format keeps Mod (SPEC \u00a710.4, SDK.md \u00a73.10)",
+   "name": "mod reads as the platform's modifier: on ctrl, mod+a and ctrl+a are one key, the later binding's, and Format keeps mod (SPEC \u00a710.4, SDK.md \u00a73.10)",
    "platform": {
-    "mod": "Control"
+    "mod": "ctrl"
    },
-   "parse": "Control+a=line-start Mod+a=select-all Shift+Mod+z=redo Mod+Mod+x=cut",
-   "format": "Mod+a=select-all Mod+Z=redo"
+   "parse": "ctrl+a=line-start mod+a=select-all shift+mod+z=redo mod+mod+x=cut",
+   "format": "mod+a=select-all mod+shift+z=redo"
   },
   {
-   "name": "the same where Mod is Meta: Mod+a and Control+a are two keys",
+   "name": "the same where mod is super: mod+a and ctrl+a are two keys",
    "platform": {
-    "mod": "Meta"
+    "mod": "super"
    },
-   "parse": "Control+a=line-start Mod+a=select-all Shift+Mod+z=redo",
-   "format": "Control+a=line-start Mod+a=select-all Mod+Z=redo"
+   "parse": "ctrl+a=line-start mod+a=select-all shift+mod+z=redo",
+   "format": "ctrl+a=line-start mod+a=select-all mod+shift+z=redo"
   },
   {
-   "name": "a field's data-keys with Mod: Mod+c given to the program is Meta+c where Mod is Meta, and Control+c stays unbound",
+   "name": "a field's data-keys with mod: mod+c given to the program is super+c where mod is super, and ctrl+c stays unbound",
    "platform": {
-    "mod": "Meta"
+    "mod": "super"
    },
    "multiline": false,
    "keys": [
-    "Mod+c=program Mod+ArrowLeft=word-backward"
+    "mod+c=program mod+arrow_left=word-backward"
    ],
    "lookup": {
-    "Meta+c": null,
-    "Control+c": null,
-    "Meta+ArrowLeft": "word-backward",
-    "Meta+v": "paste"
+    "super+c": null,
+    "ctrl+c": null,
+    "super+arrow_left": "word-backward",
+    "super+v": "paste"
    }
   },
   {
-   "name": "outside a text field, a binding's Mod is the platform's (SPEC \u00a710.2, \u00a710.4)",
+   "name": "outside a text field, a binding's mod is the platform's (SPEC \u00a710.2, \u00a710.4)",
    "platform": {
-    "mod": "Meta"
+    "mod": "super"
    },
    "keys": [
-    "Mod+j=program Mod+k=scroll-up"
+    "mod+j=program mod+k=scroll-up"
    ],
    "program": {
-    "Meta+j": true,
-    "Control+j": false
+    "super+j": true,
+    "ctrl+j": false
    },
    "scroll": {
-    "Meta+k": "scroll-up",
-    "Control+k": null
+    "super+k": "scroll-up",
+    "ctrl+k": null
    }
   },
   {
    "name": "prefix is an action a keymap keeps (SPEC \u00a710.2, \u00a710.5)",
-   "parse": "g=prefix Control+k=prefix Mod+j=prefix",
-   "format": "g=prefix Control+k=prefix Mod+j=prefix"
+   "parse": "g=prefix ctrl+k=prefix mod+j=prefix",
+   "format": "g=prefix ctrl+k=prefix mod+j=prefix"
   },
   {
    "name": "outside a text field, a key bound to prefix is the program's, and Prefix says so of it alone, with the fallback without Shift (SPEC \u00a710.2, \u00a710.5)",
    "keys": [
-    "g=prefix j=program ArrowDown=prefix",
+    "g=prefix j=program arrow_down=prefix",
     "k=scroll-down"
    ],
    "program": {
     "g": true,
     "j": true,
-    "ArrowDown": true,
-    "Shift+ArrowDown": true,
+    "arrow_down": true,
+    "shift+arrow_down": true,
     "k": false
    },
    "prefix": {
     "g": true,
     "j": false,
-    "ArrowDown": true,
-    "Shift+ArrowDown": true,
+    "arrow_down": true,
+    "shift+arrow_down": true,
     "k": false,
-    "G": false
+    "shift+g": false
    }
   },
   {
@@ -20673,31 +21289,91 @@
    }
   },
   {
-   "name": "a prefix's Mod is the platform's (SPEC \u00a710.4, \u00a710.5)",
+   "name": "a prefix's mod is the platform's (SPEC \u00a710.4, \u00a710.5)",
    "platform": {
-    "mod": "Meta"
+    "mod": "super"
    },
    "keys": [
-    "Mod+k=prefix"
+    "mod+k=prefix"
    ],
    "prefix": {
-    "Meta+k": true,
-    "Control+k": false
+    "super+k": true,
+    "ctrl+k": false
    },
    "program": {
-    "Meta+k": true
+    "super+k": true
    }
   },
   {
    "name": "in a text field, a key bound to prefix is not the field's: it reaches the program (SPEC \u00a710.2, \u00a710.5)",
    "multiline": false,
    "keys": [
-    "Control+k=prefix"
+    "ctrl+k=prefix"
    ],
    "lookup": {
-    "Control+k": null,
+    "ctrl+k": null,
     "a": "insert",
-    "ArrowLeft": "char-backward"
+    "arrow_left": "char-backward"
+   }
+  },
+  {
+   "name": "keys are read with myelin key names' default reading: any case and order, cmd and opt, W3C code values; a capital is its letter, so G is g, not shift+g (SPEC \u00a710.4)",
+   "parse": "Ctrl+A=line-start PageDown=page-down cmd+b=line-end opt+f=word-forward G=input-end shift+g=input-start pgup=page-up",
+   "format": "ctrl+a=line-start page_down=page-down super+b=line-end alt+f=word-forward g=input-end shift+g=input-start page_up=page-up"
+  },
+  {
+   "name": "a character with shift is a key of its own: it is not looked up without shift, so it types, and stays out of a program binding of its letter (SPEC \u00a710.2)",
+   "multiline": false,
+   "keys": [
+    "g=program"
+   ],
+   "lookup": {
+    "g": null,
+    "shift+g": "insert"
+   }
+  },
+  {
+   "name": "Program gives no fallback to a character with shift (SPEC \u00a710.2)",
+   "keys": [
+    "g=program arrow_down=program"
+   ],
+   "program": {
+    "g": true,
+    "shift+g": false,
+    "arrow_down": true,
+    "shift+arrow_down": true
+   }
+  },
+  {
+   "name": "Binds: the key, or a key with shift that is not a character, without it; a physical key and a character are different keys (SPEC \u00a710.2, \u00a710.4)",
+   "multiline": false,
+   "keys": [
+    "ctrl+key_w=program ctrl+w=line-start arrow_left=program"
+   ],
+   "lookup": {
+    "ctrl+key_w": null,
+    "ctrl+w": "line-start",
+    "ctrl+key_a": null
+   },
+   "binds": {
+    "ctrl+key_w": true,
+    "ctrl+w": true,
+    "ctrl+key_a": false,
+    "ctrl+a": true,
+    "shift+arrow_left": true,
+    "shift+w": false,
+    "key_w": false
+   }
+  },
+  {
+   "name": "space types, and shift+space with it, unless bound (SPEC \u00a710.2)",
+   "multiline": false,
+   "keys": [],
+   "lookup": {
+    "space": "insert",
+    "shift+space": "insert",
+    "ctrl+space": null,
+    "alt+space": null
    }
   }
  ],

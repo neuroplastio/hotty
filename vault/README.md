@@ -6,6 +6,7 @@ itself is [`SPEC.md`](../SPEC.md); this holds what is being weighed for it.
 | Path | What it is |
 | --- | --- |
 | [`tasks/fold-0.3.md`](tasks/fold-0.3.md) | What to fold into the spec for 0.3: bandwidth and protocol complexity |
+| [`tasks/0.4.md`](tasks/0.4.md) | What breaks 0.3, collected for 0.4 |
 | [`knowledge/wire-sizes.md`](knowledge/wire-sizes.md) | What 0.2's messages cost on the wire, and the script that measures them |
 | [`journal/`](journal/) | One file per month, one bullet per leg |
 

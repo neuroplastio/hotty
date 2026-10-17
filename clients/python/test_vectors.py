@@ -421,13 +421,19 @@ def run_keys(v):
     if "input" in v:
         got = hotty.decode_keys(v["input"])
         return got == v["keys"], f"{got!r}, want {v['keys']!r}"
+    if "text" in v:
+        got = hotty.key_text(v["key"])
+        return got == v["text"], f"{got!r}, want {v['text']!r}"
+    if "mod" in v:
+        got = hotty.read_key(hotty.Platform(v["mod"]), v["key"])
+        return got == v["canon"], f"{got!r}, want {v['canon']!r}"
     got = hotty.parse_key(v["key"])
     return got == v["canon"], f"{got!r}, want {v['canon']!r}"
 
 
 def platform(v):
     p = v.get("platform", {})
-    return hotty.Platform(p.get("mod", "Control"), p.get("edit"))
+    return hotty.Platform(p.get("mod", "ctrl"), p.get("edit"))
 
 
 def run_keymap(v):
@@ -459,6 +465,10 @@ def run_keymap(v):
         got = m.selects(key)
         if got != want:
             return False, f"{key!r}: selects {got!r}, want {want!r}"
+    for key, want in v.get("binds", {}).items():
+        got = m.binds(key)
+        if got != want:
+            return False, f"{key!r}: binds {got!r}, want {want!r}"
     return True, ""
 
 
