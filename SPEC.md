@@ -1766,7 +1766,12 @@ with (§5.3), but none after a prefix (§10.5). A press with two names, a
 physical key and a character, or a sided modifier key and a modifier key,
 is looked up by its physical name first, as myelin key names §3 has it:
 the surface uses the press if it uses either name, and where a keymap
-binds both, the physical binding wins.
+binds both, the physical binding wins. A press the surface gives the
+program as pressed, by a binding of either name to `program` or `prefix`,
+stays the program's when it comes again as bytes, whatever its one name
+then is bound to: in a field, `ctrl+key_a=program` sends `ctrl+a` to the
+program, though the field selects all with `ctrl+a`, and a `prefix`
+binding starts its prefix.
 - **As pressed, first.** A host that sees the key the user pressed (a
   terminal emulator, a browser) offers it before the terminal's own
   shortcuts and before the bindings that translate keys, named from the key
@@ -1780,8 +1785,8 @@ binds both, the physical binding wins.
   own is named on its release, as its sided key and as a modifier key
   (`shift_left`, `shift`), and goes no further: a key reaches the program
   as bytes, from which a host names no modifier key (below), so a tap
-  bound to `program` or `prefix` does nothing. Typing goes only the second way, through the
-  platform's input methods. If the surface uses the key, it is the
+  bound to `program` or `prefix` does nothing. Typing goes only the
+  second way, through the platform's input methods. If the surface uses the key, it is the
   surface's, and the terminal does nothing with it, not even a shortcut
   bound to it. A host **MAY** keep keys it reserves for itself, as a
   browser keeps `ctrl+t`.

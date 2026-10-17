@@ -8588,6 +8588,118 @@
    ]
   },
   {
+   "name": "a press given to the program as pressed stays the program's as bytes: in a field, ctrl+key_a=program sends ctrl+a to the program though the field selects all with ctrl+a, and ctrl+key_a=prefix starts a prefix (SPEC \u00a710.4, \u00a710.5)",
+   "requires": "pressed",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input{font-family:monospace}</style><input id=a data-on=input data-keys=\"ctrl+key_a=program\"><input id=b data-on=input data-keys=\"ctrl+key_a=prefix\">"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "x"
+       }
+      }
+     ]
+    },
+    {
+     "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "y",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "xy"
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "a",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "value": "x"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "data-keys on an ancestor binds keys to actions in the fields under it: ctrl+a and ctrl+e to the line's ends, alt+b and alt+f by words, ctrl+w and alt+d delete words, ctrl+u and ctrl+k to the line's ends; an unbound ctrl key still reaches the program (SPEC \u00a710.2)",
    "steps": [
     {

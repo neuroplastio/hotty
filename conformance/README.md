@@ -52,6 +52,9 @@ it. A list names several, all required:
 - `"touch"`, a host that takes touch (SPEC §9.1, §16);
 - `"commands"`, a host with a terminal that takes edit commands (§10.6);
 - `"undo"`, a host whose text fields keep a history and cut (§10.2);
+- `"pressed"`, a host that sees the key the user pressed (§10.4): its
+  runner offers a key step's key as pressed, by both its names, and then
+  as the bytes a terminal sends for it, as the host would;
 - `"scroll"` (§5.3), `"steps"`, `"drop"` (§9.1) and `"view"` (§9.5): what
   every host of this version does, named so that a host that lays nothing
   out, an SDK's test host (SDK.md §4.4), skips it. Nor do test hosts keep a
