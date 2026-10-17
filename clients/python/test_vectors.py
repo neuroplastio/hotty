@@ -128,6 +128,7 @@ def build(b):
         "menu": lambda: hotty.menu(menu_tree(a["menu"]) if "menu" in a else None, **ro),
         "menu_show": lambda: hotty.menu_show(a.get("keys", []), **ro),
         "menu_hide": lambda: hotty.menu_hide(**ro),
+        "touch": lambda: hotty.touch([hotty.TouchArea(**t) for t in a.get("areas", [])], **ro),
     }[name]
     return fn()
 

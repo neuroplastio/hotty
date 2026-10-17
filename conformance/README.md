@@ -51,6 +51,8 @@ it. A list names several, all required:
   `"count"` (§9), `"menu"` (§10.7);
 - `"touch"`, a host that takes touch (SPEC §9.1, §16);
 - `"commands"`, a host with a terminal that takes edit commands (§10.6);
+- `"mouse"`, a host with a terminal that reports the mouse (§9.6), whose
+  runner tells what it reported (Touch, below);
 - `"undo"`, a host whose text fields keep a history and cut (§10.2);
 - `"pressed"`, a host that sees the key the user pressed (§10.4): its
   runner offers a key step's key as pressed, by both its names, and then
@@ -60,7 +62,7 @@ it. A list names several, all required:
   out, an SDK's test host (SDK.md §4.4), skips it. Nor do test hosts keep a
   history, so they skip `"undo"`.
 
-Its steps come in six kinds.
+Its steps come in seven kinds.
 
 **Send** `{ "send": {control}, "payload": text?, "body": value?, "reply":
 …, "events": … }`: the command goes to the host as the program would send
@@ -134,17 +136,25 @@ checked).
   when the event has none. Absent: events are not checked.
 
 **Touch** `{ "touch": "down" | "move" | "up", "s": surface, "at": …,
-"keys": [ … ], "terminal": …, "events": [ … ] }`: one finger, as the user
-would touch the terminal (SPEC §9.1, §16). `"down"` touches surface `s` at
-`at`, a cell `[c, r]` as for a pointer step; `"move"` moves the finger to
+"keys": [ … ], "terminal": …, "mouse": …, "events": [ … ] }`: one finger,
+as the user would touch the terminal (SPEC §9.1, §9.6, §16). `"down"`
+touches surface `s` at `at`, a cell `[c, r]` as for a pointer step, or,
+without `s`, the cells: the screen's cell `[c, r]`, counted from 0 at its
+top left. `"move"` moves the finger to
 `at`, in moves of a runner's choosing, along the straight line from where
 it was, so it passes the host's tap slop in that line's direction (the
 vectors move along a row or a column, so where the finger enters an
 element does not depend on those moves); `"up"`
 lifts it. `"keys"` are the modifier keys held, as for a pointer step.
 `"terminal"`, for a move: `true` if the touch went on to the terminal as a
-scroll (SPEC §9), `false` if the surface took it; absent, not checked.
-`"events"` as for a pointer step: what the step makes the host send.
+scroll (SPEC §9), `false` if the surface or the program's mouse took it
+(§9.6); absent, not checked. `"mouse"`: what the terminal reported of the
+mouse's primary button for the step (§9.6), each `[kind, c, r]`, `kind`
+`"down"`, `"move"` or `"up"` on the screen's cell `[c, r]`, counted from
+0; `[]` for nothing, and absent, not checked. How many moves it reports
+depends on the runner's moves, so a runner compares the two lists keeping
+only the last move of each run of moves in each. `"events"` as for a
+pointer step: what the step makes the host send.
 
 **Key** `{ "key": name, "keys": [ … ], "terminal": …, "events": [ … ] }`: a
 key pressed and released where the keyboard is (SPEC §10): on the surface
@@ -159,6 +169,14 @@ key, but the physical name of a character's key (`ctrl+key_w`, beside
 `ctrl+w`). `"terminal"`:
 `true` if the key reached the program as terminal input (§10.2), `false` if
 the surface used it; absent, not checked. `"events"` as for a pointer step.
+
+**Write** `{ "write": text }`: the program writes text to the terminal,
+bytes that are not HOTTY's. The vectors write `CSI ? 1002 h` and `CSI ?
+1006 h` together, so that the terminal reports the mouse's buttons and
+drags in the SGR encoding, `CSI ? 1002 l`, so that it reports them no
+longer, and `CSI ? 1049 h` and `CSI ? 1049 l`, the alternate screen and
+back. A runner whose host has no terminal of its own does to the host what
+a terminal does on these.
 
 **Menu** `{ "menu": "shown" | "pick", "expect": …, "name": str, "events":
 [ … ] }`: the program's menu, in a host that has `menu` (SPEC §10.7, §16).

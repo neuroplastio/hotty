@@ -274,6 +274,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | `Menu` | `a=menu` and the menu as msgpack (below); with no menu, no payload, which leaves the program none (SPEC.md §10.7) | menu | 2 |
 | `MenuShow` | `a=menu:show=1` and `{"seq": [str]}`, the keys typed; with none, no payload, which shows the top level (SPEC.md §10.7) | keys | 2 |
 | `MenuHide` | `a=menu:show=0` | — | 2 |
+| `Touch` | `a=touch` and `{"areas": [area]}` as msgpack (below); with no areas, no payload, which leaves none (SPEC.md §9.6) | areas | 2 |
 
 - **`Doc` and `Place` answer errors**, since a refused document or placement
   (`EQUOTA`, `ENOENT`) is something a program must hear. Everything else
@@ -290,6 +291,12 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
   `name` unless they are empty, `enabled`, and `items` unless there are
   none. A program on myelin names each binding of its `Tree` and hands it
   over. The program keeps it within eight levels (SPEC.md §10.7).
+- **`Touch`** takes a list of `TouchArea`, each with `C`, `R`, `W`, `H`
+  and `Drag`: the screen's cells it covers, counted from 0, and `"x"`,
+  `"y"` or `"xy"`. It writes each area as a map of all five, in that
+  order. The program keeps to 256 areas, `W` and `H` at least 1, and
+  sends them again when what it drew moves, or the screen changes
+  (SPEC.md §9.6).
 
 #### 3.4.1 Placement
 
@@ -860,7 +867,9 @@ Go: `hottytest.Host`.
   up.
 - **Inspection.** The test reads each surface: its document, an element's
   attributes and text, the focused element, whether it is detached, and
-  where it is placed.
+  where it is placed. It also reads the touch areas the program sent for
+  each screen, which it checks as a host does and keeps per screen,
+  though no finger reaches them (SPEC.md §9.6).
 
 An SDK that does not build one **MAY** test its SDK layer against another
 implementation's host, over a pipe.
@@ -993,6 +1002,7 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Detach`, `Focus`, `Blur`, `Sync` | the same | `detach`, `focus`, `blur`, `sync` | as Python | as Python | `detach`, `focus`, `blur`, `sync` |
 | `WithdrawLate` | `hotty.WithdrawLate` | `withdraw_late` | `withdraw_late` | `withdraw_late` | `withdrawLate` |
 | `Edit`, `Menu`, `MenuShow`, `MenuHide` | `hotty.Edit`, `hotty.Menu`, `hotty.MenuShow`, `hotty.MenuHide` | `edit`, `menu`, `menu_show`, `menu_hide` | as Python | as Python | `edit`, `menu`, `menuShow`, `menuHide` |
+| `Touch`, `TouchArea` and its fields | `hotty.Touch`, `hotty.TouchArea{C, R, W, H, Drag}` | `touch`, `TouchArea(c, r, w, h, drag)` | `touch`, tables with those keys | `touch`, `TouchArea { c, r, w, h, drag }` | `touch`, `{ c, r, w, h, drag }` |
 | `MenuTree`, `MenuItem` and their fields | `hotty.MenuTree{Label, Items}`, `hotty.MenuItem{Key, Label, Name, Enabled, Items}` | `MenuTree(label, items)`, `MenuItem(key, label, name, enabled, items)` | tables with those keys | `MenuTree { label, items }` | `{ label, items }` |
 | `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor }` |
 | a flag on, off or absent (`Press`, `Fit`, `Hover`) | `hotty.On`, `hotty.Off`, the zero value | `True`, `False`, `None` | `true`, `false`, `nil` | `Option<bool>` | `true`, `false`, `undefined` |

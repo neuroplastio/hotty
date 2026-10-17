@@ -163,8 +163,8 @@ alphabet).
 - **Bodies with fields are msgpack**
   ([MessagePack](https://github.com/msgpack/msgpack/blob/master/spec.md)).
   The body of a reply (§3.6, §4) or an event (§9) is one msgpack map, with
-  nothing after it, and so are a program's deltas (§6.1) and menus
-  (§10.7). Documents are text, and resources bytes.
+  nothing after it, and so are a program's deltas (§6.1), touch areas
+  (§9.6) and menus (§10.7). Documents are text, and resources bytes.
 - **Each field has a type.** This document shows a body as JSON with types
   in place of values: `{"c": int, "keys": [str]}` is a map with an int
   `c` and an array of strings `keys`, and `{str: int}` a map from strings
@@ -1037,7 +1037,8 @@ the program asked for it, and as often as this table says:
   it. That is scrollback, or on the alternate screen, the program's wheel
   input. The host **MUST** pass them on, with the position of the pointer
   or the finger. Taps and long presses, and clicks and drags (§9.1) that
-  do not begin with Alt held (§9.2), stay the surface's.
+  do not begin with Alt held (§9.2), stay the surface's. Over the cells, a
+  program can take a finger's drag as the mouse's (§9.6).
 - **The detail** is a msgpack map (§3.3), base64-encoded. Values are the
   program's (§7): an `href` is reported as the document has it. A detail
   that would have no field is left out, with no payload: a `press` with no
@@ -1353,6 +1354,82 @@ a table of contents does, or to fetch what comes into view.
   heard once it is drawn again (§9). A new document sends one once it is
   laid out, if an element in it asks. A detached surface sends none
   (§5.5).
+
+### 9.6 Touch in the cells
+
+A touch drag over the cells scrolls (§9), and on the alternate screen the
+program hears it as its wheel. A program that draws a slider in its cells
+and reads the mouse to move it can be dragged with the mouse but not with a
+finger. It names the cells where a finger drags instead, as a document does
+with `touch-action` (§9.1):
+
+```
+ESC ] 7279 ; a=touch ; <base64 msgpack {"areas": [area]}> ST
+```
+
+- **An area** is `{"c": int, "r": int, "w": int, "h": int, "drag": str}`:
+  - `c` and `r`, the first column and row it covers, counted from 0 at the
+    screen's top left cell (a mouse report counts from 1);
+  - `w` and `h`, the columns and rows it spans, at least 1 each;
+  - `drag`, which way a finger drags in it: `"x"` across, `"y"` up and
+    down, `"xy"` either. A horizontal slider is `"x"`, as `touch-action:
+    pan-y` makes one on a surface. A swipe the other way still scrolls.
+
+  An area past the screen's edge covers what of it is on the screen. Where
+  areas overlap, the last listed decides. A body with more than 256 areas,
+  or one that is no such map, is `EINVAL`.
+- **They last** until the program sends others, or `a=touch` with no body,
+  which leaves none. The main screen and the alternate screen each keep
+  their own, as edit commands are kept (§10.6): leaving the alternate
+  screen drops its areas, and a full reset (RIS) drops both. They are cells
+  of the screen, not of its text. When its lines scroll, the areas stay
+  where they are, so a program that moves what it drew sends them again. A
+  program that ends clears them, as it clears its menu (§10.7).
+- **Only while the program reads the mouse.** An area does something only
+  while the program has the terminal report the mouse's buttons, in any
+  mode and encoding, and the terminal shows the screen rather than its
+  scrollback. Otherwise a touch in it does what it does in any other cell.
+- **A touch that drags.** A touch that begins in an area, without Alt held
+  (§9.2), is decided as one on a surface is (§9.1). Once it goes past the
+  host's tap slop, its way is the larger of the two deltas, and a tie
+  counts as a pan.
+  - If that way is one the area drags, the touch is the mouse's primary
+    button. It is pressed on the cell where the touch began, moved with
+    the finger, and released on the cell where the finger lifts. The
+    terminal reports each of these as it reports the mouse's, in the
+    program's mode and encoding, with the modifier keys held on a
+    keyboard. When the finger is by then on another cell, a move to it
+    follows the press.
+  - Otherwise the touch pans, as §9 says, and stays a pan to its end.
+- **The finger is the program's until it lifts,** as the pointer is in a
+  drag (§9.1). Every move goes to the program as the mouse moving with its
+  button held: over a surface too, and past the screen's edge, where the
+  terminal reports it as it reports a mouse dragged there. None of it
+  reaches a surface, and nothing is selected.
+- **A tap** in an area is a touch that lifts before going past the slop. It
+  is the primary button pressed and released on its cell at the lift, so a
+  slider jumps to where it was tapped. A long press is whatever the host
+  makes of one anywhere, and never drags.
+- **What ends a drag early.** A second finger, or the host losing the
+  touch, releases the button on the cell the finger was last on. What the
+  host does with the rest of the gesture is its own. A second finger
+  before a touch drags makes it no drag. Nothing else ends a drag, new
+  areas included.
+- **Surfaces come first.** A touch that begins on a surface, where its
+  window takes the pointer, is the surface's (§9.1): where it pans, it
+  scrolls as §9 says, whatever areas lie beneath. A touch that passes
+  through a window (§9.3) begins in the cells, and an area there applies.
+- **Only a finger.** The mouse and a pen reach the program as they always
+  have, and a touch outside every area is the terminal's, as it always
+  was: its drag scrolls (§9).
+- **A multiplexer that relays the mouse** to its panes gives the terminal
+  the areas of the panes it shows whose programs read the mouse, each moved
+  to where its pane is and cut to it, and sends them again when that
+  changes. The drag then reaches the multiplexer as the mouse's does, and it
+  passes the drag to the pane as it would the mouse's.
+
+A host that takes no touch accepts `a=touch` as any host does, and nothing
+comes of it.
 
 ## 10. Keyboard and focus
 
@@ -2171,13 +2248,14 @@ A host conforms to HOTTY version 0.4 when:
 
 The vectors check replies, error codes, every delta op, morph, context
 parsing, resources, drags and their steps, presses with Alt, `fit`, hover,
-`area`, scrolling, `reveal` and `view`, prefixes, edit commands, menus,
-keymaps and the envelope, and their `keys`, `keymap` and `edit` sections a
-host's key names (§10.4), keymaps and actions (§10.2). They inspect
-documents and events, not pixels. The vectors marked with a feature (`"passthrough"`,
-`"hover"`, `"count"`, `"menu"`, §4) apply to a host that has it, and those
-marked `"commands"` to a host with a terminal that takes edit commands
-(§10.6).
+`area`, scrolling, `reveal` and `view`, touch in the cells, prefixes,
+edit commands, menus, keymaps and the envelope, and their `keys`, `keymap`
+and `edit` sections a host's key names (§10.4), keymaps and actions
+(§10.2). They inspect documents and events, not pixels. The vectors marked
+with a feature (`"passthrough"`, `"hover"`, `"count"`, `"menu"`, §4) apply
+to a host that has it, those marked `"commands"` to a host with a terminal
+that takes edit commands (§10.6), and those marked `"mouse"` to a host with
+a terminal that reports the mouse (§9.6).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
@@ -2189,8 +2267,11 @@ It also lets a test move a mouse's pointer to the centre of an element, or
 of a cell of a surface, press and release its primary button there, with
 modifier keys held, turn its wheel there, take the pointer out of the
 terminal's window, and press keys where the keyboard is. A host that takes
-touch also lets a test touch a cell of a surface with one finger, move it,
-and lift it, and tells it whether a touch went on to the terminal. A host
+touch also lets a test touch a cell of a surface, or of the screen, with
+one finger, move it, and lift it, and tells it whether a touch went on to
+the terminal as a scroll. One whose terminal reports the mouse also tells
+the test what the terminal reported of the mouse's primary button for a
+touch in the cells (§9.6). A host
 with `passthrough` also tells the test whether each of those reached the
 surface or passed through it, and whether a wheel or a key went on to the
 terminal. A host with `menu` also tells a test the level of the program's
@@ -2568,6 +2649,16 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
   field decides on a surface. It takes them by name, per screen, as the
   kitty keyboard protocol's flags are taken, so a shell and a full-screen
   editor run in one terminal each get what they asked for.
+- **Why a finger in the cells becomes the mouse.** A program that drags
+  with the mouse in its cells already reads presses, moves and releases. A
+  finger can give it the same, but not everywhere: a terminal that took
+  every touch drag as the mouse's would trap the finger, as a surface would
+  (§9.1). Only the program knows where its sliders are, so it names those
+  cells and the way each drags, as `touch-action` does for an element. The
+  finger then reaches the program through the mouse reporting it already
+  reads, so there is no new event to parse. Areas are cells of the screen
+  and are kept per screen, as edit commands are, because the cells are
+  where the program draws.
 - **Why a prefix, and the program resolves sequences.** Leader keys and
   which-key menus are how keyboard programs grow past the keys they have
   (Spacemacs, Neovim, Zed, Helix). On a surface, after a leader, the next

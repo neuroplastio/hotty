@@ -36,6 +36,11 @@ it is released: `vault/tasks/0.4.md`.
   does nothing (§10.4).
 - **A `command`'s `key` is the one name its bytes have,** `ctrl+c`, never
   `ctrl+key_c` (§10.6).
+- **A finger can drag in the cells** (§9.6). `a=touch` names areas of the
+  screen, each with the way it drags. There, while the program reads the
+  mouse, a touch drag that way and a tap reach the program as the mouse's
+  primary button. Elsewhere, and the other way, a touch drag still
+  scrolls. It adds to 0.3 and changes nothing a program already does.
 
 ### Upgrading from 0.3
 
@@ -46,6 +51,9 @@ it is released: `vault/tasks/0.4.md`.
 - Read the capabilities' `mod` as `"ctrl"` or `"super"`, and `edit` in the
   new names (§4).
 - Bind Shift with a letter as `shift+<letter>`: a host reads `G` as `g`.
+- If you read the mouse to drag something in your cells, such as a
+  slider, send its cells with `a=touch` so that a finger drags it too, and
+  send them again when it moves (§9.6).
 
 **A host:**
 - Read a written key with myelin's default reading, `mod` standing for
@@ -62,9 +70,13 @@ it is released: `vault/tasks/0.4.md`.
   else (§10.4).
 - Fall back without `shift` only from a key that is not a character
   (§10.2).
+- Take `a=touch`, and keep its areas per screen. In an area, while the
+  program reads the mouse, report a touch drag the area's way, and a tap,
+  as the mouse's primary button (§9.6).
 
 **A multiplexer** does both lists. A keymap of its own that is myelin's
-already speaks these names.
+already speaks these names. One that relays the mouse gives the terminal
+the areas of the panes it shows, moved to where each pane is (§9.6).
 
 ## 0.3
 

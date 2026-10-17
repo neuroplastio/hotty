@@ -270,6 +270,28 @@ def menu_hide(n=None, q=None):
     return _command([("a", "menu"), ("show", "0")], b"", NO_REPLY, n, q)
 
 
+@dataclass
+class TouchArea:
+    """Cells of the screen where a finger drags as the mouse (SPEC §9.6):
+    the first column and row, counted from 0, the columns and rows spanned,
+    and the way it drags, "x", "y" or "xy"."""
+
+    c: int = 0
+    r: int = 0
+    w: int = 1
+    h: int = 1
+    drag: str = "x"
+
+
+def touch(areas=(), n=None, q=None):
+    """Names the cells where a finger drags as the mouse, or with none
+    leaves none (SPEC §9.6). Each area's order is SDK.md §3.4's."""
+    if not areas:
+        return _command([("a", "touch")], b"", NO_REPLY, n, q)
+    body = {"areas": [{"c": a.c, "r": a.r, "w": a.w, "h": a.h, "drag": a.drag} for a in areas]}
+    return _command([("a", "touch")], pack(body), NO_REPLY, n, q)
+
+
 SCROLL_VERTICAL = 1
 SCROLL_HORIZONTAL = 2
 
