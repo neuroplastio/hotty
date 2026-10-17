@@ -1906,7 +1906,9 @@ ESC ] 7279 ; a=edit:take=copy,paste,undo,redo ST
   ```
 
   The detail is `{"name": str, "key": str}`: the command, and its key as
-  §10.4 names it. A `paste` also has `"text": str`, the text on the
+  §10.4 names it from the bytes the program would have read for it, one
+  name: `ctrl+c`, never `ctrl+key_c`, whichever name of the press the
+  shortcut binds. A `paste` also has `"text": str`, the text on the
   clipboard, and none when the clipboard holds no text or the host cannot
   read it.
 - **The program decides** what the command means. It copies what it has
