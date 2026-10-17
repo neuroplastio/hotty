@@ -1,4 +1,4 @@
-# HOTTY conformance vectors
+# hotty conformance vectors
 
 `vectors.json` is what a host and an SDK must do, as data.
 
@@ -208,9 +208,9 @@ implements, and skips the rest:
 the runner calls the builder with `args`, and with the reply options `n`
 and `q`, `detached`, `scroll` and `late` from `options`, which have no
 order. `sync` takes `args.commands`, each a `{ "build", "args", "options" }`
-of its own. The output, split into raw bytes and HOTTY sequences, must be
+of its own. The output, split into raw bytes and hotty sequences, must be
 `out`:
-- `{ "raw": text }`: bytes that are not HOTTY's, such as `PlaceAt`'s cursor
+- `{ "raw": text }`: bytes that are not hotty's, such as `PlaceAt`'s cursor
   moves, `Query`'s DA1 and `Sync`'s brackets;
 - `{ "cmd": { "control": {…}, "payload": text? } }`: one command, decoded.
   Its control has exactly these keys (`m` and `o` never), and its payload is
