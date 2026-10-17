@@ -10,9 +10,9 @@ path: changes
 
 ## 0.4
 
-A draft, as every 0.x is, built on the branch `hotty-0.4` and not
-released. It breaks 0.3 (SPEC.md §15), and collects what else does before
-it is released: `vault/tasks/0.4.md`.
+A draft, as every 0.x is, released 2026-10-18 across the stack. It breaks
+0.3 (SPEC.md §15): a 0.4 host answers a 0.3 program with `EVERSION`, and
+the program falls back (§4, §14).
 
 ### What changed
 
