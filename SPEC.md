@@ -1422,11 +1422,15 @@ ESC ] 7279 ; a=touch ; <base64 msgpack {"areas": [area]}> ST
 - **Only a finger.** The mouse and a pen reach the program as they always
   have, and a touch outside every area is the terminal's, as it always
   was: its drag scrolls (§9).
-- **A multiplexer that relays the mouse** to its panes gives the terminal
-  the areas of the panes it shows whose programs read the mouse, each moved
-  to where its pane is and cut to it, and sends them again when that
-  changes. The drag then reaches the multiplexer as the mouse's does, and it
-  passes the drag to the pane as it would the mouse's.
+- **A multiplexer that relays the mouse** to its panes sends the terminal
+  the areas of the panes it shows whose programs read the mouse. It moves
+  each to where its pane is, and cuts it to the part of the pane that
+  shows: not past the pane's edges, nor under what the multiplexer draws
+  over it, such as a menu or a dialog. It adds areas of its own where it
+  drags in its cells, such as a border between panes. It sends them again
+  whenever any of this changes. The drag then reaches the multiplexer as
+  the mouse's does, and it passes the drag to the pane as it would the
+  mouse's.
 
 A host that takes no touch accepts `a=touch` as any host does, and nothing
 comes of it.
