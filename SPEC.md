@@ -211,7 +211,7 @@ into chunks of at most 4096 payload bytes each:
 
 | key | meaning |
 | --- | --- |
-| `a` | the action: `q`, `doc`, `place`, `hide`, `delta`, `res`, `del`, `detach`, `focus`, `blur`, `edit`, `menu` from the program (§4–§10); `ok`, `err`, `ev` from the host |
+| `a` | the action: `q`, `doc`, `place`, `hide`, `delta`, `res`, `del`, `detach`, `focus`, `blur`, `edit`, `menu`, `touch` from the program (§4–§10); `ok`, `err`, `ev` from the host |
 | `s` | a surface name: `[A-Za-z0-9_-]{1,64}` |
 | `n` | a request number chosen by the program, echoed in the reply |
 | `q` | quiet: `0` reply always, `1` reply only on error, `2` never reply. Absent: `0` for a query (`a=q`) and for a command with `n`, `1` for any other |
@@ -284,7 +284,7 @@ program **SHOULD** then fall back (§14).
 
 **Versions.** `v` lists the HOTTY versions the program speaks,
 comma-separated: `v=0.4` for this document, and `v=0.3,0.4` for a
-program that speaks 0.2 as well. A version is `major.minor`, two numbers written without
+program that speaks 0.3 as well. A version is `major.minor`, two numbers written without
 leading zeros, and versions compare as those numbers, the major first.
 - A host answers in the highest version it shares with the program: `a=ok`,
   with that version's capabilities, whose `v` names it. It speaks that
