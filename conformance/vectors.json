@@ -8660,7 +8660,16 @@
       "t": "b",
       "q": "2"
      },
-     "events": []
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "xy"
+       }
+      }
+     ]
     },
     {
      "key": "a",
