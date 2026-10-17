@@ -1778,7 +1778,9 @@ binds both, the physical binding wins.
   `enter`), and a key with `ctrl` or `super`, which has both names
   (`ctrl+key_w` and `ctrl+w`, on a US layout). A modifier tapped on its
   own is named on its release, as its sided key and as a modifier key
-  (`shift_left`, `shift`). Typing goes only the second way, through the
+  (`shift_left`, `shift`), and goes no further: a key reaches the program
+  as bytes, from which a host names no modifier key (below), so a tap
+  bound to `program` or `prefix` does nothing. Typing goes only the second way, through the
   platform's input methods. If the surface uses the key, it is the
   surface's, and the terminal does nothing with it, not even a shortcut
   bound to it. A host **MAY** keep keys it reserves for itself, as a
