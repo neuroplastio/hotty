@@ -1398,8 +1398,9 @@ ESC ] 7279 ; a=touch ; <base64 msgpack {"areas": [area]}> ST
     the finger, and released on the cell where the finger lifts. The
     terminal reports each of these as it reports the mouse's, in the
     program's mode and encoding, with the modifier keys held on a
-    keyboard. When the finger is by then on another cell, a move to it
-    follows the press.
+    keyboard. A modifier with which the terminal keeps a mouse press for
+    itself, such as Shift for selecting text, is left out. When the
+    finger is by then on another cell, a move to it follows the press.
   - Otherwise the touch pans, as §9 says, and stays a pan to its end.
 - **The finger is the program's until it lifts,** as the pointer is in a
   drag (§9.1). Every move goes to the program as the mouse moving with its
@@ -1419,6 +1420,8 @@ ESC ] 7279 ; a=touch ; <base64 msgpack {"areas": [area]}> ST
   window takes the pointer, is the surface's (§9.1): where it pans, it
   scrolls as §9 says, whatever areas lie beneath. A touch that passes
   through a window (§9.3) begins in the cells, and an area there applies.
+  Where a touch lands is as the platform decides it, and a browser may
+  give a touch just off a window's edge to the window.
 - **Only a finger.** The mouse and a pen reach the program as they always
   have, and a touch outside every area is the terminal's, as it always
   was: its drag scrolls (§9).
