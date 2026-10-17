@@ -1,3 +1,11 @@
+---
+group: Reference
+order: 20
+nav: SDK design
+description: what a library that speaks HOTTY provides, in any language
+path: sdk-design
+---
+
 # HOTTY SDKs
 
     Version:  0.4, with SPEC.md 0.4

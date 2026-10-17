@@ -1,3 +1,11 @@
+---
+group: Reference
+order: 30
+nav: Changes
+description: what each version changed, and how to upgrade
+path: changes
+---
+
 # Changes
 
 ## 0.4

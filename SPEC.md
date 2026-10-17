@@ -1,3 +1,11 @@
+---
+group: Reference
+order: 10
+nav: Protocol
+description: the HOTTY protocol, version 0.4
+path: protocol
+---
+
 # HOTTY — HTML Over The TTY
 
     Version:  0.4

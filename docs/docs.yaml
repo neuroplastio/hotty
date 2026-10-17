@@ -1,0 +1,3 @@
+name: hotty
+description: HTML over the TTY. Programs put HTML on a terminal's screen, among its cells.
+pages: [SPEC.md, SDK.md, CHANGES.md, conformance/README.md]

@@ -1,3 +1,11 @@
+---
+group: Reference
+order: 40
+nav: Conformance
+description: the vectors a host and an SDK must pass, and how to run them
+path: conformance
+---
+
 # HOTTY conformance vectors
 
 `vectors.json` is what a host and an SDK must do, as data.
