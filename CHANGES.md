@@ -27,6 +27,15 @@ it is released: `vault/tasks/0.4.md`.
   `shift+g` is a key of its own. A field types what a key types, a letter
   with `shift` as its capital.
 - **`mods` keeps its bits,** and 8 is `super` (§9).
+- **A press given to the program as pressed stays the program's** when it
+  comes again as bytes, though the field binds its bytes' name, and a
+  `prefix` binding starts its prefix (§10.4): `ctrl+key_a=program` in a
+  field sends `ctrl+a` on.
+- **A modifier tapped alone** is named on its release (`shift_left`,
+  `shift`) and goes no further, so a tap bound to `program` or `prefix`
+  does nothing (§10.4).
+- **A `command`'s `key` is the one name its bytes have,** `ctrl+c`, never
+  `ctrl+key_c` (§10.6).
 
 ### Upgrading from 0.3
 
@@ -45,7 +54,12 @@ it is released: `vault/tasks/0.4.md`.
 - Name a press seen as pressed by its physical key and by the character
   it types, and look the physical one up first. Name keys from bytes as
   §10.4's table has them.
-- Report `mod`, `edit` and a `command`'s `key` in the new names.
+- Report `mod`, `edit` and a `command`'s `key` in the new names, the
+  `key` as its bytes name it (§10.6).
+- Keep a press you give the program as pressed, by either name, the
+  program's when its bytes come, and start a `prefix` binding's prefix
+  then. Offer a modifier tapped alone to the surface, and send it nowhere
+  else (§10.4).
 - Fall back without `shift` only from a key that is not a character
   (§10.2).
 
