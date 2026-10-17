@@ -2,11 +2,11 @@
 group: Reference
 order: 10
 nav: Protocol
-description: the HOTTY protocol, version 0.4
+description: the hotty protocol, version 0.4
 path: protocol
 ---
 
-# HOTTY — HTML Over The TTY
+# hotty — HTML over the TTY
 
     Version:  0.4
     Status:   Draft. Versions 0.x may change incompatibly (§15).
@@ -15,7 +15,7 @@ path: protocol
 
 ## Abstract
 
-HOTTY lets a program running in a terminal show **surfaces**: small HTML
+hotty lets a program running in a terminal show **surfaces**: small HTML
 documents drawn by the terminal into rectangles of cells, the way the kitty
 graphics protocol places images. The program sends markup and deltas
 in-band, as escape sequences in its ordinary output, so it works over a pty,
@@ -36,7 +36,7 @@ scrolls a row at a time, with a table, code and an SVG diagram in it; cards,
 images and charts scroll in a feed; and an agent's transcript, diff, approval
 and load test follow.](demo.gif)
 
-*The HOTTY website, [hotty.neuroplast.io](https://hotty.neuroplast.io),
+*The hotty website, [hotty.neuroplast.io](https://hotty.neuroplast.io),
 running in xterm.js with
 [xterm-addon-hotty](https://github.com/neuroplastio/xterm-addon-hotty), one of
 the two hosts that share no code and pass the conformance vectors. Every
@@ -70,13 +70,13 @@ Appendices: A. Examples · B. Rationale · C. Prior art
 ## 1. Introduction
 
 A terminal program has cells: monospace characters with a few
-attributes. HOTTY adds a second kind of output: a **surface**, one HTML
+attributes. hotty adds a second kind of output: a **surface**, one HTML
 document, placed on a rectangle of cells. Inside it the host lays out and draws
 the document at the terminal's own resolution, with proportional type,
 tables, form controls, SVG and images. Outside it, everything stays a
 terminal.
 
-HOTTY is designed around four constraints:
+hotty is designed around four constraints:
 
 - **In-band.** Everything a surface needs travels in the program's output
   stream. Nothing is loaded from files or the network, so a program behaves
@@ -84,16 +84,16 @@ HOTTY is designed around four constraints:
 - **The program is the application.** Surfaces have no script. The program
   changes the document with deltas and hears about events. It never runs
   code in the terminal.
-- **Degradable.** A program asks whether the terminal is a HOTTY host before
+- **Degradable.** A program asks whether the terminal is a hotty host before
   using it, and paints ordinary text when it is not. Terminals that are not
-  hosts ignore HOTTY sequences.
+  hosts ignore hotty sequences.
 - **Cheap to update.** Changes are deltas addressed by element id, so a
   program changing one number sends a few bytes, and a host repaints what
   changed.
 
 ### Non-goals
 
-HOTTY is not a web browser in a terminal:
+hotty is not a web browser in a terminal:
 - it has no URLs to visit;
 - it loads nothing remotely;
 - it runs no JavaScript or WebAssembly;
@@ -109,12 +109,12 @@ are to be interpreted as described in RFC 2119 and RFC 8174 when, and only
 when, they appear in bold.
 
 - **Program**: the process whose output the terminal displays.
-- **Host**: whatever renders HOTTY for that program. Usually the terminal
+- **Host**: whatever renders hotty for that program. Usually the terminal
   emulator itself. It can also be a pty shim between the program and a
   terminal (a *polyfill*; §14). A multiplexer between a program and a
-  terminal either is a host itself, or passes HOTTY through and keeps
+  terminal either is a host itself, or passes hotty through and keeps
   placements consistent with its own screen and scrollback.
-- **Session**: a program's connection to a host, from the first HOTTY command
+- **Session**: a program's connection to a host, from the first hotty command
   until a full reset or the end of the program's output.
 - **Surface**, **resource**, **delta**, **event**: §5, §7, §6 and §9.
 - `ESC` is 0x1B, `BEL` 0x07, `ST` the two bytes `ESC \`. `CSI` is `ESC [`.
@@ -125,7 +125,7 @@ when, they appear in bold.
 
 ### 3.1 Sequences
 
-Every HOTTY message, in both directions, is an operating system command:
+Every hotty message, in both directions, is an operating system command:
 
 ```
 ESC ] 7279 ; <control> [ ; <payload> ] ST
@@ -133,8 +133,8 @@ ESC ] 7279 ; <control> [ ; <payload> ] ST
 
 - **7279** is the ASCII codes of `H` and `O`.
 - A host **MUST** also accept `BEL` as the terminator. Hosts send `ST`.
-- A terminal that is not a HOTTY host ignores the sequence, as it ignores any
-  OSC it does not know. That is what makes HOTTY safe to try (§4).
+- A terminal that is not a hotty host ignores the sequence, as it ignores any
+  OSC it does not know. That is what makes hotty safe to try (§4).
 
 ### 3.2 Control
 
@@ -202,7 +202,7 @@ into chunks of at most 4096 payload bytes each:
 - The first chunk carries the whole control plus `m=1`.
 - Every further chunk carries only `m`. Every chunk but the last has `m=1`;
   the last has `m=0`.
-- The chunks of one message are contiguous. A HOTTY message with any other key
+- The chunks of one message are contiguous. A hotty message with any other key
   arriving before the last chunk aborts the message in progress. The host
   **MUST** discard that message and process the new one normally.
 - Other output (terminal text, other escape sequences) may appear between
@@ -287,10 +287,10 @@ Every terminal answers DA1. A host answers the query first:
 ESC ] 7279 ; a=ok:n=1:re=q ; <base64 msgpack> ST
 ```
 
-If the DA1 answer arrives with no HOTTY reply before it, there is no host. The
+If the DA1 answer arrives with no hotty reply before it, there is no host. The
 program **SHOULD** then fall back (§14).
 
-**Versions.** `v` lists the HOTTY versions the program speaks,
+**Versions.** `v` lists the hotty versions the program speaks,
 comma-separated: `v=0.4` for this document, and `v=0.3,0.4` for a
 program that speaks 0.3 as well. A version is `major.minor`, two numbers written without
 leading zeros, and versions compare as those numbers, the major first.
@@ -314,7 +314,7 @@ only that little. SDK.md sets how long.
 
 **A late answer.** What stands between the program and the terminal may not
 know yet whether there will be a host: a multiplexer running a pane with no
-terminal attached. A program that can start using HOTTY after it has fallen
+terminal attached. A program that can start using hotty after it has fallen
 back asks for a late answer with `late=1`:
 
 ```
@@ -322,14 +322,14 @@ ESC ] 7279 ; a=q:n=1:v=0.4:late=1 ST   CSI c
 ```
 
 - A host answers it as any query, at once.
-- What passes HOTTY through and cannot answer it yet **MAY** hold it, and
+- What passes hotty through and cannot answer it yet **MAY** hold it, and
   answer it once, with the reply a host would send, as soon as there is a
   host. It holds one query at a time: any other `a=q` takes its place. It
   forgets the query when the program it runs ends and on a full reset
   (RIS).
 - The program takes such a reply, whenever it arrives, as detection finding
   a host, if it is one the program can use (Versions, above), and may use
-  HOTTY from then on (§14). Without `late=1`, a reply that arrives once the
+  hotty from then on (§14). Without `late=1`, a reply that arrives once the
   program has fallen back changes nothing.
 - A program that will no longer take a late answer, such as one about to
   exit, withdraws its query with `a=q:q=2`: a query that wants no answer,
@@ -340,7 +340,7 @@ The capabilities, the body of that reply, are a map of these fields (§3.3):
 
 | field | type | meaning |
 | --- | --- | --- |
-| `v` | str | the HOTTY version the host answers in (Versions, above): `"0.4"` for this document |
+| `v` | str | the hotty version the host answers in (Versions, above): `"0.4"` for this document |
 | `cellcss` | `{"w": float, "h": float}` | one cell's size in CSS pixels (§5.3) |
 | `scale` | float | device pixels per CSS pixel when the host answers: a hint for the resolution of images, which a zoom changes without telling (§5.3) |
 | `scheme` | str | `"dark"` or `"light"`: the terminal's colour scheme |
@@ -543,7 +543,7 @@ A placement behaves like a kitty graphics placement:
   removed when the terminal leaves the alternate screen, and the host
   **SHOULD** delete the surface as well.
 - A full reset (RIS) deletes every surface.
-- A multiplexer that passes HOTTY through, when the program a pane runs
+- A multiplexer that passes hotty through, when the program a pane runs
   ends or it starts another in its place, **SHOULD** delete the surfaces
   and resources that program left, and no other pane's, as a full reset in
   that pane would. Where it keeps the pane's text on the screen, it keeps
@@ -919,7 +919,7 @@ ESC ] 7279 ; a=ev:s=<name>:e=<kind>[:t=<element id>] [; <base64 msgpack detail>]
 The host reports what the user did. Events are not replies: they are sent
 whatever the value of `q`. Like replies (§3.6), they arrive on the program's
 input, interleaved with the user's keys, so a program that places surfaces
-reads HOTTY messages from its input. A detached surface sends none (§5.5).
+reads hotty messages from its input. A detached surface sends none (§5.5).
 
 | `e` | when | detail |
 | --- | --- | --- |
@@ -1802,10 +1802,10 @@ space=scroll-page-down shift+space=scroll-page-up b=scroll-page-up"`
 
 ### 10.3 Key releases
 
-HOTTY has no key events of its own. A program that needs to know when a key is
+hotty has no key events of its own. A program that needs to know when a key is
 released (a game, say) enables the kitty keyboard protocol with *report event
 types*. That is an ordinary terminal feature, and works the same with or
-without HOTTY.
+without hotty.
 - The alternate screen keeps its own stack of keyboard flags, so a
   full-screen program enables them after switching to it.
 - A surface that does not have the keyboard does not affect the keys at all.
@@ -2026,7 +2026,7 @@ ESC ] 7279 ; a=edit:take=copy,paste,undo,redo ST
 - **In order.** A command reaches the program on its input, among the keys
   typed around it, as every event does (§9): a paste never overtakes what
   was typed before it. The terminal's own paste, by a key that is no edit
-  shortcut, still sends the clipboard as it would without HOTTY, as a
+  shortcut, still sends the clipboard as it would without hotty, as a
   bracketed paste where the program asked for one.
 - **A host that takes `a=edit`** reports its edit shortcuts as `edit`
   (§4). When they change, or `mod` does (§10.4), as when a multiplexer's
@@ -2136,7 +2136,7 @@ document, and therefore its text.
   surface's selection, so that no document makes its text uncopyable, and
   while a text field has the keyboard its paste **SHOULD** type into the
   field as `paste` does, and not reach the program. Its own selection on
-  its cells it copies as it would without HOTTY.
+  its cells it copies as it would without hotty.
 - **`user-select: none`** is the document's to set, as in a browser. A host
   **MUST NOT** start a selection on an element whose `user-select` is
   `none` (its used value, CSS UI 4: the elements inside one with `auto`
@@ -2206,13 +2206,13 @@ A host **MUST** ensure that:
 A program **SHOULD** work without a host.
 - When detection (§4) finds none it can use, it paints its interface as
   terminal text (until a late answer finds one, §4), and should not send
-  HOTTY commands to a terminal that is not a host.
-- The same program can use HOTTY where it is available and text where it is
+  hotty commands to a terminal that is not a host.
+- The same program can use hotty where it is available and text where it is
   not, with no change to how it runs.
 
 Between the two, a **polyfill** host can serve terminals that show images:
 - It sits on the pty between the program and the terminal, and passes every
-  byte through except HOTTY messages.
+  byte through except hotty messages.
 - It renders surfaces itself and sends them as pixels: kitty graphics
   placements anchored where the cursor was, updated as frames change. A
   window is a placement of part of the image.
@@ -2257,7 +2257,7 @@ the text of §11.
 
 ## 16. Conformance
 
-A host conforms to HOTTY version 0.4 when:
+A host conforms to hotty version 0.4 when:
 - it meets every **MUST** of this document;
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
@@ -2294,7 +2294,7 @@ menu it shows, and lets it pick an item by its name.
 
 This is a test interface, not part of the wire protocol.
 
-A library that speaks HOTTY for programs, an SDK, conforms when it meets
+A library that speaks hotty for programs, an SDK, conforms when it meets
 [SDK.md](SDK.md) and passes the vectors' SDK sections: `build`, `encode`,
 `decode`, `scan`, `detect`, `keys` and `keymap`, and `edit` where it edits
 fields (SDK.md §4.6).
@@ -2713,8 +2713,8 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
   cells, its surfaces and its other tools, and the terminal it most often
   runs in, Ghostty, already has a spelling for keys: modifiers in lower
   case, physical keys by where they are, characters by what they type.
-  HOTTY wrote the W3C's key values until 0.4.
-  - **Cited, not copied,** so that HOTTY, plx and myelin cannot drift: a
+  hotty wrote the W3C's key values until 0.4.
+  - **Cited, not copied,** so that hotty, plx and myelin cannot drift: a
     change to the names is a new version of that document, with its
     vectors, and of this one.
   - **Physical keys and characters both,** because some bindings follow
@@ -2732,7 +2732,7 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
   would force small surfaces to grow, and drawn outside, it is something
   the host places over what the program placed.
   - **Programs draw their own lists anyway,** as web apps wrap or replace
-    `<select>` with script. In HOTTY the program plays the script's part: a
+    `<select>` with script. In hotty the program plays the script's part: a
     button, and a list in a surface of its own, placed by `area`.
   - **A closed select still works,** with keys as browsers' do, so a
     document that has one loses nothing but the list.
@@ -2806,7 +2806,7 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
 
 ## Appendix C. Prior art
 
-HOTTY takes from:
+hotty takes from:
 
 - **the kitty graphics protocol**: the shape of the envelope (key=value
   controls, chunks, `q`, `C=1`), and placements anchored to cells;

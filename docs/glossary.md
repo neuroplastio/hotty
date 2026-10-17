@@ -2,7 +2,7 @@
 group: Reference
 order: 50
 nav: Glossary
-description: the words HOTTY uses, each with its section of the protocol
+description: the words hotty uses, each with its section of the protocol
 ---
 
 # Glossary
@@ -53,5 +53,5 @@ Each word below links to the section that defines it, in the
 - **window**: the part of a surface that its placement shows, chosen with
   `x`, `y`, `w` and `h` ([§5.2](../SPEC.md#52-placement-aplace)).
 
-[How HOTTY works](concepts/how-it-works.md) shows most of these in one
+[How hotty works](concepts/how-it-works.md) shows most of these in one
 round trip.

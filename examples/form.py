@@ -66,7 +66,7 @@ def main():
     with Hotty.raw():
         caps = lam.query()
         if caps is None:
-            print("form.py needs a HOTTY host: run it under `hotty run`.")
+            print("form.py needs a hotty host: run it under `hotty run`.")
             return
         lam.write("\x1b[?1049h\x1b[?25l\x1b[2J\x1b[1;1H")
         lam.doc("form", HTML)

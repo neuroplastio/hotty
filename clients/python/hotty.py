@@ -1,4 +1,4 @@
-"""The reference client: speak HOTTY (SPEC.md) from a Python program.
+"""The reference client: speak hotty (SPEC.md) from a Python program.
 
 No dependencies. It has the two layers SDK.md describes:
 
@@ -533,7 +533,7 @@ class HottyError(Exception):
 
 
 class Message:
-    """One HOTTY message: a reply or an event from the host, or a command
+    """One hotty message: a reply or an event from the host, or a command
     from a program. `control` has no `m` or `o`."""
 
     def __init__(self, control, payload):
@@ -1194,9 +1194,9 @@ _DA1_PREFIX = b"\x1b[?"
 
 
 class Scanner:
-    """Cuts HOTTY messages out of a byte stream, however its reads split it
+    """Cuts hotty messages out of a byte stream, however its reads split it
     (SDK.md §3.7). `feed` returns segments in order: ("pass", bytes) for
-    everything else, unchanged; ("osc", bytes) for one complete HOTTY
+    everything else, unchanged; ("osc", bytes) for one complete hotty
     sequence; and with da1=True, ("da1", bytes) for a Primary Device
     Attributes answer. It holds only what may still become one of those."""
 
@@ -1206,8 +1206,8 @@ class Scanner:
         self.da1 = da1
         self.invalid = 0
         self._mode = self._GROUND
-        self._held = b""  # a prefix of a sequence, or the HOTTY sequence in progress
-        self._esc = False  # the last byte inside a HOTTY sequence was ESC
+        self._held = b""  # a prefix of a sequence, or the hotty sequence in progress
+        self._esc = False  # the last byte inside a hotty sequence was ESC
 
     @property
     def holding(self):
@@ -1216,7 +1216,7 @@ class Scanner:
 
     @property
     def in_sequence(self):
-        """Whether a HOTTY sequence is in progress, or one too long is being
+        """Whether a hotty sequence is in progress, or one too long is being
         dropped: the next feed goes on with it, and flush would drop it.
         Otherwise what is held is the start of a segment, which a program
         reading keys may flush after a moment, as typing (SDK.md §3.7)."""
@@ -1229,7 +1229,7 @@ class Scanner:
         return _merge(out)
 
     def flush(self):
-        """Ends the stream: a held prefix goes out as pass, and a HOTTY
+        """Ends the stream: a held prefix goes out as pass, and a hotty
         sequence in progress is dropped as malformed."""
         out = []
         if self._mode == self._OSC:
@@ -1241,7 +1241,7 @@ class Scanner:
 
     def _byte(self, c, out):
         if self._mode == self._DISCARD:
-            # Dropping a HOTTY sequence longer than SCAN_MAX, up to its end.
+            # Dropping a hotty sequence longer than SCAN_MAX, up to its end.
             if self._esc:
                 self._esc = False
                 self._mode = self._GROUND
@@ -1335,7 +1335,7 @@ DETECT_AFTER_REPLY = 300  # ms: the DA1 behind the reply
 
 
 class Detector:
-    """Decides whether the terminal is a HOTTY host (SPEC §4), with time
+    """Decides whether the terminal is a hotty host (SPEC §4), with time
     passed in as milliseconds. `decided` is set when the state is known,
     `done` when nothing more of the detection will arrive; `deadline` is
     when to call `tick` next (None once done). A reply to the query makes
@@ -2292,7 +2292,7 @@ class Hotty:
         return False
 
     def take(self):
-        """Splits the buffer into (messages, other input bytes). A HOTTY
+        """Splits the buffer into (messages, other input bytes). A hotty
         message still arriving stays in the buffer; a lone ESC is the
         Escape key, and goes out at once."""
         sc = Scanner()
@@ -2313,7 +2313,7 @@ class Hotty:
         return messages, other
 
     def query(self, timeout=None):
-        """Is there a HOTTY host that speaks VERSION? Returns its
+        """Is there a hotty host that speaks VERSION? Returns its
         capabilities (a Caps), or None. Reads until detection is done (SDK.md §3.8), and leaves
         everything that is not detection's in the buffer, for take()."""
         now = lambda: time.monotonic() * 1000  # noqa: E731

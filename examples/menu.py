@@ -56,7 +56,7 @@ def main():
     with Hotty.raw():
         caps = lam.query()
         if caps is None:
-            print("menu.py needs a HOTTY host: run it under `hotty run`.")
+            print("menu.py needs a hotty host: run it under `hotty run`.")
             return
         if not caps.has(hotty.FEATURE_MENU):
             print("this host takes no menus (the feature menu, SPEC §4).")

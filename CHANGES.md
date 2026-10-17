@@ -49,6 +49,10 @@ it is released: `vault/tasks/0.4.md`.
   mouse, a touch drag that way and a tap reach the program as the mouse's
   primary button. Elsewhere, and the other way, a touch drag still
   scrolls. It adds to 0.3 and changes nothing a program already does.
+- **The name is written hotty,** in lowercase, even at the start of a
+  sentence: "hotty 0.4", "a hotty host". Nothing on the wire changes, and
+  neither do identifiers, environment variables or task ids. The text of
+  0.1 to 0.3 stays as it was released.
 
 ### Upgrading from 0.3
 

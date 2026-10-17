@@ -2,11 +2,11 @@
 group: Reference
 order: 20
 nav: SDK design
-description: what a library that speaks HOTTY provides, in any language
+description: what a library that speaks hotty provides, in any language
 path: sdk-design
 ---
 
-# HOTTY SDKs
+# hotty SDKs
 
     Version:  0.4, with SPEC.md 0.4
     Status:   Draft. It changes with SPEC.md (§15 there).
@@ -14,7 +14,7 @@ path: sdk-design
 
 ## Abstract
 
-An **SDK** is a library through which a program speaks HOTTY in one
+An **SDK** is a library through which a program speaks hotty in one
 language. This document says what every SDK provides, whatever its
 language: its components, what each one does, the options each takes and
 their defaults, and the names they go by. A program written against one SDK
@@ -53,7 +53,7 @@ are to be interpreted as in SPEC.md §2.
 
 - **Program**, **host**, **surface**, **placement**, **reply**, **event**:
   as in SPEC.md.
-- **SDK**: a library that speaks HOTTY for programs in one language.
+- **SDK**: a library that speaks hotty for programs in one language.
 - **Wire layer**: the part of an SDK that builds commands and reads what the
   host sends. It does no I/O (§2.1).
 - **SDK layer**: the part that reads and writes a terminal, or works through
@@ -129,7 +129,7 @@ SDK makes the three branch points plain:
 - **No terminal:** opening the terminal fails (§4.1). The program writes
   plain data.
 - **Not a host:** detection says no (§3.8). The program draws in cells, and
-  sends nothing of HOTTY but the query.
+  sends nothing of hotty but the query.
 - **A host:** surfaces.
 
 ### 2.6 Leave the terminal clean
@@ -184,7 +184,7 @@ An SDK **MUST** provide every component of this section.
 | commands (§3.4) | a builder for each action | `Doc`, `Place`, … | `build` |
 | names (§3.5) | surface names | `ValidName`, `SurfaceName` | — |
 | Decoder (§3.6) | OSC sequences into messages | `Decoder` | `wire`, `decode` |
-| Scanner (§3.7) | HOTTY sequences out of a byte stream | — | `scan` |
+| Scanner (§3.7) | hotty sequences out of a byte stream | — | `scan` |
 | Detector (§3.8) | whether the terminal is a host | `internal/detect` | `detect` |
 | messages (§3.9) | replies, events, capabilities, errors | `Reply`, `Event`, `Caps`, `Error` | `decode` |
 | keys (§3.10) | key names, keymaps, the SDK's keymap | `ParseKey`, `DecodeKeys`, `KeyText`, `Keymap`, `TerminalKeys` | `keys`, `keymap` |
@@ -427,36 +427,36 @@ ones. A new Decoder is ready to use.
 
 ### 3.7 Scanner
 
-A Scanner cuts HOTTY sequences out of a byte stream, however the reads split
+A Scanner cuts hotty sequences out of a byte stream, however the reads split
 it. An SDK that reads a raw terminal uses one; so does a relay, on a
 program's output. An environment that hands over complete sequences needs
 none (§2.8), but the wire layer has one all the same.
 
 - **`Feed(bytes)`** returns segments, in order:
-  - `pass`: bytes that are not HOTTY's, unchanged: keys, mouse reports,
+  - `pass`: bytes that are not hotty's, unchanged: keys, mouse reports,
     other OSCs, other answers;
-  - `osc`: one complete HOTTY sequence, from `ESC ] 7279 ;` to its
+  - `osc`: one complete hotty sequence, from `ESC ] 7279 ;` to its
     terminator (ST or BEL), ready for the Decoder;
   - `da1`: optionally, an answer to Primary Device Attributes,
     `CSI ? <digits and ;> c`, for an SDK that reads DA1 itself (§4.1). A
     Scanner that does not look for them passes them.
 - **It holds only what may still become a segment of its own**: bytes that
   are the start of `ESC ] 7279 ;` (or of a DA1 answer, when it looks for
-  them), and a HOTTY sequence in progress. Everything else goes out in the
+  them), and a hotty sequence in progress. Everything else goes out in the
   same `Feed` that brought it. So the segments do not depend on how the
   stream was split, and a key is never kept waiting for the next read.
 - **`Holding()`** returns what it holds, and **`InSequence()`** whether
-  that is a HOTTY sequence in progress (or one too long, being dropped),
+  that is a hotty sequence in progress (or one too long, being dropped),
   which the next `Feed` goes on with, rather than the start of a segment,
   which a program reading keys may flush after a moment as typing.
-- **An ESC inside a HOTTY sequence** that does not begin its ST ends the
+- **An ESC inside a hotty sequence** that does not begin its ST ends the
   sequence unfinished: the sequence is dropped as malformed, and the ESC
   begins what comes next.
-- **A HOTTY sequence longer than 64 KiB** (65536 bytes, its terminator not
+- **A hotty sequence longer than 64 KiB** (65536 bytes, its terminator not
   counted) is dropped as malformed, up to its terminator. No host sends one:
   chunks are at most 4096 bytes of base64.
 - **`Flush()`** ends the stream: what is held goes out as `pass`, except a
-  HOTTY sequence in progress, which is dropped as malformed. A program
+  hotty sequence in progress, which is dropped as malformed. A program
   reading keys flushes a lone ESC held at the end of a read, as the Escape
   key; that is the SDK layer's choice (§4.1).
 - **`Invalid`** counts the sequences it dropped.
@@ -848,7 +848,7 @@ Go: `hottytest.Host`.
   cursor's position, the background colour, and, when asked to, the kitty
   graphics query. It tracks the alternate screen and full resets as a host
   does (SPEC.md §5.4), and keeps the cells the program printed. Made as a
-  terminal that is not a host, it answers no HOTTY command, until the test
+  terminal that is not a host, it answers no hotty command, until the test
   makes it a host, as a multiplexer's terminal attaching does: then it
   answers a query that asked for a late answer and was not answered
   (SPEC.md §4), and every command after.
@@ -866,7 +866,7 @@ Go: `hottytest.Host`.
   `drop` in its `data-on`. So it skips the vectors marked `scroll`,
   `steps`, `drop` and `view` (conformance/README.md), which every other
   host passes.
-- **Strict by default.** A malformed message, an `EINVAL`, or a HOTTY
+- **Strict by default.** A malformed message, an `EINVAL`, or a hotty
   command other than the query sent to a terminal that is not a host fails
   the test. A lenient host records them instead.
 - **The user.** It plays the user: typing, pressing a key as SPEC.md §10.2
@@ -1070,13 +1070,13 @@ In the vectors, every name is in snake case: `place_at`, `keep_cursor`,
   types (Go's msgp, Rust's serde) stops at the first field of the wrong
   type. A rule every SDK can keep is the one such a codec keeps, and a
   host that sends a wrong type fails the vectors instead.
-- **Why presentation is out.** HOTTY carries any HTML. How one program
+- **Why presentation is out.** hotty carries any HTML. How one program
   presents its content is that program's choice, and an SDK that builds
   documents would make it for every program, in each language differently.
 
 ## Appendix C. Moving from 0.2
 
-Informative. HOTTY 0.3 breaks 0.2 (SPEC.md §15), as a fold of what 0.2
+Informative. hotty 0.3 breaks 0.2 (SPEC.md §15), as a fold of what 0.2
 grew. A program and its SDK move together, and its tests' fake hosts with
 them. These are the places a port goes wrong:
 
@@ -1120,7 +1120,7 @@ them. These are the places a port goes wrong:
 
 ## Appendix D. Moving from 0.3
 
-Informative. HOTTY 0.4 breaks 0.3 (SPEC.md §15): it names keys as *myelin
+Informative. hotty 0.4 breaks 0.3 (SPEC.md §15): it names keys as *myelin
 key names* 0.1 does (SPEC.md §10.4). A program and its SDK move together,
 and its tests' fake hosts with them. These are the places a port goes
 wrong:

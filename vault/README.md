@@ -1,6 +1,6 @@
 # Vault
 
-HOTTY's working memory, for whichever agent picks the spec up next. The spec
+hotty's working memory, for whichever agent picks the spec up next. The spec
 itself is [`SPEC.md`](../SPEC.md); this holds what is being weighed for it.
 
 | Path | What it is |

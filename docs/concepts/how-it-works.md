@@ -1,17 +1,17 @@
 ---
 group: Concepts
 order: 10
-nav: How HOTTY works
+nav: How hotty works
 description: one surface, from the program's first byte to the user's click
 ---
 
-# How HOTTY works
+# How hotty works
 
-A HOTTY program writes HTML to its terminal, and the terminal draws it
+A hotty program writes HTML to its terminal, and the terminal draws it
 among the cells. When the user clicks, the program reads the event from
 its input, as it reads keys. Everything travels in the program's own
-output and input, so HOTTY works wherever a terminal does: over SSH, in a
-container, in a multiplexer that is a host itself or passes HOTTY
+output and input, so hotty works wherever a terminal does: over SSH, in a
+container, in a multiplexer that is a host itself or passes hotty
 through.
 
 ```text
@@ -55,7 +55,7 @@ host    → ESC ] 7279 ; a=ok:n=1:re=q ; <the capabilities> ST  CSI ? 62 ; 22 c
 ```
 
 `CSI c` asks the terminal what it is, and every terminal answers it. So a
-program that sees that answer with no HOTTY reply in front of it knows
+program that sees that answer with no hotty reply in front of it knows
 there is no host. It then draws in cells after a short grace, not a long
 timeout.
 
@@ -118,7 +118,7 @@ program hears only what it asked for: a `change` when the field's value is
 committed, a `submit` with the whole form. [Input](input.md) and
 [Keyboard and focus](keyboard.md) say what a surface reports, and when.
 
-## What HOTTY is not
+## What hotty is not
 
 - **Not a browser.** A surface runs no script. The program holds the state
   and decides what every click means. The host only draws and reports.

@@ -103,9 +103,9 @@ With nothing selected, `mod+c` has nothing to copy, and the key reaches
 the program: on Linux, `ctrl+c` still interrupts it. Each field keeps its
 own undo history, which a value the program sets clears.
 
-**Key releases** are not HOTTY's. A program that needs them, such as a
+**Key releases** are not hotty's. A program that needs them, such as a
 game, enables the kitty keyboard protocol's event types, as it would
-without HOTTY ([§10.3](../../SPEC.md#103-key-releases)).
+without hotty ([§10.3](../../SPEC.md#103-key-releases)).
 
 ## Keymaps
 
@@ -162,7 +162,7 @@ same keymap.
 
 ## Key names
 
-HOTTY names keys as
+hotty names keys as
 [*myelin key names* 0.1](https://github.com/neuroplastio/myelin/blob/myelinkey/v0.1.0/myelinkey/SPEC.md)
 does ([§10.4](../../SPEC.md#104-key-names)), in Ghostty's vocabulary. A
 name is its modifiers, each followed by `+`, then one key: a physical key,

@@ -2,12 +2,12 @@
 group: Start
 order: 20
 nav: Choose an SDK
-description: the libraries that speak HOTTY for a program, in Go, TypeScript, Lua and Python
+description: the libraries that speak hotty for a program, in Go, TypeScript, Lua and Python
 ---
 
 # Choose an SDK
 
-An SDK speaks HOTTY for your program. It asks the terminal whether it is a
+An SDK speaks hotty for your program. It asks the terminal whether it is a
 host, builds the commands that show and change surfaces, and reads the
 events that come back. Every SDK follows the same [design](../SDK.md):
 the same names, the same defaults, and the same conformance vectors. So
@@ -18,9 +18,9 @@ what you learn in one carries over to the others.
 | [Go](#go) | command-line tools, full-screen programs, their tests | the most: Bubble Tea, charts, forms, fields in cells, a host for tests |
 | [TypeScript](#typescript) | Node and Bun programs | the protocol and a terminal to use it in |
 | [Lua](#lua) | Neovim plugins, plx scripts | the protocol, and surfaces anchored to a buffer or a tool |
-| [Python](#python) | trying HOTTY out, the examples in this repository | the protocol, in one file with no dependencies |
+| [Python](#python) | trying hotty out, the examples in this repository | the protocol, in one file with no dependencies |
 
-Each speaks HOTTY 0.4 and no other version. A program written with one
+Each speaks hotty 0.4 and no other version. A program written with one
 draws in cells wherever the terminal is not a host of 0.4.
 
 ## Go
@@ -64,7 +64,7 @@ Start with the [Lua quick start](https://github.com/neuroplastio/hotty-lua/blob/
 [`clients/python/hotty.py`](../clients/python/hotty.py) in this repository
 is one file with no dependencies: every command, the decoder, detection,
 and a small terminal for the examples. Copy it next to your program to try
-HOTTY:
+hotty:
 
 ```sh
 python3 examples/card.py   # in a host, from a checkout of this repository
@@ -76,7 +76,7 @@ reference implementation is [hotty-go](#go).
 
 ## Your own
 
-To speak HOTTY from another language, follow the [SDK design](../SDK.md)
+To speak hotty from another language, follow the [SDK design](../SDK.md)
 and pass the SDK sections of the [conformance vectors](../conformance/README.md).
 The protocol is escape sequences, base64 and msgpack, so any language that
 can write to its terminal can speak it.

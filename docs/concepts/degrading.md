@@ -7,7 +7,7 @@ description: how a program finds a host, and what it shows where there is none
 
 # Degrading
 
-A HOTTY program runs wherever a terminal program runs, and shows surfaces
+A hotty program runs wherever a terminal program runs, and shows surfaces
 only where it finds a host ([§14](../../SPEC.md#14-degradation)).
 Everywhere else it draws in cells, or writes plain data. It finds out
 when it starts, and runs the same way in each case.
@@ -25,7 +25,7 @@ them plain ([SDK design §2.5](../../SDK.md#25-three-renditions)):
 
 A command that prints a status card shows a surface in a host, and lines
 of text in another terminal. With no terminal, it writes the card's facts
-as plain data. In the cells, a program sends nothing of HOTTY but its
+as plain data. In the cells, a program sends nothing of hotty but its
 query.
 
 An SDK opens the process's terminal itself, `/dev/tty` or the platform's
@@ -113,7 +113,7 @@ field would tell it.
 
 ## A late answer
 
-A program can start using HOTTY after it fell back, when it asked for a
+A program can start using hotty after it fell back, when it asked for a
 late answer ([§4](../../SPEC.md#4-detection-and-capabilities)). A
 multiplexer can run a pane with no terminal attached, such as one
 restored after a reboot. Detection then finds no host, though one may
@@ -142,7 +142,7 @@ surfaces when the answer comes, and asks the program for a new layout
 
 A polyfill is a host for terminals that show images
 ([§14](../../SPEC.md#14-degradation)). It sits on the pty between the
-program and the terminal, passes every byte through but HOTTY's, and
+program and the terminal, passes every byte through but hotty's, and
 answers the query for the terminal. It draws each surface itself, and
 sends it as a kitty graphics placement.
 
@@ -166,7 +166,7 @@ suggest the polyfill to its user.
   screen, and reads every reply its commands caused
   ([SDK design §2.6](../../SDK.md#26-leave-the-terminal-clean)).
 - **In the cells**, it draws the same interface as text, and sends nothing
-  of HOTTY but the query. An SDK's field edits as a surface's does, with
+  of hotty but the query. An SDK's field edits as a surface's does, with
   the same keymap, so the user's hands need not change
   ([SDK design §4.6](../../SDK.md#46-field)).
 - **With no terminal**, it writes plain data.

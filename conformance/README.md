@@ -6,7 +6,7 @@ description: the vectors a host and an SDK must pass, and how to run them
 path: conformance
 ---
 
-# HOTTY conformance vectors
+# hotty conformance vectors
 
 `vectors.json` is what a host and an SDK must do, as data.
 
@@ -179,7 +179,7 @@ key, but the physical name of a character's key (`ctrl+key_w`, beside
 the surface used it; absent, not checked. `"events"` as for a pointer step.
 
 **Write** `{ "write": text }`: the program writes text to the terminal,
-bytes that are not HOTTY's. The vectors write `CSI ? 1002 h` and `CSI ?
+bytes that are not hotty's. The vectors write `CSI ? 1002 h` and `CSI ?
 1006 h` together, so that the terminal reports the mouse's buttons and
 drags in the SGR encoding, `CSI ? 1002 l`, so that it reports them no
 longer, and `CSI ? 1049 h` and `CSI ? 1049 l`, the alternate screen and
@@ -239,9 +239,9 @@ implements, and skips the rest:
 the runner calls the builder with `args`, and with the reply options `n`
 and `q`, `detached`, `scroll` and `late` from `options`, which have no
 order. `sync` takes `args.commands`, each a `{ "build", "args", "options" }`
-of its own. The output, split into raw bytes and HOTTY sequences, must be
+of its own. The output, split into raw bytes and hotty sequences, must be
 `out`:
-- `{ "raw": text }`: bytes that are not HOTTY's, such as `PlaceAt`'s cursor
+- `{ "raw": text }`: bytes that are not hotty's, such as `PlaceAt`'s cursor
   moves, `Query`'s DA1 and `Sync`'s brackets;
 - `{ "cmd": { "control": {…}, "payload": text? } }`: one command, decoded.
   Its control has exactly these keys (`m` and `o` never), and its payload is

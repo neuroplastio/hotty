@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""bubbros.py — Bub-n-Bros in a HOTTY surface, the game itself unchanged.
+"""bubbros.py — Bub-n-Bros in a hotty surface, the game itself unchanged.
 
     scripts/bubbros-fetch.sh                        # the game, at ../bubbros
     hotty run -- python3 examples/bubbros.py
@@ -275,7 +275,7 @@ def main():
     with Hotty.raw():
         caps = lam.query()
         if caps is None:
-            lam.write("bubbros.py needs a HOTTY host (`hotty run`, a terminal that speaks HOTTY, or xterm-addon-hotty)\r\n")
+            lam.write("bubbros.py needs a hotty host (`hotty run`, a terminal that speaks hotty, or xterm-addon-hotty)\r\n")
             return 1
         # Is there a kitty keyboard protocol? Ask, with DA1 as the fence.
         lam.write("\x1b[?u\x1b[c")

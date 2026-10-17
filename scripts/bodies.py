@@ -23,7 +23,7 @@ import sys
 
 PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "conformance", "vectors.json")
 
-# A HOTTY sequence: its control, its payload, and its terminator.
+# A hotty sequence: its control, its payload, and its terminator.
 SEQ = re.compile(r"^(\x1b\]7279;)([^;\x07\x1b]*);([^\x07\x1b]*)((?:\x07|\x1b\\)?)$")
 
 
@@ -116,7 +116,7 @@ def write_seqs(seqs, bodies, name):
         if not p or "a" not in p[1]:
             raise SystemExit(f"{name}: sequence {i} has a body but starts no message")
         # The message's chunks: this sequence, and the continuations after
-        # it up to the last (m=0), skipping what is not HOTTY's.
+        # it up to the last (m=0), skipping what is not hotty's.
         chunks = [i]
         more = p[1].get("m") == "1"
         j = i + 1

@@ -1,6 +1,6 @@
 # For agents
 
-This repository is the HOTTY protocol: `SPEC.md`, its conformance vectors, and
+This repository is the hotty protocol: `SPEC.md`, its conformance vectors, and
 the reference material around them. Implementations live elsewhere
 (hotty-blitz, xterm-addon-hotty).
 

@@ -194,7 +194,7 @@ your program can place it again.
   and goes when the terminal leaves it. The host should delete the surface
   too.
 - **A full reset** (RIS) deletes every surface.
-- **A multiplexer** that passes HOTTY through should delete what a pane's
+- **A multiplexer** that passes hotty through should delete what a pane's
   program left when it ends, as a reset in that pane would. Where it keeps
   the pane's text on the screen, it keeps the detached surfaces with it.
 

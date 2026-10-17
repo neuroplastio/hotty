@@ -5,7 +5,7 @@
     hotty run -- python3 examples/dash.py --morph    # whole tree, morphed, every frame
     options: --hz 10  --seconds N (exit after N s and print the byte count)
 
-q quits. Without a HOTTY host it draws a plain-text version.
+q quits. Without a hotty host it draws a plain-text version.
 """
 import os
 import shutil

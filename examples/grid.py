@@ -57,7 +57,7 @@ def main():
     size = shutil.get_terminal_size()
     with Hotty.raw():
         if lam.query() is None:
-            print("grid.py needs a HOTTY host (`hotty run`, or a terminal that speaks HOTTY)")
+            print("grid.py needs a hotty host (`hotty run`, or a terminal that speaks hotty)")
             return
         parts = [STYLE]
         if contain:

@@ -2,14 +2,14 @@
 group: Start
 order: 10
 nav: Choose a host
-description: the terminals and browsers that draw HOTTY's surfaces
+description: the terminals and browsers that draw hotty's surfaces
 ---
 
 # Choose a host
 
 A host is what draws a program's surfaces, usually the terminal itself. A
 program asks the terminal whether it is a host when it starts, and draws in
-cells where it is not, so you can run a HOTTY program anywhere. It only
+cells where it is not, so you can run a hotty program anywhere. It only
 shows its surfaces where there is a host.
 
 | host | where it runs | what you get |
@@ -18,7 +18,7 @@ shows its surfaces where there is a host.
 | [a browser](#a-browser) | any page that runs xterm.js | everything, each surface in a sandboxed iframe |
 | [`hotty run`](#any-terminal-with-kitty-graphics) | kitty, Ghostty and other terminals with kitty graphics | surfaces as images: sharp at one zoom, no text to select |
 
-A program of HOTTY 0.4 needs a host of 0.4. A host of another version, 0.2
+A program of hotty 0.4 needs a host of 0.4. A host of another version, 0.2
 or later, answers its question with the versions it speaks; a host of 0.1
 answers with capabilities the program can't read. Either way the program
 draws in cells, as it would without a host.
@@ -26,7 +26,7 @@ draws in cells, as it would without a host.
 ## hottyterm
 
 [hottyterm](https://github.com/neuroplastio/hottyterm) is
-[Ghostty](https://ghostty.org) with HOTTY built in. It draws surfaces as
+[Ghostty](https://ghostty.org) with hotty built in. It draws surfaces as
 it draws text: sharp at any zoom, following its theme, with text you can
 select and copy. Typing in a field, hovering and scrolling happen in the
 terminal, with no round trip to the program.
@@ -53,7 +53,7 @@ npm install @neuroplastio/xterm-addon-hotty @xterm/xterm
 ```
 
 [hotty.neuroplast.io](https://hotty.neuroplast.io) runs this way. Its
-tour, demo apps and tools are one HOTTY program, in the page with nothing
+tour, demo apps and tools are one hotty program, in the page with nothing
 to install.
 [Using the addon](https://github.com/neuroplastio/xterm-addon-hotty/blob/main/docs/usage.md)
 shows how to load it and what it lets a page decide.
@@ -63,7 +63,7 @@ shows how to load it and what it lets a page decide.
 `hotty run`, from [hotty-blitz](https://github.com/neuroplastio/hotty-blitz),
 is a host for terminals that show images through the kitty graphics
 protocol: kitty, Ghostty, WezTerm and others. It sits between the program
-and the terminal, passes everything through except HOTTY, and sends each
+and the terminal, passes everything through except hotty, and sends each
 surface as an image:
 
 ```sh
