@@ -85,8 +85,8 @@ browser through xterm-addon-hotty or natively in hottyterm.
 
 - **To run hotty programs:** [Choose a host](docs/hosts.md): hottyterm, a
   browser, any terminal with kitty graphics, or plx.
-- **To write one:** [Choose an SDK](docs/sdks.md): Go, TypeScript, Lua, or the
-  one-file Python client in this repository.
+- **To write one:** [Choose an SDK](docs/sdks.md): Go, TypeScript, Rust, Lua,
+  or the one-file Python client in this repository.
 - **To understand it:** the Concepts, starting with
   [How hotty works](docs/concepts/how-it-works.md).
 - **To implement it:** the [protocol](SPEC.md), the [SDK design](SDK.md)

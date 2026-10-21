@@ -26,9 +26,9 @@ kind of program: one that prints and exits, one built on a UI framework, a
 test. It is described here so that SDKs agree where a program would notice,
 and follow their language everywhere else.
 
-The reference implementation is
-[hotty-go](https://github.com/neuroplastio/hotty-go). Its names are the
-canonical ones, and where it falls short of this document, §5.3 says so.
+The names this document gives are the canonical ones (§2.2, Appendix A).
+The SDKs that follow it are listed in the documentation, not here
+([Choose an SDK](docs/sdks.md)).
 
 ## Contents
 
@@ -59,8 +59,8 @@ are to be interpreted as in SPEC.md §2.
 - **SDK layer**: the part that reads and writes a terminal, or works through
   whatever stands for one (§4).
 - **Canonical name**: the name this document gives a component, an
-  operation, an option or a field. It is hotty-go's, and an SDK spells it in
-  its language's case (Appendix A).
+  operation, an option or a field. An SDK spells it in its language's case
+  (Appendix A).
 - **Environment**: what the program runs in: a process with a terminal, a
   UI framework that owns the screen, an editor, a page.
 
@@ -98,9 +98,7 @@ are to be interpreted as in SPEC.md §2.
   `None`, Lua's `nil`, Rust's `Option`. The vectors write it `null`.
 - **Data takes the language's form**: what a message or a control holds
   (§3.2, §3.9) is a field or an accessor, and a question about it
-  (`Has`) a method or a function. hotty-go's are plain structs with
-  no methods but what its codec generates: a field (`ev.Value`), and a
-  function beside the type (`hotty.Light(caps)`).
+  (`Has`) a method or a function.
 
 ### 2.3 Shared defaults
 
@@ -176,7 +174,7 @@ documents (§2.4) do both.
 
 An SDK **MUST** provide every component of this section.
 
-| component | does | Go | vectors |
+| component | does | names | vectors |
 | --- | --- | --- | --- |
 | constants (§3.1) | the protocol's numbers and named values | `Number`, `Chunk`, … | — |
 | Control (§3.2) | an ordered list of keys and values | `Control` | — |
@@ -184,8 +182,8 @@ An SDK **MUST** provide every component of this section.
 | commands (§3.4) | a builder for each action | `Doc`, `Place`, … | `build` |
 | names (§3.5) | surface names | `ValidName`, `SurfaceName` | — |
 | Decoder (§3.6) | OSC sequences into messages | `Decoder` | `wire`, `decode` |
-| Scanner (§3.7) | hotty sequences out of a byte stream | — | `scan` |
-| Detector (§3.8) | whether the terminal is a host | `internal/detect` | `detect` |
+| Scanner (§3.7) | hotty sequences out of a byte stream | `Scanner` | `scan` |
+| Detector (§3.8) | whether the terminal is a host | `Detector` | `detect` |
 | messages (§3.9) | replies, events, capabilities, errors | `Reply`, `Event`, `Caps`, `Error` | `decode` |
 | keys (§3.10) | key names, keymaps, the SDK's keymap | `ParseKey`, `DecodeKeys`, `KeyText`, `Keymap`, `TerminalKeys` | `keys`, `keymap` |
 
@@ -297,8 +295,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
   It writes one msgpack map, each value in the smallest of its type's
   forms: `label` unless it is empty, `items`; each item `key`, `label` and
   `name` unless they are empty, `enabled`, and `items` unless there are
-  none. A program on myelin names each binding of its `Tree` and hands it
-  over. The program keeps it within eight levels (SPEC.md §10.7).
+  none. The program keeps it within eight levels (SPEC.md §10.7).
 - **`Touch`** takes a list of `TouchArea`, each with `C`, `R`, `W`, `H`
   and `Drag`: the screen's cells it covers, counted from 0, and `"x"`,
   `"y"` or `"xy"`. It writes each area as a map of all five, in that
@@ -323,8 +320,7 @@ A `Placement` says where and how a surface is shown (SPEC.md §5.2):
 
 `Press`, `Fit` and `Hover` belong to the surface (SPEC.md §5.2), so each is
 absent, on or off: a placement that leaves them absent leaves them as they
-were. Go spells them `hotty.On` and `hotty.Off`, with the zero value
-absent.
+were (Appendix A gives each language's three).
 
 #### 3.4.2 Reply options
 
@@ -696,15 +692,13 @@ host.
 
 What a program does with a terminal depends on the kind of program, and on
 what it runs in. This section describes the components an SDK **SHOULD**
-provide for the kinds of program its language is used for, by what they do,
-then by the shape hotty-go gives them. An SDK follows its language and its
-frameworks in everything else.
+provide for the kinds of program its language is used for, by what they
+do. An SDK follows its language and its frameworks in everything else.
 
 ### 4.1 Terminal
 
 For a program that is not a full-screen framework's: a command that prints
-documents and exits, one that asks a question, a chart that streams. Go:
-`hottyterm.Term`.
+documents and exits, one that asks a question, a chart that streams.
 
 - **Opening.** `Open(name)` uses the process's terminal, whatever its
   standard output is (a pipe, say): `/dev/tty`, or the platform's console.
@@ -790,8 +784,8 @@ its terminator; a plugin writes to the terminal with `nvim_ui_send`. There:
 ### 4.3 Session: a framework's adapter
 
 For a full-screen program built on a UI framework, which redraws its frame
-as its state changes. Go: `hottytea.Session`, for Bubble Tea. Other
-frameworks get their own adapter, with the same responsibilities.
+as its state changes. Each framework gets an adapter of its own, with the
+same responsibilities.
 
 - **Modes.** `Detecting` until the Detector decides, then `Native` (a host)
   or `Text` (not one). In `Text` the Session sends nothing, and the program
@@ -842,7 +836,6 @@ frameworks get their own adapter, with the same responsibilities.
 ### 4.4 Test host
 
 A host that runs inside a test, so that a program's tests need no terminal.
-Go: `hottytest.Host`.
 
 - **The terminal around it.** It answers what terminals answer: DA1, the
   cursor's position, the background colour, and, when asked to, the kitty
@@ -888,15 +881,14 @@ A relay stands between programs and a host, as a multiplexer does (SPEC.md
 §2): it answers the query with the host's capabilities, gives each
 program's surfaces names of their own on the host, places them where the
 program's pane is, and passes events back to the program whose surface they
-came from. plx's `pkg/hottyrelay` is one. This section is reserved: what a
-relay does will be specified here, with its own vectors.
+came from. This section is reserved: what a relay does will be specified
+here, with its own vectors.
 
 ### 4.6 Field
 
 A text field's value, caret and selection, edited as SPEC.md §10.2's actions
 edit them, for a program that draws its fields in cells (the second
-rendition, §2.5). Go: `hottyedit.Field`, a module of its own for its
-grapheme segmentation.
+rendition, §2.5).
 
 - **The field.** `Value`, `Caret` (a count of characters, grapheme
   clusters, from the start), `Anchor`, `Multiline`, `Password`, and
@@ -907,9 +899,9 @@ grapheme segmentation.
   the caret. `Selection()` returns its start and end, equal when nothing
   is selected, for the rendition to draw. `Select(anchor, caret)` sets
   both, for a selection the user makes with the pointer, and
-  `Select(p, p)` puts the caret at `p` with nothing selected. Go keeps the
-  anchor behind `Anchor()` and `Select`, since a `Field` literal's zero
-  anchor would select.
+  `Select(p, p)` puts the caret at `p` with nothing selected. In a
+  language whose absence is a zero value, the anchor is kept behind
+  `Anchor()` and `Select`, since a field's zero anchor would select.
 - **Rows are lines.** A field in cells does not wrap: each line is a row,
   and the place along it is a count of characters. A rendition that wraps
   moves the caret between its rows itself.
@@ -969,31 +961,23 @@ every SDK section, `edit` where it provides a Field.
   the vectors whose `requires` it lacks, so the list of what an SDK lacks is
   its runner's, not a list kept by hand.
 - **A copy, checked.** An SDK keeps a copy of `vectors.json` in its tests,
-  and a test that compares it with the spec's when a checkout is at hand
-  (hotty-go: `make vectors`, `TestVectorsAreCurrent`). The runner checks
-  that the vectors' version is the SDK's.
+  a way to refresh it from a checkout of this repository, and a test that
+  fails when it differs from the spec's, where a checkout is at hand. The
+  runner checks that the vectors' version is the SDK's.
 
-### 5.3 Implementations
+### 5.3 What an SDK lacks
 
-| SDK | language | wire layer | SDK layer |
-| --- | --- | --- | --- |
-| [hotty-go](https://github.com/neuroplastio/hotty-go) | Go | the reference; complete, with what a relay writes as a host (replies, events, `Message.Placement`, `CursorBelow`) | `hottyterm`, `hottytea`, `hottytest`, `hottyedit` (§4.6) |
-| `clients/python` (this repository) | Python | complete | `Hotty`, for the examples |
-| [hotty-lua](https://github.com/neuroplastio/hotty-lua) | Lua | complete, under LuaJIT, Lua 5.1, Neovim and gopher-lua (plx's) | `hotty.nvim` (§4.2) |
-
-hotty-go's runners (`vectors_test.go`, and `hottyedit`'s for `edit`) run
-every SDK section and skip nothing. hotty-lua's (`tests/vectors.lua`, under
-each of its runtimes) and the Python client's count code points (§4.6) and
-skip only the vectors that require `graphemes`. plx's `sdk/hotty` (Go) is a
-relay's codec, to be replaced by hotty-go's, which has all that plexos
-listed it uses. hotty-blitz's `hotty-wire` (Rust) is a host's; its tests
-run the `keys`, `keymap` and `edit` sections.
+An SDK says in its own documentation what of this document it does not
+do: a component of §4 it does not provide, a Field and `DecodeKeys` that
+count code points (§4.6), a name its language makes it spell otherwise
+(§2.2). The vectors it skips are its runner's `requires` (§5.2), so the
+list of what it lacks is kept by its tests, not by hand.
 
 ---
 
 ## Appendix A. Names
 
-The canonical names, in each language's case. Go's are hotty-go's.
+The canonical names, in each language's case.
 
 | canonical | Go | Python | Lua | Rust | TypeScript |
 | --- | --- | --- | --- | --- | --- |
@@ -1031,7 +1015,7 @@ The canonical names, in each language's case. Go's are hotty-go's.
 | `Keymap`, `ParseKeymap`, `Resolve`, `Binds`, `Lookup`, `Program`, `Prefix`, `Scroll`, `Format` | `hotty.Keymap`, `hotty.ParseKeymap`, `hotty.Resolve`, `(Keymap).Binds`, `.Lookup`, `.Program`, `.Prefix`, `.Scroll`, `.Format` | `Keymap`, `parse_keymap`, `resolve`, `Keymap.binds`, `.lookup`, `.program`, `.prefix`, `.scroll`, `.format` | `parse_keymap`, `resolve`, `keymap:binds`, `:lookup`, `:program`, `:prefix`, `:scroll`, `:format` | as Python | `Keymap`, `parseKeymap`, `resolve`, `.binds`, `.lookup`, `.program`, `.prefix`, `.scroll`, `.format` |
 | `TerminalKeys` | `hotty.TerminalKeys` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` | `TERMINAL_KEYS` |
 | `Platform`, `PlatformOf`, `DefaultEdit`, `ReadKey` | `hotty.Platform{Mod, Edit}`, `hotty.PlatformOf`, `hotty.DefaultEdit`, `(Platform).ReadKey` | `Platform(mod, edit)`, `platform_of`, `default_edit`, `read_key` | a table `{ mod = …, edit = … }`, `platform_of`, `default_edit`, `read_key` | as Python | `{ mod, edit }`, `platformOf`, `defaultEdit`, `readKey` |
-| `Field`, `Do`, `Type` | `hottyedit.Field`, `(*Field).Do`, `.Type` | `Field`, `.do`, `.type` | `field`, `:do_action` (`do` is a keyword), `:type` | `Field`, `do_action`, `type_text` | `Field`, `.do`, `.type` |
+| `Field`, `Do`, `Type` | `Field`, `(*Field).Do`, `.Type` | `Field`, `.do`, `.type` | `field`, `:do_action` (`do` is a keyword), `:type` | `Field`, `do_action`, `type_text` | `Field`, `.do`, `.type` |
 
 In the vectors, every name is in snake case: `place_at`, `keep_cursor`,
 `fit_rows`, `cell_css`.
@@ -1064,8 +1048,9 @@ In the vectors, every name is in snake case: `place_at`, `keep_cursor`,
   small, so that a program that names no keys loses none. A program that
   edits fields in cells, though, has a keymap already, usually its
   framework's, and wants its surfaces' fields to edit the same. Bubble
-  Tea's is the one the reference SDK's programs have; one keymap shared by
-  every SDK keeps a program the same in every language (§2.3).
+  Tea's is a common one among programs that edit fields in cells; one
+  keymap shared by every SDK keeps a program the same in every language
+  (§2.3).
 - **Why a body decodes whole or not at all.** A codec generated from the
   types (Go's msgp, Rust's serde) stops at the first field of the wrong
   type. A rule every SDK can keep is the one such a codec keeps, and a
@@ -1082,7 +1067,7 @@ them. These are the places a port goes wrong:
 
 - **A delta is a list of ops.** `Delta(surface, op, target, key,
   payload)` became `Delta(surface, ops…)`, the ops built by `Text`,
-  `Attr` and the rest (§3.4.3; in Go `OpText`, `OpAttr`, …). A frame's changes to one surface go in one
+  `Attr` and the rest (§3.4.3). A frame's changes to one surface go in one
   delta, which the host applies as one; the one-op shorthands (`SetText`,
   …) are still there for a single change.
 - **The flags stay on the surface.** `p`, `f` and `v` hold until the
@@ -1128,8 +1113,7 @@ wrong:
 - **Every key's name changes.** `Control+a` is `ctrl+a`, `Meta` is
   `super`, `ArrowLeft` is `arrow_left`, `PageDown` is `page_down`, `Enter`
   is `enter` and `Space` is `space`. A program's `data-keys`, its menu's
-  keys and `seq`, and the keys its tests expect all move. myelinkey's
-  `ParseHotty` reads the 0.3 names, for a script that ports them.
+  keys and `seq`, and the keys its tests expect all move.
 - **`mod`, not `Mod`.** A binding writes `mod+s`, and one with `mod` and
   `ctrl` or `super` as well is refused. The capabilities' `mod` is
   `"ctrl"` or `"super"`, and `edit` names its keys the new way. `ParseKey`

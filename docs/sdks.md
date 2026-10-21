@@ -2,7 +2,7 @@
 group: Start
 order: 20
 nav: Choose an SDK
-description: the libraries that speak hotty for a program, in Go, TypeScript, Lua and Python
+description: the libraries that speak hotty for a program, in Go, TypeScript, Rust, Lua and Python
 ---
 
 # Choose an SDK
@@ -17,11 +17,15 @@ what you learn in one carries over to the others.
 | --- | --- | --- |
 | [Go](#go) | command-line tools, full-screen programs, their tests | the most: Bubble Tea, charts, forms, fields in cells, a host for tests |
 | [TypeScript](#typescript) | Node and Bun programs | the protocol and a terminal to use it in |
+| [Rust](#rust) | command-line tools, ratatui programs, hosts | the protocol, a terminal, ratatui widgets, and a host's side |
 | [Lua](#lua) | Neovim plugins, plx scripts | the protocol, and surfaces anchored to a buffer or a tool |
 | [Python](#python) | trying hotty out, the examples in this repository | the protocol, in one file with no dependencies |
 
 Each speaks hotty 0.4 and no other version. A program written with one
-draws in cells wherever the terminal is not a host of 0.4.
+draws in cells wherever the terminal is not a host of 0.4. Each passes the
+SDK sections of the [conformance vectors](../conformance/README.md); the
+Python client and the Lua SDK count code points where the others count
+grapheme clusters (SDK.md §4.6), and skip the few vectors that need them.
 
 ## Go
 
@@ -45,9 +49,29 @@ Start with the [Go quick start](https://github.com/neuroplastio/hotty-go/blob/ma
 
 ## TypeScript
 
-hotty-ts is the SDK for Node and Bun: the protocol, and a terminal that
-detects the host, prints documents and reads the host's events. Its
-package is `@neuroplastio/hotty`, which isn't published yet.
+[hotty-ts](https://github.com/neuroplastio/hotty-ts) is the SDK for Node
+and Bun: the protocol, and a terminal that detects the host, prints
+documents and reads the host's events, a framework's session, and a host
+for tests.
+
+```sh
+npm install @neuroplastio/hotty
+```
+
+## Rust
+
+[hotty-rs](https://github.com/neuroplastio/hotty-rs) has two crates:
+
+- `hotty`, the protocol, a terminal for a command that prints and exits, a
+  framework's session, and `hotty::host`, what a host or a relay reads of
+  a program and writes back. hotty-blitz is built on it;
+- `hotty-ratatui`, for a [ratatui](https://ratatui.rs) program: a
+  `Surface` widget that shows its HTML on a host and a fallback widget in
+  cells anywhere else. It reads the terminal itself, since crossterm's
+  reader would take the host's replies for keys, and hands the program
+  crossterm's events beside hotty's.
+
+Start with its [README](https://github.com/neuroplastio/hotty-rs#readme).
 
 ## Lua
 
