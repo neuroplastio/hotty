@@ -14,6 +14,16 @@ A draft, as every 0.x is, released 2026-10-18 across the stack. It breaks
 0.3 (SPEC.md §15): a 0.4 host answers a 0.3 program with `EVERSION`, and
 the program falls back (§4, §14).
 
+It is tagged `v0.4.0` (481a79f). Its implementations take its MAJOR.MINOR
+(gov P-5 rule 6), and each released 0.4.0 with it, tagged `v0.4.0` in its
+repository: hotty-go (with `hottyedit/`, `hottyterm/`, `hottytea/`,
+`hottytest/` and `hottyvt/v0.4.0`), hotty-ts, hotty-lua
+(`hotty-0.4.0-1.rockspec`), hotty-blitz, and xterm-addon-hotty, which npm
+has as `@neuroplastio/xterm-addon-hotty` 0.4.0. The first hottyterm release
+that speaks it is 26.10.17-dev.e873289, on hotty-blitz a596c6d, which named
+itself 0.0.3; the first to say so beside its name, on hotty-blitz 0.4.0, is
+26.10.21-dev.6ca19c1.
+
 ### What changed
 
 - **Keys are named by *myelin key names* 0.1** (SPEC.md §10.4), which this
