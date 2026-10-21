@@ -71,7 +71,7 @@ npm install @neuroplastio/hotty
   reader would take the host's replies for keys, and hands the program
   crossterm's events beside hotty's.
 
-Start with its [README](https://github.com/neuroplastio/hotty-rs#readme).
+Start with the [Rust quick start](https://github.com/neuroplastio/hotty-rs/blob/main/docs/quickstart.md).
 
 ## Lua
 
