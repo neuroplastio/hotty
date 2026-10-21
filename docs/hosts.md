@@ -18,6 +18,10 @@ shows its surfaces where there is a host.
 | [a browser](#a-browser) | any page that runs xterm.js | everything, each surface in a sandboxed iframe |
 | [`hotty run`](#any-terminal-with-kitty-graphics) | kitty, Ghostty and other terminals with kitty graphics | surfaces as images: sharp at one zoom, no text to select |
 
+hottyterm and the browser's host share no code, and each passes the host
+sections of the [conformance vectors](../conformance/README.md); so does
+`hotty run`, which draws with hottyterm's renderer, hotty-blitz.
+
 A program of hotty 0.4 needs a host of 0.4. A host of another version, 0.2
 or later, answers its question with the versions it speaks; a host of 0.1
 answers with capabilities the program can't read. Either way the program

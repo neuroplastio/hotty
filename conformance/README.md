@@ -10,26 +10,18 @@ path: conformance
 
 `vectors.json` is what a host and an SDK must do, as data.
 
-The host sections (`vectors`, `wire`) are run by two hosts that share no
-code:
-- hotty-blitz: `crates/hotty-blitz/tests/conformance.rs`, which runs the
-  `keys`, `keymap` and `edit` sections too, the edits on a real surface;
-- xterm-addon-hotty: `tests/e2e/conformance.spec.ts` and
-  `tests/unit/conformance.test.ts` (with `keys`, `keymap` and `edit`).
-
-hotty-go's test host runs `vectors` too (`hottytest/conformance_test.go`).
+The host sections (`vectors`, `wire`) are a host's, and an SDK's test
+host's (SDK.md §4.4), which skips what it cannot do (below). A host runs the
+`keys`, `keymap` and `edit` sections too, since its fields edit as SPEC
+§10.2 has them.
 
 The SDK sections (`wire`, `build`, `encode`, `decode`, `scan`, `detect`,
-`keys`, `keymap`, `edit`; SDK.md §5) are run by:
-- the Python client: `clients/python/test_vectors.py`, every section;
-- hotty-go: `hotty_test.go` (`wire`), `vectors_test.go` (`build`,
-  `encode`, `decode`, `scan`, `detect`, `keys`, `keymap`) and
-  `hottyedit/field_test.go` (`edit`);
-- hotty-lua: `tests/vectors.lua`, every section, under each of its
-  runtimes.
+`keys`, `keymap`, `edit`; SDK.md §5) are an SDK's. An SDK that counts code
+points rather than grapheme clusters (SDK.md §4.6) skips the vectors that
+require `graphemes`.
 
-The Python client and hotty-lua count code points, not grapheme clusters
-(SDK.md §4.6), and skip the vectors that require `graphemes`.
+Which hosts and SDKs pass them, the documentation says:
+[Choose a host](../docs/hosts.md) and [Choose an SDK](../docs/sdks.md).
 
 A disagreement is either a bug or a line of `SPEC.md` or `SDK.md` that says
 too little.

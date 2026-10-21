@@ -28,7 +28,7 @@ the state and decides what every event means. The terminal is the view. A
 surface can do nothing the program did not send it, and can learn nothing
 the program did not give it.
 
-![hotty-demo full screen in xterm.js: the web shell runs `sh deploy.sh`, whose
+![The hotty website's demo, full screen in a host in the browser: the web shell runs `sh deploy.sh`, whose
 askhot questions — a choice, a text field, a confirmation, a form — are
 surfaces the program hears; a chart streams from a pipe; a metrics chart is
 hovered for its values, a moment pinned and a heatmap shown; a document
@@ -37,9 +37,7 @@ images and charts scroll in a feed; and an agent's transcript, diff, approval
 and load test follow.](demo.gif)
 
 *The hotty website, [hotty.neuroplast.io](https://hotty.neuroplast.io),
-running in xterm.js with
-[xterm-addon-hotty](https://github.com/neuroplastio/xterm-addon-hotty), one of
-the two hosts that share no code and pass the conformance vectors. Every
+running in a host in the browser. Every
 surface — the askhot questions, the charts, the table, the diagram, the cards,
 the diff, the approval — is HTML the program sent in-band, in the terminal's
 own output; the cells around them are the program's too.*
@@ -1941,7 +1939,7 @@ binding starts its prefix.
 ### 10.5 Key sequences
 
 A program reads its key sequences itself, a leader and the keys after it,
-or `g g`, with the keymap it uses in its cells (myelin's, say), and shows
+or `g g`, with the keymap it uses in its cells, and shows
 which keys can follow one with its menu (§10.7). On a surface it needs two
 things of the host: the keys after the first, whatever is focused, and a
 place to show the menu.
@@ -2055,7 +2053,8 @@ ESC ] 7279 ; a=menu ; <base64 msgpack menu> ST
   - `items`, the items after it, which make it a group; an empty list
     makes none.
 
-  It is myelin's `Tree`, with a name for each binding. The top level's
+  It is the tree a keymap makes of its key sequences, with a name for
+  each binding. The top level's
   items are one deep, and items nest at most eight deep: a deeper menu is
   `EINVAL`.
 - **It lasts** until the program sends another, or `a=menu` with no body,
@@ -2714,7 +2713,8 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
   runs in, Ghostty, already has a spelling for keys: modifiers in lower
   case, physical keys by where they are, characters by what they type.
   hotty wrote the W3C's key values until 0.4.
-  - **Cited, not copied,** so that hotty, plx and myelin cannot drift: a
+  - **Cited, not copied,** so that hotty and every keymap that reads the
+    same names cannot drift: a
     change to the names is a new version of that document, with its
     vectors, and of this one.
   - **Physical keys and characters both,** because some bindings follow
