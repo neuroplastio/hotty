@@ -12650,7 +12650,7 @@
    ]
   },
   {
-   "name": "a=field completes what the user typed: text replaces [from, to), the caret goes after it, and the host sends nothing; the user's next key edits from there, and an a=field made against an older rev changes nothing and answers ESTALE with the control's rev (SPEC \u00a76.4)",
+   "name": "a=field completes what the user typed: text replaces [from, to), the caret goes after it, and the host sends nothing; the user's next key edits from there, and an a=field made against an older rev changes nothing and answers ESTALE with the control's rev, even when its positions run past what the user left (SPEC \u00a76.4)",
    "steps": [
     {
      "send": {
@@ -12788,6 +12788,24 @@
        }
       }
      ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 3,
+      "from": 0,
+      "to": 5,
+      "text": "src/main"
+     },
+     "reply": {
+      "a": "err",
+      "code": "ESTALE",
+      "detail": "4"
+     }
     },
     {
      "send": {
@@ -13480,7 +13498,7 @@
    ]
   },
   {
-   "name": "a=field is checked whole before it changes anything: EINVAL for a body that is not such a map, a missing or mistyped rev, no field but rev, value with text, from or to, from or to without the other or without text, from past to, a position past the end, sel not two ints, a field not for the control, a target that is not a control, a select value with no option, and a missing t, even with a rev that is stale; ENOTARGET for a missing element and EDETACHED for a detached surface; with more than one wrong, EDETACHED comes first, then ENOTARGET, EINVAL and ESTALE (SPEC \u00a76.4)",
+   "name": "a=field is checked whole before it changes anything: EINVAL for a body that is not such a map, a missing or mistyped rev, no field but rev, value with text, from or to, from or to without the other or without text, from past to, a position past the end of a value whose rev matches, sel not two ints, a field not for the control, a target that is not a control, a select value with no option, and a missing t, even with a rev that is stale; ENOTARGET for a missing element and EDETACHED for a detached surface; with more than one wrong, EDETACHED comes first, then ENOTARGET, EINVAL and ESTALE (SPEC \u00a76.4)",
    "steps": [
     {
      "send": {

@@ -830,12 +830,16 @@ The body is a msgpack map (§3.3):
   decode (§3.3) or is not such a map; `rev` is missing; no field but `rev`
   is there; the target is not a control, or a field is not for it (the
   table); `value` comes with `text`, `from` or `to`; `from` or `to` comes
-  without the other, or without `text`; `from` is past `to`; a position is
-  past the end of its value, or inside a code point; `sel` is not two ints;
-  or a `select` has no option with the value. A missing target is
-  `ENOTARGET`, and a detached surface `EDETACHED` (§5.5). Only a command
-  that would apply can be stale. When more than one holds, the answer is
-  the first of `EDETACHED`, `ENOTARGET`, `EINVAL` and `ESTALE`.
+  without the other, or without `text`; `from` is past `to`; `sel` is not
+  two ints; or a `select` has no option with the value. A missing target
+  is `ENOTARGET`, and a detached surface `EDETACHED` (§5.5). When more
+  than one holds, the answer is the first of `EDETACHED`, `ENOTARGET`,
+  `EINVAL` and `ESTALE`.
+- **Positions come last.** They count bytes of the value the program heard,
+  so the host checks them only against a value that is still that one: a
+  stale command is `ESTALE` whatever its positions, and one that is not
+  is `EINVAL` when a position is past the end of its value, or inside a
+  code point.
 
 ## 7. Resources
 
