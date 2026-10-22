@@ -10,9 +10,9 @@ path: changes
 
 ## 0.5
 
-A draft, as every 0.x is, not yet released. It breaks 0.4 (SPEC.md §15): a
-0.5 host answers a 0.4 program with `EVERSION`, and the program falls back
-(§4, §14). Its task is `vault/tasks/0.5.md`.
+A draft, as every 0.x is, released 2026-10-22 across the stack. It breaks
+0.4 (SPEC.md §15): a 0.5 host answers a 0.4 program with `EVERSION`, and
+the program falls back (§4, §14).
 
 ### What changed
 
