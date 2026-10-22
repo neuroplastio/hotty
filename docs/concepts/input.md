@@ -34,6 +34,7 @@ whole surface. Nothing is sent that nobody asked for:
 | event | asked for by | sent |
 | --- | --- | --- |
 | `click`, `change`, `input`, `submit` | the element: its kind, or `click` or `input` in its `data-on` | each time |
+| `caret` | `caret` in a text field's `data-on` | each move of the selection, at most one a frame |
 | `press` | `p=1` on the placement | each press |
 | `dragstart`, `drag`, `dragend` | `drag` in the element's `data-on`, and `drop` for a target | for each element, cell or step crossed |
 | `hover` | `v=1` on the placement | each change, at most one a frame |
@@ -127,8 +128,9 @@ need no round trip, and each control reports by its kind:
 
 | event | when | detail |
 | --- | --- | --- |
-| `change` | a checkbox or radio button toggled, or a select's option picked: at once. A text field's value: when focus leaves it, if the value changed | `{"checked": bool, "value": str}` for a checkbox or radio button, `{"value": str}` otherwise |
-| `input` | every edit of a control with `data-on="input"` | `{"value": str}` |
+| `change` | a checkbox or radio button toggled, or a select's option picked: at once. A text field's value: when focus leaves it, if the user changed it | `{"checked": bool, "value": str, "rev": int}` for a checkbox or radio button, `{"value": str, "rev": int}` otherwise |
+| `input` | every edit of a control with `data-on="input"` | `{"value": str, "rev": int}`, and `"sel": [int, int]` with `data-on="input caret"` |
+| `caret` | the user moved the selection of a text field with `data-on="caret"`, and no `input` says so | `{"sel": [int, int], "rev": int}` |
 | `submit` | a submit button, or `enter` in a text field | `{"fields": [[str, str]]}`: each named field's name and value, in tree order |
 
 A search box that hears every keystroke, as the user types "ad" and
@@ -141,8 +143,8 @@ presses `enter`:
 ```
 
 ```text
-host → ESC ] 7279 ; a=ev:s=find:e=input:t=q ; {"value": "a"} ST
-host → ESC ] 7279 ; a=ev:s=find:e=input:t=q ; {"value": "ad"} ST
+host → ESC ] 7279 ; a=ev:s=find:e=input:t=q ; {"value": "a", "rev": 1} ST
+host → ESC ] 7279 ; a=ev:s=find:e=input:t=q ; {"value": "ad", "rev": 2} ST
 host → ESC ] 7279 ; a=ev:s=find:e=submit:t=search ; {"fields": [["q", "ad"]]} ST
 ```
 
@@ -152,9 +154,50 @@ host → ESC ] 7279 ; a=ev:s=find:e=submit:t=search ; {"fields": [["q", "ad"]]} 
 - **A text field commits** when focus leaves it, including when the
   surface loses the keyboard, and sends `change` if its value changed.
   Without `data-on="input"`, that `change` is all the program hears of it.
+- **`rev` counts the user's changes** to the control: each edit, toggle,
+  check and pick. Moving the caret doesn't count, nor does a value the
+  program sets. The program sends it back to change the control
+  (below).
 - **The program sets a value** by changing the control's `value`,
   `checked` or `selected` attribute with a delta. Its value wins, except
   while the user is editing that control ([Updates](updates.md)).
+
+## Changing what the user is changing
+
+> [!NOTE]
+> New in 0.5.
+
+To change a control the user may be changing, a program sends `a=field`
+([§6.4](../../SPEC.md#64-afield)). The command carries the `rev` the
+program last heard, and the host applies it only if the control still has
+that `rev`. A picker completes what the user typed in place: the field
+keeps its id, its history and its keys, and the caret goes after the
+text.
+
+```text
+host    → ESC ] 7279 ; a=ev:s=find:e=input:t=q ; {"value": "sr", "rev": 2} ST
+program → ESC ] 7279 ; a=field:s=find:t=q ; {"rev": 2, "from": 0, "to": 2, "text": "src/"} ST
+```
+
+- **The body** holds `rev` and one of:
+  - `value`;
+  - `text`, which replaces the selection or the range `from`..`to`;
+  - `checked`, for a checkbox or a radio button.
+
+  `sel` sets the selection after the change: the anchor, then the caret.
+  `sel` alone moves the selection.
+- **Positions** count bytes of the value's UTF-8, so `é` is 2. A program
+  in JavaScript converts from UTF-16.
+- **If the user changed the control first**, the host changes nothing and
+  answers `ESTALE`, with the control's `rev` as the detail. The program
+  waits for the event it hears next and decides again. It doesn't resend:
+  that would overwrite what the user did.
+- **Nothing is sent back.** `a=field` sends no `input` or `change`. When
+  focus leaves a field that only the program changed, the host sends no
+  `change` either.
+- **Undo** takes the change back as one edit, as it does the user's.
+- **A field's caret starts at the end of its value**, and stays where the
+  user left it while another element has focus.
 
 ## Presses
 

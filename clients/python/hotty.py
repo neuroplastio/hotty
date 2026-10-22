@@ -38,13 +38,14 @@ OSC_NUMBER = NUMBER  # the name this client had first
 CHUNK = 4096
 MAX_SIZE = 1000
 MAX_NAME = 64
-VERSION = "0.4"
+VERSION = "0.5"
 COMPRESS_FROM = 256
 SCAN_MAX = 64 << 10
 
 EVENT_CLICK = "click"
 EVENT_CHANGE = "change"
 EVENT_INPUT = "input"
+EVENT_CARET = "caret"
 EVENT_SUBMIT = "submit"
 EVENT_PRESS = "press"
 EVENT_FOCUS = "focus"
@@ -64,6 +65,7 @@ ENOTARGET = "ENOTARGET"
 EDETACHED = "EDETACHED"
 EQUOTA = "EQUOTA"
 EBUDGET = "EBUDGET"
+ESTALE = "ESTALE"
 EVERSION = "EVERSION"
 
 # The features a host may lack (SPEC §4).
@@ -515,6 +517,36 @@ def blur(surface, n=None, q=None):
     return _command([("a", "blur"), ("s", surface)], b"", NO_REPLY, n, q)
 
 
+@dataclass
+class FieldChange:
+    """A change to a control the user may be changing (SPEC §6.4): the
+    control's `rev` it is made against, and the fields to change, None
+    where absent. Positions count bytes of the value's UTF-8; `sel` is
+    (anchor, caret)."""
+
+    rev: int = 0
+    value: str = None
+    from_: int = None
+    to: int = None
+    text: str = None
+    sel: tuple = None
+    checked: bool = None
+
+
+def set_field(surface, target, change, n=None, q=None):
+    """Changes a control unless the user has since `change.rev` (SPEC §6.4).
+    The map's order is SDK.md §3.4's; the host checks the fields."""
+    m = {"rev": change.rev}
+    for k, v in (("value", change.value), ("from", change.from_), ("to", change.to), ("text", change.text)):
+        if v is not None:
+            m[k] = v
+    if change.sel is not None:
+        m["sel"] = list(change.sel)
+    if change.checked is not None:
+        m["checked"] = change.checked
+    return _command([("a", "field"), ("s", surface), ("t", target)], pack(m), REPLY_ON_ERROR, n, q)
+
+
 def sync(*cmds):
     """Commands the host applies as one batch (SPEC §6.3)."""
     return "\x1b[?2026h" + "".join(cmds) + "\x1b[?2026l"
@@ -713,8 +745,9 @@ _DRAG = {"c": "int", "r": "int", "mods": "int", "x": "int", "y": "int", "tx": "i
 _DETAIL = {
     EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA, "mods": "int", "count": "int"},
     EVENT_PRESS: {"area": _AREA, "mods": "int"},
-    EVENT_CHANGE: {"checked": "bool", "value": "str"},
-    EVENT_INPUT: {"value": "str"},
+    EVENT_CHANGE: {"checked": "bool", "value": "str", "rev": "int"},
+    EVENT_INPUT: {"value": "str", "rev": "int", "sel": ("int", "int")},
+    EVENT_CARET: {"sel": ("int", "int"), "rev": "int"},
     EVENT_SUBMIT: {"fields": [("str", "str")]},
     EVENT_FIT: {"r": "int"},
     EVENT_DRAG_START: _DRAG,
@@ -748,6 +781,16 @@ class Event:
 
     def checked(self):
         return self._d.get("checked") if self.kind == EVENT_CHANGE else None
+
+    def rev(self):
+        """The control's revision (SPEC §6.4), which set_field sends back."""
+        return self._d.get("rev") if self.kind in (EVENT_CHANGE, EVENT_INPUT, EVENT_CARET) else None
+
+    def sel(self):
+        """(anchor, caret) in bytes of the value's UTF-8 (SPEC §6.4), in
+        an input or a caret of a field with data-on~=caret."""
+        s = self._d.get("sel") if self.kind in (EVENT_INPUT, EVENT_CARET) else None
+        return tuple(s) if s is not None else None
 
     def fields(self):
         """A submit's fields, a list of (name, value) in order: two fields of

@@ -114,7 +114,9 @@ removed or inserted.
 **The program's values win, except while the user is editing.** A change
 to `value`, `checked` or `selected` also sets the control's current state,
 unless the control is focused. A focused control keeps the value the user
-is typing.
+is typing. To change a control the user may be changing, the program sends
+`a=field`, which changes it only if the user hasn't since
+([Input](input.md#changing-what-the-user-is-changing)).
 
 `morph` with no `t` matches each top-level element of `v` to the element
 of the document with the same id. A program that redraws its whole tree

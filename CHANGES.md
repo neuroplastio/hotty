@@ -8,6 +8,75 @@ path: changes
 
 # Changes
 
+## 0.5
+
+A draft, as every 0.x is, not yet released. It breaks 0.4 (SPEC.md §15): a
+0.5 host answers a 0.4 program with `EVERSION`, and the program falls back
+(§4, §14). Its task is `vault/tasks/0.5.md`.
+
+### What changed
+
+- **`a=field` changes a control the user may be changing** (SPEC.md §6.4),
+  but only if they have not changed it since the program last heard.
+  - It works on a text field, a checkbox, a radio button and a select,
+    focused or not.
+  - Its msgpack body holds the control's `rev` and one of:
+    - `value`;
+    - `text`, which replaces the selection or a range `from`..`to`;
+    - `checked`.
+  - It can also hold `sel`, the selection after the change.
+  - A program can now complete what the user typed in place. Before, it
+    had to replace the field with a new one so that its value would
+    reach the field while it was focused.
+- **Controls count the user's changes, as `rev`** (§6.4):
+  - every edit, toggle, check and pick;
+  - never a move of the caret, nor a value the program sets.
+  - `input` and `change` carry it (§9).
+  - An `a=field` made against another `rev` changes nothing and answers
+    `ESTALE`, a new code whose detail is the control's `rev` (§3.6).
+- **Positions are bytes of the value's UTF-8** (§6.4), in `a=field` and in
+  the selection events report.
+- **`caret`, a new event** (§9), with `data-on~=caret`, reports the
+  user's moves of the selection. With it, `input` carries `sel` as well.
+- **A field's caret starts at the end of its value** (§10.2). That holds
+  when the field enters the document and when a delta sets its value. A
+  field keeps its selection while it is not focused, and `a=focus` gives
+  it back.
+- **An `a=field` is one edit of the field's history** (§10.2), and it ends
+  a run of typing.
+
+### Upgrading from 0.4
+
+**A program:**
+- Read `rev` from `input` and `change`, and send it back in `a=field`.
+- To complete a field, send `a=field` with `text`, `from` and `to`. Don't
+  swap in a new element: the field keeps its id, its history and its
+  caret, which goes after the text.
+- On `ESTALE`, do nothing. The user typed first. Decide again from the
+  `input` you hear next, and don't resend against the detail's `rev`.
+- Count positions in bytes of UTF-8. In JavaScript, convert from UTF-16.
+
+**A host:**
+- Keep a `rev` for each control:
+  - one more for each of the user's changes;
+  - for a radio group, one `rev` for the group.
+  - Send it in `input` and `change`.
+- Take `a=field`:
+  - check it whole first;
+  - answer `ESTALE` against another `rev`, or while an input method
+    composes;
+  - apply it as one edit of the history;
+  - send nothing back.
+- Send `caret`, and `sel` in `input`, for fields with `data-on~=caret`.
+- Put a field's caret at the end of its value when the field enters the
+  document and when a delta sets the value. Keep the selection while the
+  field is not focused.
+- When focus leaves a field that only `a=field` changed, send no
+  `change`.
+
+**A multiplexer** relays `a=field` to the host and `ESTALE` back, as it
+relays `a=focus`.
+
 ## 0.4
 
 A draft, as every 0.x is, released 2026-10-18 across the stack. It breaks

@@ -29,7 +29,7 @@ too little.
 ## Format
 
 ```
-{ "version": "0.4",
+{ "version": "0.5",
   "vectors": [ { "name": …, "steps": [ step, … ] } ],
   "wire":    [ { "name": …, "stream": …, "commands": [ … ], "invalid": n } ],
   "build":   [ … ], "encode": [ … ], "decode": [ … ], "scan": [ … ],
@@ -67,7 +67,7 @@ Its steps come in seven kinds.
 **Send** `{ "send": {control}, "payload": text?, "body": value?, "reply":
 …, "events": … }`: the command goes to the host as the program would send
 it. It is base64-encoded and chunked as needed. `payload` is UTF-8 text;
-`body` is a msgpack body (a delta's ops, a menu), as JSON: the runner
+`body` is a msgpack body (a delta's ops, a menu, an `a=field`'s change), as JSON: the runner
 writes it as msgpack, its numbers as Numbers (above) say, and sends that.
 - `"reply"` absent: replies are not checked.
 - `"reply": null`: the command must produce no reply.
@@ -261,7 +261,7 @@ in order:
 - `reply`: `Reply`'s fields (`ok`, `re`, `n`, `surface`, `cols`, `rows`,
   `code`, `detail`, `op`);
 - `event`: `Event`'s fields and accessors (`surface`, `kind`, `target`,
-  `value`, `checked`, `fields` as a list of `[name, value]`, `mods`, `link`
+  `value`, `checked`, `rev`, `sel` as a list of two, `fields` as a list of `[name, value]`, `mods`, `link`
   with `href` and `url`, `fit_rows`, `drag` with `c`, `r`, `x`, `y`, `tx`
   and `ty`, `hover` with `c`, `r` and `out`, `area`, `count`, `view` with
   `areas` and `at_end`, `command` with `name`, `key`, `text` and

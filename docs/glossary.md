@@ -48,6 +48,9 @@ Each word below links to the section that defines it, in the
 - **resource**: named bytes with a MIME type, such as an image, sent with
   `a=res` and referred to as `cid:<id>`
   ([§7.1](../SPEC.md#71-in-band-resources)).
+- **rev**: a control's count of the user's changes, which `input` and
+  `change` carry and an `a=field` is made against
+  ([§6.4](../SPEC.md#64-afield)).
 - **surface**: a named HTML document, and at most one placement showing
   it ([§5](../SPEC.md#5-surfaces)).
 - **window**: the part of a surface that its placement shows, chosen with

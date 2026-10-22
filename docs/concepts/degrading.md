@@ -39,7 +39,7 @@ A program asks with a query, followed by a question every terminal
 answers ([§4](../../SPEC.md#4-detection-and-capabilities)):
 
 ```text
-program → ESC ] 7279 ; a=q:n=1:v=0.4 ST  CSI c
+program → ESC ] 7279 ; a=q:n=1:v=0.5 ST  CSI c
 ```
 
 `CSI c` asks for the terminal's Primary Device Attributes (DA1). A host
@@ -73,8 +73,8 @@ the highest one it shares. A host that shares none answers `EVERSION`,
 with the versions it speaks as the detail:
 
 ```text
-program → ESC ] 7279 ; a=q:n=1:v=0.4 ST  CSI c
-host    → ESC ] 7279 ; a=err:n=1:re=q ; {"code": "EVERSION", "detail": "0.3"} ST  CSI ? 62 ; 22 c
+program → ESC ] 7279 ; a=q:n=1:v=0.5 ST  CSI c
+host    → ESC ] 7279 ; a=err:n=1:re=q ; {"code": "EVERSION", "detail": "0.4"} ST  CSI ? 62 ; 22 c
 ```
 
 The program takes that as no host, and draws in cells. It does the same
@@ -83,13 +83,13 @@ list. Until 1.0 a version may change how messages are read, so a program
 and a host of different versions never meet
 ([§15](../../SPEC.md#15-versioning-and-extensions)).
 
-Today's SDKs each speak 0.4 alone, so a program written with one draws
-in cells on a host of 0.3. The detail lets the program tell its user which
+Today's SDKs each speak 0.5 alone, so a program written with one draws
+in cells on a host of 0.4. The detail lets the program tell its user which
 versions the terminal speaks.
 
 ## Features
 
-A host of 0.4 does everything 0.4 describes, except the features it may
+A host of 0.5 does everything 0.5 describes, except the features it may
 lack ([§4](../../SPEC.md#4-detection-and-capabilities)). The
 capabilities' `features` list those it has, and a program offers another
 way where one is missing:
@@ -120,7 +120,7 @@ restored after a reboot. Detection then finds no host, though one may
 attach later.
 
 ```text
-program  → ESC ] 7279 ; a=q:n=1:v=0.4:late=1 ST  CSI c
+program  → ESC ] 7279 ; a=q:n=1:v=0.5:late=1 ST  CSI c
 terminal → CSI ? 62 ; 22 c                                    (no host yet: the program draws in cells)
 host     → ESC ] 7279 ; a=ok:n=1:re=q ; <the capabilities> ST   (later: a host attached)
 ```

@@ -50,7 +50,7 @@ command it doesn't know. That's what makes it safe to ask.
 A program asks first (§4):
 
 ```text
-program → ESC ] 7279 ; a=q:n=1:v=0.4 ST  CSI c
+program → ESC ] 7279 ; a=q:n=1:v=0.5 ST  CSI c
 host    → ESC ] 7279 ; a=ok:n=1:re=q ; <the capabilities> ST  CSI ? 62 ; 22 c
 ```
 

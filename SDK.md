@@ -8,7 +8,7 @@ path: sdk-design
 
 # hotty SDKs
 
-    Version:  0.4, with SPEC.md 0.4
+    Version:  0.5, with SPEC.md 0.5
     Status:   Draft. It changes with SPEC.md (§15 there).
     Licence:  CC BY 4.0
 
@@ -195,18 +195,18 @@ An SDK **MUST** provide every component of this section.
 | `Chunk` | 4096, the most base64 bytes in one sequence |
 | `MaxSize` | 1000, the most columns or rows of a surface |
 | `MaxName` | 64, the longest surface name |
-| `Version` | `"0.4"`, the protocol version the SDK speaks, which its query lists (SPEC.md §4) |
+| `Version` | `"0.5"`, the protocol version the SDK speaks, which its query lists (SPEC.md §4) |
 | `DefaultMax` | 16777216 (16 MiB), the most bytes a Decoder decodes one message to unless its `Max` says otherwise (§3.6) |
 
 And these sets, each value under its canonical name:
-- **event kinds**: `click`, `change`, `input`, `submit`, `press`, `focus`,
-  `blur`, `fit`, `hover`, `view`, `dragstart`, `drag`, `dragend`,
+- **event kinds**: `click`, `change`, `input`, `caret`, `submit`, `press`,
+  `focus`, `blur`, `fit`, `hover`, `view`, `dragstart`, `drag`, `dragend`,
   `command`, `caps` (SPEC.md §9);
 - **features**: `passthrough`, `hover`, `count`, `menu` (SPEC.md §4);
 - **modifier bits**: `ModShift` 1, `ModAlt` 2, `ModCtrl` 4, `ModSuper` 8
   (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
-  `EBUDGET`, `EVERSION` (SPEC.md §3.6);
+  `EBUDGET`, `ESTALE`, `EVERSION` (SPEC.md §3.6);
 - **delta ops**: `morph`, `inner`, `replace`, `append`, `prepend`, `before`,
   `after`, `remove`, `attr`, `unattr`, `text`, `var`, `reveal` (SPEC.md
   §6.1);
@@ -267,6 +267,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | `RemoveAttr` | `Delta` with one op, `Unattr` | surface, target, name | 2 |
 | `MorphTo` | `Delta` with one op, `Morph` | surface, target, html | 2 |
 | `Reveal` | `Delta` with one op, `RevealOp`: `where` is `start`, `end`, or empty for the nearest (SPEC.md §6.1) | surface, target, where | 2 |
+| `SetField` | `a=field:s:t` and the change as msgpack (below; SPEC.md §6.4) | surface, target, change | 1 |
 | `Res` | `a=res:id:type` and the data | id, mime, data | 2 |
 | `DelRes` | `a=del:id` | id | 2 |
 | `Del` | `a=del:s` | surface | 2 |
@@ -282,8 +283,9 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | `MenuHide` | `a=menu:show=0` | — | 2 |
 | `Touch` | `a=touch` and `{"areas": [area]}` as msgpack (below); with no areas, no payload, which leaves none (SPEC.md §9.6) | areas | 2 |
 
-- **`Doc` and `Place` answer errors**, since a refused document or placement
-  (`EQUOTA`, `ENOENT`) is something a program must hear. Everything else
+- **`Doc`, `Place` and `SetField` answer errors**, since a refused document
+  or placement (`EQUOTA`, `ENOENT`), and a field the user changed first
+  (`ESTALE`), are something a program must hear. Everything else
   answers nothing unless asked: a program that sends deltas every frame would
   otherwise fill its input with replies.
 - **`PlaceAt`** places a surface at screen cell (x, y), counted from 0, and
@@ -296,6 +298,12 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
   forms: `label` unless it is empty, `items`; each item `key`, `label` and
   `name` unless they are empty, `enabled`, and `items` unless there are
   none. The program keeps it within eight levels (SPEC.md §10.7).
+- **`SetField`** takes a `FieldChange`: `Rev`, and `Value`, `From`, `To`,
+  `Text`, `Sel` (two positions, the anchor and the caret) and `Checked`,
+  each absent unless given, so that an empty `Value` or `Text` and a
+  position 0 are sent. It writes one msgpack map of `rev` and the fields
+  given, in that order, each value in the smallest of its type's forms.
+  It checks none of them: the host does (SPEC.md §6.4).
 - **`Touch`** takes a list of `TouchArea`, each with `C`, `R`, `W`, `H`
   and `Drag`: the screen's cells it covers, counted from 0, and `"x"`,
   `"y"` or `"xy"`. It writes each area as a map of all five, in that
@@ -551,6 +559,8 @@ carries, each absent when the event does not carry it:
 | --- | --- | --- |
 | `Value` | `value`, a string | `click`, `change`, `input` |
 | `Checked` | `checked`, a boolean | `change` |
+| `Rev` | `rev`: the control's revision (SPEC.md §6.4), which `SetField` sends back | `change`, `input`, `caret` |
+| `Sel` | `sel`: the selection, its anchor and its caret, in bytes of the value's UTF-8 (SPEC.md §6.4) | `input`, `caret` |
 | `Fields` | `fields`: the pairs of a name and a value, in order (SPEC.md §9) | `submit` |
 | `Mods` | `mods`: the modifier bits (§3.1), 0 when absent | `click`, `press`, `dragstart`, `drag`, `dragend` |
 | `Link` | `href`, and `url` if present | `click` on a link |
@@ -845,8 +855,9 @@ A host that runs inside a test, so that a program's tests need no terminal.
   makes it a host, as a multiplexer's terminal attaching does: then it
   answers a query that asked for a late answer and was not answered
   (SPEC.md §4), and every command after.
-- **The host.** It keeps every surface's document with the delta operations
-  and the morph of SPEC.md §6, answers as SPEC.md §3.6 has hosts do, and
+- **The host.** It keeps every surface's document with the delta operations,
+  the morph and `a=field` of SPEC.md §6, and each control's `rev` and
+  selection (SPEC.md §6.4), answers as SPEC.md §3.6 has hosts do, and
   passes the host vectors' `send`, `inspect` and `key` steps. It speaks
   the SDK's `Version` only: it answers a query that lists it with its
   capabilities, and any other with `EVERSION` (SPEC.md §4). It lays
@@ -989,6 +1000,7 @@ The canonical names, in each language's case.
 | `Op` and its fields | `hotty.Op{Op, Target, Key, Value}` | `Op(op, target, key, value)` | a table with those keys | `Op { op, target, key, value }` | `{ op, target, key, value }` |
 | `Morph`, `Inner`, `Replace`, `Append`, `Prepend`, `Before`, `After`, `Remove`, `Attr`, `Unattr`, `Text`, `Var`, `RevealOp` | `hotty.OpMorph`, `hotty.OpInner`, …, `hotty.OpText`, `hotty.OpVar`, `hotty.OpReveal` (`hotty.Text` is a detector's state) | `morph`, `inner`, …, `text`, `var`, `reveal_op` | as Python | as Python | `morph`, `inner`, …, `text`, `varOp`, `revealOp` |
 | `SetText`, `SetVar`, `SetAttr`, `RemoveAttr`, `MorphTo`, `Reveal` | the same | `set_text`, `set_var`, `set_attr`, `remove_attr`, `morph_to`, `reveal` | as Python | as Python | `setText`, `setVar`, `setAttr`, `removeAttr`, `morphTo`, `reveal` |
+| `SetField`, `FieldChange` and its fields | `hotty.SetField`, `hotty.FieldChange{Rev, Value, From, To, Text, Sel, Checked}`, absent as nil pointers | `set_field`, `FieldChange(rev, value, from_, to, text, sel, checked)`, absent as `None` | `set_field`, a table with those keys | `set_field`, `FieldChange { rev, value, from, to, text, sel, checked }`, each but `rev` an `Option` | `setField`, `{ rev, value, from, to, text, sel, checked }`, absent as `undefined` |
 | `Res`, `DelRes` | `Res`, `DelRes` | `res`, `del_res` | `res`, `del_res` | `res`, `del_res` | `res`, `delRes` |
 | `Del`, `DelAll` | `Del`, `DelAll` | `delete`, `del_all` | `del`, `del_all` | `del`, `del_all` | `del`, `delAll` |
 | `Detach`, `Focus`, `Blur`, `Sync` | the same | `detach`, `focus`, `blur`, `sync` | as Python | as Python | `detach`, `focus`, `blur`, `sync` |
@@ -1132,3 +1144,29 @@ wrong:
   they carry.
 - **The modifier bits keep their values,** under myelin's names:
   `ModControl` is `ModCtrl`, and `ModMeta` is `ModSuper`.
+
+## Appendix E. Moving from 0.4
+
+Informative. hotty 0.5 breaks 0.4 (SPEC.md §15): a program changes a
+control the user may be changing with `a=field` (SPEC.md §6.4), and the
+events of controls carry its revision. A program and its SDK move
+together, and its tests' fake hosts with them. These are the places a port
+goes wrong:
+
+- **`input` and `change` carry `rev`.** A test that expects their detail
+  exactly expects `rev` too: 1 after the first edit of a field, and one
+  more for each edit after it. A select's pick sends one `rev` in its
+  `input` and its `change`, and a radio group counts together.
+- **Complete with `SetField`, not a new element.** A program that replaced
+  a field with one of a new id, so that its value would reach it while
+  focused, sends `SetField` with the `rev` it last heard. The caret goes
+  after the text, the history stays, and the field keeps its id.
+- **`ESTALE` is not a failure.** The user typed first. The program does
+  nothing, and decides again from the `input` it hears next: it does not
+  resend with the `rev` the detail names, which would overwrite what the
+  user did.
+- **A field's caret starts at its end,** when the field enters the
+  document and when a morph's value reaches it, and `a=focus` leaves a
+  field's selection where it was.
+- **Positions are bytes of UTF-8,** in `SetField` and in `Sel`, not
+  characters: `é` is 2. A language whose strings count UTF-16 converts.

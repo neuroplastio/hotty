@@ -114,7 +114,7 @@ it before it relies on a fetch, and send an image in-band where the host
 grants nothing:
 
 ```text
-host → ESC ] 7279 ; a=ok:n=1:re=q ; {"v": "0.4", …, "net": {"img-src": ["https://example.com"]}} ST
+host → ESC ] 7279 ; a=ok:n=1:re=q ; {"v": "0.5", …, "net": {"img-src": ["https://example.com"]}} ST
 ```
 
 A host should fetch without a referrer and without credentials, such as

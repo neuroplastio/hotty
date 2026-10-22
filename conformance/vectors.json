@@ -1,6 +1,6 @@
 {
- "version": "0.4",
- "protocol": "SPEC.md version 0.4",
+ "version": "0.5",
+ "protocol": "SPEC.md version 0.5",
  "vectors": [
   {
    "name": "a=q answers ok and echoes n",
@@ -9,7 +9,7 @@
      "send": {
       "a": "q",
       "n": "7",
-      "v": "0.4"
+      "v": "0.5"
      },
      "reply": {
       "a": "ok",
@@ -26,14 +26,14 @@
      "send": {
       "a": "q",
       "n": "1",
-      "v": "0.4,99.0"
+      "v": "0.5,99.0"
      },
      "reply": {
       "a": "ok",
       "re": "q",
       "n": "1",
       "body": {
-       "v": "0.4"
+       "v": "0.5"
       }
      }
     },
@@ -41,14 +41,14 @@
      "send": {
       "a": "q",
       "n": "2",
-      "v": "99.0,0.4"
+      "v": "99.0,0.5"
      },
      "reply": {
       "a": "ok",
       "re": "q",
       "n": "2",
       "body": {
-       "v": "0.4"
+       "v": "0.5"
       }
      }
     },
@@ -56,14 +56,14 @@
      "send": {
       "a": "q",
       "n": "3",
-      "v": "0.3,0.4"
+      "v": "0.4,0.5"
      },
      "reply": {
       "a": "ok",
       "re": "q",
       "n": "3",
       "body": {
-       "v": "0.4"
+       "v": "0.5"
       }
      }
     }
@@ -82,7 +82,7 @@
       "re": "q",
       "n": "1",
       "code": "EVERSION",
-      "detail": "0.4"
+      "detail": "0.5"
      }
     },
     {
@@ -96,7 +96,7 @@
       "re": "q",
       "n": "2",
       "code": "EVERSION",
-      "detail": "0.4"
+      "detail": "0.5"
      }
     },
     {
@@ -110,21 +110,21 @@
       "re": "q",
       "n": "3",
       "code": "EVERSION",
-      "detail": "0.4"
+      "detail": "0.5"
      }
     },
     {
      "send": {
       "a": "q",
       "n": "4",
-      "v": "0.40"
+      "v": "0.50"
      },
      "reply": {
       "a": "err",
       "re": "q",
       "n": "4",
       "code": "EVERSION",
-      "detail": "0.4"
+      "detail": "0.5"
      }
     },
     {
@@ -138,7 +138,7 @@
       "re": "q",
       "n": "5",
       "code": "EVERSION",
-      "detail": "0.4"
+      "detail": "0.5"
      }
     },
     {
@@ -157,7 +157,7 @@
      "send": {
       "a": "q",
       "n": "1",
-      "v": "0.4"
+      "v": "0.5"
      },
      "reply": {
       "a": "ok",
@@ -202,7 +202,7 @@
      "send": {
       "a": "q",
       "n": "5",
-      "v": "0.4",
+      "v": "0.5",
       "late": "1"
      },
      "reply": {
@@ -12167,7 +12167,8 @@
        "s": "x",
        "t": "reason",
        "detail": {
-        "value": "a"
+        "value": "a",
+        "rev": 1
        }
       }
      ]
@@ -12181,7 +12182,8 @@
        "s": "x",
        "t": "reason",
        "detail": {
-        "value": "ab"
+        "value": "ab",
+        "rev": 2
        }
       }
      ]
@@ -12195,7 +12197,8 @@
        "s": "x",
        "t": "reason",
        "detail": {
-        "value": "abc"
+        "value": "abc",
+        "rev": 3
        }
       }
      ]
@@ -12209,7 +12212,8 @@
        "s": "x",
        "t": "reason",
        "detail": {
-        "value": "ab"
+        "value": "ab",
+        "rev": 4
        }
       }
      ]
@@ -12223,7 +12227,8 @@
        "s": "x",
        "t": "reason",
        "detail": {
-        "value": "abx"
+        "value": "abx",
+        "rev": 5
        }
       }
      ]
@@ -12242,7 +12247,8 @@
        "s": "x",
        "t": "reason",
        "detail": {
-        "value": "ab"
+        "value": "ab",
+        "rev": 6
        }
       }
      ]
@@ -12261,7 +12267,8 @@
        "s": "x",
        "t": "reason",
        "detail": {
-        "value": "b"
+        "value": "b",
+        "rev": 7
        }
       }
      ]
@@ -12285,7 +12292,8 @@
        "s": "x",
        "t": "reason",
        "detail": {
-        "value": ""
+        "value": "",
+        "rev": 8
        }
       }
      ]
@@ -12306,7 +12314,8 @@
        "s": "x",
        "t": "reason",
        "detail": {
-        "value": "B"
+        "value": "B",
+        "rev": 9
        }
       }
      ]
@@ -12323,7 +12332,8 @@
        "s": "x",
        "t": "reason",
        "detail": {
-        "value": ""
+        "value": "",
+        "rev": 10
        }
       }
      ]
@@ -12373,7 +12383,8 @@
        "s": "x",
        "t": "pin",
        "detail": {
-        "value": "abc"
+        "value": "abc",
+        "rev": 1
        }
       }
      ]
@@ -12387,7 +12398,8 @@
        "s": "x",
        "t": "pin",
        "detail": {
-        "value": "ab"
+        "value": "ab",
+        "rev": 2
        }
       }
      ]
@@ -12409,7 +12421,8 @@
        "s": "x",
        "t": "pin",
        "detail": {
-        "value": "aXb"
+        "value": "aXb",
+        "rev": 3
        }
       }
      ]
@@ -12428,7 +12441,8 @@
        "s": "x",
        "t": "pin",
        "detail": {
-        "value": "Xb"
+        "value": "Xb",
+        "rev": 4
        }
       }
      ]
@@ -12473,7 +12487,8 @@
        "s": "x",
        "t": "a",
        "detail": {
-        "value": "a"
+        "value": "a",
+        "rev": 1
        }
       }
      ]
@@ -12487,7 +12502,8 @@
        "s": "x",
        "t": "a",
        "detail": {
-        "value": "ab"
+        "value": "ab",
+        "rev": 2
        }
       }
      ]
@@ -12519,7 +12535,8 @@
        "s": "x",
        "t": "a",
        "detail": {
-        "value": "abc"
+        "value": "abc",
+        "rev": 3
        }
       }
      ]
@@ -12567,7 +12584,8 @@
        "s": "x",
        "t": "a",
        "detail": {
-        "value": "abcd"
+        "value": "abcd",
+        "rev": 4
        }
       }
      ]
@@ -12603,7 +12621,8 @@
        "s": "x",
        "t": "a",
        "detail": {
-        "value": "abcd"
+        "value": "abcd",
+        "rev": 4
        }
       }
      ]
@@ -12622,7 +12641,1822 @@
        "s": "x",
        "t": "b",
        "detail": {
-        "value": "xy"
+        "value": "xy",
+        "rev": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a=field completes what the user typed: text replaces [from, to), the caret goes after it, and the host sends nothing; the user's next key edits from there, and an a=field made against an older rev changes nothing and answers ESTALE with the control's rev (SPEC \u00a76.4)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=q data-on=\"input caret\">"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "q",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "s",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "s",
+        "rev": 1,
+        "sel": [
+         1,
+         1
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "key": "r",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "sr",
+        "rev": 2,
+        "sel": [
+         2,
+         2
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q",
+      "q": "0"
+     },
+     "body": {
+      "rev": 2,
+      "from": 0,
+      "to": 2,
+      "text": "src/"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "key": "m",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "src/m",
+        "rev": 3,
+        "sel": [
+         5,
+         5
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 2,
+      "text": "x"
+     },
+     "reply": {
+      "a": "err",
+      "code": "ESTALE",
+      "detail": "3"
+     }
+    },
+    {
+     "key": "Backspace",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "src/",
+        "rev": 4,
+        "sel": [
+         4,
+         4
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q",
+      "q": "0"
+     },
+     "body": {
+      "rev": 4,
+      "value": "lib/",
+      "sel": [
+       0,
+       3
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "x/",
+        "rev": 5,
+        "sel": [
+         1,
+         1
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "positions count bytes of UTF-8: a field's caret starts at the end of its value, sel alone selects and edits nothing, typing replaces the selection, and a position past the end or inside a code point is EINVAL; caret reports the user's moves of the selection (SPEC \u00a76.4, \u00a79, \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=q data-on=\"input caret\" value=\"h\u00e9llo\">"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "q",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "!",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "h\u00e9llo!",
+        "rev": 1,
+        "sel": [
+         7,
+         7
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q",
+      "q": "0"
+     },
+     "body": {
+      "rev": 1,
+      "sel": [
+       1,
+       3
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "key": "e",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "hello!",
+        "rev": 2,
+        "sel": [
+         2,
+         2
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q",
+      "q": "0"
+     },
+     "body": {
+      "rev": 2,
+      "value": "\u65e5\u672c",
+      "sel": [
+       0,
+       3
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "x\u672c",
+        "rev": 3,
+        "sel": [
+         1,
+         1
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 3,
+      "sel": [
+       2,
+       2
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 3,
+      "sel": [
+       0,
+       5
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 3,
+      "from": 0,
+      "to": 3,
+      "text": "y"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q",
+      "q": "0"
+     },
+     "body": {
+      "rev": 3,
+      "sel": [
+       4,
+       1
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "key": "ArrowLeft",
+     "terminal": false,
+     "events": [
+      {
+       "e": "caret",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "sel": [
+         1,
+         1
+        ],
+        "rev": 3
+       }
+      }
+     ]
+    },
+    {
+     "key": "Home",
+     "terminal": false,
+     "events": [
+      {
+       "e": "caret",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "sel": [
+         0,
+         0
+        ],
+        "rev": 3
+       }
+      }
+     ]
+    },
+    {
+     "key": "End",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "caret",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "sel": [
+         0,
+         4
+        ],
+        "rev": 3
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a=field changes a field whether it is focused or not, and sends no event: focus leaving a field that only a=field changed sends no change, and one the user edited sends change with its rev; an input drops the line breaks of a value and a text, a textarea keeps them (SPEC \u00a76.4)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=a data-on=input><textarea id=t data-on=input></textarea>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "a",
+      "q": "0"
+     },
+     "body": {
+      "rev": 0,
+      "text": "one\ntwo"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "t",
+      "q": "0"
+     },
+     "body": {
+      "rev": 0,
+      "value": "one\ntwo"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "key": "!",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "one\ntwo!",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "a",
+      "q": "0"
+     },
+     "body": {
+      "rev": 0,
+      "from": 3,
+      "to": 3,
+      "text": "\n-"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "one\ntwo!",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "one-xtwo",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "one-xtwo",
+        "rev": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a=field sets a checkbox, a radio button and a select: checked unchecks the others of the group, a select's value picks the first option with it, disabled or not; each toggle, check and pick of the user's is one more rev, so an a=field made before it is stale, and a radio group counts together (SPEC \u00a76.4)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input type=checkbox id=c><input type=radio name=g id=r1 value=1><input type=radio name=g id=r2 value=2><select id=s><option>a<option value=bee>b<option disabled value=x>x</select>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "c",
+      "q": "0"
+     },
+     "body": {
+      "rev": 0,
+      "checked": true
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "c",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "checked": false,
+        "value": "on",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "c"
+     },
+     "body": {
+      "rev": 0,
+      "checked": true
+     },
+     "reply": {
+      "a": "err",
+      "code": "ESTALE",
+      "detail": "1"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "r1",
+      "q": "0"
+     },
+     "body": {
+      "rev": 0,
+      "checked": true
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "r2",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "r2",
+       "detail": {
+        "checked": true,
+        "value": "2",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "r1"
+     },
+     "body": {
+      "rev": 0,
+      "checked": true
+     },
+     "reply": {
+      "a": "err",
+      "code": "ESTALE",
+      "detail": "1"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "r1",
+      "q": "0"
+     },
+     "body": {
+      "rev": 1,
+      "checked": true
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "r2",
+       "detail": {
+        "checked": true,
+        "value": "2",
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "s",
+      "q": "0"
+     },
+     "body": {
+      "rev": 0,
+      "value": "x"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "s",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "ArrowUp",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "value": "bee",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "s"
+     },
+     "body": {
+      "rev": 0,
+      "value": "a"
+     },
+     "reply": {
+      "a": "err",
+      "code": "ESTALE",
+      "detail": "1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a=field is checked whole before it changes anything: EINVAL for a body that is not such a map, a missing or mistyped rev, no field but rev, value with text, from or to, from or to without the other or without text, from past to, a position past the end, sel not two ints, a field not for the control, a target that is not a control, a select value with no option, and a missing t, even with a rev that is stale; ENOTARGET for a missing element and EDETACHED for a detached surface (SPEC \u00a76.4)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=q value=ab><input type=checkbox id=c><p id=p>p</p><select id=s><option>a</select><input type=range id=g>"
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": [
+      0
+     ],
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "value": "x"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": "0",
+      "value": "x"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0,
+      "value": "x",
+      "text": "y"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0,
+      "value": "x",
+      "from": 0,
+      "to": 0
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0,
+      "from": 0,
+      "text": "y"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0,
+      "from": 0,
+      "to": 1
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0,
+      "from": 2,
+      "to": 1,
+      "text": "y"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0,
+      "from": 0,
+      "to": 3,
+      "text": "y"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0,
+      "sel": [
+       1
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0,
+      "sel": [
+       0,
+       1.0
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0,
+      "checked": true
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 5,
+      "value": "x",
+      "text": "y"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "c"
+     },
+     "body": {
+      "rev": 0,
+      "value": "on"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "c"
+     },
+     "body": {
+      "rev": 0,
+      "sel": [
+       0,
+       0
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "p"
+     },
+     "body": {
+      "rev": 0,
+      "value": "x"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "s"
+     },
+     "body": {
+      "rev": 0,
+      "text": "a"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "s"
+     },
+     "body": {
+      "rev": 0,
+      "value": "b"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "g"
+     },
+     "body": {
+      "rev": 0,
+      "sel": [
+       0,
+       0
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x"
+     },
+     "body": {
+      "rev": 0,
+      "value": "x"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "nope"
+     },
+     "body": {
+      "rev": 0,
+      "value": "x"
+     },
+     "reply": {
+      "a": "err",
+      "code": "ENOTARGET",
+      "detail": "nope"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q",
+      "q": "0"
+     },
+     "body": {
+      "rev": 0,
+      "value": "ok"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "d",
+      "d": "1",
+      "q": "2"
+     },
+     "payload": "<input id=i>"
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "d",
+      "t": "i"
+     },
+     "body": {
+      "rev": 0,
+      "value": "x"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EDETACHED"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a=field is one edit of the field's history: it ends a run of typing, and undo takes it back as it takes back the user's, each undo and redo one more rev; sel alone edits nothing but ends the run (SPEC \u00a76.4, \u00a710.2)",
+   "requires": "undo",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=q data-on=input>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "q",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "a",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "a",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": "b",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "ab",
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q",
+      "q": "0"
+     },
+     "body": {
+      "rev": 2,
+      "text": "cd"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "key": "e",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "abcde",
+        "rev": 3
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "abcd",
+        "rev": 4
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "ab",
+        "rev": 5
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "",
+        "rev": 6
+       }
+      }
+     ]
+    },
+    {
+     "key": "y",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "ab",
+        "rev": 7
+       }
+      }
+     ]
+    },
+    {
+     "key": "y",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "abcd",
+        "rev": 8
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "abcdz",
+        "rev": 9
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q",
+      "q": "0"
+     },
+     "body": {
+      "rev": 9,
+      "sel": [
+       0,
+       0
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "xabcdz",
+        "rev": 10
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "value": "abcdz",
+        "rev": 11
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a field keeps its selection while it is not focused, and a=focus gives it back as it was; a value a delta sets puts the caret at the end, and the field keeps its rev (SPEC \u00a710.2, \u00a76.2, \u00a76.4)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=a data-on=\"input caret\"><input id=b>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "60",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "x",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "x",
+        "rev": 1,
+        "sel": [
+         1,
+         1
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "key": "y",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "xy",
+        "rev": 2,
+        "sel": [
+         2,
+         2
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "key": "Home",
+     "terminal": false,
+     "events": [
+      {
+       "e": "caret",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "sel": [
+         0,
+         0
+        ],
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "xy",
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "z",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "zxy",
+        "rev": 3,
+        "sel": [
+         1,
+         1
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "zxy",
+        "rev": 3
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "morph",
+        "t": "a",
+        "v": "<input id=a data-on=\"input caret\" value=new>"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "!",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "new!",
+        "rev": 4,
+        "sel": [
+         4,
+         4
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "in a field with data-on~=caret and no input, each edit and each move of the user's sends caret, with the selection and the rev; a line break of a textarea is one byte (SPEC \u00a79, \u00a76.4)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><textarea id=t data-on=caret></textarea>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "3",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "a",
+     "terminal": false,
+     "events": [
+      {
+       "e": "caret",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "sel": [
+         1,
+         1
+        ],
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "caret",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "sel": [
+         2,
+         2
+        ],
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "key": "b",
+     "terminal": false,
+     "events": [
+      {
+       "e": "caret",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "sel": [
+         3,
+         3
+        ],
+        "rev": 3
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowUp",
+     "terminal": false,
+     "events": [
+      {
+       "e": "caret",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "sel": [
+         1,
+         1
+        ],
+        "rev": 3
+       }
+      }
+     ]
+    },
+    {
+     "key": "Backspace",
+     "terminal": false,
+     "events": [
+      {
+       "e": "caret",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "sel": [
+         0,
+         0
+        ],
+        "rev": 4
        }
       }
      ]
@@ -12684,7 +14518,8 @@
        "s": "x",
        "t": "a",
        "detail": {
-        "value": "p"
+        "value": "p",
+        "rev": 1
        }
       }
      ]
@@ -12702,7 +14537,8 @@
        "s": "x",
        "t": "a",
        "detail": {
-        "value": "p"
+        "value": "p",
+        "rev": 1
        }
       },
       {
@@ -12721,7 +14557,8 @@
        "s": "y",
        "t": "b",
        "detail": {
-        "value": "q"
+        "value": "q",
+        "rev": 1
        }
       }
      ]
@@ -12735,7 +14572,8 @@
        "s": "y",
        "t": "b",
        "detail": {
-        "value": ""
+        "value": "",
+        "rev": 2
        }
       }
      ]
@@ -12800,7 +14638,8 @@
        "s": "x",
        "t": "a",
        "detail": {
-        "value": "B"
+        "value": "B",
+        "rev": 1
        }
       },
       {
@@ -12945,7 +14784,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "a"
+        "value": "a",
+        "rev": 1
        }
       }
      ]
@@ -12959,7 +14799,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "ab"
+        "value": "ab",
+        "rev": 2
        }
       }
      ]
@@ -12973,7 +14814,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abc"
+        "value": "abc",
+        "rev": 3
        }
       }
      ]
@@ -13011,7 +14853,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "xabc"
+        "value": "xabc",
+        "rev": 4
        }
       }
      ]
@@ -13049,7 +14892,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "xay"
+        "value": "xay",
+        "rev": 5
        }
       }
      ]
@@ -13071,7 +14915,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "z"
+        "value": "z",
+        "rev": 6
        }
       }
      ]
@@ -13096,7 +14941,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": ""
+        "value": "",
+        "rev": 7
        }
       }
      ]
@@ -13149,7 +14995,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "one "
+        "value": "one ",
+        "rev": 1
        }
       }
      ]
@@ -13171,7 +15018,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "xone "
+        "value": "xone ",
+        "rev": 2
        }
       }
      ]
@@ -13193,7 +15041,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "xy"
+        "value": "xy",
+        "rev": 3
        }
       }
      ]
@@ -13215,7 +15064,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "z"
+        "value": "z",
+        "rev": 4
        }
       }
      ]
@@ -13277,7 +15127,8 @@
        "s": "x",
        "t": "a",
        "detail": {
-        "value": "x"
+        "value": "x",
+        "rev": 1
        }
       }
      ]
@@ -13299,7 +15150,8 @@
        "s": "x",
        "t": "a",
        "detail": {
-        "value": "xy"
+        "value": "xy",
+        "rev": 2
        }
       }
      ]
@@ -13317,7 +15169,8 @@
        "s": "x",
        "t": "a",
        "detail": {
-        "value": "xy"
+        "value": "xy",
+        "rev": 2
        }
       }
      ]
@@ -13352,7 +15205,8 @@
        "s": "x",
        "t": "b",
        "detail": {
-        "value": "x"
+        "value": "x",
+        "rev": 1
        }
       }
      ]
@@ -13405,7 +15259,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "foo bar "
+        "value": "foo bar ",
+        "rev": 1
        }
       }
      ]
@@ -13430,7 +15285,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "foo  "
+        "value": "foo  ",
+        "rev": 2
        }
       }
      ]
@@ -13463,7 +15319,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "foo"
+        "value": "foo",
+        "rev": 3
        }
       }
      ]
@@ -13480,7 +15337,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": ""
+        "value": "",
+        "rev": 4
        }
       }
      ]
@@ -13559,7 +15417,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abc"
+        "value": "abc",
+        "rev": 1
        }
       }
      ]
@@ -13638,7 +15497,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "xab"
+        "value": "xab",
+        "rev": 1
        }
       }
      ]
@@ -13652,7 +15512,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "xab"
+        "value": "xab",
+        "rev": 1
        }
       },
       {
@@ -13723,7 +15584,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "x"
+        "value": "x",
+        "rev": 1
        }
       }
      ]
@@ -13826,7 +15688,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "a"
+        "value": "a",
+        "rev": 1
        }
       }
      ]
@@ -13840,7 +15703,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "ab"
+        "value": "ab",
+        "rev": 2
        }
       }
      ]
@@ -13854,7 +15718,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abc"
+        "value": "abc",
+        "rev": 3
        }
       }
      ]
@@ -13868,7 +15733,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "ab"
+        "value": "ab",
+        "rev": 4
        }
       }
      ]
@@ -13882,7 +15748,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "a"
+        "value": "a",
+        "rev": 5
        }
       }
      ]
@@ -13899,7 +15766,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abc"
+        "value": "abc",
+        "rev": 6
        }
       }
      ]
@@ -13916,7 +15784,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": ""
+        "value": "",
+        "rev": 7
        }
       }
      ]
@@ -13941,7 +15810,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abc"
+        "value": "abc",
+        "rev": 8
        }
       }
      ]
@@ -13959,7 +15829,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "a"
+        "value": "a",
+        "rev": 9
        }
       }
      ]
@@ -13984,7 +15855,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abc"
+        "value": "abc",
+        "rev": 10
        }
       }
      ]
@@ -13998,7 +15870,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abcd"
+        "value": "abcd",
+        "rev": 11
        }
       }
      ]
@@ -14039,7 +15912,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": ""
+        "value": "",
+        "rev": 12
        }
       }
      ]
@@ -14064,7 +15938,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abcd"
+        "value": "abcd",
+        "rev": 13
        }
       }
      ]
@@ -14081,7 +15956,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abc"
+        "value": "abc",
+        "rev": 14
        }
       }
      ]
@@ -14156,7 +16032,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "a"
+        "value": "a",
+        "rev": 1
        }
       }
      ]
@@ -14170,7 +16047,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "ab"
+        "value": "ab",
+        "rev": 2
        }
       }
      ]
@@ -14184,7 +16062,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "ab\n"
+        "value": "ab\n",
+        "rev": 3
        }
       }
      ]
@@ -14198,7 +16077,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "ab\nc"
+        "value": "ab\nc",
+        "rev": 4
        }
       }
      ]
@@ -14212,7 +16092,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "ab\ncd"
+        "value": "ab\ncd",
+        "rev": 5
        }
       }
      ]
@@ -14234,7 +16115,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abx\ncd"
+        "value": "abx\ncd",
+        "rev": 6
        }
       }
      ]
@@ -14256,7 +16138,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "abx\ncdy"
+        "value": "abx\ncdy",
+        "rev": 7
        }
       }
      ]
@@ -14278,7 +16161,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "zabx\ncdy"
+        "value": "zabx\ncdy",
+        "rev": 8
        }
       }
      ]
@@ -14300,7 +16184,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "zabx\ncwdy"
+        "value": "zabx\ncwdy",
+        "rev": 9
        }
       }
      ]
@@ -14358,7 +16243,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "xhunter two"
+        "value": "xhunter two",
+        "rev": 1
        }
       }
      ]
@@ -14380,7 +16266,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": ""
+        "value": "",
+        "rev": 2
        }
       }
      ]
@@ -14497,7 +16384,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "one two\nfour"
+        "value": "one two\nfour",
+        "rev": 1
        }
       }
      ]
@@ -14522,7 +16410,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "one \nfour"
+        "value": "one \nfour",
+        "rev": 2
        }
       }
      ]
@@ -14552,7 +16441,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "one! \nfour"
+        "value": "one! \nfour",
+        "rev": 3
        }
       }
      ]
@@ -14569,7 +16459,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": " \nfour"
+        "value": " \nfour",
+        "rev": 4
        }
       }
      ]
@@ -14594,7 +16485,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "Z"
+        "value": "Z",
+        "rev": 5
        }
       }
      ]
@@ -14639,7 +16531,8 @@
        "s": "x",
        "t": "s",
        "detail": {
-        "value": "bee"
+        "value": "bee",
+        "rev": 1
        }
       }
      ]
@@ -14653,7 +16546,8 @@
        "s": "x",
        "t": "s",
        "detail": {
-        "value": "c"
+        "value": "c",
+        "rev": 2
        }
       }
      ]
@@ -14667,7 +16561,8 @@
        "s": "x",
        "t": "s",
        "detail": {
-        "value": "cat"
+        "value": "cat",
+        "rev": 3
        }
       }
      ]
@@ -14686,7 +16581,8 @@
        "s": "x",
        "t": "s",
        "detail": {
-        "value": "a"
+        "value": "a",
+        "rev": 4
        }
       }
      ]
@@ -14700,7 +16596,8 @@
        "s": "x",
        "t": "s",
        "detail": {
-        "value": "c"
+        "value": "c",
+        "rev": 5
        }
       }
      ]
@@ -14714,7 +16611,8 @@
        "s": "x",
        "t": "s",
        "detail": {
-        "value": "cat"
+        "value": "cat",
+        "rev": 6
        }
       }
      ]
@@ -14733,7 +16631,8 @@
        "s": "x",
        "t": "s",
        "detail": {
-        "value": "c"
+        "value": "c",
+        "rev": 7
        }
       }
      ]
@@ -14774,7 +16673,8 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "b"
+        "value": "b",
+        "rev": 1
        }
       }
      ]
@@ -15189,7 +17089,8 @@
        "s": "x",
        "t": "i",
        "detail": {
-        "value": "j"
+        "value": "j",
+        "rev": 1
        }
       }
      ]
@@ -16982,7 +18883,8 @@
        "s": "x",
        "t": "f",
        "detail": {
-        "value": "a"
+        "value": "a",
+        "rev": 1
        }
       }
      ]
@@ -17028,7 +18930,8 @@
        "s": "x",
        "t": "f",
        "detail": {
-        "value": "ac"
+        "value": "ac",
+        "rev": 2
        }
       }
      ]
@@ -18633,7 +20536,7 @@
       "control": {
        "a": "q",
        "n": "1",
-       "v": "0.4"
+       "v": "0.5"
       }
      }
     },
@@ -18657,7 +20560,7 @@
       "control": {
        "a": "q",
        "n": "1",
-       "v": "0.4",
+       "v": "0.5",
        "late": "1"
       }
      }
@@ -19616,6 +21519,76 @@
    ]
   },
   {
+   "name": "set_field: a=field, the change in its body, rev first; it answers errors, which the wire says without a q (SDK.md \u00a73.4, SPEC \u00a76.4)",
+   "build": "set_field",
+   "args": {
+    "surface": "find",
+    "target": "q",
+    "change": {
+     "rev": 2,
+     "from": 0,
+     "to": 2,
+     "text": "src/"
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "field",
+       "s": "find",
+       "t": "q"
+      },
+      "body": {
+       "rev": 2,
+       "from": 0,
+       "to": 2,
+       "text": "src/"
+      },
+      "payload_b64": "hKNyZXYCpGZyb20AonRvAqR0ZXh0pHNyYy8="
+     }
+    }
+   ]
+  },
+  {
+   "name": "set_field sends what it is given, an empty value and a position 0 among them, in the order rev, value, from, to, text, sel, checked, and checks none of it (SDK.md \u00a73.4)",
+   "build": "set_field",
+   "args": {
+    "surface": "x",
+    "target": "f",
+    "change": {
+     "checked": false,
+     "sel": [
+      3,
+      0
+     ],
+     "value": "",
+     "rev": 0
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "field",
+       "s": "x",
+       "t": "f"
+      },
+      "body": {
+       "rev": 0,
+       "value": "",
+       "sel": [
+        3,
+        0
+       ],
+       "checked": false
+      },
+      "payload_b64": "hKNyZXYApXZhbHVloKNzZWySAwCnY2hlY2tlZMI="
+     }
+    }
+   ]
+  },
+  {
    "name": "blur",
    "build": "blur",
    "args": {
@@ -20496,11 +22469,11 @@
   {
    "name": "the reply to q carries the capabilities, the cell's size in CSS pixels as the host sends it",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;h6F2ozAuNKdjZWxsY3NzgqF3y0AgAAAAAAAAoWjLQDAAAAAAAAClc2NhbGXLQAAAAAAAAACmc2NoZW1lpWxpZ2h0pmxpbWl0c4Koc3VyZmFjZXNAqXJlc291cmNlc84BAAAAo25ldIGnaW1nLXNyY5GzaHR0cHM6Ly9leGFtcGxlLmNvbaRob3N0oXg=\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;h6F2ozAuNadjZWxsY3NzgqF3y0AgAAAAAAAAoWjLQDAAAAAAAAClc2NhbGXLQAAAAAAAAACmc2NoZW1lpWxpZ2h0pmxpbWl0c4Koc3VyZmFjZXNAqXJlc291cmNlc84BAAAAo25ldIGnaW1nLXNyY5GzaHR0cHM6Ly9leGFtcGxlLmNvbaRob3N0oXg=\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.4",
+     "v": "0.5",
      "cellcss": {
       "w": 8.0,
       "h": 16.0
@@ -20536,7 +22509,7 @@
       "n": 1
      },
      "caps": {
-      "v": "0.4",
+      "v": "0.5",
       "cell_css": {
        "w": 8.0,
        "h": 16.0
@@ -20564,11 +22537,11 @@
   {
    "name": "capabilities: features, and the host's version",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuNKhmZWF0dXJlc5GrcGFzc3Rocm91Z2ikaG9zdKtob3R0eS1ibGl0eqd2ZXJzaW9upjAuMC4xMA==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuNahmZWF0dXJlc5GrcGFzc3Rocm91Z2ikaG9zdKtob3R0eS1ibGl0eqd2ZXJzaW9upjAuMC4xMA==\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.4",
+     "v": "0.5",
      "features": [
       "passthrough"
      ],
@@ -20588,7 +22561,7 @@
       "re": "q"
      },
      "caps": {
-      "v": "0.4",
+      "v": "0.5",
       "features": [
        "passthrough"
       ],
@@ -20605,16 +22578,16 @@
   {
    "name": "a capability of another type: the capabilities do not decode, and the reply stands (SDK.md \u00a73.9)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuNKVzY2FsZaEy\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuNKhmZWF0dXJlc5KlY2xpY2sD\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuNaVzY2FsZaEy\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuNahmZWF0dXJlc5KlY2xpY2sD\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.4",
+     "v": "0.5",
      "scale": "2"
     },
     {
-     "v": "0.4",
+     "v": "0.5",
      "features": [
       "click",
       3
@@ -20658,11 +22631,11 @@
   {
    "name": "fields a reader does not know are skipped, whatever their type: an array, a float, bin, a time, an extension no one defines (SDK.md \u00a72.7)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;haF2ozAuNKZmdXR1cmWBoXiUActABAAAAAAAAMPUBQChYsQCAP+hdNb/AAAAAKZzY2hlbWWlbGlnaHQ=\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;haF2ozAuNaZmdXR1cmWBoXiUActABAAAAAAAAMPUBQChYsQCAP+hdNb/AAAAAKZzY2hlbWWlbGlnaHQ=\u001b\\"
    ],
    "bodies": [
     {
-     "hex": "85a176a3302e34a666757475726581a1789401cb4004000000000000c3d40500a162c40200ffa174d6ff00000000a6736368656d65a56c69676874"
+     "hex": "85a176a3302e35a666757475726581a1789401cb4004000000000000c3d40500a162c40200ffa174d6ff00000000a6736368656d65a56c69676874"
     }
    ],
    "results": [
@@ -20677,7 +22650,7 @@
       "re": "q"
      },
      "caps": {
-      "v": "0.4",
+      "v": "0.5",
       "scheme": "light",
       "light": true
      }
@@ -20919,6 +22892,153 @@
         "pro"
        ]
       ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "input, change and caret carry the control's rev, and input and caret the selection, its anchor then its caret, in bytes of UTF-8 (SPEC \u00a76.4, \u00a79)",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=input:t=q;g6V2YWx1ZaZow6lsbG+jcmV2A6NzZWySBgY=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=caret:t=q;gqNzZWySAAajcmV2Aw==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=change:t=agree;g6djaGVja2Vkw6V2YWx1ZaJvbqNyZXYB\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=change:t=name;gqV2YWx1ZaNBZGGjcmV2BA==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "value": "h\u00e9llo",
+     "rev": 3,
+     "sel": [
+      6,
+      6
+     ]
+    },
+    {
+     "sel": [
+      0,
+      6
+     ],
+     "rev": 3
+    },
+    {
+     "checked": true,
+     "value": "on",
+     "rev": 1
+    },
+    {
+     "value": "Ada",
+     "rev": 4
+    }
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "input",
+      "t": "q"
+     },
+     "event": {
+      "kind": "input",
+      "target": "q",
+      "value": "h\u00e9llo",
+      "checked": null,
+      "rev": 3,
+      "sel": [
+       6,
+       6
+      ]
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "caret",
+      "t": "q"
+     },
+     "event": {
+      "kind": "caret",
+      "target": "q",
+      "value": null,
+      "checked": null,
+      "rev": 3,
+      "sel": [
+       0,
+       6
+      ]
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "change",
+      "t": "agree"
+     },
+     "event": {
+      "kind": "change",
+      "target": "agree",
+      "value": "on",
+      "checked": true,
+      "rev": 1,
+      "sel": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "change",
+      "t": "name"
+     },
+     "event": {
+      "kind": "change",
+      "target": "name",
+      "value": "Ada",
+      "checked": null,
+      "rev": 4,
+      "sel": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "an a=field the user beat is ESTALE, with the control's rev as the detail, in decimal (SPEC \u00a73.6, \u00a76.4)",
+   "seqs": [
+    "\u001b]7279;a=err:s=f:re=field;gqRjb2RlpkVTVEFMRaZkZXRhaWyhMw==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "code": "ESTALE",
+     "detail": "3"
+    }
+   ],
+   "results": [
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "err",
+      "s": "f",
+      "re": "field"
+     },
+     "reply": {
+      "ok": false,
+      "re": "field",
+      "surface": "f",
+      "code": "ESTALE",
+      "detail": "3",
+      "op": null
      }
     }
    ]
@@ -22584,88 +24704,88 @@
   {
    "name": "a body that holds, anywhere, what no host sends does not decode: a nil, a key that is not a string or is given twice in one map, a string that is not UTF-8, an int past 2^53 \u2212 1, a timestamp of another size, nanoseconds of a whole second, or seconds past 2^53 \u2212 1 (SDK.md \u00a73.9)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;g6F2ozAuNKZmdXR1cmXApnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuNKVzY2FsZcA=\u001b\\",
-    "\u001b]7279;a=ok:n=3:re=q;g6F2ozAuNKZmdXR1cmWBAaFhpnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=4:re=q;g6F2ozAuNKZmdXR1cmWBxAF4oWGmc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=5:re=q;g6F2ozAuNAGhYaZzY2hlbWWlbGlnaHQ=\u001b\\",
-    "\u001b]7279;a=ok:n=6:re=q;g6F2ozAuNKZmdXR1cmWiwyimc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=7:re=q;g6F2ozAuNKZmdXR1cmWj7aCApnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=8:re=q;g6F2ozAuNKLDKKFhpnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=9:re=q;g6F2ozAuNKZmdXR1cmXPACAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=10:re=q;g6F2ozAuNKZmdXR1cmXT/+AAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=11:re=q;g6F2ozAuNKZmdXR1cmWSzwAf////////0//gAAAAAAABpnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=12:re=q;g6F2ozAuNKZmdXR1cmXV/wAApnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=13:re=q;g6F2ozAuNKZmdXR1cmXX/+5rKAAAAAAApnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=14:re=q;g6F2ozAuNKZmdXR1cmXHDP8AAAAAACAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=15:re=q;g6F2ozAuNKZmdXR1cmXHDP87msn/AAAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
-    "\u001b]7279;a=ok:n=16:re=q;g6F2ozAuNKF2ozAuNKZzY2hlbWWlbGlnaHQ=\u001b\\",
-    "\u001b]7279;a=ok:n=17:re=q;g6F2ozAuNKZmdXR1cmWCoWEBoWEBpnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=18:re=q;g6F2ozAuNKVzY2FsZaF4pXNjYWxly0AAAAAAAAAA\u001b\\",
-    "\u001b]7279;a=ok:n=19:re=q;hKF2ozAuNKZmdXR1cmUB2QZmdXR1cmUCpnNjaGVtZaVsaWdodA==\u001b\\",
-    "\u001b]7279;a=ok:n=20:re=q;g6F2ozAuNKZmdXR1cmWBoXajMC40pnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=1:re=q;g6F2ozAuNaZmdXR1cmXApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuNaVzY2FsZcA=\u001b\\",
+    "\u001b]7279;a=ok:n=3:re=q;g6F2ozAuNaZmdXR1cmWBAaFhpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=4:re=q;g6F2ozAuNaZmdXR1cmWBxAF4oWGmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=5:re=q;g6F2ozAuNQGhYaZzY2hlbWWlbGlnaHQ=\u001b\\",
+    "\u001b]7279;a=ok:n=6:re=q;g6F2ozAuNaZmdXR1cmWiwyimc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=7:re=q;g6F2ozAuNaZmdXR1cmWj7aCApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=8:re=q;g6F2ozAuNaLDKKFhpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=9:re=q;g6F2ozAuNaZmdXR1cmXPACAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=10:re=q;g6F2ozAuNaZmdXR1cmXT/+AAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=11:re=q;g6F2ozAuNaZmdXR1cmWSzwAf////////0//gAAAAAAABpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=12:re=q;g6F2ozAuNaZmdXR1cmXV/wAApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=13:re=q;g6F2ozAuNaZmdXR1cmXX/+5rKAAAAAAApnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=14:re=q;g6F2ozAuNaZmdXR1cmXHDP8AAAAAACAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=15:re=q;g6F2ozAuNaZmdXR1cmXHDP87msn/AAAAAAAAAACmc2NoZW1lpWxpZ2h0\u001b\\",
+    "\u001b]7279;a=ok:n=16:re=q;g6F2ozAuNaF2ozAuNaZzY2hlbWWlbGlnaHQ=\u001b\\",
+    "\u001b]7279;a=ok:n=17:re=q;g6F2ozAuNaZmdXR1cmWCoWEBoWEBpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=18:re=q;g6F2ozAuNaVzY2FsZaF4pXNjYWxly0AAAAAAAAAA\u001b\\",
+    "\u001b]7279;a=ok:n=19:re=q;hKF2ozAuNaZmdXR1cmUB2QZmdXR1cmUCpnNjaGVtZaVsaWdodA==\u001b\\",
+    "\u001b]7279;a=ok:n=20:re=q;g6F2ozAuNaZmdXR1cmWBoXajMC41pnNjaGVtZaVsaWdodA==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=change:t=box;gqdjaGVja2VkwKV2YWx1ZaFh\u001b\\"
    ],
    "bodies": [
     {
-     "hex": "83a176a3302e34a6667574757265c0a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a6667574757265c0a6736368656d65a56c69676874"
     },
     {
-     "hex": "82a176a3302e34a57363616c65c0"
+     "hex": "82a176a3302e35a57363616c65c0"
     },
     {
-     "hex": "83a176a3302e34a66675747572658101a161a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a66675747572658101a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a666757475726581c40178a161a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a666757475726581c40178a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e3401a161a6736368656d65a56c69676874"
+     "hex": "83a176a3302e3501a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a6667574757265a2c328a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a6667574757265a2c328a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a6667574757265a3eda080a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a6667574757265a3eda080a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a2c328a161a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a2c328a161a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a6667574757265cf0020000000000000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a6667574757265cf0020000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a6667574757265d3ffe0000000000000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a6667574757265d3ffe0000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a666757475726592cf001fffffffffffffd3ffe0000000000001a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a666757475726592cf001fffffffffffffd3ffe0000000000001a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a6667574757265d5ff0000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a6667574757265d5ff0000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a6667574757265d7ffee6b280000000000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a6667574757265d7ffee6b280000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a6667574757265c70cff000000000020000000000000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a6667574757265c70cff000000000020000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a6667574757265c70cff3b9ac9ff0000000000000000a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a6667574757265c70cff3b9ac9ff0000000000000000a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a176a3302e34a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a176a3302e35a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a666757475726582a16101a16101a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a666757475726582a16101a16101a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a57363616c65a178a57363616c65cb4000000000000000"
+     "hex": "83a176a3302e35a57363616c65a178a57363616c65cb4000000000000000"
     },
     {
-     "hex": "84a176a3302e34a666757475726501d90666757475726502a6736368656d65a56c69676874"
+     "hex": "84a176a3302e35a666757475726501d90666757475726502a6736368656d65a56c69676874"
     },
     {
-     "hex": "83a176a3302e34a666757475726581a176a3302e34a6736368656d65a56c69676874"
+     "hex": "83a176a3302e35a666757475726581a176a3302e35a6736368656d65a56c69676874"
     },
     {
      "hex": "82a7636865636b6564c0a576616c7565a161"
@@ -22838,7 +24958,7 @@
       "n": 11
      },
      "caps": {
-      "v": "0.4",
+      "v": "0.5",
       "scheme": "light",
       "light": true
      }
@@ -22894,7 +25014,7 @@
       "n": 15
      },
      "caps": {
-      "v": "0.4",
+      "v": "0.5",
       "scheme": "light",
       "light": true
      }
@@ -22963,7 +25083,7 @@
       "n": 20
      },
      "caps": {
-      "v": "0.4",
+      "v": "0.5",
       "scheme": "light",
       "light": true
      }
@@ -22988,12 +25108,12 @@
    "name": "a field a reader knows holding another kind of value than its type does not decode, as msgpack tells kinds apart: bin for a string, an array for a map, a map for an array, a timestamp for a map, an extension for a bool or a string (SPEC \u00a73.3, SDK.md \u00a73.9)",
    "seqs": [
     "\u001b]7279;a=ev:s=f:e=click:t=ok;gaV2YWx1ZcQBYQ==\u001b\\",
-    "\u001b]7279;a=ok:n=1:re=q;gaF2xAMwLjQ=\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuNKdjZWxsY3NzkA==\u001b\\",
-    "\u001b]7279;a=ok:n=3:re=q;gqF2ozAuNKZsaW1pdHOQ\u001b\\",
-    "\u001b]7279;a=ok:n=4:re=q;gqF2ozAuNKhmZWF0dXJlc4A=\u001b\\",
-    "\u001b]7279;a=ok:n=5:re=q;gqF2ozAuNKdjZWxsY3Nz1v8AAAAA\u001b\\",
-    "\u001b]7279;a=ok:n=6:re=q;gqF2ozAuNKhmZWF0dXJlc5KlY2xpY2vUBQA=\u001b\\",
+    "\u001b]7279;a=ok:n=1:re=q;gaF2xAMwLjU=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuNadjZWxsY3NzkA==\u001b\\",
+    "\u001b]7279;a=ok:n=3:re=q;gqF2ozAuNaZsaW1pdHOQ\u001b\\",
+    "\u001b]7279;a=ok:n=4:re=q;gqF2ozAuNahmZWF0dXJlc4A=\u001b\\",
+    "\u001b]7279;a=ok:n=5:re=q;gqF2ozAuNadjZWxsY3Nz1v8AAAAA\u001b\\",
+    "\u001b]7279;a=ok:n=6:re=q;gqF2ozAuNahmZWF0dXJlc5KlY2xpY2vUBQA=\u001b\\",
     "\u001b]7279;a=ev:s=f:e=change:t=box;gqdjaGVja2Vk1AUApXZhbHVloWE=\u001b\\"
    ],
    "bodies": [
@@ -23001,22 +25121,22 @@
      "hex": "81a576616c7565c40161"
     },
     {
-     "hex": "81a176c403302e34"
+     "hex": "81a176c403302e35"
     },
     {
-     "hex": "82a176a3302e34a763656c6c63737390"
+     "hex": "82a176a3302e35a763656c6c63737390"
     },
     {
-     "hex": "82a176a3302e34a66c696d69747390"
+     "hex": "82a176a3302e35a66c696d69747390"
     },
     {
-     "hex": "82a176a3302e34a8666561747572657380"
+     "hex": "82a176a3302e35a8666561747572657380"
     },
     {
-     "hex": "82a176a3302e34a763656c6c637373d6ff00000000"
+     "hex": "82a176a3302e35a763656c6c637373d6ff00000000"
     },
     {
-     "hex": "82a176a3302e34a8666561747572657392a5636c69636bd40500"
+     "hex": "82a176a3302e35a8666561747572657392a5636c69636bd40500"
     },
     {
      "hex": "82a7636865636b6564d40500a576616c7565a161"
@@ -23148,7 +25268,7 @@
     "\u001b]7279;a=ev:s=g:e=drag;g6Fj0f/+oXLMBaRtb2RzzQAB\u001b\\",
     "\u001b]7279;a=ev:e=caps;gadjZWxsY3NzgqF3ykOgQAChaMtASAAAAAAAAA==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=input:t=q;gaV2YWx1ZdoAAmFi\u001b\\",
-    "\u001b]7279;a=ok:n=1:re=q;3gADoXbbAAAAAzAuNKVzY2FsZcpAAAAAqGZlYXR1cmVz3AAB2QVob3Zlcg==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;3gADoXbbAAAAAzAuNaVzY2FsZcpAAAAAqGZlYXR1cmVz3AAB2QVob3Zlcg==\u001b\\"
    ],
    "bodies": [
     {
@@ -23164,7 +25284,7 @@
      "hex": "81a576616c7565da00026162"
     },
     {
-     "hex": "de0003a176db00000003302e34a57363616c65ca40000000a86665617475726573dc0001d905686f766572"
+     "hex": "de0003a176db00000003302e35a57363616c65ca40000000a86665617475726573dc0001d905686f766572"
     }
    ],
    "results": [
@@ -23244,7 +25364,7 @@
       "n": 1
      },
      "caps": {
-      "v": "0.4",
+      "v": "0.5",
       "scale": 2.0,
       "features": [
        "hover"
@@ -23455,18 +25575,18 @@
   {
    "name": "features lists count: a repeated click carries its count (SPEC \u00a74, \u00a79); absent, it does not",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuNKhmZWF0dXJlc5GlY291bnQ=\u001b\\",
-    "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuNA==\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuNahmZWF0dXJlc5GlY291bnQ=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuNQ==\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.4",
+     "v": "0.5",
      "features": [
       "count"
      ]
     },
     {
-     "v": "0.4"
+     "v": "0.5"
     }
    ],
    "results": [
@@ -23684,11 +25804,11 @@
   {
    "name": "the capabilities' mod, edit and features (SPEC \u00a74)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuNKNtb2Slc3VwZXKkZWRpdIKqc2VsZWN0LWFsbJGnc3VwZXIrYaRjb3B5kadzdXBlcitjqGZlYXR1cmVzkaRtZW51\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;hKF2ozAuNaNtb2Slc3VwZXKkZWRpdIKqc2VsZWN0LWFsbJGnc3VwZXIrYaRjb3B5kadzdXBlcitjqGZlYXR1cmVzkaRtZW51\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.4",
+     "v": "0.5",
      "mod": "super",
      "edit": {
       "select-all": [
@@ -23738,11 +25858,11 @@
   {
    "name": "a limit that is not an int fails the capabilities (SPEC \u00a73.3)",
    "seqs": [
-    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuNKZsaW1pdHOBqHN1cmZhY2VzojY0\u001b\\"
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuNaZsaW1pdHOBqHN1cmZhY2VzojY0\u001b\\"
    ],
    "bodies": [
     {
-     "v": "0.4",
+     "v": "0.5",
      "limits": {
       "surfaces": "64"
      }
@@ -23896,9 +26016,9 @@
     },
     {
      "at": 20,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNQ==\u001b\\",
      "body": {
-      "v": "0.4"
+      "v": "0.5"
      },
      "took": true,
      "state": "native",
@@ -23921,7 +26041,7 @@
     }
    ],
    "caps": {
-    "v": "0.4"
+    "v": "0.5"
    }
   },
   {
@@ -23970,9 +26090,9 @@
     },
     {
      "at": 40,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNQ==\u001b\\",
      "body": {
-      "v": "0.4"
+      "v": "0.5"
      },
      "took": true,
      "state": "native",
@@ -24017,9 +26137,9 @@
     },
     {
      "at": 10,
-     "osc": "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuNA==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=2:re=q;gaF2ozAuNQ==\u001b\\",
      "body": {
-      "v": "0.4"
+      "v": "0.5"
      },
      "took": false,
      "state": "detecting"
@@ -24059,10 +26179,10 @@
     },
     {
      "at": 20,
-     "osc": "\u001b]7279;a=err:n=1:re=q;gqRjb2RlqEVWRVJTSU9OpmRldGFpbKMwLjQ=\u001b\\",
+     "osc": "\u001b]7279;a=err:n=1:re=q;gqRjb2RlqEVWRVJTSU9OpmRldGFpbKMwLjU=\u001b\\",
      "body": {
       "code": "EVERSION",
-      "detail": "0.4"
+      "detail": "0.5"
      },
      "took": true,
      "state": "text",
@@ -24221,10 +26341,10 @@
     },
     {
      "at": 60000,
-     "osc": "\u001b]7279;a=err:n=1:re=q;gqRjb2RlqEVWRVJTSU9OpmRldGFpbKMwLjQ=\u001b\\",
+     "osc": "\u001b]7279;a=err:n=1:re=q;gqRjb2RlqEVWRVJTSU9OpmRldGFpbKMwLjU=\u001b\\",
      "body": {
       "code": "EVERSION",
-      "detail": "0.4"
+      "detail": "0.5"
      },
      "took": true,
      "state": "text",
@@ -24242,9 +26362,9 @@
     },
     {
      "at": 60020,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNQ==\u001b\\",
      "body": {
-      "v": "0.4"
+      "v": "0.5"
      },
      "took": true,
      "state": "native",
@@ -24254,7 +26374,7 @@
     }
    ],
    "caps": {
-    "v": "0.4"
+    "v": "0.5"
    }
   },
   {
@@ -24266,9 +26386,9 @@
     },
     {
      "at": 100,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNQ==\u001b\\",
      "body": {
-      "v": "0.4"
+      "v": "0.5"
      },
      "took": true,
      "state": "native",
@@ -24297,9 +26417,9 @@
     },
     {
      "at": 1400,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNQ==\u001b\\",
      "body": {
-      "v": "0.4"
+      "v": "0.5"
      },
      "took": true,
      "deadline": 1500
@@ -24325,9 +26445,9 @@
     },
     {
      "at": 200,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNQ==\u001b\\",
      "body": {
-      "v": "0.4"
+      "v": "0.5"
      },
      "took": true,
      "state": "text",
@@ -24361,9 +26481,9 @@
     },
     {
      "at": 60000,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNQ==\u001b\\",
      "body": {
-      "v": "0.4"
+      "v": "0.5"
      },
      "took": true,
      "state": "native",
@@ -24373,9 +26493,9 @@
     },
     {
      "at": 60010,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNQ==\u001b\\",
      "body": {
-      "v": "0.4"
+      "v": "0.5"
      },
      "took": true,
      "state": "native",
@@ -24383,7 +26503,7 @@
     }
    ],
    "caps": {
-    "v": "0.4"
+    "v": "0.5"
    }
   },
   {
@@ -24434,9 +26554,9 @@
     },
     {
      "at": 10,
-     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNA==\u001b\\",
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNQ==\u001b\\",
      "body": {
-      "v": "0.4"
+      "v": "0.5"
      },
      "took": true
     },

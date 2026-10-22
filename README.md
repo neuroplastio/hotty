@@ -11,7 +11,7 @@ back to plain text where there is no host.
 
 ![hotty full screen in one terminal: the shell asks a form through askhot, plothot streams a chart, a metrics chart is hovered and pinned, a document scrolls, cards move in a feed, and an agent runs a diff, an approval and a load test.](demo.gif)
 
-[![status: 0.4 draft](https://img.shields.io/badge/status-0.4%20draft-orange)](#status)
+[![status: 0.5 draft](https://img.shields.io/badge/status-0.5%20draft-orange)](#status)
 [![spec: CC BY 4.0](https://img.shields.io/badge/spec-CC%20BY%204.0-lightgrey)](LICENSE-CC-BY-4.0)
 [![code: Apache-2.0](https://img.shields.io/badge/code-Apache--2.0-blue)](LICENSE-APACHE)
 
@@ -49,10 +49,10 @@ program's first byte to the user's click.
 
 ## Status
 
-**Version 0.4, a draft.** Versions 0.x may change incompatibly (§15 of the
-[spec](SPEC.md)). 0.4 breaks 0.3: keys are named as *myelin key names* 0.1
-names them (`ctrl+a`, `arrow_left`, `mod+s`), and a finger can drag in a
-program's cells. [`CHANGES.md`](CHANGES.md) says what changed and how to
+**Version 0.5, a draft.** Versions 0.x may change incompatibly (§15 of the
+[spec](SPEC.md)). 0.5 breaks 0.4: a program changes a field the user may be
+typing in with `a=field`, which applies only if the user hasn't changed it
+since, and controls report their revision in every `input` and `change`. [`CHANGES.md`](CHANGES.md) says what changed and how to
 upgrade.
 
 Two hosts that share no code pass the conformance vectors:

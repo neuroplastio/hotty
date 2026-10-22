@@ -74,7 +74,7 @@ The policy has two halves, and a URL is fetched only when both allow it:
   document with none asks for nothing.
 
 ```text
-host    → ESC ] 7279 ; a=ok:n=1:re=q ; {"v": "0.4", …, "net": {"img-src": ["https://example.com"]}} ST
+host    → ESC ] 7279 ; a=ok:n=1:re=q ; {"v": "0.5", …, "net": {"img-src": ["https://example.com"]}} ST
 program → ESC ] 7279 ; a=doc:s=post ; <meta name="hotty-network" content="img-src https://example.com"> <img src="https://example.com/cover.png"> ST
 ```
 

@@ -2,13 +2,13 @@
 group: Reference
 order: 10
 nav: Protocol
-description: the hotty protocol, version 0.4
+description: the hotty protocol, version 0.5
 path: protocol
 ---
 
 # hotty — HTML over the TTY
 
-    Version:  0.4
+    Version:  0.5
     Status:   Draft. Versions 0.x may change incompatibly (§15).
     Licence:  CC BY 4.0 (this document); the conformance vectors are
               Apache-2.0.
@@ -217,7 +217,7 @@ into chunks of at most 4096 payload bytes each:
 
 | key | meaning |
 | --- | --- |
-| `a` | the action: `q`, `doc`, `place`, `hide`, `delta`, `res`, `del`, `detach`, `focus`, `blur`, `edit`, `menu`, `touch` from the program (§4–§10); `ok`, `err`, `ev` from the host |
+| `a` | the action: `q`, `doc`, `place`, `hide`, `delta`, `field`, `res`, `del`, `detach`, `focus`, `blur`, `edit`, `menu`, `touch` from the program (§4–§10); `ok`, `err`, `ev` from the host |
 | `s` | a surface name: `[A-Za-z0-9_-]{1,64}` |
 | `n` | a request number chosen by the program, echoed in the reply |
 | `q` | quiet: `0` reply always, `1` reply only on error, `2` never reply. Absent: `0` for a query (`a=q`) and for a command with `n`, `1` for any other |
@@ -245,12 +245,13 @@ ESC ] 7279 ; a=ok|err [:n=<n>] [:s=<s>] :re=<action> [:<more>] [; <payload>] ST
 
 | code | when |
 | --- | --- |
-| `EINVAL` | an unknown action or op; a bad surface name; a missing `s`, `t`, `k`, `c` or `id`; `c` or `r` out of range; a program's body that does not decode, or holds a field of another type (§3.3) |
+| `EINVAL` | an unknown action or op; a bad surface name; a missing `s`, `t`, `k`, `c` or `id`; `c` or `r` out of range; a program's body that does not decode, or holds a field of another type (§3.3); an `a=field` that does not fit its target (§6.4) |
 | `ENOENT` | no surface of that name |
 | `ENOTARGET` | no element with that id. The detail is the id, or the missing ids comma-separated (§6.2) |
 | `EDETACHED` | the surface is detached (§5.5) |
 | `EQUOTA` | over one of the host's limits (§13) |
 | `EBUDGET` | the host gave up on work that exceeded its time budget (§13) |
+| `ESTALE` | an `a=field` made against another `rev` than the control's: the user changed it since (§6.4). The detail is the control's `rev`, in decimal |
 | `EVERSION` | a query (§4) lists no version the host speaks, or none at all. The detail is the versions the host speaks, comma-separated |
 
 Replies travel on the program's input, interleaved with whatever the user
@@ -276,7 +277,7 @@ A program finds out whether it has a host by sending a query, then Primary
 Device Attributes as a fence:
 
 ```
-ESC ] 7279 ; a=q:n=1:v=0.4 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.5 ST   CSI c
 ```
 
 Every terminal answers DA1. A host answers the query first:
@@ -289,8 +290,8 @@ If the DA1 answer arrives with no hotty reply before it, there is no host. The
 program **SHOULD** then fall back (§14).
 
 **Versions.** `v` lists the hotty versions the program speaks,
-comma-separated: `v=0.4` for this document, and `v=0.3,0.4` for a
-program that speaks 0.3 as well. A version is `major.minor`, two numbers written without
+comma-separated: `v=0.5` for this document, and `v=0.4,0.5` for a
+program that speaks 0.4 as well. A version is `major.minor`, two numbers written without
 leading zeros, and versions compare as those numbers, the major first.
 - A host answers in the highest version it shares with the program: `a=ok`,
   with that version's capabilities, whose `v` names it. It speaks that
@@ -316,7 +317,7 @@ terminal attached. A program that can start using hotty after it has fallen
 back asks for a late answer with `late=1`:
 
 ```
-ESC ] 7279 ; a=q:n=1:v=0.4:late=1 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.5:late=1 ST   CSI c
 ```
 
 - A host answers it as any query, at once.
@@ -338,7 +339,7 @@ The capabilities, the body of that reply, are a map of these fields (§3.3):
 
 | field | type | meaning |
 | --- | --- | --- |
-| `v` | str | the hotty version the host answers in (Versions, above): `"0.4"` for this document |
+| `v` | str | the hotty version the host answers in (Versions, above): `"0.5"` for this document |
 | `cellcss` | `{"w": float, "h": float}` | one cell's size in CSS pixels (§5.3) |
 | `scale` | float | device pixels per CSS pixel when the host answers: a hint for the resolution of images, which a zoom changes without telling (§5.3) |
 | `scheme` | str | `"dark"` or `"light"`: the terminal's colour scheme |
@@ -724,7 +725,9 @@ Morphing a live node *old* into a parsed node *new*:
 sets a control's default changes (`value` on inputs, textareas and selects;
 `checked` on checkboxes and radio buttons; `selected` on options), the host
 **MUST** also set the control's current state to it, unless the control is
-focused. The program's value wins, except while the user is editing.
+focused. The program's value wins, except while the user is editing. A
+program that changes a control the user may be changing, focused or not,
+sends `a=field` (§6.4), which changes it only if they have not.
 
 **`morph` without `t`** matches each top-level element of `v` to the
 document element with the same id, and morphs it. Elements whose id is not in
@@ -747,6 +750,91 @@ of what did not change.
   ends, or apply them without drawing.
 - A host that gives up waiting for the end of a batch (terminals time these
   out) **MAY** apply what it holds.
+
+### 6.4 `a=field`
+
+```
+ESC ] 7279 ; a=field:s=<name>:t=<element id> ; <base64 msgpack> ST
+```
+
+`a=field` changes what the user changes in a control: its value, its
+selection, whether it is checked. It changes it only if the user has not
+since the program last heard, so a program can complete what the user is
+typing, or set a box they may be toggling, and lose nothing they did. It
+works on a control whether it is focused or not, and moves neither focus
+nor the keyboard (§10.1).
+
+A **control** is an `input` of any type but `hidden`, `button`, `submit`,
+`reset`, `image` and `file`, a `textarea`, or a `select`. Its **text
+fields** are those of §10.2 that are not editing hosts: the `input`s of a
+text type, and `textarea`.
+
+**Revisions.** A control counts the changes the user makes to it, its
+`rev`:
+- each edit of a text field, which sends `input`, or would with
+  `data-on~=input` (§9): typing, deleting, cutting, pasting, undoing,
+  redoing (§10.2);
+- each toggle of a checkbox, check of a radio button, pick of a select's
+  option (§10.2), and change to another control's value.
+
+Nothing else changes it: neither a move of the caret or the selection, nor
+a value the program sets, with a morph (§6.2) or with `a=field`. It starts
+at 0 when the element enters the document, and a morph keeps it with the
+element. The radio buttons of a group (HTML's: one `name`, in one form)
+count together: a button's `rev` is the highest of its group's, and the
+user's check of any of them makes the whole group's one more than that.
+`input` and `change` carry it (§9), so a program knows the `rev` of what it
+heard.
+
+The body is a msgpack map (§3.3):
+
+| field | type | for | meaning |
+| --- | --- | --- | --- |
+| `rev` | int | every control | the control's `rev` the change is made against. Required |
+| `value` | str | every control but checkboxes and radio buttons | the new value |
+| `text` | str | text fields | text that replaces the selection, or with `from` and `to`, that range |
+| `from`, `to` | int | text fields | the range `text` replaces |
+| `sel` | [int, int] | text fields | the selection after the change: its anchor, then its caret |
+| `checked` | bool | checkboxes and radio buttons | whether it is checked |
+
+- **Positions** count the bytes of the value's UTF-8, from 0 at its start,
+  in the value as events report it (§9), and fall between code points. An
+  end of the selection that falls inside a character (a grapheme cluster,
+  §10.2) moves to its start.
+- **Stale.** The host compares `rev` with the control's. When they differ,
+  or while an input method composes text in the field, it changes nothing,
+  and answers `ESTALE` with the control's `rev` (§3.6): the user changed it
+  since the program heard. The program waits for what it hears next, and
+  decides again.
+- **The edit.** `value` sets the value as a script sets a control's value
+  in HTML, and sanitizes it as its type says: an `input` drops line
+  breaks, a range clamps and steps it, a number or a date that does not
+  parse is empty. In a `select` it picks the first option, disabled or
+  not, whose value it is. `text` goes in as a paste does: an `input` drops
+  its line breaks. `checked` checks a checkbox or a radio button, and
+  unchecks the others of its group, or unchecks it.
+- **The selection.** After the edit, `sel` sets the selection, in the new
+  value. Without `sel`, the caret goes after the text put in, at the end of
+  a `value`, and nothing is selected. `sel` alone moves the selection and
+  edits nothing.
+- **No echo.** It sends no `input` or `change`, and leaves `rev` as it is.
+  Focus leaving a text field commits the user's edits only: one that only
+  `a=field` changed sends no `change`.
+- **Undo.** In a text field, the change is one edit of its history (§10.2),
+  which `undo` takes back as it does the user's. It ends a run of typing,
+  and so does `sel` alone, as the pointer's move does.
+- **Disabled** and `readonly` controls take it as any other: what the user
+  cannot change, the program still can.
+- **Checked first.** The host checks the whole command before it changes
+  anything, and answers `EINVAL`, changing nothing, when: the body does not
+  decode (§3.3) or is not such a map; `rev` is missing; no field but `rev`
+  is there; the target is not a control, or a field is not for it (the
+  table); `value` comes with `text`, `from` or `to`; `from` or `to` comes
+  without the other, or without `text`; `from` is past `to`; a position is
+  past the end of its value, or inside a code point; `sel` is not two ints;
+  or a `select` has no option with the value. A missing target is
+  `ENOTARGET`, and a detached surface `EDETACHED` (§5.5). Only a command
+  that would apply can be stale.
 
 ## 7. Resources
 
@@ -922,8 +1010,9 @@ reads hotty messages from its input. A detached surface sends none (§5.5).
 | `e` | when | detail |
 | --- | --- | --- |
 | `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `{"area": area, "mods": int}`, the element's cells and the modifier keys held (below); with `"href": str` and `"url": str` for links (below), `"value": str` when the element has a `value` attribute, and `"count": int` for a repeated click (below) |
-| `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": bool, "value": str}` for checkboxes and radio buttons, `{"value": str}` otherwise |
-| `input` | every edit of a control with `data-on~=input` | `{"value": str}` |
+| `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": bool, "value": str, "rev": int}` for checkboxes and radio buttons, `{"value": str, "rev": int}` otherwise: with the control's `rev` (§6.4) |
+| `input` | every edit of a control with `data-on~=input` | `{"value": str, "rev": int}`, with `"sel": [int, int]`, the selection after it, in a text field with `data-on~=caret` (below) |
+| `caret` | in a text field with `data-on~=caret`, the user moved the selection, and no `input` says so: a move, a click, or an edit in a field without `data-on~=input` | `{"sel": [int, int], "rev": int}`: the selection, its anchor then its caret, as `a=field` counts them (§6.4) |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | `{"fields": [[str, str]]}`: the form's fields, each its name and its value, in tree order, the submitter's included; `[]` for a form with none |
 | `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface whose `p` is on (§5.2), except a mouse's or a pen's press with Alt held (§9.2) and where the pointer passes through (§9.3) | `{"area": area, "mods": int}`: the cells of the element `t` names (below), and the modifier keys held; no `area` without `t` |
 | `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": int, "r": int, "mods": int}`: the pointer's cell and the modifier keys held, with `"x": int` and `"y": int`, its step, on an element with `data-steps` (§9.1) |
@@ -953,6 +1042,7 @@ the program asked for it, and as often as this table says:
 | `e` | asked for by | how long | how often |
 | --- | --- | --- | --- |
 | `click`, `change`, `input`, `submit` | the element: its kind, or its `data-on` (`click`, `input`) | while it is so | each time |
+| `caret` | the element: `caret` in its `data-on` | while it has it | each change, at most one a frame, and before any other event of its field |
 | `focus`, `blur` | nothing: the keyboard is always told | — | each time |
 | `dragstart`, `drag`, `dragend` | the element: `drag` in its `data-on`, and `drop` for a target (§9.1) | from a press to its release | for each element, cell or step crossed (§9.1) |
 | `press` | `p=1` on the surface (§5.2) | until `p=0` | each press |
@@ -1455,7 +1545,8 @@ takes focus, or the program gives it with:
 ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
 ```
 
-- **With `t`:** the element is focused (`ENOTARGET` if there is none).
+- **With `t`:** the element is focused (`ENOTARGET` if there is none). A
+  text field keeps its selection (§10.2).
 - **Without `t`:** the surface's focused element keeps focus, or else the
   first focusable element receives it.
 - **Echo:** no `focus` event is sent for focus the program gave.
@@ -1707,7 +1798,13 @@ The actions:
   `ctrl+shift+arrow_right`, `shift+end` and, in a `textarea`,
   `shift+arrow_down` go on by a word, to the line's end and by a row. When the
   caret comes back to the anchor, nothing is selected.
-- **Every edit** is an edit for the `input` and `change` events (§9).
+- **Where the caret starts:** at the end of the value, when the field
+  enters the document and when the program sets its value with a delta
+  (§6.2). A field keeps its selection while it is not focused, and
+  `a=focus` gives it back as it was (§10.1). A program that puts the caret
+  elsewhere sends `a=field` (§6.4).
+- **Every edit** is an edit for the `input` and `change` events (§9), and
+  for the field's `rev` (§6.4).
 - **The clipboard** is the host's: the platform's, where there is one. A
   field has no `copy` or `cut` with nothing selected, nor in a password
   field, and no `paste` on a host that cannot read the clipboard: the key
@@ -1717,16 +1814,18 @@ The actions:
   does, for as long as it is in the document:
   - Typing characters one after another is one edit, and so is deleting
     them one at a time, with `delete-char-backward` or
-    `delete-char-forward`. The run ends with any other action, and when
-    the pointer moves the caret. Every other edit, a cut and a paste among
-    them, is one of its own.
+    `delete-char-forward`. The run ends with any other action, when the
+    pointer moves the caret, and with `a=field` (§6.4). Every other edit,
+    a cut, a paste and a change by `a=field` among them, is one of its
+    own.
   - `undo` puts back the value and the selection from before the last
     edit, and `redo` those from after the edit last undone. A new edit
     drops the edits undone.
   - With nothing to undo, or to redo, the key is still the field's, and
     does nothing.
-  - A value the program sets (§6.2, *Controls whose values the program
-    sets*) clears the history.
+  - A value the program sets with a morph (§6.2, *Controls whose values
+    the program sets*) clears the history. A change by `a=field` keeps
+    it.
 
 #### Keys for the program
 
@@ -2256,12 +2355,12 @@ the text of §11.
 
 ## 16. Conformance
 
-A host conforms to hotty version 0.4 when:
+A host conforms to hotty version 0.5 when:
 - it meets every **MUST** of this document;
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
 The vectors check replies, error codes, every delta op, morph, context
-parsing, resources, drags and their steps, presses with Alt, `fit`, hover,
+parsing, `a=field` and revisions, resources, drags and their steps, presses with Alt, `fit`, hover,
 `area`, scrolling, `reveal` and `view`, touch in the cells, prefixes,
 edit commands, menus, keymaps and the envelope, and their `keys`, `keymap`
 and `edit` sections a host's key names (§10.4), keymaps and actions
@@ -2305,7 +2404,7 @@ fields (SDK.md §4.6).
 Detection (payload shortened):
 
 ```
-program → ESC ] 7279 ; a=q:n=1:v=0.4 ST  CSI c
+program → ESC ] 7279 ; a=q:n=1:v=0.5 ST  CSI c
 host    → ESC ] 7279 ; a=ok:n=1:re=q ; haF2ozAuM6djZWxsY3Nz… ST  CSI ? 62 ; 22 c
 ```
 
@@ -2348,6 +2447,21 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
                     {"op": "text", "t": "clock", "v": "12:00:01"}]}:
            --p: 42 on cpu, and the clock reads 12:00:01)
 ```
+
+A field that completes what the user types, `<input id=q data-on=input>`,
+focused, when the user presses a key the program takes for completion:
+
+```
+host    → ESC ] 7279 ; a=ev:s=find:e=input:t=q ; gqV2YWx1ZaJzcqNyZXYC ST
+          ({"value": "sr", "rev": 2}: the user typed "sr")
+program → ESC ] 7279 ; a=field:s=find:t=q ; hKNyZXYCpGZyb20AonRvAqR0ZXh0pHNyYy8= ST
+          ({"rev": 2, "from": 0, "to": 2, "text": "src/"}: the field reads
+           "src/", and the caret is at its end)
+```
+
+Had the user typed another character first, the host would have changed
+nothing and answered `ESTALE` with `3`, and the program would complete from
+the `input` it hears next.
 
 ## Appendix B. Rationale
 
@@ -2803,6 +2917,28 @@ program → ESC ] 7279 ; a=delta:s=dash:q=2 ; gaNvcHOShKJvcKN2YXKhdKNjcHWha6FwoX
 - **Why a submit's fields are pairs.** A form may give two controls one
   name, as two checkboxes for one setting do, and a map holds a name once.
   Pairs in tree order are what a browser's `FormData` holds.
+- **Why `a=field`.** Until 0.5 a program could set a control only with a
+  morph, which leaves a focused control alone, and the caret where it was.
+  A field that completes what the user types had to replace itself with a
+  new element to put its text in, and lost the caret, the history and the
+  user's selection on the way.
+  - **A revision, not a lock.** The host and the program are a round trip
+    apart, and the user types in between. A counter of the user's changes
+    makes the program's change conditional, as an HTTP `If-Match` does:
+    the host refuses one made against what is no longer there, and the
+    program, which hears every change, decides again. A lock would need
+    the program to ask, and the user to wait.
+  - **Only the user's changes count,** so a program that heard `rev` 3
+    and changes the field twice still sends 3, and the user's next key
+    makes it stale whatever the program did meanwhile.
+  - **One command for every control:** the race is the same for a
+    checkbox as for a field, and a radio group counts together because a
+    check of one changes the others.
+  - **Bytes of UTF-8** because the program reads the value as UTF-8 from
+    msgpack, and a Go, Rust or Lua program slices it by bytes. A host
+    whose platform counts UTF-16 converts, which it can do exactly.
+  - **The morph stays as it was,** since a program that redraws its tree
+    every frame (§6.2) must not wipe what the user is typing.
 
 ## Appendix C. Prior art
 

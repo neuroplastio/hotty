@@ -21,8 +21,8 @@ what you learn in one carries over to the others.
 | [Lua](#lua) | Neovim plugins, plx scripts | the protocol, and surfaces anchored to a buffer or a tool |
 | [Python](#python) | trying hotty out, the examples in this repository | the protocol, in one file with no dependencies |
 
-Each speaks hotty 0.4 and no other version. A program written with one
-draws in cells wherever the terminal is not a host of 0.4. Each passes the
+Each speaks hotty 0.5 and no other version. A program written with one
+draws in cells wherever the terminal is not a host of 0.5. Each passes the
 SDK sections of the [conformance vectors](../conformance/README.md); the
 Python client and the Lua SDK count code points where the others count
 grapheme clusters (SDK.md §4.6), and skip the few vectors that need them.

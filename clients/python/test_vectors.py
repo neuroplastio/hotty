@@ -129,8 +129,14 @@ def build(b):
         "menu_show": lambda: hotty.menu_show(a.get("keys", []), **ro),
         "menu_hide": lambda: hotty.menu_hide(**ro),
         "touch": lambda: hotty.touch([hotty.TouchArea(**t) for t in a.get("areas", [])], **ro),
+        "set_field": lambda: hotty.set_field(a["surface"], a["target"], field_change(a["change"]), **ro),
     }[name]
     return fn()
+
+
+def field_change(c):
+    return hotty.FieldChange(c["rev"], c.get("value"), c.get("from"), c.get("to"), c.get("text"),
+                             tuple(c["sel"]) if "sel" in c else None, c.get("checked"))
 
 
 def menu_item(i):
@@ -230,6 +236,8 @@ def event_view(e):
         "target": e.target,
         "value": e.value(),
         "checked": e.checked(),
+        "rev": e.rev(),
+        "sel": list(e.sel()) if e.sel() is not None else None,
         "fields": [list(p) for p in e.fields()] if e.fields() is not None else None,
         "mods": e.mods(),
         "link": {"href": link[0], "url": link[1]} if link else None,
