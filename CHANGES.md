@@ -24,6 +24,10 @@ as `@neuroplastio/xterm-addon-hotty` 0.5.0. The first hottyterm release that
 speaks it is 26.10.22-dev.9793b2f, on hotty-blitz 0.5.0; margin's is
 26.10.22-dev.a0d5c31, and plx's 26.10.22-dev.6403390.
 
+hotty-blitz 0.5.1 and xterm-addon-hotty 0.5.1 ship the font that
+[HOST.md](HOST.md) describes; hottyterm has it from 26.10.22-dev.9a14b7e.
+It isn't on the wire, so nothing above changes.
+
 ### What changed
 
 - **`a=field` changes a control the user may be changing** (SPEC.md §6.4),
