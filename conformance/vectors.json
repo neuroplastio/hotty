@@ -12650,7 +12650,7 @@
    ]
   },
   {
-   "name": "a=field completes what the user typed: text replaces [from, to), the caret goes after it, and the host sends nothing; the user's next key edits from there, and an a=field made against an older rev changes nothing and answers ESTALE with the control's rev, even when its positions run past what the user left (SPEC \u00a76.4)",
+   "name": "a=field completes what the user typed: text replaces [from, to), the caret goes after it, and the host sends nothing; the user's next key edits from there, and an a=field made against an older rev changes nothing and answers ESTALE with the control's rev, even when its positions are negative or run past what the user left (SPEC \u00a76.4)",
    "steps": [
     {
      "send": {
@@ -12800,6 +12800,24 @@
       "from": 0,
       "to": 5,
       "text": "src/main"
+     },
+     "reply": {
+      "a": "err",
+      "code": "ESTALE",
+      "detail": "4"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 3,
+      "from": -1,
+      "to": 0,
+      "text": "x"
      },
      "reply": {
       "a": "err",
@@ -13109,7 +13127,7 @@
    ]
   },
   {
-   "name": "a=field changes a field whether it is focused or not, and sends no event: focus leaving a field that only a=field changed sends no change, and one the user edited sends change with its rev; an input drops the line breaks of a value and a text, a textarea keeps them (SPEC \u00a76.4)",
+   "name": "a=field changes a field whether it is focused or not, and sends no event: focus leaving a field that only a=field changed sends no change, and one the user edited sends change with its rev; an input drops the line breaks of a value and a text, a textarea keeps them, each CR LF pair and each lone CR made one LF (SPEC \u00a76.4)",
    "steps": [
     {
      "send": {
@@ -13172,7 +13190,7 @@
      },
      "body": {
       "rev": 0,
-      "value": "one\ntwo"
+      "value": "one\r\ntwo"
      },
      "reply": {
       "a": "ok",
@@ -13194,6 +13212,25 @@
        }
       }
      ]
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "t",
+      "q": "0"
+     },
+     "body": {
+      "rev": 1,
+      "from": 8,
+      "to": 8,
+      "text": "\r"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "field"
+     },
+     "events": []
     },
     {
      "send": {
@@ -13227,7 +13264,7 @@
        "s": "x",
        "t": "t",
        "detail": {
-        "value": "one\ntwo!",
+        "value": "one\ntwo!\n",
         "rev": 1
        }
       }
@@ -13498,7 +13535,7 @@
    ]
   },
   {
-   "name": "a=field is checked whole before it changes anything: EINVAL for a body that is not such a map, a missing or mistyped rev, no field but rev, value with text, from or to, from or to without the other or without text, from past to, a position past the end of a value whose rev matches, sel not two ints, a field not for the control, a target that is not a control, a select value with no option, and a missing t, even with a rev that is stale; ENOTARGET for a missing element and EDETACHED for a detached surface; with more than one wrong, EDETACHED comes first, then ENOTARGET, EINVAL and ESTALE (SPEC \u00a76.4)",
+   "name": "a=field is checked whole before it changes anything: EINVAL for a body that is not such a map, a missing or mistyped rev, no field but rev, value with text, from or to, from or to without the other or without text, from past to, a position negative or past the end of a value whose rev matches, sel not two ints, a field not for the control, a target that is not a control, a select value with no option, and a missing t, even with a rev that is stale; ENOTARGET for a missing element and EDETACHED for a detached surface; with more than one wrong, EDETACHED comes first, then ENOTARGET, EINVAL and ESTALE (SPEC \u00a76.4)",
    "steps": [
     {
      "send": {
@@ -13669,6 +13706,41 @@
       "from": 0,
       "to": 3,
       "text": "y"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0,
+      "from": -1,
+      "to": 0,
+      "text": "y"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
+      "t": "q"
+     },
+     "body": {
+      "rev": 0,
+      "sel": [
+       0,
+       -1
+      ]
      },
      "reply": {
       "a": "err",

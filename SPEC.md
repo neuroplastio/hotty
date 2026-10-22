@@ -808,11 +808,13 @@ The body is a msgpack map (§3.3):
   decides again.
 - **The edit.** `value` sets the value as a script sets a control's value
   in HTML, and sanitizes it as its type says: an `input` drops line
-  breaks, a range clamps and steps it, a number or a date that does not
-  parse is empty. In a `select` it picks the first option, disabled or
-  not, whose value it is. `text` goes in as a paste does: an `input` drops
-  its line breaks. `checked` checks a checkbox or a radio button, and
-  unchecks the others of its group, or unchecks it.
+  breaks, a `textarea` makes each CR LF pair and each lone CR one LF, a
+  range clamps and steps it, a number or a date that does not parse is
+  empty. In a `select` it picks the first option, disabled or not, whose
+  value it is. `text` goes in as a paste does: an `input` drops its line
+  breaks, and a `textarea` makes them LF as above. Positions in the new
+  value count its bytes after that. `checked` checks a checkbox or a radio
+  button, and unchecks the others of its group, or unchecks it.
 - **The selection.** After the edit, `sel` sets the selection, in the new
   value. Without `sel`, the caret goes after the text put in, at the end of
   a `value`, and nothing is selected. `sel` alone moves the selection and
@@ -838,8 +840,8 @@ The body is a msgpack map (§3.3):
 - **Positions come last.** They count bytes of the value the program heard,
   so the host checks them only against a value that is still that one: a
   stale command is `ESTALE` whatever its positions, and one that is not
-  is `EINVAL` when a position is past the end of its value, or inside a
-  code point.
+  is `EINVAL` when a position is negative, past the end of its value, or
+  inside a code point.
 
 ## 7. Resources
 
