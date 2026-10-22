@@ -14,6 +14,15 @@ A draft, as every 0.x is, released 2026-10-22 across the stack. It breaks
 0.4 (SPEC.md §15): a 0.5 host answers a 0.4 program with `EVERSION`, and
 the program falls back (§4, §14).
 
+It is tagged `v0.5.0` (95a1147). Its implementations take its MAJOR.MINOR
+(gov P-5 rule 6), and each released 0.5.0 with it, tagged `v0.5.0` in its
+repository: hotty-go (with `hottyedit/`, `hottyterm/`, `hottytea/`,
+`hottytest/` and `hottyvt/v0.5.0`), hotty-ts, which npm has as
+`@neuroplastio/hotty` 0.5.0, hotty-lua (`hotty-0.5.0-1.rockspec`), hotty-rs,
+tagged for the first time, hotty-blitz, and xterm-addon-hotty, which npm has
+as `@neuroplastio/xterm-addon-hotty` 0.5.0. The first hottyterm release that
+speaks it is 26.10.22-dev.9793b2f, on hotty-blitz 0.5.0.
+
 ### What changed
 
 - **`a=field` changes a control the user may be changing** (SPEC.md §6.4),
