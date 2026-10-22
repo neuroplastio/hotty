@@ -21,8 +21,8 @@ repository: hotty-go (with `hottyedit/`, `hottyterm/`, `hottytea/`,
 `@neuroplastio/hotty` 0.5.0, hotty-lua (`hotty-0.5.0-1.rockspec`), hotty-rs,
 tagged for the first time, hotty-blitz, and xterm-addon-hotty, which npm has
 as `@neuroplastio/xterm-addon-hotty` 0.5.0. The first hottyterm release that
-speaks it is 26.10.22-dev.9793b2f, on hotty-blitz 0.5.0, and margin's is
-26.10.22-dev.a0d5c31.
+speaks it is 26.10.22-dev.9793b2f, on hotty-blitz 0.5.0; margin's is
+26.10.22-dev.a0d5c31, and plx's 26.10.22-dev.6403390.
 
 ### What changed
 
