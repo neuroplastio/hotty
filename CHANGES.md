@@ -64,7 +64,8 @@ A draft, as every 0.x is, not yet released. It breaks 0.4 (SPEC.md §15): a
 - Take `a=field`:
   - check it whole first;
   - answer `ESTALE` against another `rev`, or while an input method
-    composes;
+    composes, whatever its positions: check them only when it is not
+    stale;
   - apply it as one edit of the history;
   - send nothing back.
 - Send `caret`, and `sel` in `input`, for fields with `data-on~=caret`.
