@@ -90,7 +90,8 @@ browser through xterm-addon-hotty or natively in hottyterm.
 - **To understand it:** the Concepts, starting with
   [How hotty works](docs/concepts/how-it-works.md).
 - **To implement it:** the [protocol](SPEC.md), the [SDK design](SDK.md)
-  every SDK follows, and the [conformance vectors](conformance/README.md).
+  every SDK follows, the [host design](HOST.md) hosts follow beyond the
+  protocol, and the [conformance vectors](conformance/README.md).
 
 ## Repositories
 
@@ -111,6 +112,7 @@ browser through xterm-addon-hotty or natively in hottyterm.
 | --- | --- |
 | [`SPEC.md`](SPEC.md) | the protocol |
 | [`SDK.md`](SDK.md) | what a library that speaks hotty for programs provides, in any language: its components, options, defaults and names |
+| [`HOST.md`](HOST.md) | what a host provides beyond the protocol, so that hosts agree: the font it ships |
 | [`CHANGES.md`](CHANGES.md) | what each version changed, and how to upgrade to it |
 | [`docs/`](docs/) | these docs: choosing a host and an SDK, and the concepts |
 | [`conformance/`](conformance/README.md) | the conformance vectors: what a host and an SDK must do, as data |

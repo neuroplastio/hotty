@@ -11,6 +11,10 @@ the reference material around them. Implementations live elsewhere
   event kind or a capability field also says, in SDK.md, how an SDK builds
   or reads it, with vectors in the SDK sections, and the Python client
   passes them (`python3 clients/python/test_vectors.py`).
+- **HOST.md is guidance, not the wire.** It says what hosts provide beyond
+  the protocol (the font they ship), so a program can't detect or rely on
+  it. Something a program would need to count on goes in SPEC.md, which is
+  the maintainer's call.
 - **Do not grow the wire for one implementation.** Anything only one host
   needs is an extension under a vendor prefix (§15), in that host's
   repository.
