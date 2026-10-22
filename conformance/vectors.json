@@ -13480,7 +13480,7 @@
    ]
   },
   {
-   "name": "a=field is checked whole before it changes anything: EINVAL for a body that is not such a map, a missing or mistyped rev, no field but rev, value with text, from or to, from or to without the other or without text, from past to, a position past the end, sel not two ints, a field not for the control, a target that is not a control, a select value with no option, and a missing t, even with a rev that is stale; ENOTARGET for a missing element and EDETACHED for a detached surface (SPEC \u00a76.4)",
+   "name": "a=field is checked whole before it changes anything: EINVAL for a body that is not such a map, a missing or mistyped rev, no field but rev, value with text, from or to, from or to without the other or without text, from past to, a position past the end, sel not two ints, a field not for the control, a target that is not a control, a select value with no option, and a missing t, even with a rev that is stale; ENOTARGET for a missing element and EDETACHED for a detached surface; with more than one wrong, EDETACHED comes first, then ENOTARGET, EINVAL and ESTALE (SPEC \u00a76.4)",
    "steps": [
     {
      "send": {
@@ -13853,6 +13853,21 @@
      "send": {
       "a": "field",
       "s": "x",
+      "t": "nope"
+     },
+     "body": {
+      "rev": 0
+     },
+     "reply": {
+      "a": "err",
+      "code": "ENOTARGET",
+      "detail": "nope"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "x",
       "t": "q",
       "q": "0"
      },
@@ -13884,6 +13899,19 @@
      "body": {
       "rev": 0,
       "value": "x"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EDETACHED"
+     }
+    },
+    {
+     "send": {
+      "a": "field",
+      "s": "d"
+     },
+     "body": {
+      "rev": 0
      },
      "reply": {
       "a": "err",

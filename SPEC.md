@@ -834,7 +834,8 @@ The body is a msgpack map (§3.3):
   past the end of its value, or inside a code point; `sel` is not two ints;
   or a `select` has no option with the value. A missing target is
   `ENOTARGET`, and a detached surface `EDETACHED` (§5.5). Only a command
-  that would apply can be stale.
+  that would apply can be stale. When more than one holds, the answer is
+  the first of `EDETACHED`, `ENOTARGET`, `EINVAL` and `ESTALE`.
 
 ## 7. Resources
 
