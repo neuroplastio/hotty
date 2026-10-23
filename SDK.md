@@ -829,8 +829,14 @@ same responsibilities.
   alternate screen, or a full reset. An environment that knows its own
   redraws (an editor) uses its events instead.
 - **Lost documents.** `ENOENT` in answer to a placement means the host lost
-  the document (a reset, the alternate screen); the Session sends it again
-  with the next layout.
+  the document (a reset, the alternate screen, a host restarting behind a
+  relay); the Session sends it again with the next layout. It may have lost
+  the resources the document refers to as well (a full reset ends the
+  session, SPEC.md §2), and only the program knows them: the relayout it
+  asks for says the host lost documents, so that the program sends its
+  resources again before the documents go. One loss is reported once,
+  however many documents it took: an `ENOENT` for a placement sent before
+  the report is the same loss's.
 - **Limits.** At most 48 surfaces by default, fewer when the host's
   `limits.surfaces` says so, or when an `EQUOTA` says so. To make room, it
   deletes the surfaces not wanted, the longest unseen first; under a limit
@@ -850,7 +856,9 @@ A host that runs inside a test, so that a program's tests need no terminal.
 - **The terminal around it.** It answers what terminals answer: DA1, the
   cursor's position, the background colour, and, when asked to, the kitty
   graphics query. It tracks the alternate screen and full resets as a host
-  does (SPEC.md §5.4), and keeps the cells the program printed. Made as a
+  does (SPEC.md §5.4), a full reset dropping the resources too, and keeps
+  the cells the program printed. The test can make it lose every surface
+  and resource without a word, as a host restarting behind a relay does. Made as a
   terminal that is not a host, it answers no hotty command, until the test
   makes it a host, as a multiplexer's terminal attaching does: then it
   answers a query that asked for a late answer and was not answered
