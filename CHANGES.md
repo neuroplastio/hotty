@@ -37,11 +37,15 @@ UTF-8 sees no change. The conformance vectors test it, with a send step's
 `payload_b64` for bytes that are not UTF-8.
 
 Since the release, SPEC.md has the error code `ENOTERM` (§3.6). A
-multiplexer running a pane with no terminal attached has nothing to lay
-an `r=auto` placement out with. It makes the placement and answers
-`ENOTERM` where the rows would be, without waiting for a terminal and
-without `EBUDGET`, which plx answered there before. A placement with
-`f=1` hears its rows as `fit` once a terminal attaches and lays the
+multiplexer running a pane with no terminal attached keeps what the
+program sends for the terminal that attaches, and answers in its place.
+What it can tell it answers as a host would. What needs the document, an
+`a=doc`, `a=delta`, `a=field`, `a=focus`, `a=blur` and the rows of an
+`r=auto` placement, it keeps unchecked, and answers `ENOTERM` where the
+program asks for every answer (`q=0`). It no longer leaves them
+unanswered, and no longer answers `EBUDGET` for the rows, as plx did
+before. An `r=auto` placement moves the cursor as one row tall would, and
+with `f=1` hears its rows as `fit` once a terminal attaches and lays the
 surface out (§5.2). Only a multiplexer sends it, and the SDKs name it from
 their next patch. A program that doesn't know the code reads it as any
 other error.

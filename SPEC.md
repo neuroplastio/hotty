@@ -255,9 +255,23 @@ ESC ] 7279 ; a=ok|err [:n=<n>] [:s=<s>] :re=<action> [:<more>] [; <payload>] ST
 | `EDETACHED` | the surface is detached (§5.5) |
 | `EQUOTA` | over one of the host's limits (§13) |
 | `EBUDGET` | the host gave up on work that exceeded its time budget (§13) |
-| `ENOTERM` | nothing can lay the document out yet, to tell a placement's rows: a multiplexer running a pane with no terminal attached (§5.2) |
+| `ENOTERM` | no terminal is attached to check the command or lay its document out: a multiplexer running a pane with none keeps the command, unchecked, for the terminal that attaches (below; §5.2) |
 | `ESTALE` | an `a=field` made against another `rev` than the control's: the user changed it since (§6.4). The detail is the control's `rev`, in decimal |
 | `EVERSION` | a query (§4) lists no version the host speaks, or none at all. The detail is the versions the host speaks, comma-separated |
+
+**With no terminal attached**, a multiplexer running the pane (§4) keeps
+what the program sends, for the terminal that attaches, and answers in its
+place:
+- **What it can tell**, it answers as a host would: a placement with `r`
+  given, a surface name it does not hold (`ENOENT`), a value out of range
+  (`EINVAL`).
+- **What needs the document**, parsed or laid out, it keeps unchecked: an
+  `a=doc`, `a=delta`, `a=field`, `a=focus` or `a=blur`, and the rows of an
+  `r=auto` placement (§5.2). Where the program asks for every answer
+  (`q=0`), it answers `ENOTERM`. With `q=1` it answers nothing: it knows of
+  no error.
+- The terminal that attaches gets every command kept. One it refuses then
+  goes unanswered: what the multiplexer said for it stands.
 
 Replies travel on the program's input, interleaved with whatever the user
 types. A program that wants none, not even an error, sends `q=2`.
@@ -425,8 +439,10 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   `a=ok:…:c=<c>:r=<r>`.
   - **With no terminal attached**, a multiplexer running the pane (§4) has
     nothing to lay the document out with. It makes the placement, and
-    answers `ENOTERM` where the rows would be. It does not wait for a
-    terminal to attach, and does not answer `EBUDGET`. The rows are chosen
+    answers `ENOTERM` where the rows would be (§3.6). It does not wait for
+    a terminal to attach, and does not answer `EBUDGET`. Unless `C=1`, it
+    moves the cursor as for a placement one row tall, the least it can be,
+    or `h` rows when the window gives `h`. The rows are chosen
     when a terminal attaches and lays the surface out, and a placement with
     `f=1` hears them then as `fit` (§9).
 - **The window:** `x`, `y`, `w` and `h` choose the part of the surface the
