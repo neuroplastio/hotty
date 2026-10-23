@@ -830,17 +830,22 @@ same responsibilities.
   redraws (an editor) uses its events instead.
 - **Lost documents.** `ENOENT` in answer to a placement means the host lost
   the document (a reset, the alternate screen, a host restarting behind a
-  relay); the Session sends it again with the next layout. It may have lost
-  the resources the document refers to as well (a full reset ends the
-  session, SPEC.md §2), and only the program knows them: the relayout it
-  asks for says the host lost documents, so that the program sends its
-  resources again before the documents go. One loss is reported once,
-  however many documents it took: an `ENOENT` for a placement sent before
-  the report is the same loss's, and the report takes the hidden surfaces'
-  documents as well: each goes again with its next placement, so that one
-  brought back later doesn't report the loss a second time. A full reset
-  the Session reads in the output is a loss too once it has sent
-  documents, though no `ENOENT` follows it.
+  relay). A host loses its documents together, so the Session takes them
+  all as lost and sends every one again with the next layout; when only
+  some went, the rest cost a few bytes. It may have lost the resources the
+  documents refer to as well (a full reset ends the session, SPEC.md §2),
+  and only the program knows them: the relayout it asks for says the host
+  lost documents, so that the program sends its resources again before the
+  documents go. One loss is reported once, however many documents it took.
+  The Session numbers the first document it sends again, above any number a
+  program picks, so that the host answers it (SPEC.md §3.5); the host
+  answers in order, so an `ENOENT` read before that answer is for a
+  placement sent before the documents went again: the same loss's, which
+  gives nothing. The answer is the Session's and doesn't reach the program,
+  even late. When it doesn't come within a few seconds (it went with the
+  host), an `ENOENT` is a loss again. A full reset the Session reads in the
+  output is a loss too once it has sent documents, though no `ENOENT`
+  follows it.
 - **Limits.** At most 48 surfaces by default, fewer when the host's
   `limits.surfaces` says so, or when an `EQUOTA` says so. To make room, it
   deletes the surfaces not wanted, the longest unseen first; under a limit
