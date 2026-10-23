@@ -836,7 +836,9 @@ same responsibilities.
   asks for says the host lost documents, so that the program sends its
   resources again before the documents go. One loss is reported once,
   however many documents it took: an `ENOENT` for a placement sent before
-  the report is the same loss's.
+  the report is the same loss's. A full reset the Session reads in the
+  output is a loss too once it has sent documents, though no `ENOENT`
+  follows it.
 - **Limits.** At most 48 surfaces by default, fewer when the host's
   `limits.surfaces` says so, or when an `EQUOTA` says so. To make room, it
   deletes the surfaces not wanted, the longest unseen first; under a limit
