@@ -165,7 +165,11 @@ alphabet).
   and events), so a program needs no zlib to read them.
 - An empty body is sent as nothing, and the `;` before it may then be
   omitted.
-- Text bodies (markup) are UTF-8.
+- **A document is UTF-8** (RFC 3629), the whole body once its chunks are
+  joined and any `o=z` undone (§3.4). A host answers one that is not,
+  anywhere in it, with `EINVAL`, and applies nothing: no surface is made,
+  and one that has a document keeps it. It does not repair the bytes, as by
+  putting U+FFFD in their place.
 - **Bodies with fields are msgpack**
   ([MessagePack](https://github.com/msgpack/msgpack/blob/master/spec.md)).
   The body of a reply (§3.6, §4) or an event (§9) is one msgpack map, with
@@ -245,7 +249,7 @@ ESC ] 7279 ; a=ok|err [:n=<n>] [:s=<s>] :re=<action> [:<more>] [; <payload>] ST
 
 | code | when |
 | --- | --- |
-| `EINVAL` | an unknown action or op; a bad surface name; a missing `s`, `t`, `k`, `c` or `id`; `c` or `r` out of range; a program's body that does not decode, or holds a field of another type (§3.3); an `a=field` that does not fit its target (§6.4) |
+| `EINVAL` | an unknown action or op; a bad surface name; a missing `s`, `t`, `k`, `c` or `id`; `c` or `r` out of range; a program's body that does not decode, or holds a field of another type (§3.3); a document that is not UTF-8 (§3.3); an `a=field` that does not fit its target (§6.4) |
 | `ENOENT` | no surface of that name |
 | `ENOTARGET` | no element with that id. The detail is the id, or the missing ids comma-separated (§6.2) |
 | `EDETACHED` | the surface is detached (§5.5) |

@@ -28,6 +28,14 @@ hotty-blitz 0.5.1 and xterm-addon-hotty 0.5.1 ship the font that
 [HOST.md](HOST.md) describes; hottyterm has it from 26.10.22-dev.9a14b7e.
 It isn't on the wire, so nothing above changes.
 
+Since the release, SPEC.md §3.3 says what a host does with a document that
+is not UTF-8: it answers `EINVAL` and applies nothing. hotty-blitz, and so
+hottyterm, did already. xterm-addon-hotty put U+FFFD in place of the bad
+bytes, and answers `EINVAL` from 0.5.3, as the test hosts of hotty-go
+(`hottytest`) and hotty-ts do from their next patch. A program that sends
+UTF-8 sees no change. The conformance vectors test it, with a send step's
+`payload_b64` for bytes that are not UTF-8.
+
 ### What changed
 
 - **`a=field` changes a control the user may be changing** (SPEC.md §6.4),

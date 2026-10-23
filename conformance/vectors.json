@@ -244,6 +244,116 @@
    ]
   },
   {
+   "name": "a document that is not UTF-8 is EINVAL, whatever is wrong with it, and changes nothing: a surface keeps the document it had, and none is made (SPEC \u00a73.3)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=a>ok</p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "1",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x"
+     },
+     "payload_b64": "PHAgaWQ9YT5jYWbpPC9wPg==",
+     "reply": {
+      "a": "err",
+      "re": "doc",
+      "s": "x",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x"
+     },
+     "payload_b64": "PHAgaWQ9YT7toIA8L3A+",
+     "reply": {
+      "a": "err",
+      "re": "doc",
+      "s": "x",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x"
+     },
+     "payload_b64": "PHAgaWQ9YT7ArzwvcD4=",
+     "reply": {
+      "a": "err",
+      "re": "doc",
+      "s": "x",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x"
+     },
+     "payload_b64": "PHAgaWQ9YT5vazwvcD7ihw==",
+     "reply": {
+      "a": "err",
+      "re": "doc",
+      "s": "x",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "inspect": [
+      "x",
+      "a"
+     ],
+     "expect": {
+      "text": "ok"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "y"
+     },
+     "payload_b64": "PHA+/zwvcD4=",
+     "reply": {
+      "a": "err",
+      "re": "doc",
+      "s": "y",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "y",
+      "c": "20",
+      "r": "1"
+     },
+     "reply": {
+      "a": "err",
+      "re": "place",
+      "s": "y",
+      "code": "ENOENT"
+     }
+    }
+   ]
+  },
+  {
    "name": "a command for a missing surface is ENOENT",
    "steps": [
     {

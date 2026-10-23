@@ -64,10 +64,12 @@ it. A list names several, all required:
 
 Its steps come in seven kinds.
 
-**Send** `{ "send": {control}, "payload": text?, "body": value?, "reply":
-…, "events": … }`: the command goes to the host as the program would send
-it. It is base64-encoded and chunked as needed. `payload` is UTF-8 text;
-`body` is a msgpack body (a delta's ops, a menu, an `a=field`'s change), as JSON: the runner
+**Send** `{ "send": {control}, "payload": text?, "payload_b64": str?, "body":
+value?, "reply": …, "events": … }`: the command goes to the host as the
+program would send it. It is base64-encoded and chunked as needed.
+`payload` is UTF-8 text; `payload_b64` is a payload that is not, its bytes in
+base64, sent as they are (a document that is not UTF-8, SPEC §3.3); `body`
+is a msgpack body (a delta's ops, a menu, an `a=field`'s change), as JSON: the runner
 writes it as msgpack, its numbers as Numbers (above) say, and sends that.
 - `"reply"` absent: replies are not checked.
 - `"reply": null`: the command must produce no reply.
