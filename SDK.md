@@ -206,7 +206,7 @@ And these sets, each value under its canonical name:
 - **modifier bits**: `ModShift` 1, `ModAlt` 2, `ModCtrl` 4, `ModSuper` 8
   (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
-  `EBUDGET`, `ESTALE`, `EVERSION` (SPEC.md §3.6);
+  `EBUDGET`, `ENOTERM`, `ESTALE`, `EVERSION` (SPEC.md §3.6);
 - **delta ops**: `morph`, `inner`, `replace`, `append`, `prepend`, `before`,
   `after`, `remove`, `attr`, `unattr`, `text`, `var`, `reveal` (SPEC.md
   §6.1);

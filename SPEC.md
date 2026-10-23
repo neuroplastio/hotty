@@ -255,6 +255,7 @@ ESC ] 7279 ; a=ok|err [:n=<n>] [:s=<s>] :re=<action> [:<more>] [; <payload>] ST
 | `EDETACHED` | the surface is detached (§5.5) |
 | `EQUOTA` | over one of the host's limits (§13) |
 | `EBUDGET` | the host gave up on work that exceeded its time budget (§13) |
+| `ENOTERM` | nothing can lay the document out yet, to tell a placement's rows: a multiplexer running a pane with no terminal attached (§5.2) |
 | `ESTALE` | an `a=field` made against another `rev` than the control's: the user changed it since (§6.4). The detail is the control's `rev`, in decimal |
 | `EVERSION` | a query (§4) lists no version the host speaks, or none at all. The detail is the versions the host speaks, comma-separated |
 
@@ -422,6 +423,12 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   smallest number of rows that holds its content, up to 1000. The reply,
   where the program asks for one (§3.6), reports the rows chosen:
   `a=ok:…:c=<c>:r=<r>`.
+  - **With no terminal attached**, a multiplexer running the pane (§4) has
+    nothing to lay the document out with. It makes the placement, and
+    answers `ENOTERM` where the rows would be. It does not wait for a
+    terminal to attach, and does not answer `EBUDGET`. The rows are chosen
+    when a terminal attaches and lays the surface out, and a placement with
+    `f=1` hears them then as `fit` (§9).
 - **The window:** `x`, `y`, `w` and `h` choose the part of the surface the
   placement shows: `w` columns and `h` rows, starting `x` columns and `y`
   rows into the surface. By default `x` and `y` are 0, and `w` and `h` reach
@@ -451,12 +458,14 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
     of rows the document needs at the placement's width — the rows `r=auto`
     would choose — differs from the rows it last heard. Each placement
     starts from its own rows: `r`, or for `r=auto` the rows chosen, whether
-    or not a reply carries them (§3.6). A document's height changes after
-    it is placed when a resource it refers to arrives or is replaced
-    (§7.1), an image or font it fetched loads (§7.2), a delta changes it
-    (§6), or a cell's size in CSS pixels changes (§5.3). The placement
-    keeps its size: the footprint is the program's (§11), and placing the
-    surface again with the new rows is the program's to do.
+    or not a reply carries them (§3.6). A placement answered with `ENOTERM`
+    starts from none, so the rows first chosen for it are a `fit`. A
+    document's height changes after it is placed when a resource it refers
+    to arrives or is replaced (§7.1), an image or font it fetched loads
+    (§7.2), a delta changes it (§6), or a cell's size in CSS pixels changes
+    (§5.3). The placement keeps its size: the footprint is the program's
+    (§11), and placing the surface again with the new rows is the
+    program's to do.
   - **Hover:** with `v=1`, the program hears `hover` (§9.4) each time the
     element the pointer is over in the window changes, and when the
     pointer leaves the window. (`h` is taken: it is the window's rows.)
@@ -2308,7 +2317,9 @@ A host **MUST** ensure that:
   takes.
 - Rendering must not stall the terminal. A host **MAY** abandon a render
   that exceeds its time budget and report `EBUDGET`: pathological CSS such
-  as huge blurs, deep nesting, or enormous documents.
+  as huge blurs, deep nesting, or enormous documents. A multiplexer with no
+  terminal to lay a surface out answers `ENOTERM` instead (§5.2): nothing
+  took too long, and nothing can yet.
 
 ## 14. Degradation
 

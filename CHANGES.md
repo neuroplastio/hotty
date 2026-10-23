@@ -36,6 +36,16 @@ bytes, and answers `EINVAL` from 0.5.3, as the test hosts of hotty-go
 UTF-8 sees no change. The conformance vectors test it, with a send step's
 `payload_b64` for bytes that are not UTF-8.
 
+Since the release, SPEC.md has the error code `ENOTERM` (§3.6). A
+multiplexer running a pane with no terminal attached has nothing to lay
+an `r=auto` placement out with. It makes the placement and answers
+`ENOTERM` where the rows would be, without waiting for a terminal and
+without `EBUDGET`, which plx answered there before. A placement with
+`f=1` hears its rows as `fit` once a terminal attaches and lays the
+surface out (§5.2). Only a multiplexer sends it, and the SDKs name it from
+their next patch. A program that doesn't know the code reads it as any
+other error.
+
 ### What changed
 
 - **`a=field` changes a control the user may be changing** (SPEC.md §6.4),
