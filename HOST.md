@@ -50,7 +50,8 @@ that ships the font.
 ### 2.1 The font
 
 A host **SHOULD** ship one font: **AdwaitaMono Nerd Font Propo**, from Nerd
-Fonts v3.5.1, in its Regular (400) and Bold (700) faces.
+Fonts v3.5.1, in its Regular (400), Bold (700), Italic (400) and Bold Italic
+(700) faces.
 
 - **Adwaita Mono** is GNOME's monospace typeface, built on Iosevka. It is
   licensed under the SIL Open Font License 1.1, with no reserved font
@@ -67,8 +68,9 @@ The family is named `"AdwaitaMono Nerd Font Propo"`, as Nerd Fonts names it.
 A host **MUST NOT** rename it. A document that names the family gets it on
 every host that follows this document.
 
-Italic and the other weights come from the engine: it slants Regular, and
-takes the nearest of the two weights.
+Italic is the font's own, not Regular slanted by the engine, so it matches a
+terminal that draws its cells in Adwaita Mono (§2.5). The other weights come
+from the engine, which takes the nearest of the two.
 
 ### 2.2 Its place in the font lists
 
@@ -105,8 +107,8 @@ uncompressed.
 
 - **A native host** **SHOULD** embed the WOFF2 faces and decode them once
   per process, off the thread that draws, before its first surface needs
-  them. Decoding both takes about 60 ms on two threads. Every surface then
-  shares the decoded faces.
+  them. Decoding all four takes about 85 ms on four threads. Every surface
+  then shares the decoded faces.
 - **A browser host** **SHOULD** serve the faces as files, declare them with
   `@font-face` in the host stylesheet, and let the browser fetch each face
   the first time a surface draws text in it. The surface's CSP
@@ -144,16 +146,18 @@ a host ships the font.
   follows this document, and boxes or another font's glyphs elsewhere. A
   program that shows icons **SHOULD** let its user switch them to text.
 - **Cells are the terminal's.** The font plays no part in cells: the
-  terminal draws them with its own fonts. Whether an icon shows in cells
-  depends on the terminal. Ghostty embeds Symbols Nerd Font, and hottyterm
-  with it. Elsewhere the user's font decides.
+  terminal draws them with its own fonts. hottyterm's default font is
+  Adwaita Mono, the letters of this font, so until its user picks another,
+  cells and surfaces look alike. Whether an icon shows in cells depends on
+  the terminal. Ghostty embeds Symbols Nerd Font, and hottyterm with it.
+  Elsewhere the user's font decides.
 
 ## 3. Implementations
 
 | host | how it ships the font | since |
 | --- | --- | --- |
-| hotty-blitz (hottyterm, `hotty run`) | embedded, decoded on a thread of its own when a host starts; first in `monospace`, second elsewhere | 0.5.1 |
-| xterm-addon-hotty | in the package's `fonts/`; the page serves it and passes its URL as the `fonts` option, and the addon adds it to `--hotty-font` and each surface's CSP | 0.5.1 |
+| hotty-blitz (hottyterm, `hotty run`) | embedded, decoded on a thread of its own when a host starts; first in `monospace`, second elsewhere | 0.5.1; Italic and Bold Italic 0.5.2 |
+| xterm-addon-hotty | in the package's `fonts/`; the page serves it and passes its URL as the `fonts` option, and the addon adds it to `--hotty-font` and each surface's CSP | 0.5.1; Italic and Bold Italic 0.5.4 |
 
 Both ship `OFL.txt` and `NOTICE.txt` beside the faces. hottyterm lists the
 font in its third-party notices.
@@ -186,7 +190,9 @@ hosts and programs have used it.
   - its licence: the OFL with no reserved font names, so the patched font
     may be shipped under Nerd Fonts' name;
   - its look: an even, readable monospace, on the GNOME desktop by default;
-  - a Regular and a Bold, which is all a host needs.
+  - static faces of its own for Regular, Bold, Italic and Bold Italic,
+    which is all a host needs, and the faces a terminal draws its cells
+    with when it uses Adwaita Mono.
 
   Fonts whose licences limit where they may be used (Apple's SF fonts and
   SF Symbols, Microsoft's Segoe) were left out, and so was Meslo, which is
@@ -210,5 +216,5 @@ Noto Sans, draws from this font, as Adwaita Mono draws it.
 ### A.5 Why WOFF2
 
 WOFF2 is a third of the size uncompressed faces take in a binary, and it is
-what a browser fetches anyway. A native host pays for it with about 60 ms of
+what a browser fetches anyway. A native host pays for it with about 85 ms of
 decoding, once per process and off the drawing thread.
