@@ -28,6 +28,11 @@ hotty-blitz 0.5.1 and xterm-addon-hotty 0.5.1 ship the font that
 [HOST.md](HOST.md) describes; hottyterm has it from 26.10.22-dev.9a14b7e.
 It isn't on the wire, so nothing above changes.
 
+hotty-blitz 0.5.2 and xterm-addon-hotty 0.5.4 add its Italic and Bold Italic,
+so italic is the font's own rather than Regular slanted. hottyterm has them
+from 26.10.26-dev.189693b, which also draws its cells in Adwaita Mono by
+default, so cells and surfaces look alike until the user picks a font.
+
 Since the release, SPEC.md §3.3 says what a host does with a document that
 is not UTF-8: it answers `EINVAL` and applies nothing. hotty-blitz, and so
 hottyterm, did already. xterm-addon-hotty put U+FFFD in place of the bad
