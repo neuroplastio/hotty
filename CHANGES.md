@@ -33,6 +33,10 @@ so italic is the font's own rather than Regular slanted. hottyterm has them
 from 26.10.26-dev.189693b, which also draws its cells in Adwaita Mono by
 default, so cells and surfaces look alike until the user picks a font.
 
+hotty-blitz 0.5.3 draws no `text-overflow` ellipsis on a line that fits its
+box until the box is rounded to whole pixels, which cut names short in plx's
+picker although the row had room. hottyterm has it from 26.10.26-dev.16dd52e.
+
 Since the release, SPEC.md §3.3 says what a host does with a document that
 is not UTF-8: it answers `EINVAL` and applies nothing. hotty-blitz, and so
 hottyterm, did already. xterm-addon-hotty put U+FFFD in place of the bad
