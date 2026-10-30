@@ -10,6 +10,7 @@ itself is [`SPEC.md`](../SPEC.md); this holds what is being weighed for it.
 | [`tasks/0.5.md`](tasks/0.5.md) | 0.5: `a=field`, which changes a control unless the user has |
 | [`tasks/0.6.md`](tasks/0.6.md) | 0.6, drafted and held: `scroll`, which scrolls by the scrolling keys' steps |
 | [`knowledge/wire-sizes.md`](knowledge/wire-sizes.md) | What 0.2's messages cost on the wire, and the script that measures them |
+| [`knowledge/ghostty-physical-key-escape.md`](knowledge/ghostty-physical-key-escape.md) | A synthetic keymap's characters arrive as Escape under kitty flag 8, in Ghostty and hottyterm |
 | [`journal/`](journal/) | One file per month, one bullet per leg |
 
 The repository is public, and so is this vault: nothing from private
