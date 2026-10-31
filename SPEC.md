@@ -1052,7 +1052,9 @@ button:enabled, input:is([type=button], [type=submit], [type=reset]):enabled {
   background: var(--hotty-ansi-8);
 }
 ::placeholder, :disabled { color: var(--hotty-ansi-8); }
-:focus-visible { outline: 1px solid var(--hotty-accent); }
+:is(a[href], button, input, select, textarea, summary):focus-visible {
+  outline: 1px solid var(--hotty-accent);
+}
 :any-link { color: var(--hotty-accent); }
 ::selection { color: var(--hotty-bg); background: var(--hotty-accent); }
 ```
@@ -1069,6 +1071,10 @@ button:enabled, input:is([type=button], [type=submit], [type=reset]):enabled {
   - `ansi-8` (bright black) is the dim grey themes give for secondary
     text: borders, buttons, placeholders and what is disabled. A disabled
     button keeps the background, so its text stays legible.
+  - The focus ring is the controls': links, buttons, fields, selects and
+    a `details` element's `summary`. A focused container (an element that
+    takes the focus by its `tabindex`, a scrolling region, a list) has no
+    ring by default, and a document that wants one there gives it one.
 - **`--hotty-px`** is one device pixel, `1px` over `scale` (§4), so that a
   border or a rule can be exactly one device pixel thick, or a box
   snapped to device pixels, at every zoom: `border-top: var(--hotty-px)
@@ -2824,6 +2830,14 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   between hosts (Chromium's and Blitz's greys are not the same). The 16
   colours are the one palette every terminal theme designs for contrast,
   so the host stylesheet draws controls with them and nothing else.
+- **Why the ring is the controls'.** Until 0.6 the host stylesheet ringed
+  every `:focus-visible` element. A document that focuses a container, to
+  take keys or to scroll by them, got a ring round all of it, and a click
+  on a scrolling page ringed the whole surface, so every document had to
+  take it back (`outline: 0`). The ring shows which control has the
+  keyboard; it was never meant for a page, a pane or a list. Dropping the
+  rule instead would leave a document with no sheet of its own showing no
+  focus at all, and a keyboard user lost.
 - **Why `area`:** a program that shows something next to an element (a
   select's list in a surface of its own, a menu) needs to know where the
   element is, and only the host lays the document out. Terminals call a

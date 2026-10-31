@@ -155,7 +155,9 @@ them on what it scrolls:
 A text field leaves scroll actions out, so a field inside still types `j`,
 and a button keeps `space`. A key never scrolls the terminal itself. These
 keys need a document that scrolls
-([§5.3](../../SPEC.md#53-geometry)).
+([§5.3](../../SPEC.md#53-geometry)). The host's stylesheet draws no focus
+ring round the article, only round controls
+([§8](../../SPEC.md#8-the-host-stylesheet)).
 
 An SDK has the keymap as data. `TerminalKeys` has the keys of Bubble
 Tea's text input and text area, the same in every SDK

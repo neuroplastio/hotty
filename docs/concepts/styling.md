@@ -62,6 +62,15 @@ rings, links and selected text. They are drawn in the terminal's colours,
 not the engine's, so they look the same on every host. `ansi-8` draws
 their borders, buttons, placeholders and whatever is disabled.
 
+The focus ring is the controls' alone: links, buttons, fields, selects and
+a `summary` (new in 0.6). A container that takes the focus, such as a
+list with a `tabindex` that takes keys or an article that scrolls by them,
+has no ring by default. A document that wants one there gives it one:
+
+```css
+ul[tabindex]:focus-visible { outline: 1px solid var(--hotty-accent); }
+```
+
 A document that styles its own controls wins here, as everywhere else.
 
 ## Light and dark
