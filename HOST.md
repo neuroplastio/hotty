@@ -8,7 +8,7 @@ path: host-design
 
 # hotty hosts
 
-    Version:  0.5, with SPEC.md 0.5
+    Version:  0.6, with SPEC.md 0.6
     Status:   Draft. Guidance for hosts, not part of the protocol.
     Licence:  CC BY 4.0
 

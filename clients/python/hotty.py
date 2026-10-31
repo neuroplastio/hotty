@@ -38,7 +38,7 @@ OSC_NUMBER = NUMBER  # the name this client had first
 CHUNK = 4096
 MAX_SIZE = 1000
 MAX_NAME = 64
-VERSION = "0.5"
+VERSION = "0.6"
 COMPRESS_FROM = 256
 SCAN_MAX = 64 << 10
 
