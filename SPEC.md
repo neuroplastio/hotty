@@ -2443,7 +2443,7 @@ Detection (payload shortened):
 
 ```
 program → ESC ] 7279 ; a=q:n=1:v=0.5 ST  CSI c
-host    → ESC ] 7279 ; a=ok:n=1:re=q ; haF2ozAuM6djZWxsY3Nz… ST  CSI ? 62 ; 22 c
+host    → ESC ] 7279 ; a=ok:n=1:re=q ; haF2ozAuNadjZWxsY3Nz… ST  CSI ? 62 ; 22 c
 ```
 
 A card placed below the prompt, asking for the rows it took, then a delta

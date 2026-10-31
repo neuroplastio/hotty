@@ -59,6 +59,10 @@ surface out (§5.2). Only a multiplexer sends it, and the SDKs name it from
 their next patch. A program that doesn't know the code reads it as any
 other error.
 
+An erratum in an example, since the release: Appendix A's detection reply
+was capabilities whose `v` decodes to "0.3". Its base64 now decodes to
+"0.5", as §4 has it. The example was wrong, and no rule changes.
+
 ### What changed
 
 - **`a=field` changes a control the user may be changing** (SPEC.md §6.4),
