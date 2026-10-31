@@ -73,6 +73,7 @@ FEATURE_PASSTHROUGH = "passthrough"
 FEATURE_HOVER = "hover"
 FEATURE_COUNT = "count"
 FEATURE_MENU = "menu"
+FEATURE_BACKDROP = "backdrop"
 
 # The modifier bits of an event's `mods` (SPEC §9).
 MOD_SHIFT = 1
@@ -324,12 +325,15 @@ class Window:
 class Placement:
     """Where and how a surface is shown (SPEC §5.2). rows 0 is auto. `press`,
     `fit` and `hover` belong to the surface and hold until sent again:
-    None leaves the key out, True sends 1 and False sends 0 (SDK.md §3.4.1)."""
+    None leaves the key out, True sends 1 and False sends 0 (SDK.md §3.4.1).
+    `backdrop`, like `z`, is the placement's: True sends b=1, under the
+    cells, which a host without the feature ignores (SPEC §5.2)."""
 
     cols: int
     rows: int = 0
     window: Window = None
     z: int = 0
+    backdrop: bool = False
     press: bool = None
     fit: bool = None
     hover: bool = None
@@ -343,6 +347,8 @@ class Placement:
                 pairs += [("x", str(w.x)), ("y", str(w.y)), ("w", str(w.w)), ("h", str(w.h))]
         if self.z:
             pairs.append(("z", str(self.z)))
+        if self.backdrop:
+            pairs.append(("b", "1"))
         for key, flag in (("p", self.press), ("f", self.fit), ("v", self.hover)):
             if flag is not None:
                 pairs.append((key, "1" if flag else "0"))
@@ -2243,10 +2249,11 @@ class Hotty:
     def doc(self, surface, html, quiet=None, detached=False, scroll=0):
         self.write(doc(surface, html, detached=detached, scroll=scroll, q=quiet))
 
-    def place(self, surface, cols, rows="auto", move_cursor=True, quiet=None, window=None, z=0, press=None, fit=None, hover=None):
+    def place(self, surface, cols, rows="auto", move_cursor=True, quiet=None, window=None, z=0, press=None, fit=None, hover=None, backdrop=False):
         """Places a surface at the cursor. `window` is (x, y, w, h): the part
         of the surface to show (SPEC §5.2), or None for all of it; `z` puts
-        the placement above (greater) or below overlapping ones; `press`
+        the placement above (greater) or below overlapping ones; `backdrop`
+        draws it under the cells, on a host whose features list it; `press`
         asks for a `press` event on every press in it (SPEC §9); `fit` asks
         for a `fit` event whenever the rows its document needs change;
         `hover` asks for a `hover` event whenever the element under the
@@ -2258,6 +2265,7 @@ class Hotty:
             rows=0 if rows == "auto" else int(rows),
             window=Window(*window) if window is not None else None,
             z=z,
+            backdrop=backdrop,
             press=press,
             fit=fit,
             hover=hover,

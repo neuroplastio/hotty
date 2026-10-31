@@ -13,6 +13,9 @@ Each word below links to the section that defines it, in the
 - **area**: a rectangle of cells, given as `c`, `r`, `w` and `h`. It is
   where an element is, in an event ([§9](../SPEC.md#9-events)), or where
   a finger drags in the cells ([§9.6](../SPEC.md#96-touch-in-the-cells)).
+- **backdrop**: a placement drawn under the cells rather than above
+  them, made with `b=1` on a host that lists the feature `backdrop`
+  ([§5.2](../SPEC.md#52-placement-aplace)).
 - **capability**: a field of the host's answer to the query, such as its
   version, its cell size or its features
   ([§4](../SPEC.md#4-detection-and-capabilities)).
@@ -25,7 +28,7 @@ Each word below links to the section that defines it, in the
 - **event**: what the host reports of the user, written to the program's
   input as `a=ev` ([§9](../SPEC.md#9-events)).
 - **feature**: something optional a host has, listed in its capabilities:
-  `passthrough`, `hover`, `count` or `menu`
+  `passthrough`, `hover`, `count`, `menu` or `backdrop`
   ([§4](../SPEC.md#4-detection-and-capabilities)).
 - **host**: what draws a program's surfaces: usually the terminal itself,
   sometimes a polyfill or a multiplexer ([§2](../SPEC.md#2-conventions)).

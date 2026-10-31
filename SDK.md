@@ -202,7 +202,8 @@ And these sets, each value under its canonical name:
 - **event kinds**: `click`, `change`, `input`, `caret`, `submit`, `press`,
   `focus`, `blur`, `fit`, `hover`, `view`, `dragstart`, `drag`, `dragend`,
   `command`, `caps` (SPEC.md §9);
-- **features**: `passthrough`, `hover`, `count`, `menu` (SPEC.md §4);
+- **features**: `passthrough`, `hover`, `count`, `menu`, `backdrop`
+  (SPEC.md §4);
 - **modifier bits**: `ModShift` 1, `ModAlt` 2, `ModCtrl` 4, `ModSuper` 8
   (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
@@ -321,6 +322,7 @@ A `Placement` says where and how a surface is shown (SPEC.md §5.2):
 | `Rows` | `r` | 0, which is `auto` | always: the number, or `auto` |
 | `Window` | `x`, `y`, `w`, `h` | none | all four, or none: none when absent, when all are 0, or when it shows the whole surface (rows given, and the window is 0, 0, cols, rows) |
 | `Z` | `z` | 0 | when not 0 |
+| `Backdrop` | `b=1` | false | when true |
 | `Press` | `p` | absent | `p=1` when on, `p=0` when off, nothing when absent |
 | `Fit` | `f` | absent | as `Press` |
 | `Hover` | `v` | absent | as `Press` |
@@ -329,6 +331,12 @@ A `Placement` says where and how a surface is shown (SPEC.md §5.2):
 `Press`, `Fit` and `Hover` belong to the surface (SPEC.md §5.2), so each is
 absent, on or off: a placement that leaves them absent leaves them as they
 were (Appendix A gives each language's three).
+
+`Backdrop`, like `Z`, belongs to the placement: a placement without it is
+above the cells, so a program that places a backdrop every frame sets it
+every time. It goes out whatever the host: a program sets it only where
+`Has(backdrop)` (§3.9; SPEC.md §5.2), since a host without the feature
+ignores `b` and draws the surface over the text.
 
 #### 3.4.2 Reply options
 
@@ -1025,7 +1033,7 @@ The canonical names, in each language's case.
 | `Edit`, `Menu`, `MenuShow`, `MenuHide` | `hotty.Edit`, `hotty.Menu`, `hotty.MenuShow`, `hotty.MenuHide` | `edit`, `menu`, `menu_show`, `menu_hide` | as Python | as Python | `edit`, `menu`, `menuShow`, `menuHide` |
 | `Touch`, `TouchArea` and its fields | `hotty.Touch`, `hotty.TouchArea{C, R, W, H, Drag}` | `touch`, `TouchArea(c, r, w, h, drag)` | `touch`, tables with those keys | `touch`, `TouchArea { c, r, w, h, drag }` | `touch`, `{ c, r, w, h, drag }` |
 | `MenuTree`, `MenuItem` and their fields | `hotty.MenuTree{Label, Items}`, `hotty.MenuItem{Key, Label, Name, Enabled, Items}` | `MenuTree(label, items)`, `MenuItem(key, label, name, enabled, items)` | tables with those keys | `MenuTree { label, items }` | `{ label, items }` |
-| `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor }` |
+| `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Backdrop, Press, Fit, Hover, KeepCursor}` | `Placement(cols, rows, window, z, backdrop, press, fit, hover, keep_cursor)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, backdrop, press, fit, hover, keepCursor }` |
 | a flag on, off or absent (`Press`, `Fit`, `Hover`) | `hotty.On`, `hotty.Off`, the zero value | `True`, `False`, `None` | `true`, `false`, `nil` | `Option<bool>` | `true`, `false`, `undefined` |
 | `N`, `Q`, `Detached`, `Scroll`, `Late` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)`, `hotty.Late()` | `n=`, `q=`, `detached=`, `scroll=`, `late=` | `{ n = …, q = …, detached = …, scroll = …, late = … }` | builder methods | `{ n, q, detached, scroll, late }` |
 | `ScrollVertical`, `ScrollHorizontal` | `hotty.ScrollVertical`, `hotty.ScrollHorizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` |
@@ -1187,3 +1195,22 @@ goes wrong:
   field's selection where it was.
 - **Positions are bytes of UTF-8,** in `SetField` and in `Sel`, not
   characters: `é` is 2. A language whose strings count UTF-16 converts.
+
+## Appendix F. Moving from 0.5
+
+Informative. hotty 0.6 breaks 0.5 (SPEC.md §15): a 0.6 host answers a 0.5
+query with `EVERSION`. A program and its SDK move together, and its tests'
+fake hosts with them. These are the places a port goes wrong:
+
+- **`Version` is `"0.6"`,** and the runner's copy of the vectors moves with
+  it (§5.2).
+- **`Backdrop` is the placement's, not the surface's.** It goes out as
+  `b=1` when true and not at all when false, as `KeepCursor` does, never as
+  `b=0`. Unlike `Press`, `Fit` and `Hover`, it has no absent: each
+  placement says it again.
+- **Ask before placing a backdrop.** A host without the feature `backdrop`
+  ignores `b` and draws the surface over the text (SPEC.md §5.2), so a
+  program checks `Has(backdrop)` and draws in cells without it.
+- **A backdrop never has the keyboard.** `Focus` on one is `EINVAL`, and a
+  focused surface placed as one sends `blur`. A test host that lists the
+  feature answers so.

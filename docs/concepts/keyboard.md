@@ -41,7 +41,8 @@ The keyboard goes back to the terminal, and the host sends `blur`, when:
 - the user clicks the cells, another surface, or an element here that
   takes no focus;
 - `tab` moves past the last element, or `shift+tab` before the first;
-- the program sends `a=blur`, or hides the surface.
+- the program sends `a=blur`, hides the surface, or places it as a
+  backdrop ([Surfaces](surfaces.md#backdrops)).
 
 A focused text field commits its value first, so its `change`, if the
 value changed, comes before the `blur`. `escape` is never the surface's, except in a select's
@@ -50,7 +51,9 @@ open list: it reaches the program, which may send `a=blur`.
 A surface cannot take the keyboard on its own: `autofocus` does nothing
 ([Security](security.md)). A detached surface never has it, and detaching
 one that has it gives the keyboard back with no `change` and no `blur`
-([§5.5](../../SPEC.md#55-ownership-adetach)).
+([§5.5](../../SPEC.md#55-ownership-adetach)). A backdrop, drawn under the
+cells, never has it either: `a=focus` on one is `EINVAL`
+([§5.2](../../SPEC.md#52-placement-aplace)).
 
 ## Following focus
 

@@ -112,8 +112,44 @@ the same `z`, the surface created later is above.
 
 - `z` belongs to the placement: placing the surface again without it puts
   it back at 0.
-- Every placement is above the terminal's cells, whatever its `z`.
+- Every placement is above the terminal's cells, whatever its `z`, except a
+  backdrop ([below](#backdrops)).
 - Where placements overlap, the pointer goes to the topmost one under it.
+
+## Backdrops
+
+> [!NOTE]
+> New in 0.6.
+
+A placement with `b=1` is a **backdrop**: the host draws it under the
+cells, not above them ([§5.2](../../SPEC.md#52-placement-aplace)). A cell
+with the default background shows it through, and a cell with any other
+background, the text and the cursor cover it. A program that shows several
+terminals at once, as a multiplexer shows its panes, can then draw each
+pane as a card on a canvas, and leave the panes' text in the cells:
+
+```text
+program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=1 ST  ESC 8
+```
+
+- **Check `features` first.** Only a host that lists `backdrop` draws
+  one. Any other ignores `b` and draws the surface above the cells, over
+  the text, so without the feature a program draws in cells instead:
+  borders, gutters ([Degrading](degrading.md#features)).
+- **Under everything:** a backdrop is under the cells and under every
+  other placement. Among backdrops, `z` orders them, as above.
+- **The placement's,** like `z`: placed again without `b=1`, the surface
+  is above the cells again.
+- **No input.** The pointer goes to what is above a backdrop, the cells or
+  another surface, so its `p` and `v` hear nothing. It never has the
+  keyboard: `a=focus` on one is `EINVAL`, and a surface that had the
+  keyboard gives it back when it is placed as one.
+- **On to the window's edges.** Where a backdrop reaches an edge of the
+  screen, the host draws it on across the padding it keeps round the
+  cells, so a canvas the size of the screen fills the whole window.
+- **Redraw it with deltas.** When a pane moves, splits or takes the
+  focus, a delta to the canvas moves its card or its ring
+  ([Updates](updates.md)).
 
 ## Where a placement goes
 

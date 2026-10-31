@@ -249,7 +249,7 @@ ESC ] 7279 ; a=ok|err [:n=<n>] [:s=<s>] :re=<action> [:<more>] [; <payload>] ST
 
 | code | when |
 | --- | --- |
-| `EINVAL` | an unknown action or op; a bad surface name; a missing `s`, `t`, `k`, `c` or `id`; `c` or `r` out of range; a program's body that does not decode, or holds a field of another type (§3.3); a document that is not UTF-8 (§3.3); an `a=field` that does not fit its target (§6.4) |
+| `EINVAL` | an unknown action or op; a bad surface name; a missing `s`, `t`, `k`, `c` or `id`; `c` or `r` out of range; a program's body that does not decode, or holds a field of another type (§3.3); a document that is not UTF-8 (§3.3); an `a=field` that does not fit its target (§6.4); `a=focus` on a backdrop (§5.2) |
 | `ENOENT` | no surface of that name |
 | `ENOTARGET` | no element with that id. The detail is the id, or the missing ids comma-separated (§6.2) |
 | `EDETACHED` | the surface is detached (§5.5) |
@@ -384,6 +384,7 @@ a **feature**, and `features` lists those it has:
 | `hover` | says where the pointer is, with `hover` (§9.4). Without it, a program never hears that the pointer has left |
 | `count` | says that a click repeats one before it, with `count` (§9). Without it, every click reads as the first of its run, and a program offers another way to do what a double click would |
 | `menu` | keeps a program's menu, shows its levels and lets the user pick from it (§10.7). Without it, a program shows its menus itself |
+| `backdrop` | draws a placement with `b=1` under the cells, as a backdrop (§5.2). Without it, `b` is ignored and the surface is drawn above the cells, over the text, so a program draws in cells instead |
 
 A program **MUST** ignore a feature it does not know: later versions add
 them (§15).
@@ -427,7 +428,7 @@ ESC ] 7279 ; a=doc:s=<name>[:d=1][:scroll=<axes>] ; <HTML> ST
 ### 5.2 Placement: `a=place`
 
 ```
-ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:z=<n>][:p=0|1][:f=0|1][:v=0|1][:C=1] ST
+ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<cols>][:h=<rows>][:z=<n>][:b=1][:p=0|1][:f=0|1][:v=0|1][:C=1] ST
 ```
 
 - **Size:** the surface is `c` columns wide and `r` rows tall, and its
@@ -459,9 +460,56 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   two with the same `z`, the surface created later (by the `a=doc` that
   created it) is above. `z` is an integer from -1000 to 1000, else `EINVAL`;
   a placement without it has 0. It belongs to the placement: placing the
-  surface again without `z` puts it back at 0. Every placement is above the
-  cells, whatever its `z`. Where placements overlap, the topmost one under
-  the pointer receives it (§5.3).
+  surface again without `z` puts it back at 0. Every placement without `b`
+  (below) is above the cells, whatever its `z`. Where placements overlap,
+  the topmost one under the pointer receives it (§5.3).
+- **Backdrops:** on a host with the feature `backdrop` (§4), `b=1` makes
+  the placement a **backdrop**, drawn under the cells, as the kitty
+  graphics protocol draws an image placed below the cells' backgrounds: a
+  cell with the default background is transparent over it, and a cell
+  with any other background, the text and the cursor cover it. Only `1`
+  makes one: without `b`, or with any other value, the placement is above
+  the cells.
+  - **Stacking:** backdrops are under every cell and every placement
+    without `b`. Among themselves they stack as placements do (above): by
+    `z`, then the surface created later above.
+  - **The placement's:** like `z`, `b` belongs to the placement. Placing
+    the surface again without `b=1` puts it back above the cells.
+  - **No pointer:** a backdrop takes no pointer, from a mouse, a pen or a
+    touch. The pointer reaches what is above it: the topmost window there
+    that takes it, or else the cells (§9.3), on a host with `passthrough`
+    or without. So the surface hears no `press` there, whatever `p` asked
+    for, and no `hover`, whatever `v` asked for (§9, §9.4); nothing there
+    drags, clicks or takes focus; and a gesture that scrolls is the
+    terminal's, as over the cells (§9). What the surface heard before it
+    became a backdrop ends as it would: a gesture whose press it took
+    stays its own until the release, as the press decides (§9.3), and a
+    window that had the pointer loses it (§9.4). `f` holds as on any
+    placement.
+  - **No keyboard:** a backdrop never has the keyboard (§10.1). `a=focus`
+    on a surface whose placement is a backdrop is `EINVAL`, whatever its
+    `t`. A surface that has the keyboard when it is placed as one gives
+    it back to the terminal, as `a=blur` does: the host sends `blur`.
+  - **The window's edges:** a host may keep room round the cells that no
+    cell covers: the padding it is set to keep, and what is left of the
+    window where it is not a whole number of cells. A backdrop that
+    reaches an edge of the screen goes on to the window's edge there: the
+    host draws its outermost pixels across that room, the edge row or
+    column drawn out, and the corner pixel in a corner. So no part of the
+    window shows the terminal's own background unless the backdrop or a
+    cell paints it, and a program needs to know nothing of the padding. A
+    backdrop that reaches no edge stops at its cells. A cell that paints
+    its background still covers the room beside it where the host extends
+    the cells at the edge into the padding, since cells are above
+    backdrops.
+  - **The rest is a placement's,** as for any other: the window, the
+    cursor (`C=1`, below), moving with the screen, and removal (§5.4).
+  - **Detection:** a host lists `backdrop` (§4) when it draws backdrops.
+    A host without it ignores `b`, as it ignores every control key it does
+    not know (§15), and places the surface above the cells, over the text.
+    A program **MUST** check `features` before it places a backdrop, and
+    without the feature draws in cells what the backdrop would show, such
+    as borders or gutters.
 - **What the program hears:** `p`, `f` and `v` ask for events (§9). Each
   belongs to the surface, not to the placement: `1` turns it on and `0`
   off, and it holds until the program sends it again. A placement without
@@ -505,9 +553,10 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   refer to it. The document is laid out at that width, and at that height
   for anything sized by the viewport.
 - Only the window is shown, and only the window receives the pointer: where
-  windows overlap, the topmost (§5.2, `z`). A press with Alt held is the
-  exception: it passes every surface (§9.2). On a host with `passthrough`,
-  so does the pointer over the parts of a window that take none (§9.3).
+  windows overlap, the topmost (§5.2, `z`). A backdrop's window receives
+  none (§5.2). A press with Alt held is the exception: it passes every
+  surface (§9.2). On a host with `passthrough`, so does the pointer over
+  the parts of a window that take none (§9.3).
 - **What does not fit is clipped, and a surface scrolls only where its
   document asks** (`scroll`, §5.1). Along an axis it did not ask for:
   - The host **MUST** clip overflow as `overflow: hidden` does: the
@@ -1050,7 +1099,7 @@ reads hotty messages from its input. A detached surface sends none (§5.5).
 | `input` | every edit of a control with `data-on~=input` | `{"value": str, "rev": int}`, with `"sel": [int, int]`, the selection after it, in a text field with `data-on~=caret` (below) |
 | `caret` | in a text field with `data-on~=caret`, the user moved the selection, and no `input` says so: a move, a click, or an edit in a field without `data-on~=input` | `{"sel": [int, int], "rev": int}`: the selection, its anchor then its caret, as `a=field` counts them (§6.4) |
 | `submit` | a form submitted (a submit button, or Enter in a text field) | `{"fields": [[str, str]]}`: the form's fields, each its name and its value, in tree order, the submitter's included; `[]` for a form with none |
-| `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface whose `p` is on (§5.2), except a mouse's or a pen's press with Alt held (§9.2) and where the pointer passes through (§9.3) | `{"area": area, "mods": int}`: the cells of the element `t` names (below), and the modifier keys held; no `area` without `t` |
+| `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface whose `p` is on (§5.2), except a mouse's or a pen's press with Alt held (§9.2), where the pointer passes through (§9.3), and on a backdrop (§5.2) | `{"area": area, "mods": int}`: the cells of the element `t` names (below), and the modifier keys held; no `area` without `t` |
 | `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": int, "r": int, "mods": int}`: the pointer's cell and the modifier keys held, with `"x": int` and `"y": int`, its step, on an element with `data-steps` (§9.1) |
 | `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element or in `t` (§9.1) | the same, with `"tx": int` and `"ty": int`, the step in `t`, where `t` has `drop` in its `data-on` and `data-steps` (§9.1) |
 | `dragend` | the drag ended: the button released or the finger lifted, wherever the pointer is (§9.1) | as for `drag` |
@@ -1616,6 +1665,11 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
   take focus. The host sends `blur`.
 - **A detached surface** (§5.5) never has the keyboard: `a=focus` is
   `EDETACHED`, whatever its `t`, and `a=blur` does nothing.
+- **A backdrop** (§5.2) never has the keyboard either: `a=focus` on a
+  surface whose placement is one is `EINVAL`, whatever its `t`, or
+  `EDETACHED` if it is detached as well, and `a=blur` does nothing. A
+  surface that has the keyboard gives it back when it is placed as one,
+  and the host sends `blur`.
 
 The program takes the keyboard back with `a=blur:s=<name>`. The focused
 control commits its value first (a `change` may follow), and then `blur` is
@@ -2399,14 +2453,14 @@ A host conforms to hotty version 0.6 when:
 
 The vectors check replies, error codes, every delta op, morph, context
 parsing, `a=field` and revisions, resources, drags and their steps, presses with Alt, `fit`, hover,
-`area`, scrolling, `reveal` and `view`, touch in the cells, prefixes,
-edit commands, menus, keymaps and the envelope, and their `keys`, `keymap`
-and `edit` sections a host's key names (§10.4), keymaps and actions
-(§10.2). They inspect documents and events, not pixels. The vectors marked
-with a feature (`"passthrough"`, `"hover"`, `"count"`, `"menu"`, §4) apply
-to a host that has it, those marked `"commands"` to a host with a terminal
-that takes edit commands (§10.6), and those marked `"mouse"` to a host with
-a terminal that reports the mouse (§9.6).
+`area`, scrolling, `reveal` and `view`, touch in the cells, backdrops,
+prefixes, edit commands, menus, keymaps and the envelope, and their `keys`,
+`keymap` and `edit` sections a host's key names (§10.4), keymaps and
+actions (§10.2). They inspect documents and events, not pixels. The vectors
+marked with a feature (`"passthrough"`, `"hover"`, `"count"`, `"menu"`,
+`"backdrop"`, §4) apply to a host that has it, those marked `"commands"` to
+a host with a terminal that takes edit commands (§10.6), and those marked
+`"mouse"` to a host with a terminal that reports the mouse (§9.6).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
@@ -2423,10 +2477,10 @@ one finger, move it, and lift it, and tells it whether a touch went on to
 the terminal as a scroll. One whose terminal reports the mouse also tells
 the test what the terminal reported of the mouse's primary button for a
 touch in the cells (§9.6). A host
-with `passthrough` also tells the test whether each of those reached the
-surface or passed through it, and whether a wheel or a key went on to the
-terminal. A host with `menu` also tells a test the level of the program's
-menu it shows, and lets it pick an item by its name.
+with `passthrough` or `backdrop` also tells the test whether each of those
+reached the surface or passed through it, and whether a wheel or a key went
+on to the terminal. A host with `menu` also tells a test the level of the
+program's menu it shows, and lets it pick an item by its name.
 
 This is a test interface, not part of the wire protocol.
 
@@ -2500,6 +2554,17 @@ program → ESC ] 7279 ; a=field:s=find:t=q ; hKNyZXYCpGZyb20AonRvAqR0ZXh0pHNyYy
 Had the user typed another character first, the host would have changed
 nothing and answered `ESTALE` with `3`, and the program would complete from
 the `input` it hears next.
+
+A multiplexer that cards its panes, on a host whose `features` list
+`backdrop`: one surface the size of the screen, its canvas and a card for
+each pane, placed at the top left as a backdrop, under the panes' cells:
+
+```
+program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=1 ST  ESC 8
+          (each pane's text stays in the cells, on the default background,
+           so its card shows under it; a pane that moves, splits or takes
+           the focus is a delta to the canvas)
+```
 
 ## Appendix B. Rationale
 
@@ -2977,13 +3042,44 @@ the `input` it hears next.
     whose platform counts UTF-16 converts, which it can do exactly.
   - **The morph stays as it was,** since a program that redraws its tree
     every frame (§6.2) must not wipe what the user is typing.
+- **Why a backdrop.** A program that shows several terminals at once, as a
+  multiplexer shows its panes, could separate them only with cells:
+  box-drawing lines a cell wide, or a blank gutter. What makes a native
+  window read as one is under the text: each pane a rounded card in its
+  own background, on a darker canvas, a few pixels apart, and a ring round
+  the focused one. A surface above the cells cannot draw that without
+  hiding the text, and a terminal's text cannot move into a surface.
+  - **Not an image.** The kitty graphics protocol already draws an image
+    placed below the cells' backgrounds, under them. But the program
+    rasterises it, so it must know the cell's size in device pixels and
+    draw it again on a zoom, another display or a new font; it sends every
+    frame whole; and it needs a host and a multiplexer that speak kitty
+    graphics. A surface is laid out by the host at the cells' size, in the
+    theme's colours (§8), drawn again without the program (§5.3), and
+    changed with deltas (§6).
+  - **The placement's, like `z`,** because where a surface is drawn is
+    where it is placed: placed again without `b`, it is above the cells
+    again.
+  - **No input,** because what lies under the text is not what the user
+    points at: a press there is the cells', and the keyboard stays with the
+    terminal the backdrop frames.
+  - **A feature,** because a 0.5 host ignores `b`, as it does any key it
+    does not know (§15), and would draw the surface over the text. A
+    program has to know before it places one.
+  - **On to the window's edges, from cells.** A backdrop the size of the
+    screen would otherwise leave strips of the terminal's background in
+    the padding and in what is left of the window. Placing it in the
+    window's pixels instead would make the program learn the padding and
+    the window's size, which hotty keeps from it: placements are in cells
+    (§5.2).
 
 ## Appendix C. Prior art
 
 hotty takes from:
 
 - **the kitty graphics protocol**: the shape of the envelope (key=value
-  controls, chunks, `q`, `C=1`), and placements anchored to cells;
+  controls, chunks, `q`, `C=1`), placements anchored to cells, and images
+  drawn under the cells, which backdrops follow;
 - **Hotwire and Turbo**: HTML over the wire, which the name follows, and
   appending by id;
 - **Datastar and idiomorph**: morphing, and matching top-level elements by id;

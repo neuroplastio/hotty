@@ -18933,6 +18933,560 @@
    ]
   },
   {
+   "name": "b=1 places a backdrop, under the cells: it takes no pointer, so a press over it passes to the cells, and the surface hears nothing of it, whatever p asks for, nor takes the keyboard; a=focus on it is EINVAL, whatever its t; placed again without b=1, or with b=0, it is above the cells and takes the pointer; a surface that has the keyboard, placed as a backdrop, gives it back with blur (SPEC \u00a75.2, \u00a710.1)",
+   "requires": "backdrop",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}button{display:block;box-sizing:border-box;margin:0;padding:0;border:0;font:inherit;width:calc(3*var(--hotty-cell-w));height:var(--hotty-cell-h)}</style><button id=go>go</button>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "b": "1",
+      "p": "1",
+      "q": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "go",
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "through": true,
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "go"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "nope"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "go",
+     "through": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "through": false,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "go",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      },
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "go"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "through": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "go",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "b": "0",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "go",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "b": "1",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "blur",
+       "s": "x",
+       "t": null
+      }
+     ]
+    },
+    {
+     "key": "Enter",
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a backdrop sends no hover, whatever v asks for: the pointer over it is over the cells; v holds on the surface, so placed above the cells it hovers again (SPEC \u00a75.2, \u00a79.4)",
+   "requires": [
+    "backdrop",
+    "hover"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}button{display:block;box-sizing:border-box;margin:0;padding:0;border:0;font:inherit;width:calc(3*var(--hotty-cell-w));height:var(--hotty-cell-h)}</style><button id=go>go</button>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "b": "1",
+      "v": "1",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "go",
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      10,
+      1
+     ],
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "leave",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "go",
+     "through": false,
+     "events": [
+      {
+       "e": "hover",
+       "s": "x",
+       "t": "go",
+       "detail": {
+        "c": 1,
+        "r": 0
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a gesture the surface took before it became a backdrop stays its own until the release, as the press decides; after it, the pointer passes the backdrop (SPEC \u00a75.2, \u00a79.3)",
+   "requires": "backdrop",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}</style><div id=d data-on=drag>d</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "d",
+     "through": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "through": false,
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "d",
+       "detail": {
+        "c": 1,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "b": "1",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "through": false,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "d",
+       "detail": {
+        "c": 1,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "d",
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "through": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a wheel over a backdrop is the terminal's, though its document scrolls; placed above the cells, the same wheel scrolls the document (SPEC \u00a75.2, \u00a75.3)",
+   "requires": [
+    "backdrop",
+    "scroll"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}#t{height:calc(10*var(--hotty-cell-h))}</style><div id=t></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "b": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      2,
+      1
+     ],
+     "through": true,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      3
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      2,
+      2
+     ],
+     "through": false,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      3
+     ],
+     "terminal": false,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a touch on a backdrop is the terminal's: it presses and drags nothing and scrolls the terminal, where the same touch above the cells drags (SPEC \u00a75.2, \u00a79.1)",
+   "requires": [
+    "backdrop",
+    "touch"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(10*var(--hotty-cell-w))}#h{touch-action:pan-y}</style><div id=h data-on=drag>h</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "12",
+      "r": "2",
+      "b": "1",
+      "p": "1",
+      "q": "2"
+     }
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "touch": "move",
+     "s": "x",
+     "at": [
+      6,
+      0
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "touch": "up",
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "12",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "touch": "move",
+     "s": "x",
+     "at": [
+      6,
+      0
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 10,
+         "h": 1
+        }
+       }
+      },
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "c": 1,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "touch": "up",
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "c": 6,
+        "r": 0
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "a key the keymap binds to prefix reaches the program, and so does every key after it, whatever is focused, space, tab and escape too, until the program sends a=focus, with or without t (SPEC \u00a710.5)",
    "steps": [
     {
@@ -21108,6 +21662,61 @@
    ]
   },
   {
+   "name": "place as a backdrop: b=1, drawn under the cells (SPEC \u00a75.2)",
+   "build": "place",
+   "args": {
+    "surface": "card",
+    "placement": {
+     "cols": 40,
+     "rows": 10,
+     "z": -3,
+     "backdrop": true,
+     "press": true,
+     "keep_cursor": true
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "place",
+       "s": "card",
+       "c": "40",
+       "r": "10",
+       "z": "-3",
+       "b": "1",
+       "p": "1",
+       "C": "1"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "place with backdrop false sends no b: the placement is above the cells (SPEC \u00a75.2)",
+   "build": "place",
+   "args": {
+    "surface": "card",
+    "placement": {
+     "cols": 40,
+     "rows": 2,
+     "backdrop": false
+    }
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "place",
+       "s": "card",
+       "c": "40",
+       "r": "2"
+      }
+     }
+    }
+   ]
+  },
+  {
    "name": "place_at: save the cursor, move it, place with C=1, restore it",
    "build": "place_at",
    "args": {
@@ -21134,6 +21743,40 @@
        "r": "auto",
        "C": "1",
        "n": "3"
+      }
+     }
+    },
+    {
+     "raw": "\u001b8"
+    }
+   ]
+  },
+  {
+   "name": "place_at as a backdrop: a canvas at the top left, under the cells, with b=1 and C=1 (SPEC \u00a75.2)",
+   "build": "place_at",
+   "args": {
+    "surface": "canvas",
+    "x": 0,
+    "y": 0,
+    "placement": {
+     "cols": 80,
+     "rows": 24,
+     "backdrop": true
+    }
+   },
+   "out": [
+    {
+     "raw": "\u001b7\u001b[1;1H"
+    },
+    {
+     "cmd": {
+      "control": {
+       "a": "place",
+       "s": "canvas",
+       "c": "80",
+       "r": "24",
+       "b": "1",
+       "C": "1"
       }
      }
     },
@@ -25844,6 +26487,68 @@
      "caps": {
       "has": {
        "count": false
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "features lists backdrop: the host draws a placement with b=1 under the cells (SPEC \u00a74, \u00a75.2); absent, it does not",
+   "seqs": [
+    "\u001b]7279;a=ok:n=1:re=q;gqF2ozAuNqhmZWF0dXJlc5KlaG92ZXKoYmFja2Ryb3A=\u001b\\",
+    "\u001b]7279;a=ok:n=2:re=q;gqF2ozAuNqhmZWF0dXJlc5GlaG92ZXI=\u001b\\"
+   ],
+   "bodies": [
+    {
+     "v": "0.6",
+     "features": [
+      "hover",
+      "backdrop"
+     ]
+    },
+    {
+     "v": "0.6",
+     "features": [
+      "hover"
+     ]
+    }
+   ],
+   "results": [
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "1",
+      "re": "q"
+     },
+     "caps": {
+      "features": [
+       "hover",
+       "backdrop"
+      ],
+      "has": {
+       "backdrop": true,
+       "hover": true
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "2",
+      "re": "q"
+     },
+     "caps": {
+      "features": [
+       "hover"
+      ],
+      "has": {
+       "backdrop": false,
+       "hover": true
       }
      }
     }

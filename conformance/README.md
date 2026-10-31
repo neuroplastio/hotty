@@ -48,7 +48,7 @@ edit shortcuts (SPEC §10.2, §10.4), whatever its platform. A vector with
 `"requires"` applies only to a host that has what it names, and others skip
 it. A list names several, all required:
 - a feature (SPEC §4): `"passthrough"` (§9.3), `"hover"` (§9.4),
-  `"count"` (§9), `"menu"` (§10.7);
+  `"count"` (§9), `"menu"` (§10.7), `"backdrop"` (§5.2);
 - `"touch"`, a host that takes touch (SPEC §9.1, §16);
 - `"commands"`, a host with a terminal that takes edit commands (§10.6);
 - `"mouse"`, a host with a terminal that reports the mouse (§9.6), whose
@@ -125,7 +125,8 @@ checked).
   (macOS's `clickCount`, GTK's `n_press`, the DOM's `detail`); 1 when
   absent. A runner gives it to the host as the host's platform would.
 - `"through"`: `true` if the step passes through the surface (SPEC §9.3),
-  `false` if the surface gets it. Absent: not checked.
+  as it passes a backdrop (§5.2), `false` if the surface gets it. Absent:
+  not checked.
 - `"terminal"`, for a wheel: `true` if the gesture went on to the terminal,
   as over the cells beneath (SPEC §9), `false` if it did not (the document
   scrolled, or `overscroll-behavior` stopped it, §5.3). Absent: not

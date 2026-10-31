@@ -100,6 +100,7 @@ way where one is missing:
 | `hover` | clears what it lit under the pointer on the next key or press, since it never hears the pointer leave |
 | `count` | offers another way to do what a double click would |
 | `menu` | shows its menu itself, in its cells or on a surface |
+| `backdrop` | draws in its cells what a backdrop would have shown under them: borders, gutters |
 
 Ignore a feature you don't know: later versions add them. Edit commands in
 the cells need `edit` in the capabilities
