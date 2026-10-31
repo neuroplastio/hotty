@@ -11,7 +11,7 @@ back to plain text where there is no host.
 
 ![hotty full screen in one terminal: the shell asks a form through askhot, plothot streams a chart, a metrics chart is hovered and pinned, a document scrolls, cards move in a feed, and an agent runs a diff, an approval and a load test.](demo.gif)
 
-[![status: 0.5 draft](https://img.shields.io/badge/status-0.5%20draft-orange)](#status)
+[![status: 0.6 draft](https://img.shields.io/badge/status-0.6%20draft-orange)](#status)
 [![spec: CC BY 4.0](https://img.shields.io/badge/spec-CC%20BY%204.0-lightgrey)](LICENSE-CC-BY-4.0)
 [![code: Apache-2.0](https://img.shields.io/badge/code-Apache--2.0-blue)](LICENSE-APACHE)
 
@@ -49,11 +49,12 @@ program's first byte to the user's click.
 
 ## Status
 
-**Version 0.5, a draft.** Versions 0.x may change incompatibly (§15 of the
-[spec](SPEC.md)). 0.5 breaks 0.4: a program changes a field the user may be
-typing in with `a=field`, which applies only if the user hasn't changed it
-since, and controls report their revision in every `input` and `change`. [`CHANGES.md`](CHANGES.md) says what changed and how to
-upgrade.
+**Version 0.6, a draft.** Versions 0.x may change incompatibly (§15 of the
+[spec](SPEC.md)). 0.6 breaks 0.5: a host answers a 0.5 program with
+`EVERSION`. A program can place a surface under the terminal's text as a
+backdrop, on a host that lists the feature, and the host stylesheet rings
+only controls on focus. [`CHANGES.md`](CHANGES.md) says what changed and
+how to upgrade.
 
 Two hosts that share no code pass the conformance vectors:
 [hotty-blitz](https://github.com/neuroplastio/hotty-blitz), the renderer

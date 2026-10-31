@@ -8,6 +8,70 @@ path: changes
 
 # Changes
 
+## 0.6
+
+A draft, as every 0.x is, not yet released. It breaks 0.5 (SPEC.md §15): a
+0.6 host answers a 0.5 program with `EVERSION`, and the program falls back
+(§4, §14). Its task is `vault/tasks/0.6.md`. So far the specification has
+two of the items accepted for it; the others follow as their text lands.
+
+### What changed
+
+- **A backdrop is drawn under the cells** (SPEC.md §5.2). `a=place` takes
+  `b=1`, and the placement goes under the terminal's text instead of over
+  it, below every other placement.
+  - A host that can draw one lists the feature `backdrop` (§4). Without
+    it, `b` is ignored (§15) and the surface is drawn above the cells.
+  - Backdrops stack among themselves by `z`, then by when they were
+    placed. `b` is the placement's, as `z` is: placing the surface again
+    without it puts it back above the cells.
+  - A backdrop takes no input. Presses, wheels, touches and hover pass
+    through to the cells, and the program hears them as it would without
+    the surface. A press the surface took before it became a backdrop
+    still ends on it, and a window that had the pointer loses it.
+  - A backdrop never has the keyboard (§10.1). `a=focus` on one answers
+    `EINVAL` (§3.6), and a surface that had the keyboard gives it back
+    when it is placed as one: the host sends `blur`.
+  - A backdrop at the grid's edge reaches the window's edge, past the
+    last whole cell and into the padding.
+- **The host stylesheet rings only controls on focus** (§8). The rule is
+  `:is(a[href], button, input, select, textarea, summary):focus-visible`.
+  A focused container (an element focused by its `tabindex`, a scrolling
+  region, a list) has no ring by default. Nothing a program is told
+  changes.
+
+### Upgrading from 0.5
+
+**A program:**
+- Ask for `v=0.6`.
+- Send `b=1` only where the capabilities list `backdrop`. Without it,
+  draw the scene in cells, or not at all: a surface placed with `b` on a
+  host without it covers the text.
+- Don't focus a backdrop, and expect `blur` when you place a focused
+  surface as one.
+- If a container should show a ring when it is focused, give it one in
+  the document's sheet. A document that took the ring off its containers
+  (`outline: 0`) can keep that rule, or drop it.
+
+**A host:**
+- Speak 0.6, and answer a 0.5 program with `EVERSION`.
+- If it can draw under the cells, list `backdrop` and take `b=1`, which
+  is the only value that makes a backdrop:
+  - draw it under the cells, below every placement without `b`, ordered
+    by `z` and then by when it was placed;
+  - give its presses, wheels, touches and hover to the cells, but let a
+    press the surface took before end on it, and send the pointer's
+    leave to a window that had it;
+  - answer `a=focus` on it with `EINVAL` (or `EDETACHED` if it is
+    detached as well), and send `blur` when a surface that has the
+    keyboard is placed as one;
+  - reach the window's edges where it reaches the grid's.
+- If it can't, leave `backdrop` out of the features and ignore `b`.
+- Change the stylesheet's focus rule to the controls' (§8).
+
+**A multiplexer** relays `b` with the rest of the placement, as it relays
+`z`.
+
 ## 0.5
 
 A draft, as every 0.x is, released 2026-10-22 across the stack. It breaks
