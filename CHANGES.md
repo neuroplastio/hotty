@@ -14,6 +14,17 @@ A draft, as every 0.x is, released 2026-11-01 across the stack. It breaks
 0.5 (SPEC.md §15): a 0.6 host answers a 0.5 program with `EVERSION`, and
 the program falls back (§4, §14).
 
+It is tagged `v0.6.0` (71e7e0f). Its implementations take its MAJOR.MINOR
+(gov P-5 rule 6), and each released 0.6.0 with it, tagged `v0.6.0` in its
+repository: hotty-go (with `hottyedit/`, `hottyterm/`, `hottytea/`,
+`hottytest/` and `hottyvt/v0.6.0`), hotty-ts, which npm has as
+`@neuroplastio/hotty` 0.6.0, hotty-lua (`hotty-0.6.0-1.rockspec`), hotty-rs,
+hotty-blitz (with `v0.6.1` for CSS animations and transitions), and
+xterm-addon-hotty, which npm has as `@neuroplastio/xterm-addon-hotty` 0.6.0.
+hotty-surf `v0.1.1` builds on hotty-go `v0.6.0`. The first hottyterm release
+that speaks it is 26.11.01-dev.8f8cc90, on hotty-blitz 0.6.1; margin's is
+26.11.01 (aca330e), and plx's 26.11.01-dev.d18fe65.
+
 hotty-blitz's 0.5.11, which damages only the field an edit changes
 (Backspace, a word's deletion) rather than the whole surface, is not
 tagged: the maintainer folded it into hotty-blitz 0.6.0 (2026-11-01).
