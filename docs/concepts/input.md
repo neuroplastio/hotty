@@ -128,13 +128,13 @@ need no round trip, and each control reports by its kind:
 
 | event | when | detail |
 | --- | --- | --- |
-| `change` | a checkbox or radio button toggled, or a select's option picked: at once. A text field's value: when focus leaves it, if the user changed it | `{"checked": bool, "value": str, "rev": int}` for a checkbox or radio button, `{"value": str, "rev": int}` otherwise |
+| `change` | a checkbox or radio button toggled, or a select's option picked: at once. A text field's value: on `enter` in an `input`, or when focus leaves it, if the user changed it | `{"checked": bool, "value": str, "rev": int}` for a checkbox or radio button, `{"value": str, "rev": int}` otherwise |
 | `input` | every edit of a control with `data-on="input"` | `{"value": str, "rev": int}`, and `"sel": [int, int]` with `data-on="input caret"` |
 | `caret` | the user moved the selection of a text field with `data-on="caret"`, and no `input` says so | `{"sel": [int, int], "rev": int}` |
-| `submit` | a submit button, or `enter` in a text field | `{"fields": [[str, str]]}`: each named field's name and value, in tree order |
+| `submit` | a submit button, or `enter` in a text field, after its `change` | `{"fields": [[str, str]]}`: each named field's name and value, in tree order |
 
 A search box that hears every keystroke, as the user types "ad" and
-presses `enter`:
+presses `enter`, which commits the field and then submits the form:
 
 ```html
 <form id=search>
@@ -145,15 +145,18 @@ presses `enter`:
 ```text
 host → ESC ] 7279 ; a=ev:s=find:e=input:t=q ; {"value": "a", "rev": 1} ST
 host → ESC ] 7279 ; a=ev:s=find:e=input:t=q ; {"value": "ad", "rev": 2} ST
+host → ESC ] 7279 ; a=ev:s=find:e=change:t=q ; {"value": "ad", "rev": 2} ST
 host → ESC ] 7279 ; a=ev:s=find:e=submit:t=search ; {"fields": [["q", "ad"]]} ST
 ```
 
 - **A submit's fields are pairs**, since two controls may share a name,
   as two checkboxes for one setting do. A form with no named field sends
   `[]`. Nothing is sent anywhere else: `submit` is all that happens.
-- **A text field commits** when focus leaves it, including when the
-  surface loses the keyboard, and sends `change` if its value changed.
-  Without `data-on="input"`, that `change` is all the program hears of it.
+- **A text field commits** on `enter` in an `input`, in a form or not
+  (new in 0.6), and when focus leaves it, including when the surface
+  loses the keyboard. It sends `change` if its value changed since it
+  last committed. Without `data-on="input"`, that `change` is all the
+  program hears of it.
 - **`rev` counts the user's changes** to the control: each edit, toggle,
   check and pick. Moving the caret doesn't count, nor does a value the
   program sets. The program sends it back to change the control

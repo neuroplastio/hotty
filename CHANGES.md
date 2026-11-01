@@ -12,19 +12,34 @@ path: changes
 
 A draft, as every 0.x is, not yet released. It breaks 0.5 (SPEC.md §15): a
 0.6 host answers a 0.5 program with `EVERSION`, and the program falls back
-(§4, §14). Its task is `vault/tasks/0.6.md`. So far the specification has
-two of the items accepted for it; the others follow as their text lands.
+(§4, §14). Its task is `vault/tasks/0.6.md`. The specification holds all of
+0.6; it is released once its implementations are.
 
 ### What changed
 
-- **A backdrop is drawn under the cells** (SPEC.md §5.2). `a=place` takes
+The first two change what a 0.5 document meets; the others are new.
+
+- **Enter commits a text field, in a form or not** (SPEC.md §9). Enter in
+  a text `input` the user changed sends `change`, as focus leaving it
+  does. In a form it commits, then submits: `change`, then `submit`. A key
+  bound to `submit` does the same (§10.2). Until 0.6, §9 named only focus
+  leaving the field, and hosts read Enter in a field outside a form both
+  ways: hotty-blitz and the xterm addon sent `change`, hotty-go's test
+  host (`hottytest`) nothing.
+- **The host stylesheet rings only controls on focus** (§8). The rule is
+  `:is(a[href], button, input, select, textarea, summary, [contenteditable]):focus-visible`.
+  A focused container (an element focused by its `tabindex`, a scrolling
+  region, a list) has no ring by default. An editing host is a text field
+  (§10.2), and rings as one. Nothing a program is told changes.
+- **A backdrop is drawn under the cells** (§5.2). `a=place` takes
   `b=1`, and the placement goes under the terminal's text instead of over
   it, below every other placement.
   - A host that can draw one lists the feature `backdrop` (§4). Without
     it, `b` is ignored (§15) and the surface is drawn above the cells.
   - Backdrops stack among themselves by `z`, then by when they were
     placed. `b` is the placement's, as `z` is: placing the surface again
-    without it puts it back above the cells.
+    without it puts it back above the cells, and a hidden surface is no
+    backdrop until a placement makes it one.
   - A backdrop takes no input. Presses, wheels, touches and hover pass
     through to the cells, and the program hears them as it would without
     the surface. A press the surface took before it became a backdrop
@@ -34,27 +49,38 @@ two of the items accepted for it; the others follow as their text lands.
     when it is placed as one: the host sends `blur`.
   - A backdrop at the grid's edge reaches the window's edge, past the
     last whole cell and into the padding.
-- **The host stylesheet rings only controls on focus** (§8). The rule is
-  `:is(a[href], button, input, select, textarea, summary):focus-visible`.
-  A focused container (an element focused by its `tabindex`, a scrolling
-  region, a list) has no ring by default. Nothing a program is told
-  changes.
+- **A scroll comes to rest on a snap position** (§5.3). CSS Scroll Snap
+  applies to an element that scrolls, as in a browser: `scroll-snap-type`,
+  `scroll-snap-align` and `scroll-padding`, after a key's step, a page, the
+  wheel and `reveal`. A list of rows, each `scroll-snap-align: start` under
+  `scroll-snap-type: y mandatory`, comes to rest with a whole row at its
+  top, short of its end. A document without them scrolls as before.
 
 ### Upgrading from 0.5
 
 **A program:**
 - Ask for `v=0.6`.
+- Expect `change` when the user presses Enter in a text `input` they
+  changed, in a form or not, and before `submit` in a form. A program
+  that read a lone field only on `blur` hears it on Enter too, and needs
+  no key of its own for it.
 - Send `b=1` only where the capabilities list `backdrop`. Without it,
   draw the scene in cells, or not at all: a surface placed with `b` on a
   host without it covers the text.
 - Don't focus a backdrop, and expect `blur` when you place a focused
-  surface as one.
+  surface as one. A surface you hide is no backdrop: place it with `b=1`
+  again to make it one.
 - If a container should show a ring when it is focused, give it one in
   the document's sheet. A document that took the ring off its containers
   (`outline: 0`) can keep that rule, or drop it.
+- To scroll by whole rows, mark them `scroll-snap-align: start` under
+  `scroll-snap-type: y mandatory` on the element that scrolls.
 
 **A host:**
 - Speak 0.6, and answer a 0.5 program with `EVERSION`.
+- Commit a text field on `submit`, Enter's action in an `input`, in a form
+  or not: send `change` if its value changed since it last committed, then
+  `submit` if it is in a form.
 - If it can draw under the cells, list `backdrop` and take `b=1`, which
   is the only value that makes a backdrop:
   - draw it under the cells, below every placement without `b`, ordered
@@ -65,9 +91,15 @@ two of the items accepted for it; the others follow as their text lands.
   - answer `a=focus` on it with `EINVAL` (or `EDETACHED` if it is
     detached as well), and send `blur` when a surface that has the
     keyboard is placed as one;
+  - drop the flag with the placement, so a hidden surface is no backdrop
+    and `a=focus` on it answers as on any surface not placed;
   - reach the window's edges where it reaches the grid's.
 - If it can't, leave `backdrop` out of the features and ignore `b`.
-- Change the stylesheet's focus rule to the controls' (§8).
+- Change the stylesheet's focus rule to the controls', editing hosts
+  among them (§8).
+- Honour CSS Scroll Snap on an element that scrolls: `scroll-snap-type`,
+  `scroll-snap-align` and `scroll-padding`, after keys, pages, the wheel
+  and `reveal`.
 
 **A multiplexer** relays `b` with the rest of the placement, as it relays
 `z`.

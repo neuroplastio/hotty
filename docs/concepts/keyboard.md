@@ -99,8 +99,9 @@ surface at a higher `z` placed by the click's `area`.
 
 **Text fields** edit as a text field in a browser does. The arrows,
 `home`, `end`, `backspace` and `delete` move and delete, `shift` selects,
-and `mod+c`, `mod+v` and `mod+z` copy, paste and undo. `enter` submits an
-`input`'s form, and types a line break in a `textarea`.
+and `mod+c`, `mod+v` and `mod+z` copy, paste and undo. `enter` commits an
+`input`, so the program hears its `change`, and then submits its form if
+it is in one. In a `textarea` it types a line break.
 
 With nothing selected, `mod+c` has nothing to copy, and the key reaches
 the program: on Linux, `ctrl+c` still interrupts it. Each field keeps its

@@ -62,10 +62,11 @@ rings, links and selected text. They are drawn in the terminal's colours,
 not the engine's, so they look the same on every host. `ansi-8` draws
 their borders, buttons, placeholders and whatever is disabled.
 
-The focus ring is the controls' alone: links, buttons, fields, selects and
-a `summary` (new in 0.6). A container that takes the focus, such as a
-list with a `tabindex` that takes keys or an article that scrolls by them,
-has no ring by default. A document that wants one there gives it one:
+The focus ring is the controls' alone: links, buttons, fields and editing
+hosts (`contenteditable`), selects and a `summary` (new in 0.6). A
+container that takes the focus, such as a list with a `tabindex` that
+takes keys or an article that scrolls by them, has no ring by default. A
+document that wants one there gives it one:
 
 ```css
 ul[tabindex]:focus-visible { outline: 1px solid var(--hotty-accent); }
@@ -166,6 +167,7 @@ Some CSS tells the host how to behave, not only how to draw:
 | `overflow` | in a document that scrolls, `auto` and `scroll` make an element scroll ([Surfaces](surfaces.md#scrolling-inside-a-document)) |
 | `overscroll-behavior` | stops a gesture going on outward, to the terminal |
 | `scrollbar-width`, `scrollbar-color`, `scrollbar-gutter` | style the host's scrollbars |
+| `scroll-snap-type`, `scroll-snap-align`, `scroll-padding` | make a scroll come to rest on a snap position, as in a browser (new in 0.6) |
 | `cursor` | sets the pointer over the element, as in a browser |
 | `user-select` | `none` keeps the user from starting a selection there |
 | `touch-action` | on an element that opts in to drags, decides whether a finger drags it or scrolls ([Input](input.md#touch-on-a-surface)) |

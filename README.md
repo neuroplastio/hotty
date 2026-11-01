@@ -51,10 +51,12 @@ program's first byte to the user's click.
 
 **Version 0.6, a draft.** Versions 0.x may change incompatibly (§15 of the
 [spec](SPEC.md)). 0.6 breaks 0.5: a host answers a 0.5 program with
-`EVERSION`. A program can place a surface under the terminal's text as a
-backdrop, on a host that lists the feature, and the host stylesheet rings
-only controls on focus. [`CHANGES.md`](CHANGES.md) says what changed and
-how to upgrade.
+`EVERSION`. Enter commits a text field, in a form or not, and the host
+stylesheet rings only controls on focus. A program can place a surface
+under the terminal's text as a backdrop, on a host that lists the feature,
+and a scroll comes to rest on a snap position where a document asks with
+CSS Scroll Snap. [`CHANGES.md`](CHANGES.md) says what changed and how to
+upgrade.
 
 Two hosts that share no code pass the conformance vectors:
 [hotty-blitz](https://github.com/neuroplastio/hotty-blitz), the renderer

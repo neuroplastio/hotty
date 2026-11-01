@@ -139,7 +139,8 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
 - **Under everything:** a backdrop is under the cells and under every
   other placement. Among backdrops, `z` orders them, as above.
 - **The placement's,** like `z`: placed again without `b=1`, the surface
-  is above the cells again.
+  is above the cells again. Hidden, it is no backdrop, and its next
+  placement decides.
 - **No input.** The pointer goes to what is above a backdrop, the cells or
   another surface, so its `p` and `v` hear nothing. It never has the
   keyboard: `a=focus` on one is `EINVAL`, and a surface that had the
@@ -212,6 +213,16 @@ them the document scrolls as a page does in a browser:
 Scrollbars take pixels inside the rectangle, never cells, so the cells a
 surface covers stay what the program chose. `scrollbar-width`,
 `scrollbar-color` and `scrollbar-gutter` style them.
+
+A scroll comes to rest where CSS Scroll Snap says, as in a browser (new in
+0.6): after a key, a page, the wheel and `reveal`. The host's steps are
+not rows, so a list of rows that should always show a whole row at its
+top asks for it:
+
+```css
+ul { overflow: auto; scroll-snap-type: y mandatory; }
+li { height: var(--hotty-cell-h); scroll-snap-align: start; }
+```
 
 Scrolling is local: the program hears of it only where elements ask to be
 told when they are in view ([§9.5](../../SPEC.md#95-view)). It moves the
