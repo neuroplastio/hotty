@@ -15,6 +15,11 @@ A draft, as every 0.x is, not yet released. It breaks 0.5 (SPEC.md §15): a
 (§4, §14). Its task is `vault/tasks/0.6.md`. The specification holds all of
 0.6; it is released once its implementations are.
 
+hotty-blitz's 0.5.11, which damages only the field an edit changes
+(Backspace, a word's deletion) rather than the whole surface, is not
+tagged: the maintainer folded it into hotty-blitz 0.6.0 (2026-11-01).
+Nothing on the wire changes.
+
 ### What changed
 
 The first two change what a 0.5 document meets; the others are new.
