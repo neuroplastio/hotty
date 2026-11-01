@@ -1214,3 +1214,8 @@ fake hosts with them. These are the places a port goes wrong:
 - **A backdrop never has the keyboard.** `Focus` on one is `EINVAL`, and a
   focused surface placed as one sends `blur`. A test host that lists the
   feature answers so.
+- **Enter commits a text field, in a form or not** (SPEC.md §9). A test
+  host's `submit` commits the field first, as a host's does: Enter in an
+  `input` the user changed sends `change`, and in a form `change` then
+  `submit`. A program that read a lone field only on `blur` hears it on
+  Enter too.

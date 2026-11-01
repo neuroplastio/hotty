@@ -898,8 +898,8 @@ The body is a msgpack map (§3.3):
   a `value`, and nothing is selected. `sel` alone moves the selection and
   edits nothing.
 - **No echo.** It sends no `input` or `change`, and leaves `rev` as it is.
-  Focus leaving a text field commits the user's edits only: one that only
-  `a=field` changed sends no `change`.
+  A text field commits the user's edits only, on Enter or as focus leaves
+  it (§9 `change`): one that only `a=field` changed sends no `change`.
 - **Undo.** In a text field, the change is one edit of its history (§10.2),
   which `undo` takes back as it does the user's. It ends a run of typing,
   and so does `sel` alone, as the pointer's move does.
@@ -1101,10 +1101,10 @@ reads hotty messages from its input. A detached surface sends none (§5.5).
 | `e` | when | detail |
 | --- | --- | --- |
 | `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `{"area": area, "mods": int}`, the element's cells and the modifier keys held (below); with `"href": str` and `"url": str` for links (below), `"value": str` when the element has a `value` attribute, and `"count": int` for a repeated click (below) |
-| `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed (focus leaves it, including when the surface loses the keyboard) | `{"checked": bool, "value": str, "rev": int}` for checkboxes and radio buttons, `{"value": str, "rev": int}` otherwise: with the control's `rev` (§6.4) |
+| `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed: Enter in a text `input`, or focus leaving it (including when the surface loses the keyboard) | `{"checked": bool, "value": str, "rev": int}` for checkboxes and radio buttons, `{"value": str, "rev": int}` otherwise: with the control's `rev` (§6.4) |
 | `input` | every edit of a control with `data-on~=input` | `{"value": str, "rev": int}`, with `"sel": [int, int]`, the selection after it, in a text field with `data-on~=caret` (below) |
 | `caret` | in a text field with `data-on~=caret`, the user moved the selection, and no `input` says so: a move, a click, or an edit in a field without `data-on~=input` | `{"sel": [int, int], "rev": int}`: the selection, its anchor then its caret, as `a=field` counts them (§6.4) |
-| `submit` | a form submitted (a submit button, or Enter in a text field) | `{"fields": [[str, str]]}`: the form's fields, each its name and its value, in tree order, the submitter's included; `[]` for a form with none |
+| `submit` | a form submitted (a submit button, or Enter in a text field, after the `change` it commits) | `{"fields": [[str, str]]}`: the form's fields, each its name and its value, in tree order, the submitter's included; `[]` for a form with none |
 | `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface whose `p` is on (§5.2), except a mouse's or a pen's press with Alt held (§9.2), where the pointer passes through (§9.3), and on a backdrop (§5.2) | `{"area": area, "mods": int}`: the cells of the element `t` names (below), and the modifier keys held; no `area` without `t` |
 | `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": int, "r": int, "mods": int}`: the pointer's cell and the modifier keys held, with `"x": int` and `"y": int`, its step, on an element with `data-steps` (§9.1) |
 | `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element or in `t` (§9.1) | the same, with `"tx": int` and `"ty": int`, the step in `t`, where `t` has `drop` in its `data-on` and `data-steps` (§9.1) |
@@ -1862,7 +1862,7 @@ The actions:
 | `paste` | types the clipboard's text in place of the selection |
 | `undo`, `redo` | undoes the field's last edit, or redoes the last one undone (below) |
 | `newline` † | types a line break |
-| `submit` | submits the field's form, as Enter does in a text `input` (§9 `submit`) |
+| `submit` | commits the field (§9 `change`), then submits its form, if it is in one (§9 `submit`): what Enter does in a text `input` |
 | `program` | nothing: the key reaches the program |
 | `prefix` | nothing: the key reaches the program, and so does every key after it (§10.5) |
 
@@ -3034,6 +3034,12 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
 - **Why a submit's fields are pairs.** A form may give two controls one
   name, as two checkboxes for one setting do, and a map holds a name once.
   Pairs in tree order are what a browser's `FormData` holds.
+- **Why Enter commits.** A browser fires `change` on Enter in a text
+  `input` whose value changed, in a form or not. Until 0.6, §9 named only
+  focus leaving the field, and hosts read Enter in a field outside a form
+  both ways, so a program tested on one heard other events on another. In
+  a form, Enter commits and then submits, so the field's `change` comes
+  before the form's `submit`.
 - **Why `a=field`.** Until 0.5 a program could set a control only with a
   morph, which leaves a focused control alone, and the caret where it was.
   A field that completes what the user types had to replace itself with a

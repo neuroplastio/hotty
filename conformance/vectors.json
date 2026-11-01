@@ -20060,6 +20060,161 @@
    ]
   },
   {
+   "name": "Enter commits a text input in no form: it sends change once the user has changed it, and nothing when they have not, and focus leaving it then sends no second change (SPEC \u00a79, \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input{font-family:monospace}</style><input id=t value=a>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "b",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "ab",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "blur",
+       "s": "x",
+       "t": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Enter in a form's text input commits it, then submits the form: change, then submit with the value committed; once committed, Enter submits alone (SPEC \u00a79, \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input{font-family:monospace}</style><form id=f><input id=t name=q value=a></form>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "t",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "b",
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "t",
+       "detail": {
+        "value": "ab",
+        "rev": 1
+       }
+      },
+      {
+       "e": "submit",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "fields": [
+         [
+          "q",
+          "ab"
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "submit",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "fields": [
+         [
+          "q",
+          "ab"
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "a=menu keeps the program's menu and shows nothing; show=1 shows the keyed items of the level its keys reach, an item without enabled is shown disabled, show=0 hides it, keys that reach no group show nothing, and an item whose items are empty is no group (SPEC \u00a710.7)",
    "requires": "menu",
    "steps": [
