@@ -33,3 +33,23 @@ Item template: as `tasks/0.4.md`.
       - one dialog per origin, or one per document that lists them;
       - whether a refusal is remembered for the session;
       - the dialog: GTK's, or a surface of hottyterm's own.
+
+- [ ] **HT-02** hottyterm updates itself
+      status: recorded, not dispatched | added: 2026-10-31
+      problem: a new hottyterm reaches the user only when they run their
+      package manager. plx updates in place, and the maintainer, after
+      trying Rex (gov R-25), listed "hottyterm autoupdate feature" among
+      the things needed for a better experience.
+      shape:
+      - hottyterm checks for a newer release of its channel (dev or
+        stable), and says so in a notice that stays until the user acts.
+      - It updates the way it was installed: Homebrew and the AUR own
+        their files, so there it runs or offers their upgrade; a
+        hottyterm installed from a release archive replaces itself.
+      - A relaunch restores what plx holds: panes under plx survive it,
+        a bare shell does not, and the notice says which.
+      open:
+      - whether it checks by default, and how often;
+      - whether the package-manager route runs the upgrade or only
+        names the command;
+      - the notice: GTK's, or a surface of hottyterm's own.
