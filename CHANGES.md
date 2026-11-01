@@ -10,10 +10,9 @@ path: changes
 
 ## 0.6
 
-A draft, as every 0.x is, not yet released. It breaks 0.5 (SPEC.md §15): a
-0.6 host answers a 0.5 program with `EVERSION`, and the program falls back
-(§4, §14). Its task is `vault/tasks/0.6.md`. The specification holds all of
-0.6; it is released once its implementations are.
+A draft, as every 0.x is, released 2026-11-01 across the stack. It breaks
+0.5 (SPEC.md §15): a 0.6 host answers a 0.5 program with `EVERSION`, and
+the program falls back (§4, §14).
 
 hotty-blitz's 0.5.11, which damages only the field an edit changes
 (Backspace, a word's deletion) rather than the whole surface, is not
