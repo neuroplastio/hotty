@@ -338,6 +338,11 @@ every time. It goes out whatever the host: a program sets it only where
 `Has(backdrop)` (§3.9; SPEC.md §5.2), since a host without the feature
 ignores `b` and draws the surface over the text.
 
+`Backdrop` is the last of the fields (Appendix A), though `b` goes out
+after `z`. A language that takes the fields by position, as Python's
+constructor does, then gives a caller's arguments the meaning they had
+before 0.6.
+
 #### 3.4.2 Reply options
 
 Every builder but `Query`, `Sync` and `WithdrawLate` takes two options:
@@ -1033,7 +1038,7 @@ The canonical names, in each language's case.
 | `Edit`, `Menu`, `MenuShow`, `MenuHide` | `hotty.Edit`, `hotty.Menu`, `hotty.MenuShow`, `hotty.MenuHide` | `edit`, `menu`, `menu_show`, `menu_hide` | as Python | as Python | `edit`, `menu`, `menuShow`, `menuHide` |
 | `Touch`, `TouchArea` and its fields | `hotty.Touch`, `hotty.TouchArea{C, R, W, H, Drag}` | `touch`, `TouchArea(c, r, w, h, drag)` | `touch`, tables with those keys | `touch`, `TouchArea { c, r, w, h, drag }` | `touch`, `{ c, r, w, h, drag }` |
 | `MenuTree`, `MenuItem` and their fields | `hotty.MenuTree{Label, Items}`, `hotty.MenuItem{Key, Label, Name, Enabled, Items}` | `MenuTree(label, items)`, `MenuItem(key, label, name, enabled, items)` | tables with those keys | `MenuTree { label, items }` | `{ label, items }` |
-| `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Backdrop, Press, Fit, Hover, KeepCursor}` | `Placement(cols, rows, window, z, backdrop, press, fit, hover, keep_cursor)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, backdrop, press, fit, hover, keepCursor }` |
+| `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor, Backdrop}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor, backdrop)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor, backdrop }` |
 | a flag on, off or absent (`Press`, `Fit`, `Hover`) | `hotty.On`, `hotty.Off`, the zero value | `True`, `False`, `None` | `true`, `false`, `nil` | `Option<bool>` | `true`, `false`, `undefined` |
 | `N`, `Q`, `Detached`, `Scroll`, `Late` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)`, `hotty.Late()` | `n=`, `q=`, `detached=`, `scroll=`, `late=` | `{ n = …, q = …, detached = …, scroll = …, late = … }` | builder methods | `{ n, q, detached, scroll, late }` |
 | `ScrollVertical`, `ScrollHorizontal` | `hotty.ScrollVertical`, `hotty.ScrollHorizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` |
@@ -1212,8 +1217,9 @@ fake hosts with them. These are the places a port goes wrong:
   ignores `b` and draws the surface over the text (SPEC.md §5.2), so a
   program checks `Has(backdrop)` and draws in cells without it.
 - **A backdrop never has the keyboard.** `Focus` on one is `EINVAL`, and a
-  focused surface placed as one sends `blur`. A test host that lists the
-  feature answers so.
+  focused surface placed as one sends `blur`. Hidden, a surface is no
+  backdrop, and its next placement decides (SPEC.md §5.2). A test host
+  that lists the feature answers so.
 - **Enter commits a text field, in a form or not** (SPEC.md §9). A test
   host's `submit` commits the field first, as a host's does: Enter in an
   `input` the user changed sends `change`, and in a form `change` then

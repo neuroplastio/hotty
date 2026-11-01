@@ -327,17 +327,19 @@ class Placement:
     `fit` and `hover` belong to the surface and hold until sent again:
     None leaves the key out, True sends 1 and False sends 0 (SDK.md §3.4.1).
     `backdrop`, like `z`, is the placement's: True sends b=1, under the
-    cells, which a host without the feature ignores (SPEC §5.2)."""
+    cells, which a host without the feature ignores (SPEC §5.2). It comes
+    last, so a caller that gives the other fields by position keeps their
+    meaning."""
 
     cols: int
     rows: int = 0
     window: Window = None
     z: int = 0
-    backdrop: bool = False
     press: bool = None
     fit: bool = None
     hover: bool = None
     keep_cursor: bool = False
+    backdrop: bool = False
 
     def control(self, surface):
         pairs = [("a", "place"), ("s", surface), ("c", str(self.cols)), ("r", str(self.rows) if self.rows > 0 else "auto")]
@@ -2265,11 +2267,11 @@ class Hotty:
             rows=0 if rows == "auto" else int(rows),
             window=Window(*window) if window is not None else None,
             z=z,
-            backdrop=backdrop,
             press=press,
             fit=fit,
             hover=hover,
             keep_cursor=not move_cursor,
+            backdrop=backdrop,
         )
         self.write(place(surface, p, q=quiet))
 

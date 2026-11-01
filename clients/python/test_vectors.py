@@ -83,11 +83,11 @@ def placement(p):
         rows=p.get("rows", 0),
         window=hotty.Window(w["x"], w["y"], w["w"], w["h"]) if w else None,
         z=p.get("z", 0),
-        backdrop=p.get("backdrop", False),
         press=p.get("press"),
         fit=p.get("fit"),
         hover=p.get("hover"),
         keep_cursor=p.get("keep_cursor", False),
+        backdrop=p.get("backdrop", False),
     )
 
 

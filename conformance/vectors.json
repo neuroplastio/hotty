@@ -19337,6 +19337,139 @@
    ]
   },
   {
+   "name": "b belongs to the placement, so a hidden surface is no backdrop: a=focus on it answers as on a surface not yet placed, ENOTARGET for an id it lacks where a backdrop answers EINVAL; its next placement decides again, a backdrop with b=1, and without b one a=focus gives the keyboard (SPEC \u00a75.2, \u00a710.1)",
+   "requires": "backdrop",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}button{display:block;box-sizing:border-box;margin:0;padding:0;border:0;font:inherit;width:calc(3*var(--hotty-cell-w));height:var(--hotty-cell-h)}</style><button id=go>go</button>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "b": "1",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "nope"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "hide",
+      "s": "x",
+      "q": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hide",
+      "s": "x"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "nope"
+     },
+     "reply": {
+      "a": "err",
+      "code": "ENOTARGET",
+      "detail": "nope"
+     }
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "b": "1",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "go"
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "hide",
+      "s": "x",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "go",
+      "q": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "focus"
+     },
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "go",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "a backdrop sends no hover, whatever v asks for: the pointer over it is over the cells; v holds on the surface, so placed above the cells it hovers again (SPEC \u00a75.2, \u00a79.4)",
    "requires": [
     "backdrop",
