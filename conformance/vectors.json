@@ -12240,6 +12240,212 @@
    ]
   },
   {
+   "name": "scroll snapping: in a box 30.5 rows tall under scroll-snap-type: y mandatory, rows a cell tall with scroll-snap-align: start, and below them a note that aligns nothing, Page Down comes to rest on the last row, whole at the top, however far the host's page goes, and not in the note; Page Up comes back to the first (SPEC \u00a75.3, \u00a79.5)",
+   "requires": [
+    "scroll",
+    "view"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}#list{height:calc(30.5*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto;scroll-snap-type:y mandatory}#list div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w));scroll-snap-align:start}#list p{margin:0;height:calc(40*var(--hotty-cell-h))}</style><div id=list tabindex=0><div id=r0 data-on=view>0</div><div id=r1 data-on=view>1</div><div id=r2 data-on=view>2</div><div id=r3 data-on=view>3</div><div id=r4 data-on=view>4</div><div id=r5 data-on=view>5</div><div id=r6 data-on=view>6</div><div id=r7 data-on=view>7</div><div id=r8 data-on=view>8</div><div id=r9 data-on=view>9</div><p>the end</p></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "31",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "in": {
+         "r0": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         },
+         "r1": {
+          "c": 0,
+          "r": 1,
+          "w": 4,
+          "h": 1
+         },
+         "r2": {
+          "c": 0,
+          "r": 2,
+          "w": 4,
+          "h": 1
+         },
+         "r3": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         },
+         "r4": {
+          "c": 0,
+          "r": 4,
+          "w": 4,
+          "h": 1
+         },
+         "r5": {
+          "c": 0,
+          "r": 5,
+          "w": 4,
+          "h": 1
+         },
+         "r6": {
+          "c": 0,
+          "r": 6,
+          "w": 4,
+          "h": 1
+         },
+         "r7": {
+          "c": 0,
+          "r": 7,
+          "w": 4,
+          "h": 1
+         },
+         "r8": {
+          "c": 0,
+          "r": 8,
+          "w": 4,
+          "h": 1
+         },
+         "r9": {
+          "c": 0,
+          "r": 9,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "list",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "PageDown",
+     "terminal": false,
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "in": {
+         "r9": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    },
+    {
+     "key": "PageUp",
+     "terminal": false,
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "in": {
+         "r0": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         },
+         "r1": {
+          "c": 0,
+          "r": 1,
+          "w": 4,
+          "h": 1
+         },
+         "r2": {
+          "c": 0,
+          "r": 2,
+          "w": 4,
+          "h": 1
+         },
+         "r3": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         },
+         "r4": {
+          "c": 0,
+          "r": 4,
+          "w": 4,
+          "h": 1
+         },
+         "r5": {
+          "c": 0,
+          "r": 5,
+          "w": 4,
+          "h": 1
+         },
+         "r6": {
+          "c": 0,
+          "r": 6,
+          "w": 4,
+          "h": 1
+         },
+         "r7": {
+          "c": 0,
+          "r": 7,
+          "w": 4,
+          "h": 1
+         },
+         "r8": {
+          "c": 0,
+          "r": 8,
+          "w": 4,
+          "h": 1
+         },
+         "r9": {
+          "c": 0,
+          "r": 9,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "a focused text input edits with Backspace and Delete, and moves its caret with Left, Right, Home and End; the program hears none of them, nor Backspace in an empty input",
    "steps": [
     {

@@ -197,7 +197,8 @@ a terminal does on these.
 The documents of pointer steps size their elements in cells
 (`--hotty-cell-w`, `--hotty-cell-h`, SPEC §8), and point at centres that lie
 well inside a cell, so the cell reported is the same on every host. Wheels
-and keys scroll a document to an end, or bring an element into view where
+and keys scroll a document to an end, or to the one snap position any step
+of theirs comes to rest on (SPEC §5.3), or bring an element into view where
 any alignment ends at the same offset, never by a distance: how far a
 wheel's notch or an arrow key moves differs between hosts.
 

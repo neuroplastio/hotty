@@ -588,6 +588,16 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
     still move that way. Where none can, it goes on outward, and past the
     root to the terminal, as if over the cells beneath (§9), unless CSS
     `overscroll-behavior` stops it there.
+  - **Scroll snapping:** CSS Scroll Snap applies to an element that scrolls,
+    the root included, as in a browser: `scroll-snap-type`,
+    `scroll-snap-align` and `scroll-padding`. A scroll comes to rest where
+    they say, always on a snap position under `mandatory`, and under
+    `proximity` on one it ends near: after a key's step or a page, after the
+    wheel once its gesture ends, and after `reveal` (§6.1). The host's steps
+    stay its own; snapping is where they end. So a document laid out in rows
+    of cells, each row `scroll-snap-align: start` under `scroll-snap-type: y
+    mandatory`, comes to rest with a whole row at its top, unless it is
+    scrolled as far as it goes.
   - Scrolling is local: the program hears of it only where it asks, which
     elements are in view (§9.5), and moves it only by focus (§10.1) or by
     bringing an element into view (`reveal`, §6.1). A delta keeps the
@@ -2459,9 +2469,9 @@ A host conforms to hotty version 0.6 when:
 
 The vectors check replies, error codes, every delta op, morph, context
 parsing, `a=field` and revisions, resources, drags and their steps, presses with Alt, `fit`, hover,
-`area`, scrolling, `reveal` and `view`, touch in the cells, backdrops,
-prefixes, edit commands, menus, keymaps and the envelope, and their `keys`,
-`keymap` and `edit` sections a host's key names (§10.4), keymaps and
+`area`, scrolling and scroll snapping, `reveal` and `view`, touch in the
+cells, backdrops, prefixes, edit commands, menus, keymaps and the envelope,
+and their `keys`, `keymap` and `edit` sections a host's key names (§10.4), keymaps and
 actions (§10.2). They inspect documents and events, not pixels. The vectors
 marked with a feature (`"passthrough"`, `"hover"`, `"count"`, `"menu"`,
 `"backdrop"`, §4) apply to a host that has it, those marked `"commands"` to
@@ -3016,6 +3026,15 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     it would move the keyboard from where the user is. Its payload names
     the alignments a reader needs, those of `scrollIntoView`; across,
     where nothing is read in order, as little as it can.
+- **Why scroll snapping.** A document laid out in rows of cells, a list
+  or a file's lines, scrolls by the host's steps, which are not rows:
+  after a page a box shows part of a row at its top, and an arrow stops
+  between rows where a row does not divide its step. CSS Scroll
+  Snap is how a page asks a browser for whole rows, so a document a
+  browser draws scrolls the same on a host, and nothing new is named.
+  - **Not steps of a row.** Stepping by a cell's row by default would
+    change every document, prose included, and a browser does not step
+    so.
 
 - **Why features.** Each addition within 0.2 got a flag of its own
   (`passthrough`, `scroll`, `steps`, `drop`, `count`, `menu`), beside
