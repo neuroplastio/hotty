@@ -10669,6 +10669,636 @@
    ]
   },
   {
+   "name": "a secondary press on an element with secondary in its data-on is a press with button 2, its area, the pointer's cell and the modifier keys held, whatever p says; the nearest such element wins, and its release makes no event (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=secondary><u id=i data-on=secondary>i</u></b><i id=n>n</i><i id=k data-on=\"secondary click\">k</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      7,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "o",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 9,
+         "h": 3
+        },
+        "c": 7,
+        "r": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [],
+     "keys": [
+      "super"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1,
+        "mods": 8
+       }
+      }
+     ],
+     "keys": [
+      "super"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [],
+     "keys": [
+      "super"
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a secondary press over an element without secondary in its data-on is the terminal's, and with Shift or Alt held it is too, or the program's, over one with it: the surface hears nothing, whatever p asked for (SPEC \u00a79, \u00a79.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=secondary><u id=i data-on=secondary>i</u></b><i id=n>n</i><i id=k data-on=\"secondary click\">k</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      15,
+      5
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [],
+     "keys": [
+      "alt"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [],
+     "keys": [
+      "alt"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [],
+     "keys": [
+      "alt"
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [],
+     "keys": [
+      "shift",
+      "alt"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [],
+     "keys": [
+      "shift",
+      "alt"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [],
+     "keys": [
+      "shift",
+      "alt"
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a secondary press makes no click on its release, even on an element with click, and moves no focus: a focused field keeps the keyboard, with no blur or focus, until a primary click elsewhere (SPEC \u00a79, \u00a710.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=secondary><u id=i data-on=secondary>i</u></b><i id=n>n</i><i id=k data-on=\"secondary click\">k</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "f",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "f"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      7,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "o",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 9,
+         "h": 3
+        },
+        "c": 7,
+        "r": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "k",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        },
+        "c": 1,
+        "r": 4
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "k",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "blur",
+       "s": "x"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a long press on an element with secondary in its data-on is a secondary press, button 2 at the finger's cell, and its lift makes no click, even on an element with click; a tap is a click as before (SPEC \u00a79.1)",
+   "requires": "touch",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=secondary><u id=i data-on=secondary>i</u></b><i id=n>n</i><i id=k data-on=\"secondary click\">k</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      4,
+      1
+     ],
+     "events": []
+    },
+    {
+     "touch": "hold",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "touch": "up",
+     "events": []
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      1,
+      4
+     ],
+     "events": []
+    },
+    {
+     "touch": "hold",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        },
+        "c": 1,
+        "r": 4
+       }
+      }
+     ]
+    },
+    {
+     "touch": "up",
+     "events": []
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      1,
+      4
+     ],
+     "events": []
+    },
+    {
+     "touch": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "area counts from the surface's top left cell, not its window's",
    "steps": [
     {

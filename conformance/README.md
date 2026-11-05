@@ -109,8 +109,12 @@ checked).
   the window, outside the surface, and over another surface. Moving onto
   another surface `s`, with no button down, takes the pointer off the one
   it was on, as a terminal does: that one is left first (SPEC §9.4).
-- `"down"` and `"up"` press and release the primary button where the
-  pointer is.
+- `"down"` and `"up"` press and release a button where the pointer is.
+  `"button"` is the button, as the DOM numbers it (0 the primary, 2 the
+  secondary); 0 when absent. A runner presses it as the host's platform
+  would: a GTK secondary button, a browser's `pointerdown` with button 2
+  and the `contextmenu` that follows. The `"keys"` held apply as for any
+  button, so a secondary press with Shift or Alt is a step too.
 - `"wheel"` turns the wheel where the pointer is, by `"by": [c, r]`, columns
   and rows of the surface (positive: right and down), a cell's pixels each.
   It is one gesture: a runner may send it as several wheel events (a
@@ -138,7 +142,7 @@ checked).
   decoded: equal as values, each of its type (Numbers, above), and `null`
   when the event has none. Absent: events are not checked.
 
-**Touch** `{ "touch": "down" | "move" | "up", "s": surface, "at": …,
+**Touch** `{ "touch": "down" | "move" | "hold" | "up", "s": surface, "at": …,
 "keys": [ … ], "terminal": …, "mouse": …, "events": [ … ] }`: one finger,
 as the user would touch the terminal (SPEC §9.1, §9.6, §16). `"down"`
 touches surface `s` at `at`, a cell `[c, r]` as for a pointer step, or,
@@ -148,7 +152,11 @@ top left. `"move"` moves the finger to
 it was, so it passes the host's tap slop in that line's direction (the
 vectors move along a row or a column, so where the finger enters an
 element does not depend on those moves); `"up"`
-lifts it. `"keys"` are the modifier keys held, as for a pointer step.
+lifts it. `"hold"` keeps the finger down where it is until the host takes
+the touch as a long press (SPEC §9.1); the events the long press makes are
+its `"events"`. A runner holds for its host's long-press time, or tells the
+host the gesture directly if it can. `"keys"` are the modifier keys held,
+as for a pointer step.
 `"terminal"`, for a move: `true` if the touch went on to the terminal as a
 scroll (SPEC §9), `false` if the surface or the program's mouse took it
 (§9.6); absent, not checked. `"mouse"`: what the terminal reported of the

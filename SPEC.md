@@ -2513,7 +2513,7 @@ A host conforms to hotty version 0.6 when:
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
 The vectors check replies, error codes, every delta op, morph, context
-parsing, `a=field` and revisions, resources, drags and their steps, presses with Alt, primary presses on an element that takes the secondary button, `fit`, hover,
+parsing, `a=field` and revisions, resources, drags and their steps, presses with Alt, secondary presses and long presses, `fit`, hover,
 `area`, scrolling and scroll snapping, `reveal` and `view`, touch in the
 cells, backdrops, prefixes, edit commands, menus, keymaps and the envelope,
 and their `keys`, `keymap` and `edit` sections a host's key names (§10.4), keymaps and
@@ -2534,7 +2534,8 @@ of a cell of a surface, press and release its primary button there, or press its
 secondary button, with modifier keys held, turn its wheel there, take the pointer out of the
 terminal's window, and press keys where the keyboard is. A host that takes
 touch also lets a test touch a cell of a surface, or of the screen, with
-one finger, move it, and lift it, and tells it whether a touch went on to
+one finger, move it, hold it where it is until the host takes it as a long
+press, and lift it, and tells it whether a touch went on to
 the terminal as a scroll. One whose terminal reports the mouse also tells
 the test what the terminal reported of the mouse's primary button for a
 touch in the cells (§9.6). A host
