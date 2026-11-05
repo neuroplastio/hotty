@@ -47,6 +47,7 @@ LIST = """
 
 MENU = """
 <style>
+  :root { background: transparent; }
   body { margin: 0; font: 13px sans-serif; }
   #card { box-sizing: border-box; width: calc(100% - 8px); padding: 4px 3px; border: 1px solid var(--hotty-ansi-8); border-radius: 6px;
           background: color-mix(in srgb, var(--hotty-bg) 90%, white); color: var(--hotty-fg); box-shadow: 0 2px 6px rgba(0,0,0,.5); }
