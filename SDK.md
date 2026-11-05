@@ -1000,8 +1000,10 @@ menu: SPEC.md Appendix B says why.
   elsewhere takes the keyboard from it, and the `blur` that follows closes
   it. Nothing in it is new on the wire.
 - **What makes it feel native:**
-  - **Open at once.** The program keeps the menu's document sent and
-    hidden (SPEC.md §5.4), so a press costs a placement.
+  - **Open at once.** The program sends the menu's document once and
+    leaves it unplaced, or hidden (`a=hide`, SPEC.md §5.4) between uses, so
+    a press costs a placement. Not detached: a detached surface takes no
+    input (§5.5).
   - **Fit.** It opens below and to the right of the pointer, and flips to
     the other side where the grid ends.
   - **Keys.** Type-ahead picks an item, the right arrow opens a submenu,
