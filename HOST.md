@@ -17,7 +17,8 @@ path: host-design
 A **host** draws a program's surfaces (SPEC.md §1). SPEC.md says what a
 host must do on the wire. This document says what a host should provide
 beyond it, so that a document looks the same on every host that follows
-it: for now, the font a host ships.
+it, and a user finds the same gestures: the font a host ships, and the
+gestures it calls a secondary press.
 
 Nothing here is on the wire. A host doesn't report it, and a program can't
 ask for it. A document may use what it describes, but it can't count on it
@@ -27,7 +28,8 @@ ask for it. A document may use what it describes, but it can't count on it
 
 1. Introduction
 2. Fonts
-3. Implementations
+3. The secondary press
+4. Implementations
 
 Appendix: A. Rationale
 
@@ -152,7 +154,41 @@ a host ships the font.
   the terminal. Ghostty embeds Symbols Nerd Font, and hottyterm with it.
   Elsewhere the user's font decides.
 
-## 3. Implementations
+## 3. The secondary press
+
+SPEC.md §9 defines a secondary press and the event it makes. Which gesture
+a user makes for one is the platform's, and a host takes the ones its
+platform calls so. Nothing here is on the wire: a program hears a `press`
+with `button` 2, and can't tell which gesture made it.
+
+| gesture | where it is a secondary press |
+| --- | --- |
+| the mouse's secondary button | everywhere |
+| the primary button with Control held | macOS, where AppKit makes it a context click; `ctrl` is then left out of `mods` |
+| a pen's barrel button | where the platform reports one |
+| a touch held past the long-press time | everywhere, over an element that takes it (SPEC.md §9.1) |
+
+How a toolkit reports them:
+- **GTK:** a `GtkGestureClick` with button 3 (`GDK_BUTTON_SECONDARY`) for the
+  mouse and the pen's barrel, and a `GtkGestureLongPress` for the touch.
+- **AppKit:** `rightMouseDown`, and `menu(for:)` for a context click, which
+  covers Control with the primary button. A pen's barrel button comes with
+  `rightMouseDown` too.
+- **A browser:** `pointerdown` with `button` 2 for a mouse and a pen's barrel
+  button, which is also the DOM's number for `button`. The `contextmenu`
+  event covers the rest: Control with the primary button on macOS, and a
+  touch's long press. A host that takes the press from `pointerdown` calls
+  `preventDefault` on the `contextmenu` that follows, so the browser's
+  menu does not open over a press the surface took.
+
+Shift and Alt come first (SPEC.md §9.2). With either held, the host
+handles the press as one on the cells beneath the surface: the terminal's
+own menu with Shift, and the program's mouse report with Alt.
+
+The keyboard's way to a menu is not the host's. `shift+f10` and the Menu key
+reach the program as keys (SPEC.md §10.2), and a host adds nothing for them.
+
+## 4. Implementations
 
 | host | how it ships the font | since |
 | --- | --- | --- |

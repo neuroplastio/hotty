@@ -267,7 +267,8 @@ in order:
 - `event`: `Event`'s fields and accessors (`surface`, `kind`, `target`,
   `value`, `checked`, `rev`, `sel` as a list of two, `fields` as a list of `[name, value]`, `mods`, `link`
   with `href` and `url`, `fit_rows`, `drag` with `c`, `r`, `x`, `y`, `tx`
-  and `ty`, `hover` with `c`, `r` and `out`, `area`, `count`, `view` with
+  and `ty`, `hover` with `c`, `r` and `out`, `area`, `count`, `button` (0 for a press whose detail has none), `c` and `r`
+  of a press, `view` with
   `areas` and `at_end`, `command` with `name`, `key`, `text` and
   `has_text`);
 - `changed`: a `caps` event's `Changed`, with `fields` the names of

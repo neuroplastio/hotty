@@ -752,7 +752,7 @@ _DRAG = {"c": "int", "r": "int", "mods": "int", "x": "int", "y": "int", "tx": "i
 # Each kind's detail (SPEC §9); a kind not here carries none a program reads.
 _DETAIL = {
     EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA, "mods": "int", "count": "int"},
-    EVENT_PRESS: {"area": _AREA, "mods": "int"},
+    EVENT_PRESS: {"button": "int", "area": _AREA, "c": "int", "r": "int", "mods": "int"},
     EVENT_CHANGE: {"checked": "bool", "value": "str", "rev": "int"},
     EVENT_INPUT: {"value": "str", "rev": "int", "sel": ("int", "int")},
     EVENT_CARET: {"sel": ("int", "int"), "rev": "int"},
@@ -832,6 +832,23 @@ class Event:
             return None
         d = self._d
         return Drag(c, r, d.get("x"), d.get("y"), d.get("tx"), d.get("ty"))
+
+    def button(self):
+        """A press's button as the DOM numbers it (SPEC §9): 2 for a
+        secondary press, 0 for a press whose detail has none, the primary
+        button's. None for other kinds."""
+        if self.kind != EVENT_PRESS:
+            return None
+        return self._d.get("button", 0)
+
+    def c(self):
+        """The pointer's column, in a secondary press (SPEC §9); None where
+        the detail has none."""
+        return self._d.get("c") if self.kind == EVENT_PRESS else None
+
+    def r(self):
+        """The pointer's row, as c is."""
+        return self._d.get("r") if self.kind == EVENT_PRESS else None
 
     def count(self):
         """A click's place in its run of clicks (SPEC §9): 2 for the second

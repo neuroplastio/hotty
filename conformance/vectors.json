@@ -10524,6 +10524,151 @@
    ]
   },
   {
+   "name": "a primary press is as it was on an element with secondary in its data-on: a press with no button, c or r when the surface asks for presses (SPEC \u00a79), none when p=0, and no click unless the element has click; secondary adds no event to the primary button",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b{position:absolute;display:block;width:calc(3*var(--hotty-cell-w));height:var(--hotty-cell-h);font-weight:normal}</style><b id=m data-on=secondary style=\"left:calc(2*var(--hotty-cell-w));top:0\">M</b><b id=k data-on=\"secondary click\" style=\"left:calc(6*var(--hotty-cell-w));top:var(--hotty-cell-h)\">K</b>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "m",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "m",
+       "detail": {
+        "area": {
+         "c": 2,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "k",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 6,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 6,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "m",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "k",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 6,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "area counts from the surface's top left cell, not its window's",
    "steps": [
     {
@@ -25807,6 +25952,163 @@
       "target": "ok",
       "mods": 0,
       "value": "x"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a press carries the button as the DOM numbers it, and the pointer's cell, on a secondary press only: a primary press has no button, which reads 0, and no c or r; a button that is no int makes the body undecodable, and the detail is read as none (SPEC \u00a73.3, \u00a79)",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=press:t=row;haZidXR0b24CpGFyZWGEoWMCoXIBoXcKoWgDoWMFoXICpG1vZHMB\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press:t=row;gqRhcmVhhKFjAqFyAaF3CqFoA6Rtb2RzCA==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press;g6ZidXR0b24CoWMAoXL/\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press:t=row;gqZidXR0b24ApGFyZWGEoWMAoXIAoXcBoWgB\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press:t=row;g6ZidXR0b26hMqFjBKFyBA==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "button": 2,
+     "area": {
+      "c": 2,
+      "r": 1,
+      "w": 10,
+      "h": 3
+     },
+     "c": 5,
+     "r": 2,
+     "mods": 1
+    },
+    {
+     "area": {
+      "c": 2,
+      "r": 1,
+      "w": 10,
+      "h": 3
+     },
+     "mods": 8
+    },
+    {
+     "button": 2,
+     "c": 0,
+     "r": -1
+    },
+    {
+     "button": 0,
+     "area": {
+      "c": 0,
+      "r": 0,
+      "w": 1,
+      "h": 1
+     }
+    },
+    {
+     "button": "2",
+     "c": 4,
+     "r": 4
+    }
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press",
+      "t": "row"
+     },
+     "event": {
+      "kind": "press",
+      "target": "row",
+      "button": 2,
+      "area": {
+       "c": 2,
+       "r": 1,
+       "w": 10,
+       "h": 3
+      },
+      "c": 5,
+      "r": 2,
+      "mods": 1
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press",
+      "t": "row"
+     },
+     "event": {
+      "kind": "press",
+      "target": "row",
+      "button": 0,
+      "area": {
+       "c": 2,
+       "r": 1,
+       "w": 10,
+       "h": 3
+      },
+      "c": null,
+      "r": null,
+      "mods": 8
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press"
+     },
+     "event": {
+      "kind": "press",
+      "target": "",
+      "button": 2,
+      "c": 0,
+      "r": -1,
+      "area": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press",
+      "t": "row"
+     },
+     "event": {
+      "kind": "press",
+      "target": "row",
+      "button": 0,
+      "c": null,
+      "r": null,
+      "area": {
+       "c": 0,
+       "r": 0,
+       "w": 1,
+       "h": 1
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press",
+      "t": "row"
+     },
+     "event": {
+      "kind": "press",
+      "target": "row",
+      "button": 0,
+      "c": null,
+      "r": null
      }
     }
    ]

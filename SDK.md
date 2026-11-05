@@ -581,10 +581,16 @@ carries, each absent when the event does not carry it:
 | `Drag` | `c` and `r`; the steps `x` and `y` in the element dragged, and `tx` and `ty` in a `t` with `drop` (as `TX` and `TY` where the language capitalises), each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover` | `c` and `r`, or `out` | `hover` |
 | `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press` |
+| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 2 for a secondary press, 0 when absent, the primary button's | `press` |
+| `C`, `R` | `c` and `r`: the pointer's cell on a secondary press, each absent when the detail has none (SPEC.md §9) | `press` |
 | `Count` | `count`: the click's place in its run of clicks (SPEC.md §9), 2 for the second click of a double click; 1 for a click whose detail has none | `click` |
 | `View` | `Areas`, from `in`: each id in view to its cells as `Area` holds them, leaving out one whose area lacks a field, and none when `in` is absent; and `AtEnd`, from `end`, false when absent (SPEC.md §9.5) | `view` |
 | `Command` | `Name`, `Key` and `Text`, from `name`, `key` and `text`, each empty when absent, and `HasText`, whether `text` is there (SPEC.md §10.6); absent when the detail has no `name` | `command` |
 | `Changed` | the capabilities that changed, a `Caps` with only the fields the detail has (SPEC.md §4) | `caps` |
+
+A handler of `press` that means the primary button checks `Button`: a
+secondary press comes to it too, from every element with `secondary` in its
+`data-on` (SPEC.md §9), and `T` names that element.
 
 The detail is read by the event's kind, so a form field named `value` is in
 `Fields` and nowhere else. An event of a kind the SDK does not know carries
@@ -905,7 +911,8 @@ A host that runs inside a test, so that a program's tests need no terminal.
   the test. A lenient host records them instead.
 - **The user.** It plays the user: typing, pressing a key as SPEC.md §10.2
   has a host take it, clicking, filling a field, checking a box, choosing
-  an option, submitting, pressing, dragging, and any event the test makes
+  an option, submitting, pressing (with a button, the secondary included),
+  dragging, and any event the test makes
   up.
 - **Inspection.** The test reads each surface: its document, an element's
   attributes and text, the focused element, whether it is detached, and
@@ -968,6 +975,42 @@ An SDK whose language has no grapheme segmentation **MAY** count code
 points instead, CR LF still one, and says so (§5.3); it then skips the
 vectors that require `graphemes`. So does its `DecodeKeys`, for a character
 of more than one code point.
+
+### 4.7 Context menus
+
+An element's own menu, opened by a secondary press (SPEC.md §9) or by a key,
+for a program that draws it as a surface of its own. The host draws no
+menu: SPEC.md Appendix B says why.
+
+- **The element opts in** with `secondary` in its `data-on`. A `press` with
+  `Button` 2 then names it in `T`, with `Area`, and the pointer's cell in
+  `C` and `R`. A press with `Button` 0 is the primary button's, and a
+  program that acts on every `press` checks which it got.
+- **The keys that open a menu** are `shift+f10` and `context_menu`
+  (`ParseKey`, §3.10). They reach the program as keys while a surface has
+  the keyboard (SPEC.md §10.2), and the last `focus` names the element, so
+  the SDK opens that element's menu on them, at its `Area`. The same keys
+  open it in the cells, and on a 0.6 host, where a secondary press is never
+  reported: a program that speaks both versions opens menus from the keys
+  everywhere and from the press where the host sends it.
+- **The menu is a surface** placed at a higher `z` (SPEC.md §5.2), at the
+  press's cell or under the element's `Area`, as a select's list is drawn
+  where a host shows none (SPEC.md §10.2). The SDK gives it the keyboard
+  (`Focus`), so its arrows, Enter and Escape are the program's. A click
+  elsewhere takes the keyboard from it, and the `blur` that follows closes
+  it. Nothing in it is new on the wire.
+- **What makes it feel native:**
+  - **Open at once.** The program keeps the menu's document sent and
+    hidden (SPEC.md §5.4), so a press costs a placement.
+  - **Fit.** It opens below and to the right of the pointer, and flips to
+    the other side where the grid ends.
+  - **Keys.** Type-ahead picks an item, the right arrow opens a submenu,
+    and the Menu key or Escape closes it.
+  - **One at a time.** One menu is open, and it closes on a pick, on a
+    `blur`, on Escape, on a scroll and on a resize.
+- **The click that closes a menu** does what it would have done, as the
+  host acts on it (a focus, a checkbox). The SDK drops only what the
+  program would have done with it.
 
 ## 5. Conformance
 
@@ -1048,6 +1091,7 @@ The canonical names, in each language's case.
 | `Holding`, `InSequence` | `(*Scanner).Holding`, `.InSequence` | `Scanner.holding`, `.in_sequence` | `scanner:holding`, `:in_sequence` | `Scanner::holding`, `::in_sequence` | `Scanner.holding`, `.inSequence` |
 | `Reply`, `Event`, `Caps` | `Reply`, `Event`, `Caps` | the same | tables with the fields in snake case | the same | the same |
 | `FitRows`, `Mods`, `CellCSS` | `FitRows`, `Mods`, `CellCSS` | `fit_rows`, `mods`, `cell_css` | as Python | as Python | `fitRows`, `mods`, `cellCss` |
+| `Button`, `C`, `R` | `Button`, `C`, `R` | `button`, `c`, `r` | as Python | as Python | `button`, `c`, `r` |
 | `ModShift`, `ModAlt`, `ModCtrl`, `ModSuper` | `hotty.ModShift`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … |
 | a message as a `Reply` or an `Event`, `Err` | `hotty.ReplyOf(m)`, `hotty.EventOf(m)`, `hotty.Err(r)` | `m.reply()`, `m.event()`, `r.err()` | `m:reply()`, `m:event()`, `r:err()` | methods | `m.reply()`, `m.event()`, `r.err()` |
 | `Has`, `Light`, `Merge` | `hotty.HasFeature(c, feature)` (`hotty.Has` asks a control), `hotty.Light(c)`, `hotty.Merge(c, changed)` | `c.has(feature)`, `c.light()`, `c.merge(changed)` | `c:has(feature)`, … | methods | `c.has(feature)`, … |

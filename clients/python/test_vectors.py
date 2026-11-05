@@ -247,6 +247,9 @@ def event_view(e):
         "hover": {"c": hover.c, "r": hover.r, "out": hover.out} if hover else None,
         "area": {"c": area.c, "r": area.r, "w": area.w, "h": area.h} if area else None,
         "count": e.count(),
+        "button": e.button(),
+        "c": e.c(),
+        "r": e.r(),
         "view": {
             "areas": {k: {"c": a.c, "r": a.r, "w": a.w, "h": a.h} for k, a in view.areas.items()},
             "at_end": view.at_end,
