@@ -8,7 +8,7 @@ path: sdk-design
 
 # hotty SDKs
 
-    Version:  0.6, with SPEC.md 0.6
+    Version:  0.7, with SPEC.md 0.6
     Status:   Draft. It changes with SPEC.md (§15 there).
     Licence:  CC BY 4.0
 
@@ -195,7 +195,7 @@ An SDK **MUST** provide every component of this section.
 | `Chunk` | 4096, the most base64 bytes in one sequence |
 | `MaxSize` | 1000, the most columns or rows of a surface |
 | `MaxName` | 64, the longest surface name |
-| `Version` | `"0.6"`, the protocol version the SDK speaks, which its query lists (SPEC.md §4) |
+| `Version` | `"0.7"`, the protocol version the SDK speaks, which its query lists (SPEC.md §4) |
 | `DefaultMax` | 16777216 (16 MiB), the most bytes a Decoder decodes one message to unless its `Max` says otherwise (§3.6) |
 
 And these sets, each value under its canonical name:

@@ -11,7 +11,7 @@ back to plain text where there is no host.
 
 ![hotty full screen in one terminal: the shell asks a form through askhot, plothot streams a chart, a metrics chart is hovered and pinned, a document scrolls, cards move in a feed, and an agent runs a diff, an approval and a load test.](demo.gif)
 
-[![status: 0.6 draft](https://img.shields.io/badge/status-0.6%20draft-orange)](#status)
+[![status: 0.7 draft](https://img.shields.io/badge/status-0.7%20draft-orange)](#status)
 [![spec: CC BY 4.0](https://img.shields.io/badge/spec-CC%20BY%204.0-lightgrey)](LICENSE-CC-BY-4.0)
 [![code: Apache-2.0](https://img.shields.io/badge/code-Apache--2.0-blue)](LICENSE-APACHE)
 

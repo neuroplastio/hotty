@@ -29,7 +29,7 @@ too little.
 ## Format
 
 ```
-{ "version": "0.6",
+{ "version": "0.7",
   "vectors": [ { "name": …, "steps": [ step, … ] } ],
   "wire":    [ { "name": …, "stream": …, "commands": [ … ], "invalid": n } ],
   "build":   [ … ], "encode": [ … ], "decode": [ … ], "scan": [ … ],

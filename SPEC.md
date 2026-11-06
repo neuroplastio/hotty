@@ -2,13 +2,13 @@
 group: Reference
 order: 10
 nav: Protocol
-description: the hotty protocol, version 0.6
+description: the hotty protocol, version 0.7
 path: protocol
 ---
 
 # hotty — HTML over the TTY
 
-    Version:  0.6
+    Version:  0.7
     Status:   Draft. Versions 0.x may change incompatibly (§15).
     Licence:  CC BY 4.0 (this document); the conformance vectors are
               Apache-2.0.
@@ -298,7 +298,7 @@ A program finds out whether it has a host by sending a query, then Primary
 Device Attributes as a fence:
 
 ```
-ESC ] 7279 ; a=q:n=1:v=0.6 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.7 ST   CSI c
 ```
 
 Every terminal answers DA1. A host answers the query first:
@@ -311,8 +311,8 @@ If the DA1 answer arrives with no hotty reply before it, there is no host. The
 program **SHOULD** then fall back (§14).
 
 **Versions.** `v` lists the hotty versions the program speaks,
-comma-separated: `v=0.6` for this document, and `v=0.5,0.6` for a
-program that speaks 0.5 as well. A version is `major.minor`, two numbers written without
+comma-separated: `v=0.7` for this document, and `v=0.6,0.7` for a
+program that speaks 0.6 as well. A version is `major.minor`, two numbers written without
 leading zeros, and versions compare as those numbers, the major first.
 - A host answers in the highest version it shares with the program: `a=ok`,
   with that version's capabilities, whose `v` names it. It speaks that
@@ -338,7 +338,7 @@ terminal attached. A program that can start using hotty after it has fallen
 back asks for a late answer with `late=1`:
 
 ```
-ESC ] 7279 ; a=q:n=1:v=0.6:late=1 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.7:late=1 ST   CSI c
 ```
 
 - A host answers it as any query, at once.
@@ -360,7 +360,7 @@ The capabilities, the body of that reply, are a map of these fields (§3.3):
 
 | field | type | meaning |
 | --- | --- | --- |
-| `v` | str | the hotty version the host answers in (Versions, above): `"0.6"` for this document |
+| `v` | str | the hotty version the host answers in (Versions, above): `"0.7"` for this document |
 | `cellcss` | `{"w": float, "h": float}` | one cell's size in CSS pixels (§5.3) |
 | `scale` | float | device pixels per CSS pixel when the host answers: a hint for the resolution of images, which a zoom changes without telling (§5.3) |
 | `scheme` | str | `"dark"` or `"light"`: the terminal's colour scheme |
@@ -2508,7 +2508,7 @@ the text of §11.
 
 ## 16. Conformance
 
-A host conforms to hotty version 0.6 when:
+A host conforms to hotty version 0.7 when:
 - it meets every **MUST** of this document;
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
@@ -2558,8 +2558,8 @@ fields (SDK.md §4.6).
 Detection (payload shortened):
 
 ```
-program → ESC ] 7279 ; a=q:n=1:v=0.6 ST  CSI c
-host    → ESC ] 7279 ; a=ok:n=1:re=q ; haF2ozAuNqdjZWxsY3Nz… ST  CSI ? 62 ; 22 c
+program → ESC ] 7279 ; a=q:n=1:v=0.7 ST  CSI c
+host    → ESC ] 7279 ; a=ok:n=1:re=q ; haF2ozAuN6djZWxsY3Nz… ST  CSI ? 62 ; 22 c
 ```
 
 A card placed below the prompt, asking for the rows it took, then a delta
