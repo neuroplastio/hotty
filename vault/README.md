@@ -9,7 +9,8 @@ itself is [`SPEC.md`](../SPEC.md); this holds what is being weighed for it.
 | [`tasks/0.4.md`](tasks/0.4.md) | What breaks 0.3, collected for 0.4 |
 | [`tasks/0.5.md`](tasks/0.5.md) | 0.5: `a=field`, which changes a control unless the user has |
 | [`tasks/0.6.md`](tasks/0.6.md) | 0.6, cut 2026-11-01: a backdrop, the controls' ring, Enter commits, scroll snapping |
-| [`tasks/0.7.md`](tasks/0.7.md) | 0.7: `scroll`, Tab in a field and a key given back, moved from 0.6, and three proposals |
+| [`tasks/0.7.md`](tasks/0.7.md) | 0.7, cut 2026-11-06: a secondary press |
+| [`tasks/0.8.md`](tasks/0.8.md) | 0.8: `scroll`, Tab in a field and a key given back, moved from 0.7, and two proposals |
 | [`tasks/hottyterm.md`](tasks/hottyterm.md) | hottyterm's own features, which change no spec item |
 | [`knowledge/wire-sizes.md`](knowledge/wire-sizes.md) | What 0.2's messages cost on the wire, and the script that measures them |
 | [`knowledge/ghostty-physical-key-escape.md`](knowledge/ghostty-physical-key-escape.md) | A synthetic keymap's characters arrive as Escape under kitty flag 8, in Ghostty and hottyterm |
