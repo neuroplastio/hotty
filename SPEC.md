@@ -301,6 +301,9 @@ Device Attributes as a fence:
 ESC ] 7279 ; a=q:n=1:v=0.7 ST   CSI c
 ```
 
+A program that speaks 0.6 as well asks `v=0.6,0.7` instead (Versions,
+below).
+
 Every terminal answers DA1. A host answers the query first:
 
 ```

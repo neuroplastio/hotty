@@ -57,6 +57,14 @@ it. A list names several, all required:
 - `"pressed"`, a host that sees the key the user pressed (§10.4): its
   runner offers a key step's key as pressed, by both its names, and then
   as the bytes a terminal sends for it, as the host would;
+- `"speaks-0.6"`: a host that speaks 0.6 as well as 0.7 (SPEC §15;
+  HOST.md §4), which answers a `v=0.6` query in 0.6 and keeps a 0.6
+  session as 0.6 has it. A host that speaks 0.7 only, and an SDK's test host
+  (SDK.md §4.4) that does, skips these vectors. The vectors without it hold
+  for every 0.7 host: `v=0.6,0.7` is answered in 0.7, and an `EVERSION`
+  reply is checked for its code, not its detail (the versions the host
+  speaks, SPEC §4), which differs between a host that speaks 0.6 and one
+  that does not;
 - `"scroll"` (§5.3), `"steps"`, `"drop"` (§9.1) and `"view"` (§9.5): what
   every host of this version does, named so that a host that lays nothing
   out, an SDK's test host (SDK.md §4.4), skips it. Nor do test hosts keep a

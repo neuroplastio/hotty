@@ -8,7 +8,7 @@ path: host-design
 
 # hotty hosts
 
-    Version:  0.7, with SPEC.md 0.6
+    Version:  0.7, with SPEC.md 0.7
     Status:   Draft. Guidance for hosts, not part of the protocol.
     Licence:  CC BY 4.0
 
@@ -29,7 +29,8 @@ ask for it. A document may use what it describes, but it can't count on it
 1. Introduction
 2. Fonts
 3. The secondary press
-4. Implementations
+4. Speaking 0.6 as well
+5. Implementations
 
 Appendix: A. Rationale
 
@@ -185,10 +186,37 @@ Shift and Alt come first (SPEC.md §9.2). With either held, the host
 handles the press as one on the cells beneath the surface: the terminal's
 own menu with Shift, and the program's mouse report with Alt.
 
+In a 0.6 session (§4.1) Alt is all a 0.6 program could meet of this: see
+there.
+
 The keyboard's way to a menu is not the host's. `shift+f10` and the Menu key
 reach the program as keys (SPEC.md §10.2), and a host adds nothing for them.
 
-## 4. Implementations
+## 4. Speaking 0.6 as well
+
+hotty's own stack, hosts and SDKs, speaks 0.6 along with 0.7. SPEC.md §15
+lets a host speak several versions, and the rest is what the stack does
+with it. A host that does not speak 0.6 answers a 0.6 program with
+`EVERSION` (SPEC.md §4), and the program falls back.
+
+### 4.1 A 0.6 session
+
+- **A host that speaks 0.6 as well** answers a program that lists 0.6 and
+  not 0.7 in 0.6, and speaks 0.6 to it from then on (SPEC.md §4). A query
+  that lists both is answered in 0.7, the highest the two share.
+- **One behaviour of 0.7 can reach a 0.6 program:** a press of the
+  secondary button with Alt held. In 0.7 it is the program's, and with
+  mouse reporting on the program hears `CSI < 10 ; <col> ; <row> M`
+  (SPEC.md §9.2). In a 0.6 session it stays the terminal's, as 0.6's §9.2
+  has it: not reported to the cells as `CSI < 10`.
+- **Nothing else of the secondary press reaches a 0.6 session.** A 0.6
+  document never asks for `secondary` in its `data-on`, so the host sends it
+  no secondary `press`: a secondary press over its elements is the
+  terminal's, as it was.
+- **A 0.7 program on a 0.6 host** is answered in 0.6 and meets no
+  secondary press; SDK.md §3.8 and §4.7 say what an SDK does.
+
+## 5. Implementations
 
 | host | how it ships the font | since |
 | --- | --- | --- |

@@ -81,8 +81,7 @@
       "a": "err",
       "re": "q",
       "n": "1",
-      "code": "EVERSION",
-      "detail": "0.7"
+      "code": "EVERSION"
      }
     },
     {
@@ -95,8 +94,7 @@
       "a": "err",
       "re": "q",
       "n": "2",
-      "code": "EVERSION",
-      "detail": "0.7"
+      "code": "EVERSION"
      }
     },
     {
@@ -109,8 +107,7 @@
       "a": "err",
       "re": "q",
       "n": "3",
-      "code": "EVERSION",
-      "detail": "0.7"
+      "code": "EVERSION"
      }
     },
     {
@@ -123,8 +120,7 @@
       "a": "err",
       "re": "q",
       "n": "4",
-      "code": "EVERSION",
-      "detail": "0.7"
+      "code": "EVERSION"
      }
     },
     {
@@ -137,8 +133,7 @@
       "a": "err",
       "re": "q",
       "n": "5",
-      "code": "EVERSION",
-      "detail": "0.7"
+      "code": "EVERSION"
      }
     },
     {
@@ -147,6 +142,72 @@
       "q": "2"
      },
      "reply": null
+    }
+   ]
+  },
+  {
+   "name": "a host that speaks 0.6 as well answers a program that speaks it in 0.6, whatever else the query lists, and its capabilities name it (SPEC \u00a74, \u00a715)",
+   "requires": [
+    "speaks-0.6"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "q",
+      "n": "1",
+      "v": "0.6"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "q",
+      "n": "1",
+      "body": {
+       "v": "0.6"
+      }
+     }
+    },
+    {
+     "send": {
+      "a": "q",
+      "n": "2",
+      "v": "0.5,0.6"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "q",
+      "n": "2",
+      "body": {
+       "v": "0.6"
+      }
+     }
+    },
+    {
+     "send": {
+      "a": "q",
+      "n": "3",
+      "v": "0.6,99.0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "q",
+      "n": "3",
+      "body": {
+       "v": "0.6"
+      }
+     }
+    },
+    {
+     "send": {
+      "a": "q",
+      "n": "4",
+      "v": "0.5"
+     },
+     "reply": {
+      "a": "err",
+      "re": "q",
+      "n": "4",
+      "code": "EVERSION"
+     }
     }
    ]
   },
@@ -11012,6 +11073,113 @@
      "pointer": "up",
      "button": 2,
      "events": []
+    }
+   ]
+  },
+  {
+   "name": "in a 0.6 session a secondary press is the terminal's, even over an element with secondary in its data-on, and with Alt held too: the surface hears nothing, and the program no press (SPEC \u00a74, \u00a79.2, \u00a715)",
+   "requires": [
+    "speaks-0.6"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "q",
+      "n": "1",
+      "v": "0.6"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "q",
+      "n": "1",
+      "body": {
+       "v": "0.6"
+      }
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=secondary><u id=i data-on=secondary>i</u></b><i id=n>n</i><i id=k data-on=\"secondary click\">k</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [],
+     "keys": [
+      "alt"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [],
+     "keys": [
+      "alt"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [],
+     "keys": [
+      "alt"
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [],
+     "keys": [
+      "shift"
+     ]
     }
    ]
   },
@@ -22587,7 +22755,7 @@
       "control": {
        "a": "q",
        "n": "1",
-       "v": "0.7"
+       "v": "0.6,0.7"
       }
      }
     },
@@ -22611,7 +22779,7 @@
       "control": {
        "a": "q",
        "n": "1",
-       "v": "0.7",
+       "v": "0.6,0.7",
        "late": "1"
       }
      }
@@ -28401,6 +28569,47 @@
    ],
    "caps": {
     "v": "0.7"
+   }
+  },
+  {
+   "name": "a host of 0.6: its reply names a version the program listed, so it is a host (SPEC \u00a74)",
+   "steps": [
+    {
+     "at": 0,
+     "start": true,
+     "state": "detecting",
+     "decided": false,
+     "done": false,
+     "deadline": 1500
+    },
+    {
+     "at": 20,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNg==\u001b\\",
+     "body": {
+      "v": "0.6"
+     },
+     "took": true,
+     "state": "native",
+     "decided": true,
+     "done": false,
+     "deadline": 320
+    },
+    {
+     "at": 25,
+     "da1": true,
+     "took": true,
+     "state": "native",
+     "done": true,
+     "deadline": null
+    },
+    {
+     "at": 30,
+     "da1": true,
+     "took": false
+    }
+   ],
+   "caps": {
+    "v": "0.6"
    }
   },
   {

@@ -39,6 +39,7 @@ CHUNK = 4096
 MAX_SIZE = 1000
 MAX_NAME = 64
 VERSION = "0.7"
+VERSIONS = ("0.6", "0.7")  # every version this client speaks, which its query lists
 COMPRESS_FROM = 256
 SCAN_MAX = 64 << 10
 
@@ -194,9 +195,9 @@ def _command(pairs, payload, default_q, n=None, q=None):
 
 
 def query(n=1, late=False):
-    """Asks whether the terminal is a host that speaks VERSION, fenced
-    with DA1 (SPEC §4); with late, a late answer is welcome."""
-    pairs = [("a", "q"), ("n", n), ("v", VERSION)]
+    """Asks whether the terminal is a host that speaks a version in
+    VERSIONS (0.6 and 0.7), fenced with DA1 (SPEC §4); with late, a late answer is welcome."""
+    pairs = [("a", "q"), ("n", n), ("v", ",".join(VERSIONS))]
     if late:
         pairs.append(("late", 1))
     return encode(pairs) + "\x1b[c"
@@ -1407,7 +1408,7 @@ class Detector:
     passed in as milliseconds. `decided` is set when the state is known,
     `done` when nothing more of the detection will arrive; `deadline` is
     when to call `tick` next (None once done). A reply to the query makes
-    the terminal a host when its capabilities decode and name VERSION, and
+    the terminal a host when its capabilities decode and name a version in VERSIONS, and
     any other reply to it, an error included, leaves it TEXT. With `late`,
     the query asks for a late answer, and the first reply after the state
     is TEXT that makes the terminal a host does."""
@@ -1464,7 +1465,7 @@ class Detector:
         if not (r.re == "q" and r.n == self.n):
             return False
         caps = r.caps()
-        host = caps is not None and caps.v == VERSION
+        host = caps is not None and caps.v in VERSIONS
         if self.state == DETECTING:
             self.state, self.decided = (NATIVE, True) if host else (TEXT, True)
             self.caps = caps if host else None
@@ -2383,7 +2384,7 @@ class Hotty:
         return messages, other
 
     def query(self, timeout=None):
-        """Is there a hotty host that speaks VERSION? Returns its
+        """Is there a hotty host that speaks a version in VERSIONS? Returns its
         capabilities (a Caps), or None. Reads until detection is done (SDK.md §3.8), and leaves
         everything that is not detection's in the buffer, for take()."""
         now = lambda: time.monotonic() * 1000  # noqa: E731

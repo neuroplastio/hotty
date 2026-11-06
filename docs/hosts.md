@@ -22,7 +22,8 @@ hottyterm and the browser's host share no code, and each passes the host
 sections of the [conformance vectors](../conformance/README.md); so does
 `hotty run`, which draws with hottyterm's renderer, hotty-blitz.
 
-A program of hotty 0.7 needs a host of 0.7. A host of another version, 0.2
+A program of hotty 0.7 needs a host of 0.7, or of 0.6, which hotty's own
+hosts and SDKs speak too. A host of another version, 0.2
 or later, answers its question with the versions it speaks; a host of 0.1
 answers with capabilities the program can't read. Either way the program
 draws in cells, as it would without a host.

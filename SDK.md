@@ -8,7 +8,7 @@ path: sdk-design
 
 # hotty SDKs
 
-    Version:  0.7, with SPEC.md 0.6
+    Version:  0.7, with SPEC.md 0.7
     Status:   Draft. It changes with SPEC.md (§15 there).
     Licence:  CC BY 4.0
 
@@ -195,7 +195,8 @@ An SDK **MUST** provide every component of this section.
 | `Chunk` | 4096, the most base64 bytes in one sequence |
 | `MaxSize` | 1000, the most columns or rows of a surface |
 | `MaxName` | 64, the longest surface name |
-| `Version` | `"0.7"`, the protocol version the SDK speaks, which its query lists (SPEC.md §4) |
+| `Version` | `"0.7"`, the newest protocol version the SDK speaks (SPEC.md §4) |
+| `Versions` | `["0.6", "0.7"]`, every version the SDK speaks, which its query lists (§3.8) |
 | `DefaultMax` | 16777216 (16 MiB), the most bytes a Decoder decodes one message to unless its `Max` says otherwise (§3.6) |
 
 And these sets, each value under its canonical name:
@@ -256,7 +257,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 
 | builder | sends | parameters | default `q` |
 | --- | --- | --- | --- |
-| `Query` | `a=q:n=<n>:v=<Version>`, `late=1` with the `Late` option, then DA1 (`ESC [ c`) | n | 0 |
+| `Query` | `a=q:n=<n>:v=<Versions>`, joined by `,`; `late=1` with the `Late` option, then DA1 (`ESC [ c`) | n | 0 |
 | `Doc` | `a=doc:s` and the HTML; `d=1` with the `Detached` option, `scroll` with `Scroll` | surface, html | 1 |
 | `Place` | `a=place` (§3.4.1) | surface, placement | 1 |
 | `PlaceAt` | `ESC 7`, `ESC [ <y+1> ; <x+1> H`, `Place` with `C=1`, `ESC 8` | surface, x, y, placement | 1 |
@@ -497,13 +498,24 @@ by step.
   `Tick` next, or none once done.
 - **Every input first lets the time pass**: whatever was due at or before
   `now` happens before the input is taken.
+- **It speaks both 0.6 and 0.7.** An SDK of 0.7 lists `0.6,0.7` in its
+  query (`Versions`), and takes the host that answers in either (SPEC.md
+  §4, §15).
+  - **A 0.6 host** sends no secondary press, so a program meets none there.
+    The keys open its menus (§4.7), which already says so.
+  - **Which version it met** is the capabilities' `V`, in `Caps`, which the
+    program reads when it must tell them apart. The host speaks that
+    version from then on.
+  - A 0.7 host that speaks 0.6 too answers `v=0.6,0.7` in 0.7, and a 0.6
+    host answers it in 0.6. A host that speaks only 0.7 answers `v=0.6`
+    with `EVERSION`, and the terminal is `text` (§3.8's second rule).
 
 The rules, with their times:
 
 | rule | |
 | --- | --- |
-| a reply that answers the query (`re=q`, the query's `n`): `a=ok`, its capabilities decoding (§3.9), their `V` the SDK's `Version` | the terminal is a host: `native`, decided, with its capabilities. Done when the DA1 behind it arrives, or 300 ms after the reply, or at 1500 ms, whichever comes first |
-| any other reply that answers the query: an error (`EVERSION`, or another), or capabilities that do not decode or name another version | the terminal is no host the program can use (SPEC.md §4): `text`, decided. Done as for a host's reply |
+| a reply that answers the query (`re=q`, the query's `n`): `a=ok`, its capabilities decoding (§3.9), their `V` one of the SDK's `Versions` | the terminal is a host: `native`, decided, with its capabilities. Done when the DA1 behind it arrives, or 300 ms after the reply, or at 1500 ms, whichever comes first |
+| any other reply that answers the query: an error (`EVERSION`, or another), or capabilities that do not decode or name a version the SDK does not speak | the terminal is no host the program can use (SPEC.md §4): `text`, decided. Done as for a host's reply |
 | a DA1 before any reply | it may answer a question asked before the query (SPEC.md §4). It opens a grace of 150 ms: a reply within it still answers the query |
 | the grace ends with no reply | `text`: not a host. Decided and done |
 | 1500 ms with no answer at all | `text`. Decided and done |
@@ -896,7 +908,9 @@ A host that runs inside a test, so that a program's tests need no terminal.
   selection (SPEC.md §6.4), answers as SPEC.md §3.6 has hosts do, and
   passes the host vectors' `send`, `inspect` and `key` steps. It speaks
   the SDK's `Version` only: it answers a query that lists it with its
-  capabilities, and any other with `EVERSION` (SPEC.md §4). It lays
+  capabilities, in it, and any other with `EVERSION` (SPEC.md §4). The
+  vectors that need a host that speaks 0.6 as well (`speaks-0.6`,
+  conformance/README.md) are skipped by it, unless it does. It lays
   nothing out: `r=auto` gets an estimate the test may replace, nothing in
   it scrolls, so a key bound to a scroll action goes on as if its keymap
   did not bind it (SPEC.md §10.2), and it sends no `view`. Nor can it
@@ -1044,7 +1058,8 @@ every SDK section, `edit` where it provides a Field.
   what keeps SDKs aligned.
 - **`requires`.** A vector that needs something an SDK may not have yet
   names it in `requires`. A runner declares what it implements, and skips
-  the vectors whose `requires` it lacks, so the list of what an SDK lacks is
+  the vectors whose `requires` it lacks (the host sections' `speaks-0.6`
+  among them, for a test host that speaks 0.7 only), so the list of what an SDK lacks is
   its runner's, not a list kept by hand.
 - **A copy, checked.** An SDK keeps a copy of `vectors.json` in its tests,
   a way to refresh it from a checkout of this repository, and a test that
