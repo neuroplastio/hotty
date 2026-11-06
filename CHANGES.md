@@ -8,6 +8,50 @@ path: changes
 
 # Changes
 
+## 0.7
+
+A draft, as every 0.x is, landed across the stack on 2026-11-06, untagged
+until the maintainer's go.
+
+hotty's 0.7 hosts and SDKs speak 0.6 too (SPEC.md §15), so versions meet
+as follows (§4, §14):
+- a 0.6 program on a 0.7 host that speaks 0.6 is answered in 0.6, and the
+  host speaks 0.6 to it from then on;
+- a 0.7 program, whose query lists `0.6,0.7`, on a 0.6 host is answered in
+  0.6, and meets no secondary press: the keys open its menus (SDK.md
+  §4.7);
+- a host or a program that speaks only 0.7 meets a 0.6 one at `EVERSION`,
+  and the program falls back.
+
+### What changed
+
+- **A secondary press** (SPEC.md §9, §9.1, §9.2). An element that has
+  `secondary` in its `data-on` gets a `press` with `button` 2, its `area`
+  and the pointer's cell in `c` and `r`, from a mouse's secondary button,
+  the primary button with Control on macOS, a pen's barrel button, or a
+  touch's long press. It does nothing else: no click, no focus, no drag,
+  and not the terminal's menu. Over an element without `secondary`, and
+  with Shift held, it is the terminal's. With Alt held it is the
+  program's, and with mouse reporting on it hears `CSI < 10 ; <col> ;
+  <row> M` (§9.2). The keys that open a menu, `shift+f10` and
+  `context_menu`, stay keys (§10.2). A primary `press` has no `button`,
+  which means 0.
+
+### Upgrading from 0.6
+
+**A program:**
+- Ask for `v=0.7`, or `v=0.6,0.7` to speak both.
+- A program that acts on every `press` checks its `button`: a secondary
+  press comes only to an element that has `secondary`.
+- Open menus from the keys everywhere, and from the press where the host
+  sends one: a 0.6 host never does.
+
+**A host:**
+- Speak 0.7, and a host that also speaks 0.6 answers a 0.6 program in 0.6
+  (HOST.md §4). One that does not answers it with `EVERSION`.
+- Take `secondary` in `data-on` and report the press as §9 has it.
+- In a 0.6 session, a secondary press with Alt held stays the terminal's.
+
 ## 0.6
 
 A draft, as every 0.x is, released 2026-11-01 across the stack. It breaks
