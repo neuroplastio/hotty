@@ -1,7 +1,7 @@
 # hottyterm: the terminal's own work
 
-Features of hottyterm that change no spec item. Each is done on hottyterm's
-main when the maintainer dispatches it.
+Features of hottyterm, and its bugs against the spec, that change no spec
+item. Each is done on hottyterm's main when the maintainer dispatches it.
 
 Item template: as `tasks/0.4.md`.
 
@@ -53,3 +53,49 @@ Item template: as `tasks/0.4.md`.
       - whether the package-manager route runs the upgrade or only
         names the command;
       - the notice: GTK's, or a surface of hottyterm's own.
+
+- [ ] **HT-03** `--hotty-bg` keeps the configured background after a program sets OSC 11
+      status: a finding; recorded, not dispatched (gov, 2026-11-07: "to file only; implement nothing") | added: 2026-11-07
+      found: by plx (plx-look, 2026-11-07).
+      - A program sets the terminal's background with OSC 11 (#191919
+        there). hottyterm draws the cells on the new background.
+      - A surface keeps `--hotty-bg` at the configured one (#282C34).
+      - So a document that fills with `var(--hotty-bg)` shows two
+        backgrounds side by side.
+      - plx works around it on its side.
+      spec: §8 lists `--hotty-bg` as "the terminal's background", and says
+      "When the terminal's theme or font changes, the host updates the
+      stylesheet and draws every surface again". It doesn't name OSC 10,
+      11 or 4. But once a program sets OSC 11, the terminal draws its cells
+      on that colour, so that colour is the terminal's background. Read as
+      written, this is a bug in hottyterm against 0.7, not a spec question.
+      A sentence naming the colours a program sets is a wording to weigh
+      for 0.8 (`tasks/0.8.md`, To consider).
+      cause (read from the code at hottyterm 07080c8, not reproduced here):
+      - hotty.zig's `config()` reads the terminal's current colours
+        (`t.colors.background.get()`, where OSC 11's value wins over the
+        configured one).
+      - But hotty.zig calls `hotty_host_configure` only when the host
+        starts (`ensureHost`) and on a resize of the window or the cells
+        (`resized`).
+      - The stream handler's `colorOperation` (OSC 4, 10 and 11, set and
+        reset) and Termio's `changeConfig` (a new theme in the config)
+        change the colours without telling hotty. So the host keeps its
+        stylesheet until the next resize.
+      - hotty-blitz is right as it is: `hotty_host_configure` restyles
+        every surface, the open menu included, and sends `caps` when
+        `scheme` changed.
+      scope: everything §8 derives from the colours goes stale the same
+      way, after a program's colour change and after a theme change in
+      the config:
+      - `--hotty-fg`, the 16 `--hotty-ansi-*` and `--hotty-accent`;
+      - `color-scheme` and `prefers-color-scheme`;
+      - `caps`' `scheme`.
+      fix, once dispatched:
+      - In hotty.zig: after each of those changes, a hook gives the host
+        the current colours (`hotty_host_configure`, which does nothing
+        when nothing changed) and the surfaces are drawn again. It is
+        coalesced, so a program that sets colours often doesn't restyle
+        every surface on each one.
+      - A test: OSC 11, then the host stylesheet's `--hotty-bg`.
+      - hotty-blitz needs no change. The xterm addon is not checked.
