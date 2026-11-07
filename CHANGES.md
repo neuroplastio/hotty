@@ -10,8 +10,9 @@ path: changes
 
 ## 0.7
 
-A draft, as every 0.x is, landed across the stack on 2026-11-06, untagged
-until the maintainer's go.
+A draft, as every 0.x is, landed across the stack on 2026-11-06, and
+released on 2026-11-07 (the maintainer: "ship everything that's
+pending").
 
 hotty's 0.7 hosts and SDKs speak 0.6 too (SPEC.md §15), so versions meet
 as follows (§4, §14):
