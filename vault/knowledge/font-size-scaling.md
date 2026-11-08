@@ -1,7 +1,8 @@
 # Surface scaling from the terminal font: decision draft
 
-Status: open, 2026-11-08. No change is authorized by this draft. The
-controlled nav and monospace comparisons are recorded below; a maintainer decision is pending.
+Status: option 2 chosen by the maintainer on 2026-11-08. The kit and plx
+size their surfaces relative to the terminal font and cells. The spec and
+hosts retain their current model.
 
 ## Evidence and limits
 
@@ -69,7 +70,7 @@ not ours to change.
    and compatibility risks of both apply; avoid double scaling and define
    which changes should cause relayout.
 
-**Lean:** option 2 first, subject to measurements and maintainer choice. It
+**Choice:** option 2. It
 addresses the identified mixed-unit surfaces without changing a protocol
 contract for every author and host. Option 1 better satisfies a general
 promise that all authored pixels scale, if that is the desired contract.
