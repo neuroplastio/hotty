@@ -1,22 +1,20 @@
 # Surface scaling from the terminal font: decision draft
 
 Status: open, 2026-11-08. No change is authorized by this draft. The
-controlled comparison is preliminary; the agents list and precise layout measurements still need reproduction.
+controlled nav and monospace comparisons are recorded below; a maintainer decision is pending.
 
 ## Evidence and limits
 
-The supplied 9-point plx image shows densely packed chrome. An isolated
-headless sway at 2874×1845 device pixels and scale 1.6 ran installed
-hottyterm 26.11.07-dev.07080c8 with plx 26.11.08-dev.58e349a at 9, 12
-and 13 points. The three shots show the same empty workspace and pane
-header, in dark mode. Terminal text visibly grows with the setting while
-the pane header label remains roughly the same size. The 9-point tab was
-still showing its loading label, so it is not a clean tab comparison; the
-agents list was not present. These observations do not yet quantify the
-crowding or reproduce every surface in the report. The supplied 13-point
-hottyterm and Ghostty images look nearly identical in glyph size and line
-spacing; Zed's 13 image looks smaller. These are visual comparisons, not
-calibrated measurements.
+An isolated headless sway at 2874×1845 device pixels and scale 1.6 ran
+installed hottyterm 26.11.07-dev.07080c8 with plx 26.11.08-dev.58e349a
+at 9, 12 and 13 points, with the same nav tool in dark mode. At 9, the nav
+switches and tree rows are visibly compressed; at 12 and 13 they have
+more vertical room. Terminal monospace text grows with the setting, while
+the nav labels change much less. The supplied 13-point monospace samples
+show hottyterm and Ghostty looking nearly identical in glyph size and line
+spacing, and Zed looking smaller. These are visual comparisons, not
+calibrated glyph measurements. The screenshots and terminal log confirm
+that the issue is visible without reproducing a populated agents list.
 
 The current contract makes a settings font change resize the CSS cell and
 relayout the document, whereas zoom changes scale and keeps layout
@@ -87,7 +85,6 @@ promise that all authored pixels scale, if that is the desired contract.
   cross-host tests and a clear migration.
 - Which pixel dimensions are deliberate physical hairlines? Lean: keep
   `--hotty-px` for those and check at fractional scale.
-- Does a controlled comparison reproduce the agents-list fault and match
-  Ghostty? Lean: capture matching populated surfaces and compare the
-  terminals before implementation; the present shots are insufficient to
-  settle the visual fix.
+- Does the chosen fix preserve legibility and proportions at each size?
+  Lean: compare the same nav surface in dark and light at both widths
+  before and after implementation, with the maintainer reviewing the look.
