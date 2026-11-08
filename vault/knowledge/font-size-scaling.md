@@ -1,17 +1,22 @@
 # Surface scaling from the terminal font: decision draft
 
 Status: open, 2026-11-08. No change is authorized by this draft. The
-controlled 9/12/13 reproduction is still needed before a decision.
+controlled comparison is preliminary; the agents list and precise layout measurements still need reproduction.
 
 ## Evidence and limits
 
-The supplied 9-point plx image shows densely packed chrome. It is a single
-image, so it does not establish how the same surface changes across sizes.
-The 13-point hottyterm and Ghostty images look nearly identical in glyph
-size and line spacing; Zed's 13 image looks smaller. These are visual
-comparisons, not calibrated measurements. A headless compositor was not
-found on PATH or in the local install locations; the prescribed isolated
-reproduction and its screenshots have not been run.
+The supplied 9-point plx image shows densely packed chrome. An isolated
+headless sway at 2874×1845 device pixels and scale 1.6 ran installed
+hottyterm 26.11.07-dev.07080c8 with plx 26.11.08-dev.58e349a at 9, 12
+and 13 points. The three shots show the same empty workspace and pane
+header, in dark mode. Terminal text visibly grows with the setting while
+the pane header label remains roughly the same size. The 9-point tab was
+still showing its loading label, so it is not a clean tab comparison; the
+agents list was not present. These observations do not yet quantify the
+crowding or reproduce every surface in the report. The supplied 13-point
+hottyterm and Ghostty images look nearly identical in glyph size and line
+spacing; Zed's 13 image looks smaller. These are visual comparisons, not
+calibrated measurements.
 
 The current contract makes a settings font change resize the CSS cell and
 relayout the document, whereas zoom changes scale and keeps layout
@@ -31,8 +36,8 @@ layout defect.
 On Linux Ghostty specifies font size in points (`src/config/Config.zig:255`)
 and converts points using DPI / 72 (`src/font/face.zig:47–57`); its base
 DPI is 96 (line 29) and the surface multiplies it by content scale
-(`src/Surface.zig:510–525`). At scale 1.6 and no extra text scaling, the
-rounded DPI is 154: 11pt is about 23.53 device px or 14.71 logical px;
+(`src/Surface.zig:510–525`). The isolated hottyterm logged scale 1.6 and 154 DPI. At that DPI and no
+extra text scaling: 11pt is about 23.53 device px or 14.71 logical px;
 13pt is about 27.81 device px or 17.38 logical px. At exact 96 DPI these
 are 14.67 and 17.33 logical px. Font rasterization, rounding, text scaling,
 and font metrics affect the visible glyphs. This predicts why a point
@@ -82,6 +87,7 @@ promise that all authored pixels scale, if that is the desired contract.
   cross-host tests and a clear migration.
 - Which pixel dimensions are deliberate physical hairlines? Lean: keep
   `--hotty-px` for those and check at fractional scale.
-- Does a controlled comparison reproduce the fault and match Ghostty?
-  Lean: capture it before implementation; the supplied images alone are
-  insufficient to settle the numerical cause or a visual fix.
+- Does a controlled comparison reproduce the agents-list fault and match
+  Ghostty? Lean: capture matching populated surfaces and compare the
+  terminals before implementation; the present shots are insufficient to
+  settle the visual fix.
