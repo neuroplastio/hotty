@@ -54,8 +54,8 @@ Item template: as `tasks/0.4.md`.
         names the command;
       - the notice: GTK's, or a surface of hottyterm's own.
 
-- [ ] **HT-03** `--hotty-bg` keeps the configured background after a program sets OSC 11
-      status: a finding; recorded, not dispatched (gov, 2026-11-07: "to file only; implement nothing") | added: 2026-11-07
+- [x] **HT-03** `--hotty-bg` keeps the configured background after a program sets OSC 11
+      status: fixed for a program's OSC 4, 10 and 11 (hottyterm patch 0055, 2026-11-10, local until hottyterm's next commit); a theme change in the config is not covered | added: 2026-11-07
       found: by plx (plx-look, 2026-11-07).
       - A program sets the terminal's background with OSC 11 (#191919
         there). hottyterm draws the cells on the new background.
@@ -91,7 +91,19 @@ Item template: as `tasks/0.4.md`.
       - `--hotty-fg`, the 16 `--hotty-ansi-*` and `--hotty-accent`;
       - `color-scheme` and `prefers-color-scheme`;
       - `caps`' `scheme`.
-      fix, once dispatched:
+      done 2026-11-10 (the maintainer took it, via margin-surf's report):
+      - `Hotty.recolored` in hotty.zig, called at the top of `flush`: when
+        the foreground, background or palette differ from the ones the
+        host was last configured with, it runs `resized` (configure,
+        rewindow, repaint). Same colours again cost nothing; it is
+        coalesced by the batch of output. No upstream lines.
+      - Checked with `scripts/osc11-check.py` on a private display: after
+        a second OSC 11 the old build's surface stayed #191919 beside
+        cells at #2A1A1A, and the new one's surface was #2A1A1A. No
+        automated test (the host is a C ABI; the check is the script).
+      - Left: a theme change in the config (`Termio.changeConfig`) with no
+        output after it still waits for the next batch of output.
+      the plan was:
       - In hotty.zig: after each of those changes, a hook gives the host
         the current colours (`hotty_host_configure`, which does nothing
         when nothing changed) and the surfaces are drawn again. It is
