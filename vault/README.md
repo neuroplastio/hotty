@@ -13,6 +13,7 @@ itself is [`SPEC.md`](../SPEC.md); this holds what is being weighed for it.
 | [`tasks/0.8.md`](tasks/0.8.md) | 0.8, paused (plans only): `scroll`, Tab in a field and a key given back, moved from 0.7; reduced motion (V8-01); and two proposals |
 | [`tasks/hottyterm.md`](tasks/hottyterm.md) | hottyterm's own features and bugs, which change no spec item |
 | [`knowledge/wire-sizes.md`](knowledge/wire-sizes.md) | What 0.2's messages cost on the wire, and the script that measures them |
+| [`knowledge/sdlc-hotty-surf-pipeline.md`](knowledge/sdlc-hotty-surf-pipeline.md) | For the SDLC Agent: where hotty-surf's checks and gate cost time, what misled, and proposals (2026-11-10) |
 | [`knowledge/ghostty-physical-key-escape.md`](knowledge/ghostty-physical-key-escape.md) | A synthetic keymap's characters arrive as Escape under kitty flag 8, in Ghostty and hottyterm |
 | [`journal/`](journal/) | One file per month, one bullet per leg |
 
