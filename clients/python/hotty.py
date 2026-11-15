@@ -1540,7 +1540,7 @@ ACTIONS = (
     "delete-char-backward", "delete-char-forward", "delete-word-backward", "delete-word-forward",
     "delete-to-line-start", "delete-to-line-end", "line-previous", "line-next", "page-up", "page-down",
     "input-start", "input-end", "select-all", "newline", "submit", "program", "prefix",
-    "copy", "cut", "paste", "undo", "redo",
+    "copy", "cut", "paste", "undo", "redo", "default",
 ) + (
     "scroll-up", "scroll-down", "scroll-left", "scroll-right", "scroll-page-up", "scroll-page-down",
     "scroll-half-page-up", "scroll-half-page-down", "scroll-start", "scroll-end",
@@ -1937,6 +1937,7 @@ class Keymap:
         self.multiline = multiline
         self.platform = platform or Platform()
         self.field = False  # a field's keymap, from resolve: it may give tab
+        self.base = None  # a field's default keymap, which `default` gives a key back to
 
     def bind(self, key, action, written=None):
         """Binds a canonical key, mod read; `written` is the key with `mod`
@@ -2003,6 +2004,8 @@ class Keymap:
         if k is None or k in _UNBOUND:
             return None
         a = self._bound(k)
+        if a == "default":
+            return self.base.lookup(k) if self.base is not None else (INSERT if key_text(k) is not None else None)
         if a is not None:
             return None if a in ("program", "prefix") or (a in MULTILINE_ACTIONS and not self.multiline) else a
         return INSERT if key_text(k) is not None else None
@@ -2023,7 +2026,7 @@ def _bindings(platform, value):
             continue
         text, a = b[:i], b[i + 1:]
         k, w = read_key(platform, text), _read(text, platform.mod, True)
-        if k is None or a not in ACTIONS or (k in _UNBOUND and (k, a) != ("tab", "program")):
+        if k is None or a not in ACTIONS or (k in _UNBOUND and not (k == "tab" and a in ("program", "default"))):
             continue
         yield k, a, w
 
@@ -2077,6 +2080,8 @@ def resolve(platform, multiline, *values):
             k = read_key(platform, key)
             if k is not None and k not in _UNBOUND:
                 m.bind(k, a, _read(key, platform.mod, True))
+    m.base = Keymap(multiline, platform)
+    m.base.bindings, m.base.written = dict(m.bindings), dict(m.written)
     for v in values:
         for k, a, w in _bindings(platform, v):
             if a not in SCROLL_ACTIONS:

@@ -660,7 +660,7 @@ host.
 - **`Keymap`** is a set of bindings, key to action, read on a Platform.
   `ParseKeymap(platform, value)` reads a `data-keys` value as SPEC.md
   §10.2 has hosts read it, dropping the bindings a host ignores (it keeps
-  `tab=program`, which a field honours), each key
+  `tab=program`, which a field honours, and `tab=default`), each key
   with `ReadKey`: on `ctrl`, `mod+a` and `ctrl+a` are one key, the later
   binding's. `Format()` writes one back: each key once, where it was
   first bound, as its last binding wrote it, with its last action, as
@@ -671,7 +671,9 @@ host.
   an `input` or for a multi-line field, then each `data-keys` value in
   turn, the root's first. A binding to a scroll action is left out where
   it stands, in its own value too: it neither acts nor overrides an
-  earlier binding of its key (SPEC.md §10.2).
+  earlier binding of its key (SPEC.md §10.2). A binding to `default`
+  overrides as any other, and gives the key back: `Lookup` then answers
+  as with no `data-keys`, from the default keymap or `insert`.
 - **`Binds(key)`** says whether a keymap binds the key, or, for a key with
   `shift` that is not a character and that it does not bind, the key
   without `shift` (SPEC.md §10.2). A host that has two names for a press
@@ -703,7 +705,9 @@ host.
   the program, and from then on gives the program every key (SPEC.md
   §10.5).
 - **`Scroll(key)`** returns the scroll action a keymap binds the key to,
-  with the same fallback, or absent. A host asks it of the
+  with the same fallback, or absent. A key bound to `default` is none of
+  `Program`'s, `Prefix`'s or `Scroll`'s: it is the element's, as with no
+  keymap (SPEC.md §10.2, a key given back). A host asks it of the
   keymap it asks `Program` of, for a key the element does not use (SPEC.md
   §10.2, scrolling keys).
 - **`TerminalKeys`** is the SDK's keymap, the same in every SDK (§2.3): the

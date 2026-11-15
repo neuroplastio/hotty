@@ -17482,6 +17482,135 @@
    ]
   },
   {
+   "name": "a key given back: under a list that gives space and a to the program, a button with space=default presses on space and a field with both types them, while a button and a field without still give them to the program (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input{font-family:monospace}</style><div id=l tabindex=0 data-keys=\"space=program a=program\"><button id=b1>1</button><button id=b2 data-keys=\"space=default\">2</button><input id=f data-on=input data-keys=\"space=default a=default\"><input id=g data-on=input></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "3",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b1",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b2",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b2"
+      }
+     ]
+    },
+    {
+     "key": "a",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "f",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "value": " ",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": "a",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "value": " a",
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "g",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "value": " a",
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "key": " ",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "a",
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
    "name": "a key with Shift that no binding names does what the key does without it, selecting as it moves; a binding that names it with Shift wins (SPEC \u00a710.2)",
    "steps": [
     {
@@ -31243,6 +31372,79 @@
    },
    "program": {
     "tab": true
+   }
+  },
+  {
+   "name": "default is an action a keymap keeps, tab=default too; a key is written once, where it was first bound, with its last action (SPEC \u00a710.2)",
+   "parse": "space=program space=default a=default tab=default",
+   "format": "space=default a=default tab=default"
+  },
+  {
+   "name": "in a text field, default gives a key back as if no element above had bound it: a character types, a key of the default keymap does what it has it do, Shift's fallback follows, and tab moves focus again (SPEC \u00a710.2)",
+   "multiline": false,
+   "keys": [
+    "space=program a=program arrow_left=program tab=program",
+    "space=default a=default arrow_left=default tab=default"
+   ],
+   "lookup": {
+    "space": "insert",
+    "a": "insert",
+    "arrow_left": "char-backward",
+    "shift+arrow_left": "char-backward",
+    "tab": null
+   },
+   "selects": {
+    "shift+arrow_left": true
+   },
+   "program": {
+    "space": false,
+    "a": false,
+    "arrow_left": false,
+    "tab": false
+   }
+  },
+  {
+   "name": "default in a multi-line field gives back the default keymap's line and page moves (SPEC \u00a710.2)",
+   "multiline": true,
+   "keys": [
+    "arrow_up=program page_down=program",
+    "arrow_up=default page_down=default"
+   ],
+   "lookup": {
+    "arrow_up": "line-previous",
+    "page_down": "page-down"
+   }
+  },
+  {
+   "name": "default is an override like any other: a nearer binding of the key wins over it (SPEC \u00a710.2)",
+   "multiline": false,
+   "keys": [
+    "space=program",
+    "space=default",
+    "space=program"
+   ],
+   "lookup": {
+    "space": null
+   },
+   "program": {
+    "space": true
+   }
+  },
+  {
+   "name": "outside a text field, a key bound to default is neither the program's, a prefix nor a scroll (SPEC \u00a710.2)",
+   "keys": [
+    "space=program arrow_down=scroll-down g=prefix",
+    "space=default arrow_down=default g=default"
+   ],
+   "program": {
+    "space": false,
+    "g": false
+   },
+   "prefix": {
+    "g": false
+   },
+   "scroll": {
+    "arrow_down": null
    }
   },
   {

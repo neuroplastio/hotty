@@ -1841,10 +1841,11 @@ tab, line feed, form feed, carriage return), as HTML's space-separated
 tokens are. A binding is
 `key=action`, split at its last `=`: the key is read as §10.4 reads one
 (`ctrl+a`, `mod+s`, `alt+arrow_left`; `alt+==line-start` binds `alt+=`), and the
-action is one of the table below or a scroll action (*Scrolling keys*). A
+action is one of the table below or a scroll action (*Scrolling keys*), or
+`default` (*A key given back*). A
 host **MUST** ignore a binding whose key does not parse or whose action it
 does not know, and bindings of `shift+tab` and `escape`, and of `tab` to
-anything but `program`, which keep their meaning above.
+anything but `program` or `default`, which keep their meaning above.
 
 **A field may give the program `tab`.** `tab=program` holds in a text
 field's keymap, wherever in it the binding stands, and only there:
@@ -1857,7 +1858,8 @@ field's keymap, wherever in it the binding stands, and only there:
 - Outside a text field a host ignores it, as every binding of `tab`, and
   focus order stays the host's. A field inside an element that binds it
   gives the program `tab`; a button beside it moves focus on `tab` as
-  before.
+  before, and a field inside it that binds `tab=default` too (*A key given
+  back*, below).
 
 The default keymap is the keys every host binds, then those of the host's
 platform modifier, `Mod` (§10.4), then the host's edit shortcuts. Every
@@ -1961,6 +1963,7 @@ The actions:
 | `submit` | commits the field (§9 `change`), then submits its form, if it is in one (§9 `submit`): what Enter does in a text `input` |
 | `program` | nothing: the key reaches the program |
 | `prefix` | nothing: the key reaches the program, and so does every key after it (§10.5) |
+| `default` | gives the key back to the host: what it does with no keymap (below, *A key given back*) |
 
 † Multi-line fields only: a `textarea` and an editing host.
 
@@ -2033,12 +2036,29 @@ program's own `a=focus`.
   and is not bound is looked up again without it. Only a text field starts
   from the default keymap.
 - **Outside a text field,** a keymap gives only `program`, `prefix` and
-  the scroll actions (below), and never `tab` (*Text fields*, above). Its other bindings still override farther
+  the scroll actions (below), and never `tab` (*Text fields*, above). A
+  binding to `default` takes a farther binding of its key back (below). Its other bindings still override farther
   ones key by key, but do nothing there: the element uses those keys as
   the table above says.
 - **With no element focused** there is no keymap. A program that wants
   keys in a surface with nothing to focus gives an element a `tabindex`
   and focuses it.
+
+**A key given back.** `key=default` in an element's keymap gives the key
+back to the host's own meaning, for that element and what is inside it, as
+if no element above had bound it. It is an override like any other: a
+nearer binding of the key still wins over it.
+- **In a text field** the key does what the default keymap has it do, or
+  types if it is a character, as in a field under no `data-keys`.
+- **Outside one** the key is the element's as the table at the start of
+  §10.2 has it, then the surface's scrolling keys' (§5.3), and otherwise
+  the program's as ordinary terminal input: `space` presses a button, and
+  an arrow scrolls.
+
+So a list that binds `space=program` to toggle its rows gives `space` back
+to a button inside it with `space=default`, and a field inside it types a
+space with the same binding. A browser's page does the same in script by
+not calling `preventDefault`; `default` is that, as data.
 
 So a program that works a list, a menu or a table with the arrows keeps
 them on the element that holds it. On a button in a scrolling surface,
@@ -3133,6 +3153,14 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   - **Shift+Tab and Escape stay,** so a user always has a way out of the
     field. Forward Tab past such a field takes Shift+Tab or a key the
     program binds: an accessibility cost a program takes on by binding it.
+- **Why a key given back.** Keymaps merge from the root down (§10.2), so
+  a key an element gives the program held for everything inside it, and
+  no action took it back. A list that binds Space to toggle its rows took
+  Space from a button inside it, which Space should press, and from a
+  field inside it, which should type a space. A framework that wrote such
+  a keymap put stand-ins on the button (`space=scroll-page-down`) and had
+  none for typing. `default` is the browser's model: the default action is
+  the host's, and an inner element keeps it by not taking it.
 - **Why `focus` names the element.** Those keys reach the program as
   terminal input, which names no element, and Tab moves focus inside the
   host. A program with a field and a list could not tell which one the
