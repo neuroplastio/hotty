@@ -194,8 +194,9 @@ the surface used it; absent, not checked. `"events"` as for a pointer step.
 bytes that are not hotty's. The vectors write `CSI ? 1002 h` and `CSI ?
 1006 h` together, so that the terminal reports the mouse's buttons and
 drags in the SGR encoding, `CSI ? 1002 l`, so that it reports them no
-longer, and `CSI ? 1049 h` and `CSI ? 1049 l`, the alternate screen and
-back. A runner whose host has no terminal of its own does to the host what
+longer, `CSI ? 1049 h` and `CSI ? 1049 l`, the alternate screen and
+back, and `ESC c`, a full reset, which ends the program's session (SPEC
+§2) and starts another. A runner whose host has no terminal of its own does to the host what
 a terminal does on these.
 
 **Menu** `{ "menu": "shown" | "pick", "expect": …, "name": str, "events":

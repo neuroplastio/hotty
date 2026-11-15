@@ -27,6 +27,11 @@ program → ESC ] 7279 ; a=doc:s=about ; <img src="cid:logo"> <h1>Deploys</h1> S
 
 (Payloads are shown decoded here; on the wire they are base64.)
 
+A session's resources are its own (stated in 0.8): no other program's
+document resolves your `cid:kit.css`, even where it sends one of the same
+name, and none can replace, delete or learn of yours. A multiplexer keeps
+its panes' resources apart in the same way.
+
 A `cid:` reference works wherever a document names something to load:
 
 - in the attributes `src`, `srcset` and `poster`, SVG's `href`, and the

@@ -995,6 +995,11 @@ stylesheet shared by several surfaces, an image, a font.
 - **Quota:** the host reports its quota under `limits.resources`. A resource
   that would exceed it is refused with `EQUOTA`. A resource is one message,
   so `limits.message` (§13) also caps the largest resource the host takes.
+- **One session's own:** a session's resources are its own. A host
+  **MUST NOT** resolve `cid:` against another session's resources, nor let
+  a session replace, delete or learn of them, even under the same name. A
+  multiplexer that carries several programs' sessions to one terminal
+  keeps them apart in the same way.
 - **The program's values stand:** a host that rewrites references in order
   to load them (to `blob:` URLs, say) **MUST** still treat the attribute as
   having the program's value: in morphs, in `inspect` (§16), and in event
@@ -2526,7 +2531,9 @@ A host **MUST** ensure that:
 - **a surface cannot read** the screen, the clipboard, other surfaces, or
   anything about the terminal beyond what §8 gives it. Events carry only the
   program's own ids and what the user entered into the program's own
-  surface.
+  surface;
+- **a session cannot reach another's resources** (§7.1), by name or by
+  content.
 
 **Defence in depth:**
 - Two independent layers are recommended: a sanitizer that removes what can

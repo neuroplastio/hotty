@@ -4458,6 +4458,91 @@
    ]
   },
   {
+   "name": "a session's resources are its own: after a full reset ends the session, a document of the next one that refers to a resource of the same name finds none, and one it sends itself is its own (SPEC \u00a77.1, \u00a712)",
+   "steps": [
+    {
+     "send": {
+      "a": "res",
+      "id": "tall",
+      "type": "text/css",
+      "q": "2"
+     },
+     "payload": "#d { height: calc(5 * var(--hotty-cell-h)) }"
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><link rel=stylesheet href=\"cid:tall\"><div id=d>x</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "auto",
+      "q": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "x",
+      "c": "20",
+      "r": "5"
+     }
+    },
+    {
+     "write": "\u001bc"
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "y",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><link rel=stylesheet href=\"cid:tall\"><div id=d>x</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "y",
+      "c": "20",
+      "r": "auto",
+      "f": "1",
+      "q": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "place",
+      "s": "y",
+      "c": "20",
+      "r": "1"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "res",
+      "id": "tall",
+      "type": "text/css",
+      "q": "2"
+     },
+     "payload": "#d { height: calc(2 * var(--hotty-cell-h)) }",
+     "events": [
+      {
+       "e": "fit",
+       "s": "y",
+       "detail": {
+        "r": 2
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "without f=1 nothing is heard; f=1 holds on the surface: placing again without it goes on hearing fit, f=0 stops it, and a placement starts from its own rows (SPEC \u00a75.2)",
    "steps": [
     {
