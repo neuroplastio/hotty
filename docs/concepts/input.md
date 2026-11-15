@@ -403,7 +403,8 @@ host → ESC ] 7279 ; a=ev:s=guide:e=view ; {"in": {"install": {"c": 0, "r": -3,
 - **When:** once the document is laid out, then each time what it would
   carry changes. While a scroll moves, the host waits for it to rest.
 
-To take the reader to an element, the program sends the `reveal` op
+To take the reader to an element, the program sends the `reveal` op, and
+to scroll by the keys' steps from a keymap of its own, the `scroll` op
 ([Updates](updates.md)).
 
 ## Touch in the cells

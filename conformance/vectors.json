@@ -13183,6 +13183,485 @@
    ]
   },
   {
+   "name": "scroll: a missing target is ENOTARGET with the id as detail, and a v that is no scroll action, none or an empty one too, is EINVAL; a surface not placed scrolls nothing and answers ok, with a target or with none (SPEC \u00a76.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<p id=a>a</p>"
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "t": "nope",
+        "v": "scroll-down"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "ENOTARGET",
+      "detail": "nope",
+      "i": "0"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "t": "a"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL",
+      "i": "0"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "t": "a",
+        "v": ""
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL",
+      "i": "0"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "t": "a",
+        "v": "start"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL",
+      "i": "0"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "t": "a",
+        "v": "down"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL",
+      "i": "0"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "t": "a",
+        "v": "SCROLL-DOWN"
+       }
+      ]
+     },
+     "reply": {
+      "a": "err",
+      "code": "EINVAL",
+      "i": "0"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "0"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "t": "a",
+        "v": "scroll-down"
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "re": "delta"
+     }
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "0"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "v": "scroll-end"
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "re": "delta"
+     }
+    }
+   ]
+  },
+  {
+   "name": "scroll moves as a key bound to its action would, with the surface never given the keyboard: scroll-end from the root takes it as far down as it goes and scroll-start back, and view reports where it came to rest (SPEC \u00a76.1, \u00a79.5)",
+   "requires": [
+    "scroll",
+    "view"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=a data-on=view>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div><div id=i>i</div><div id=j data-on=view>j</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "in": {
+         "a": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "v": "scroll-end"
+       }
+      ]
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "in": {
+         "j": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "v": "scroll-end"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "v": "scroll-start"
+       }
+      ]
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "in": {
+         "a": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "v": "scroll-up"
+       }
+      ]
+     },
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "scroll starts at the nearest element that scrolls, from the target outward, and where that cannot move goes outward to the root (SPEC \u00a76.1)",
+   "requires": [
+    "scroll",
+    "view"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#v{height:calc(2*var(--hotty-cell-h));overflow:auto}</style><div id=v><div id=a data-on=view>a</div><div id=b>b</div></div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div><div id=i>i</div><div id=j data-on=view>j</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "in": {
+         "a": {
+          "c": 0,
+          "r": 0,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": false
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "t": "a",
+        "v": "scroll-end"
+       }
+      ]
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "in": {
+         "j": {
+          "c": 0,
+          "r": 3,
+          "w": 4,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "along an axis the document does not scroll, scroll does nothing and is no error (SPEC \u00a76.1)",
+   "requires": [
+    "scroll",
+    "view"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}p{margin:0;white-space:nowrap;height:var(--hotty-cell-h)}span{display:inline-block;width:calc(20*var(--hotty-cell-w))}</style><p><span id=l data-on=view>l</span><span id=r data-on=view>r</span></p>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "2",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "view",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "in": {
+         "l": {
+          "c": 0,
+          "r": 0,
+          "w": 20,
+          "h": 1
+         }
+        },
+        "end": true
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "0"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "v": "scroll-right"
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "re": "delta"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "0"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "scroll",
+        "v": "scroll-end"
+       }
+      ]
+     },
+     "reply": {
+      "a": "ok",
+      "re": "delta"
+     },
+     "events": []
+    }
+   ]
+  },
+  {
    "name": "scroll snapping: in a box 30.5 rows tall under scroll-snap-type: y mandatory, rows a cell tall with scroll-snap-align: start, and below them a note that aligns nothing, Page Down comes to rest on the last row, whole at the top, however far the host's page goes, and not in the note; Page Up comes back to the first (SPEC \u00a75.3, \u00a79.5)",
    "requires": [
     "scroll",
@@ -23693,6 +24172,115 @@
        ]
       },
       "payload_b64": "gaNvcHORgqJvcKZyZXZlYWyhdKJzMw=="
+     }
+    }
+   ]
+  },
+  {
+   "name": "scroll is op=scroll with the action in v, and t only for a target (SDK.md \u00a73.4.3)",
+   "build": "scroll",
+   "args": {
+    "surface": "x",
+    "target": "code",
+    "action": "scroll-right"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "delta",
+       "s": "x",
+       "q": "2"
+      },
+      "body": {
+       "ops": [
+        {
+         "op": "scroll",
+         "t": "code",
+         "v": "scroll-right"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORg6JvcKZzY3JvbGyhdKRjb2RloXasc2Nyb2xsLXJpZ2h0"
+     }
+    }
+   ]
+  },
+  {
+   "name": "scroll with no target sends no t: the root scrolls",
+   "build": "scroll",
+   "args": {
+    "surface": "x",
+    "action": "scroll-page-down"
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "delta",
+       "s": "x",
+       "q": "2"
+      },
+      "body": {
+       "ops": [
+        {
+         "op": "scroll",
+         "v": "scroll-page-down"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHORgqJvcKZzY3JvbGyhdrBzY3JvbGwtcGFnZS1kb3du"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a delta of scroll ops: a count is as many ops, each with its v",
+   "build": "delta",
+   "args": {
+    "surface": "x",
+    "ops": [
+     {
+      "op": "scroll",
+      "value": "scroll-down"
+     },
+     {
+      "op": "scroll",
+      "value": "scroll-down"
+     },
+     {
+      "op": "scroll",
+      "target": "code",
+      "value": "scroll-left"
+     }
+    ]
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "delta",
+       "s": "x",
+       "q": "2"
+      },
+      "body": {
+       "ops": [
+        {
+         "op": "scroll",
+         "v": "scroll-down"
+        },
+        {
+         "op": "scroll",
+         "v": "scroll-down"
+        },
+        {
+         "op": "scroll",
+         "t": "code",
+         "v": "scroll-left"
+        }
+       ]
+      },
+      "payload_b64": "gaNvcHOTgqJvcKZzY3JvbGyhdqtzY3JvbGwtZG93boKib3Cmc2Nyb2xsoXarc2Nyb2xsLWRvd26Dom9wpnNjcm9sbKF0pGNvZGWhdqtzY3JvbGwtbGVmdA=="
      }
     }
    ]

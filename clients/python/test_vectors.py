@@ -118,6 +118,7 @@ def build(b):
         "remove_attr": lambda: hotty.remove_attr(a["surface"], a["target"], a["name"], **ro),
         "morph_to": lambda: hotty.morph_to(a["surface"], a["target"], a["html"], **ro),
         "reveal": lambda: hotty.reveal(a["surface"], a["target"], a.get("where", ""), **ro),
+        "scroll": lambda: hotty.scroll(a["surface"], a.get("target", ""), a["action"], **ro),
         "res": lambda: hotty.res(a["id"], a["mime"], a["data"], **ro),
         "del_res": lambda: hotty.del_res(a["id"], **ro),
         "del": lambda: hotty.delete(a["surface"], **ro),

@@ -54,6 +54,7 @@ delta.
 | `before`, `after` | adds the nodes of `v` before or after it |
 | `remove` | removes it |
 | `reveal` | scrolls it into view: its top with `start`, its bottom with `end`, or as little as it takes |
+| `scroll` | scrolls from it (no target: the root) as a key bound to the scroll action `v` would, one of the host's steps (new in 0.8) |
 
 `text` and `var` are the ops a dashboard sends every frame, and a host
 should make them cheap. Most of what changes often fits one of them. A
@@ -72,6 +73,14 @@ send its last line again as it changes.
 the target is in view, and only in a document that scrolls
 ([Surfaces](surfaces.md#scrolling-inside-a-document)). It moves neither
 focus nor the keyboard.
+
+`scroll` changes no node either. It is for a program that keeps the
+keyboard and its own keymap, such as a reader's `j` and `k`: each op moves
+one step of the host's, the step the action's key takes
+([§10.2](../../SPEC.md#scrolling-keys)), from the nearest element that
+scrolls around the target. A count is as many ops in one delta. Where
+nothing can move, it does nothing, and the program hears where things came
+to rest from `view` ([Input](input.md)).
 
 ## Why ids
 

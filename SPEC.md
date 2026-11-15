@@ -600,16 +600,18 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
     the root included, as in a browser: `scroll-snap-type`,
     `scroll-snap-align` and `scroll-padding`. A scroll comes to rest where
     they say, always on a snap position under `mandatory`, and under
-    `proximity` on one it ends near: after a key's step or a page, after the
-    wheel once its gesture ends, and after `reveal` (§6.1). The host's steps
+    `proximity` on one it ends near: after a key's step or a page, and a
+    `scroll` op's (§6.1), after the wheel once its gesture ends, and after
+    `reveal` (§6.1). The host's steps
     stay its own; snapping is where they end. So a document laid out in rows
     of cells, each row `scroll-snap-align: start` under `scroll-snap-type: y
     mandatory`, comes to rest with a whole row at its top, unless it is
     scrolled as far as it goes.
   - Scrolling is local: the program hears of it only where it asks, which
-    elements are in view (§9.5), and moves it only by focus (§10.1) or by
-    bringing an element into view (`reveal`, §6.1). A delta keeps the
-    offsets (§6.2), and a new document starts at the top left.
+    elements are in view (§9.5), and moves it only by focus (§10.1), by
+    bringing an element into view (`reveal`, §6.1), or by the steps a
+    scrolling key takes (`scroll`, §6.1). A delta keeps the offsets
+    (§6.2), and a new document starts at the top left.
 - When the cell size changes, the rectangle keeps its cells and changes
   its pixels:
   - **A zoom**, the user enlarging or shrinking the terminal for the
@@ -752,6 +754,7 @@ they apply. Each op is a map:
 | `text` | text | replace the target's children with one text node |
 | `var` | a value | set the custom property `--k` on the target (a `k` that already starts with `--` is used as is) |
 | `reveal` | `start`, `end`, or none | scroll the target into view (below) |
+| `scroll` | a scroll action (§10.2) | scroll as a key bound to the action would, from the target (below) |
 
 - **One unit.** A host applies a delta's ops in order and shows none of
   the states between them, as if they were bracketed in synchronized
@@ -762,9 +765,10 @@ they apply. Each op is a map:
   decode (§3.3), is not such a map, or has no ops; an op is not a map,
   names an op the table does not have, or holds `op`, `t`, `k` or `v` as
   anything but a str; `t` is missing or empty where the op needs one
-  (every op but `morph`, for which an empty `t` is none), or `k` for
-  `attr`, `unattr` and `var`; or `reveal` has a `v` other than `start` or
-  `end`. Where one op is at
+  (every op but `morph`, for which an empty `t` is none, and `scroll`, for
+  which it is the root), or `k` for `attr`, `unattr` and `var`; or
+  `reveal` has a `v` other than `start` or `end`, or `scroll` one that is
+  not a scroll action (§10.2). Where one op is at
   fault, the reply names the first such by its index, `i` (§3.6). An op
   that takes a `v` and has none takes it as empty; a `v` that an op does
   not take is ignored, as is a key of an op that this table does not name
@@ -788,6 +792,25 @@ they apply. Each op is a map:
   moves nothing. It moves neither focus nor the keyboard (§10), and sends
   no event of its own: elements that report whether they are in view
   report it as after any scroll (§9.5).
+- **Scroll** changes no node. It scrolls as a key bound to its `v` would
+  with focus on the target (§10.2, *Scrolling keys*), whether the surface
+  has the keyboard or not: the nearest element that scrolls, from the
+  target outward, itself included, or the root when `t` is empty. Where
+  that cannot move that way, it goes outward as a gesture does (§5.3), as
+  far as `overscroll-behavior` lets it, and never past the root.
+  - **One step** of the host's for each op, the one the action's key
+    takes, so a program scrolls by a count with as many ops. A host that
+    animates the key animates the op, and each op starts from where the
+    one before it was going, not from where the box is drawn, so n ops
+    move n steps. It comes to rest on a snap position as the key's step
+    does (§5.3). An op stops the momentum of a gesture, and a gesture
+    takes over from an op still moving.
+  - **Nothing to move** is no error. Where nothing it may reach can move,
+    along an axis the document does not scroll (§5.1 `scroll`), and in a
+    surface not placed, it does nothing.
+  - Like `reveal`, it moves neither focus nor the keyboard (§10), and
+    sends no event of its own: elements that report whether they are in
+    view report it once the scroll comes to rest (§9.5).
 
 ### 6.2 Morph
 
@@ -2051,6 +2074,9 @@ space=scroll-page-down shift+space=scroll-page-up b=scroll-page-up"`
 (`shift+space`, or it would page down as `space` does). Its buttons keep
 `space`, and its fields type every letter.
 
+A program that keeps the keyboard, or scrolls only on a condition of its
+own, scrolls by the same steps with the `scroll` op (§6.1).
+
 ### 10.3 Key releases
 
 hotty has no key events of its own. A program that needs to know when a key is
@@ -2517,7 +2543,7 @@ A host conforms to hotty version 0.7 when:
 
 The vectors check replies, error codes, every delta op, morph, context
 parsing, `a=field` and revisions, resources, drags and their steps, presses with Alt, secondary presses and long presses, `fit`, hover,
-`area`, scrolling and scroll snapping, `reveal` and `view`, touch in the
+`area`, scrolling and scroll snapping, `reveal`, `scroll` and `view`, touch in the
 cells, backdrops, prefixes, edit commands, menus, keymaps and the envelope,
 and their `keys`, `keymap` and `edit` sections a host's key names (§10.4), keymaps and
 actions (§10.2). They inspect documents and events, not pixels. The vectors
@@ -3121,6 +3147,23 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     it would move the keyboard from where the user is. Its payload names
     the alignments a reader needs, those of `scrollIntoView`; across,
     where nothing is read in order, as little as it can.
+- **Why a `scroll` op.** Scrolling keys (§10.2) serve a program that can
+  hand its keys to the host as data. One that keeps the keyboard in the
+  terminal, with a keymap of its own, its modes, counts and the user's
+  configuration, cannot, and some of its keys scroll only on a condition
+  of its own: `j` in a reader scrolls through a block taller than the
+  window, and moves to the next block once the block's end shows. Prose
+  has no element per line for `reveal` to bring into view.
+  - **The host's steps, not an amount.** The host wraps the prose, so
+    rows of the terminal do not map onto its lines, and pixels are not
+    the program's unit. The steps are those the user's own keys take,
+    so the program's keys and the surface's agree.
+  - **From a target, as a key from focus,** so one rule says what
+    scrolls: a code block that scrolls across takes `h` and `l`, and the
+    document around it `j` and `k`.
+  - **Still local.** Gestures stay the host's, the program hears where a
+    scroll came to rest only from `view`, and an op that can move
+    nothing does nothing, as a key does.
 - **Why scroll snapping.** A document laid out in rows of cells, a list
   or a file's lines, scrolls by the host's steps, which are not rows:
   after a page a box shows part of a row at its top, and an arrow stops

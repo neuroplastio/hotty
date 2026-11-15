@@ -215,7 +215,7 @@ surface covers stay what the program chose. `scrollbar-width`,
 `scrollbar-color` and `scrollbar-gutter` style them.
 
 A scroll comes to rest where CSS Scroll Snap says, as in a browser (new in
-0.6): after a key, a page, the wheel and `reveal`. The host's steps are
+0.6): after a key, a page, the wheel, `reveal` and `scroll`. The host's steps are
 not rows, so a list of rows that should always show a whole row at its
 top asks for it:
 
@@ -226,7 +226,8 @@ li { height: var(--hotty-cell-h); scroll-snap-align: start; }
 
 Scrolling is local: the program hears of it only where elements ask to be
 told when they are in view ([§9.5](../../SPEC.md#95-view)). It moves the
-scroll only by moving focus, or with `reveal`
+scroll only by moving focus, with `reveal`, or with `scroll` (new in 0.8),
+which takes the steps a scrolling key takes
 ([Updates](updates.md#the-ops)). A delta keeps the offsets, and a new
 document starts at the top left.
 

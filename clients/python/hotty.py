@@ -82,7 +82,7 @@ MOD_ALT = 2
 MOD_CTRL = 4
 MOD_SUPER = 8
 
-OPS = ("morph", "inner", "replace", "append", "prepend", "before", "after", "remove", "attr", "unattr", "text", "var", "reveal")
+OPS = ("morph", "inner", "replace", "append", "prepend", "before", "after", "remove", "attr", "unattr", "text", "var", "reveal", "scroll")
 
 REPLY_ALWAYS = 0
 REPLY_ON_ERROR = 1
@@ -389,7 +389,7 @@ class Op:
 
 # The ops that always carry a value `v`, even an empty one (SPEC §6.1);
 # `reveal` carries it only as "start" or "end".
-_VALUED = frozenset(("morph", "inner", "replace", "append", "prepend", "before", "after", "attr", "text", "var"))
+_VALUED = frozenset(("morph", "inner", "replace", "append", "prepend", "before", "after", "attr", "text", "var", "scroll"))
 _KEYED = frozenset(("attr", "unattr", "var"))
 
 
@@ -459,6 +459,12 @@ def reveal_op(target, where=""):
     return Op("reveal", target, "", where)
 
 
+def scroll_op(target, action):
+    """Scrolls as a key bound to the scroll action would, from the target
+    outward (empty: the root), by one of the host's steps (SPEC §6.1)."""
+    return Op("scroll", target, "", action)
+
+
 def delta(surface, *ops, n=None, q=None):
     """Changes a surface's document with the ops given, applied in order and
     shown as one (SPEC §6.1). The body is one msgpack map, `{"ops": [...]}`;
@@ -491,6 +497,12 @@ def reveal(surface, target, where="", n=None, q=None):
     """Scrolls the target into view (SPEC §6.1): where is "start" or "end",
     or empty for as little as brings it into view."""
     return delta(surface, reveal_op(target, where), n=n, q=q)
+
+
+def scroll(surface, target, action, n=None, q=None):
+    """Scrolls a surface as a key bound to the scroll action would, from the
+    target outward (empty: the root); a count is as many ops (SPEC §6.1)."""
+    return delta(surface, scroll_op(target, action), n=n, q=q)
 
 
 def res(id, mime, data, n=None, q=None):
@@ -2313,6 +2325,11 @@ class Hotty:
 
     def reveal(self, surface, target, where=""):
         self.write(reveal(surface, target, where))
+
+    def scroll(self, surface, target, action, count=1):
+        """Scrolls by count of the host's steps for the scroll action, from
+        the target outward (empty: the root), in one delta (SPEC §6.1)."""
+        self.write(delta(surface, *(scroll_op(target, action) for _ in range(count))))
 
     def res(self, name, mime, data, quiet=None):
         self.write(res(name, mime, data, q=quiet))

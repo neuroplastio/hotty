@@ -210,8 +210,8 @@ And these sets, each value under its canonical name:
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
   `EBUDGET`, `ENOTERM`, `ESTALE`, `EVERSION` (SPEC.md §3.6);
 - **delta ops**: `morph`, `inner`, `replace`, `append`, `prepend`, `before`,
-  `after`, `remove`, `attr`, `unattr`, `text`, `var`, `reveal` (SPEC.md
-  §6.1);
+  `after`, `remove`, `attr`, `unattr`, `text`, `var`, `reveal`, `scroll`
+  (SPEC.md §6.1);
 - **quiet levels**: `ReplyAlways` 0, `ReplyOnError` 1, `NoReply` 2
   (SPEC.md §3.5).
 
@@ -269,6 +269,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | `RemoveAttr` | `Delta` with one op, `Unattr` | surface, target, name | 2 |
 | `MorphTo` | `Delta` with one op, `Morph` | surface, target, html | 2 |
 | `Reveal` | `Delta` with one op, `RevealOp`: `where` is `start`, `end`, or empty for the nearest (SPEC.md §6.1) | surface, target, where | 2 |
+| `Scroll` | `Delta` with one op, `ScrollOp`: `action` is a scroll action (SPEC.md §6.1, §10.2) | surface, target, action | 2 |
 | `SetField` | `a=field:s:t` and the change as msgpack (below; SPEC.md §6.4) | surface, target, change | 1 |
 | `Res` | `a=res:id:type` and the data | id, mime, data | 2 |
 | `DelRes` | `a=del:id` | id | 2 |
@@ -381,14 +382,15 @@ each op makes one:
 | `Text` | `text` | target, text |
 | `Var` | `var` | target, name, value |
 | `RevealOp` | `reveal` | target, where |
+| `ScrollOp` | `scroll` | target (empty: the root), action |
 
 The body is one msgpack map, `{"ops": [op, …]}`, each value in the smallest
 of its type's forms, and each op a map with its keys in this order:
 - `op`;
 - `t`, unless the target is empty;
 - `k`, for `attr`, `unattr` and `var`;
-- `v`: for an op that takes one (SPEC.md §6.1), always, even empty; for
-  `reveal`, only when `where` is `start` or `end`.
+- `v`: for an op that takes one (SPEC.md §6.1), always, even empty, as
+  `scroll`'s action; for `reveal`, only when `where` is `start` or `end`.
 
 Targets and values are not cleaned (§3.3): they travel in the body, as the
 document has them. A `Delta` of no ops is still sent, and the host answers
@@ -1088,8 +1090,8 @@ The canonical names, in each language's case.
 | `Place`, `PlaceAt` | `Place`, `PlaceAt` | `place`, `place_at` | `place`, `place_at` | `place`, `place_at` | `place`, `placeAt` |
 | `Hide`, `Delta` | `Hide`, `Delta` | `hide`, `delta` | `hide`, `delta` | `hide`, `delta` | `hide`, `delta` |
 | `Op` and its fields | `hotty.Op{Op, Target, Key, Value}` | `Op(op, target, key, value)` | a table with those keys | `Op { op, target, key, value }` | `{ op, target, key, value }` |
-| `Morph`, `Inner`, `Replace`, `Append`, `Prepend`, `Before`, `After`, `Remove`, `Attr`, `Unattr`, `Text`, `Var`, `RevealOp` | `hotty.OpMorph`, `hotty.OpInner`, …, `hotty.OpText`, `hotty.OpVar`, `hotty.OpReveal` (`hotty.Text` is a detector's state) | `morph`, `inner`, …, `text`, `var`, `reveal_op` | as Python | as Python | `morph`, `inner`, …, `text`, `varOp`, `revealOp` |
-| `SetText`, `SetVar`, `SetAttr`, `RemoveAttr`, `MorphTo`, `Reveal` | the same | `set_text`, `set_var`, `set_attr`, `remove_attr`, `morph_to`, `reveal` | as Python | as Python | `setText`, `setVar`, `setAttr`, `removeAttr`, `morphTo`, `reveal` |
+| `Morph`, `Inner`, `Replace`, `Append`, `Prepend`, `Before`, `After`, `Remove`, `Attr`, `Unattr`, `Text`, `Var`, `RevealOp`, `ScrollOp` | `hotty.OpMorph`, `hotty.OpInner`, …, `hotty.OpText`, `hotty.OpVar`, `hotty.OpReveal`, `hotty.OpScroll` (`hotty.Text` is a detector's state) | `morph`, `inner`, …, `text`, `var`, `reveal_op`, `scroll_op` | as Python | as Python | `morph`, `inner`, …, `text`, `varOp`, `revealOp`, `scrollOp` |
+| `SetText`, `SetVar`, `SetAttr`, `RemoveAttr`, `MorphTo`, `Reveal`, `Scroll` | the same | `set_text`, `set_var`, `set_attr`, `remove_attr`, `morph_to`, `reveal`, `scroll` | as Python | as Python | `setText`, `setVar`, `setAttr`, `removeAttr`, `morphTo`, `reveal`, `scroll` |
 | `SetField`, `FieldChange` and its fields | `hotty.SetField`, `hotty.FieldChange{Rev, Value, From, To, Text, Sel, Checked}`, absent as nil pointers | `set_field`, `FieldChange(rev, value, from_, to, text, sel, checked)`, absent as `None` | `set_field`, a table with those keys | `set_field`, `FieldChange { rev, value, from, to, text, sel, checked }`, each but `rev` an `Option` | `setField`, `{ rev, value, from, to, text, sel, checked }`, absent as `undefined` |
 | `Res`, `DelRes` | `Res`, `DelRes` | `res`, `del_res` | `res`, `del_res` | `res`, `del_res` | `res`, `delRes` |
 | `Del`, `DelAll` | `Del`, `DelAll` | `delete`, `del_all` | `del`, `del_all` | `del`, `del_all` | `del`, `delAll` |
