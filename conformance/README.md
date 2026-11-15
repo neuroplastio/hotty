@@ -58,7 +58,7 @@ it. A list names several, all required:
   runner offers a key step's key as pressed, by both its names, and then
   as the bytes a terminal sends for it, as the host would;
 - `"speaks-0.6"`: a host that speaks 0.6 as well as 0.7 (SPEC §15;
-  HOST.md §4), which answers a `v=0.6` query in 0.6 and keeps a 0.6
+  HOST.md §5), which answers a `v=0.6` query in 0.6 and keeps a 0.6
   session as 0.6 has it. A host that speaks 0.7 only, and an SDK's test host
   (SDK.md §4.4) that does, skips these vectors. The vectors without it hold
   for every 0.7 host: `v=0.6,0.7` is answered in 0.7, and an `EVERSION`

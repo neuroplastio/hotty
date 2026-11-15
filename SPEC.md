@@ -111,7 +111,11 @@ when, they appear in bold.
   emulator itself. It can also be a pty shim between the program and a
   terminal (a *polyfill*; §14). A multiplexer between a program and a
   terminal either is a host itself, or passes hotty through and keeps
-  placements consistent with its own screen and scrollback.
+  placements consistent with its own screen and scrollback. What answers a
+  program's query is its host: one that passes hotty through and answers
+  it lists in `features` (§4) only the features it knows and carries
+  whole, every key, command and event each brings, and leaves out the
+  rest, a feature added after it was written included.
 - **Session**: a program's connection to a host, from the first hotty command
   until a full reset or the end of the program's output.
 - **Surface**, **resource**, **delta**, **event**: §5, §7, §6 and §9.
@@ -1110,6 +1114,10 @@ button:enabled, input:is([type=button], [type=submit], [type=reset]):enabled {
 ```
 
 - `prefers-color-scheme` follows the terminal's scheme.
+- `prefers-reduced-motion` follows the user's setting on the system the
+  terminal runs on: `reduce` when they asked it for less motion,
+  `no-preference` otherwise, and when the host cannot tell. When the
+  setting changes, the host draws every surface again, as for a new theme.
 - **The palette dresses the controls.** Fields, buttons, checks, focus,
   links and selected text take the terminal's colours, not the engine's,
   so they look the same on every host and like the terminal around them.
@@ -1131,7 +1139,9 @@ button:enabled, input:is([type=button], [type=submit], [type=reset]):enabled {
   snapped to device pixels, at every zoom: `border-top: var(--hotty-px)
   solid`.
 - When the terminal's theme or font changes, the host updates the
-  stylesheet and draws every surface again. A zoom changes `--hotty-px`
+  stylesheet and draws every surface again. The theme is the terminal's
+  colours as they are now, including those a program set with OSC 4, 10
+  and 11, and those it reset with OSC 104, 110 and 111. A zoom changes `--hotty-px`
   alone, neither `--hotty-cell-*` nor `font-size`: the host draws every
   surface again at the new scale (§5.3).
 

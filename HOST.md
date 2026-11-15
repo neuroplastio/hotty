@@ -29,8 +29,9 @@ ask for it. A document may use what it describes, but it can't count on it
 1. Introduction
 2. Fonts
 3. The secondary press
-4. Speaking 0.6 as well
-5. Implementations
+4. Reduced motion
+5. Speaking 0.6 as well
+6. Implementations
 
 Appendix: A. Rationale
 
@@ -186,20 +187,34 @@ Shift and Alt come first (SPEC.md §9.2). With either held, the host
 handles the press as one on the cells beneath the surface: the terminal's
 own menu with Shift, and the program's mouse report with Alt.
 
-In a 0.6 session (§4.1) Alt is all a 0.6 program could meet of this: see
+In a 0.6 session (§5.1) Alt is all a 0.6 program could meet of this: see
 there.
 
 The keyboard's way to a menu is not the host's. `shift+f10` and the Menu key
 reach the program as keys (SPEC.md §10.2), and a host adds nothing for them.
 
-## 4. Speaking 0.6 as well
+## 4. Reduced motion
+
+Where a host reads the setting that `prefers-reduced-motion` follows
+(SPEC.md §8):
+
+- **GTK:** `gtk-enable-animations` in GtkSettings; false is `reduce`.
+  Watch `notify::gtk-enable-animations` for changes.
+- **macOS:** `NSWorkspace.shared.accessibilityDisplayShouldReduceMotion`,
+  and `NSWorkspace.accessibilityDisplayOptionsDidChangeNotification` for
+  changes.
+- **A browser** (the xterm.js addon): the page's own
+  `matchMedia('(prefers-reduced-motion: reduce)')`. The browser already
+  applies it to the surfaces' CSS, so the addon does nothing.
+
+## 5. Speaking 0.6 as well
 
 hotty's own stack, hosts and SDKs, speaks 0.6 along with 0.7. SPEC.md §15
 lets a host speak several versions, and the rest is what the stack does
 with it. A host that does not speak 0.6 answers a 0.6 program with
 `EVERSION` (SPEC.md §4), and the program falls back.
 
-### 4.1 A 0.6 session
+### 5.1 A 0.6 session
 
 - **A host that speaks 0.6 as well** answers a program that lists 0.6 and
   not 0.7 in 0.6, and speaks 0.6 to it from then on (SPEC.md §4). A query
@@ -216,7 +231,7 @@ with it. A host that does not speak 0.6 answers a 0.6 program with
 - **A 0.7 program on a 0.6 host** is answered in 0.6 and meets no
   secondary press; SDK.md §3.8 and §4.7 say what an SDK does.
 
-## 5. Implementations
+## 6. Implementations
 
 | host | how it ships the font | since |
 | --- | --- | --- |

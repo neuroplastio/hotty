@@ -953,13 +953,23 @@ implementation's host, over a pipe.
 ### 4.5 Relay
 
 A relay stands between programs and a host, as a multiplexer does (SPEC.md
-§2): it answers the query with the host's capabilities, gives each
+§2): it answers the query with the host's capabilities, listing only the
+features it knows and carries whole and leaving out the rest, so a
+feature the host adds later never reaches a program it can't serve, gives
+each
 program's surfaces names of their own on the host, places them where the
 program's pane is, and passes events back to the program whose surface they
 came from. This section is reserved: what a relay does will be specified
 here, with its own vectors.
 
 Until then, what the protocol already asks of one:
+- **Its features** are what it carries (SPEC.md §2): an allowlist, not a
+  denylist of what it strips. A relay that places a program's backdrops
+  (SPEC.md §5.2) without their `b` must not list `backdrop`.
+- **Its own surfaces under a program's:** a relay that places surfaces
+  of its own beside its programs', such as a canvas behind their panes,
+  keeps its own below, by `z`, and replaces a document rather than
+  creating the surface again, which keeps its place (SPEC.md §5.1, §5.2).
 - **A `hit`** (SPEC.md §9.7) it passes on with the host's name for the
   surface, and the cell as the program counts it, since the surface's top
   left cell is the same for both. It answers `ENOENT` for a surface it
