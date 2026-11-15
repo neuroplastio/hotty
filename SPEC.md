@@ -1778,7 +1778,9 @@ is offered the second time as the key that input reads as.
 - **`tab` and `shift+tab`** move between the surface's focusable elements, and
   the host sends `focus` for the one they move to (§10.1). Past the last
   one, or before the first, the surface loses the keyboard: the host sends
-  `blur` and the terminal has the keyboard again.
+  `blur` and the terminal has the keyboard again. The one exception is
+  `tab` in a text field whose keymap gives it the program (below, *Text
+  fields*).
 - **`escape`** is never used by the surface, except by a select's open list
   (below). It reaches the program, which decides, for instance by sending
   `a=blur`.
@@ -1841,8 +1843,21 @@ tokens are. A binding is
 (`ctrl+a`, `mod+s`, `alt+arrow_left`; `alt+==line-start` binds `alt+=`), and the
 action is one of the table below or a scroll action (*Scrolling keys*). A
 host **MUST** ignore a binding whose key does not parse or whose action it
-does not know, and bindings of `tab`, `shift+tab` and `escape`, which keep
-their meaning above.
+does not know, and bindings of `shift+tab` and `escape`, and of `tab` to
+anything but `program`, which keep their meaning above.
+
+**A field may give the program `tab`.** `tab=program` holds in a text
+field's keymap, wherever in it the binding stands, and only there:
+- The field gives the program `tab`, as any key bound to `program` (*Keys
+  for the program*, below). The program decides what it does: it completes
+  what was typed with `a=field` (§6.4), or moves focus itself with
+  `a=focus`.
+- `shift+tab` still moves focus back, and `escape` still reaches the
+  program, so the user always has a way out of the field.
+- Outside a text field a host ignores it, as every binding of `tab`, and
+  focus order stays the host's. A field inside an element that binds it
+  gives the program `tab`; a button beside it moves focus on `tab` as
+  before.
 
 The default keymap is the keys every host binds, then those of the host's
 platform modifier, `Mod` (§10.4), then the host's edit shortcuts. Every
@@ -2018,7 +2033,7 @@ program's own `a=focus`.
   and is not bound is looked up again without it. Only a text field starts
   from the default keymap.
 - **Outside a text field,** a keymap gives only `program`, `prefix` and
-  the scroll actions (below). Its other bindings still override farther
+  the scroll actions (below), and never `tab` (*Text fields*, above). Its other bindings still override farther
   ones key by key, but do nothing there: the element uses those keys as
   the table above says.
 - **With no element focused** there is no keymap. A program that wants
@@ -2130,7 +2145,8 @@ document is part of this one for:
 
 A host offers a surface that has the keyboard each key at most twice
 (§10.2), named as below each time. The surface uses a key that its focused
-element uses, `tab` and `shift+tab`, which move focus, and a key it scrolls
+element uses, `tab` and `shift+tab`, which move focus (but `tab` a field
+gives the program, §10.2), and a key it scrolls
 with (§5.3), but none after a prefix (§10.5). A press with two names, a
 physical key and a character, or a sided modifier key and a modifier key,
 is looked up by its physical name first, as myelin key names §3 has it:
@@ -3106,6 +3122,17 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   in a browser stops that with script (`preventDefault`); a surface has
   none, so the document says beforehand, in the `data-keys` it already
   reads for fields.
+- **Why a field may give the program Tab.** A command palette or a picker
+  completes what was typed on Tab, as shells and fuzzy finders do, and the
+  same program in its cells does. On a surface Tab moved focus, so a
+  palette whose field is its only focusable element handed the keyboard
+  back to the terminal instead.
+  - **Only a text field:** a button or a list has no reason to keep Tab,
+    and focus order stays the host's, as a browser's default is until a
+    page overrides it.
+  - **Shift+Tab and Escape stay,** so a user always has a way out of the
+    field. Forward Tab past such a field takes Shift+Tab or a key the
+    program binds: an accessibility cost a program takes on by binding it.
 - **Why `focus` names the element.** Those keys reach the program as
   terminal input, which names no element, and Tab moves focus inside the
   host. A program with a field and a list could not tell which one the

@@ -659,7 +659,8 @@ host.
   and none for any other key, or a key with `ctrl`, `alt` or `super`.
 - **`Keymap`** is a set of bindings, key to action, read on a Platform.
   `ParseKeymap(platform, value)` reads a `data-keys` value as SPEC.md
-  §10.2 has hosts read it, dropping the bindings a host ignores, each key
+  §10.2 has hosts read it, dropping the bindings a host ignores (it keeps
+  `tab=program`, which a field honours), each key
   with `ReadKey`: on `ctrl`, `mod+a` and `ctrl+a` are one key, the later
   binding's. `Format()` writes one back: each key once, where it was
   first bound, as its last binding wrote it, with its last action, as
@@ -681,13 +682,16 @@ host.
   when the key is not the field's (it reaches the program, or `tab` moves
   focus). `tab`, `shift+tab` and `escape` are never the field's, nor a key
   bound to `program` or `prefix`, or to an action the field does not
-  have.
+  have. Whether `tab` reaches the program or moves focus, `Program` says.
 - **`Selects(key)`** says whether the field selects with the key (SPEC.md
   §10.2, Shift selects): `Lookup` returns a move for it, and its name has
   `shift` (`shift+arrow_left`, `ctrl+shift+end`, not `alt+<`). A field
   then does the move with `Extend` (§4.6).
 - **`Program(key)`** says whether a keymap gives the key to the program: it
-  binds the key to `program` or `prefix`, with the fallback of `Binds`. On
+  binds the key to `program` or `prefix`, with the fallback of `Binds`.
+  `tab` it gives only on a field's keymap, from `Resolve`, where it is bound
+  to `program` (SPEC.md §10.2, a field may give the program `tab`); on any
+  other keymap `Program("tab")` is false, and `tab` moves focus. On
   an element that is not a text field, a host asks it
   of the element's keymap, `ParseKeymap` of its `data-keys` values joined
   with a space, the root's first, on the host's Platform, with no default

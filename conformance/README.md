@@ -347,8 +347,9 @@ the default edit shortcuts) where absent, in three forms:
   key: action | null } }`: `Resolve(platform, multiline, …)` with `TerminalKeys`
   first when `terminal_keys` is true, then each of `keys`. `Lookup` of each
   key of `lookup` must return its value: an action, `"insert"`, or `null`
-  when the key is not the field's. `Selects` of each key of `selects`, and
-  `Binds` of each key of `binds`, if there is one, must return its value;
+  when the key is not the field's. `Selects` of each key of `selects`,
+  `Binds` of each key of `binds`, and `Program` of each key of `program`,
+  if there is one, must return its value;
 - `{ "keys": [ … ], "program"?: { key: bool }, "prefix"?: { key: bool },
   "scroll"?: { key: action | null } }`: an element's keymap outside a text
   field, with no default keymap: `ParseKeymap` of `keys` joined with a

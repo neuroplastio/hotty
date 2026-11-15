@@ -1556,7 +1556,8 @@ MOVES = frozenset(("char-backward", "char-forward", "word-backward", "word-forwa
 _BACK = frozenset(("char-backward", "word-backward", "line-start", "line-previous", "page-up", "input-start"))
 # What Lookup returns for a key the field types.
 INSERT = "insert"
-# The keys a keymap never binds (SPEC.md §10.2).
+# The keys a keymap never binds (SPEC.md §10.2), but `tab=program`, which a
+# text field's keymap honours.
 _UNBOUND = ("tab", "shift+tab", "escape")
 
 # The SDK's keymap (SDK.md §3.10): Bubble Tea's text input and text area, but
@@ -1935,6 +1936,7 @@ class Keymap:
         self.written = {}  # key, mod read, to its last binding's key, canonical
         self.multiline = multiline
         self.platform = platform or Platform()
+        self.field = False  # a field's keymap, from resolve: it may give tab
 
     def bind(self, key, action, written=None):
         """Binds a canonical key, mod read; `written` is the key with `mod`
@@ -1953,6 +1955,8 @@ class Keymap:
         """The action bound to canonical key k, or, for a key with shift
         that is not a character and is not bound itself, to k without
         shift."""
+        if k in ("shift+tab", "escape"):
+            return None
         a = self.bindings.get(k)
         if a is None:
             mods, value, kind = _split(k)
@@ -1973,6 +1977,8 @@ class Keymap:
         a text field, a host asks it of the element's data-keys alone, before
         the element or a scroll uses it."""
         k = self._key(key)
+        if k == "tab" and not self.field:
+            return False
         return k is not None and self._bound(k) in ("program", "prefix")
 
     def prefix(self, key):
@@ -2017,7 +2023,7 @@ def _bindings(platform, value):
             continue
         text, a = b[:i], b[i + 1:]
         k, w = read_key(platform, text), _read(text, platform.mod, True)
-        if k is None or a not in ACTIONS or k in _UNBOUND:
+        if k is None or a not in ACTIONS or (k in _UNBOUND and (k, a) != ("tab", "program")):
             continue
         yield k, a, w
 
@@ -2060,6 +2066,7 @@ def resolve(platform, multiline, *values):
     data-keys value, the root's first, less their scroll actions."""
     platform = platform or Platform()
     m = Keymap(multiline, platform)
+    m.field = True
     for k, a in _DEFAULT + (("enter", "newline" if multiline else "submit"),) + _DEFAULT_MOD[platform.mod]:
         m.bind(k, a)
     edit = platform.edit if platform.edit is not None else default_edit(platform.mod)

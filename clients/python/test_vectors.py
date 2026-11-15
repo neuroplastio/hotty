@@ -451,7 +451,7 @@ def platform(v):
 
 
 def run_keymap(v):
-    if "program" in v or "scroll" in v or "prefix" in v:
+    if ("program" in v or "scroll" in v or "prefix" in v) and "lookup" not in v:
         m = hotty.parse_keymap(platform(v), " ".join(v["keys"]))
         for key, want in v.get("program", {}).items():
             got = m.program(key)
@@ -483,6 +483,10 @@ def run_keymap(v):
         got = m.binds(key)
         if got != want:
             return False, f"{key!r}: binds {got!r}, want {want!r}"
+    for key, want in v.get("program", {}).items():
+        got = m.program(key)
+        if got != want:
+            return False, f"{key!r}: program {got!r}, want {want!r}"
     return True, ""
 
 

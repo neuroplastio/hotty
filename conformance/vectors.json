@@ -17382,6 +17382,106 @@
    ]
   },
   {
+   "name": "a text field may give the program tab: with tab=program in its keymap tab reaches the program and focus stays, shift+tab still moves focus back and escape still reaches the program; a button under the same binding moves focus on tab, and a field without it too (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}input{font-family:monospace}</style><div data-keys=\"tab=program\"><input id=f><button id=b>b</button></div><input id=g>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "3",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "f",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Escape",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "g"
+      }
+     ]
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "blur",
+       "s": "x",
+       "t": null
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "f",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "blur",
+       "s": "x",
+       "t": null
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "a key with Shift that no binding names does what the key does without it, selecting as it moves; a binding that names it with Shift wins (SPEC \u00a710.2)",
    "steps": [
     {
@@ -31088,6 +31188,61 @@
     "tab": null,
     "escape": null,
     "shift+tab": null
+   }
+  },
+  {
+   "name": "a host keeps tab=program, and drops tab bound to anything else, shift+tab and escape bound to anything; the first binding of tab is the one kept (SPEC \u00a710.2)",
+   "parse": "tab=program shift+tab=program tab=prefix escape=program a=line-start",
+   "format": "tab=program a=line-start"
+  },
+  {
+   "name": "a text field may give the program tab: a field's keymap with tab=program, its own or a farther one, gives tab and nothing else; shift+tab and escape stay out, and tab is never the field's (SPEC \u00a710.2)",
+   "multiline": false,
+   "keys": [
+    "tab=program",
+    "a=line-start"
+   ],
+   "lookup": {
+    "tab": null,
+    "shift+tab": null,
+    "escape": null,
+    "a": "line-start"
+   },
+   "program": {
+    "tab": true,
+    "shift+tab": false,
+    "escape": false
+   },
+   "binds": {
+    "tab": true,
+    "shift+tab": false
+   }
+  },
+  {
+   "name": "without tab=program, a field gives the program no tab: tab bound to anything else is dropped and does not cancel a farther tab=program (SPEC \u00a710.2)",
+   "multiline": true,
+   "keys": [
+    "tab=line-end"
+   ],
+   "lookup": {
+    "tab": null
+   },
+   "program": {
+    "tab": false
+   }
+  },
+  {
+   "name": "a farther tab=program holds in a field under a nearer tab bound to another action, which a host drops (SPEC \u00a710.2)",
+   "multiline": false,
+   "keys": [
+    "tab=program",
+    "tab=line-end"
+   ],
+   "lookup": {
+    "tab": null
+   },
+   "program": {
+    "tab": true
    }
   },
   {
