@@ -10,9 +10,10 @@ path: changes
 
 ## 0.8
 
-A draft, as every 0.x is, written on 2026-11-15 and not yet released: the
-spec, SDK.md and the vectors are on hotty's `hotty-0.8` branch, and the
-SDKs and hosts follow on theirs.
+A draft, as every 0.x is, released on 2026-11-15 with its SDKs (the
+maintainer: "ship them"): hotty-go, hotty-ts, hotty-lua and hotty-rs
+0.8.0. The hosts, hotty-blitz, xterm-addon-hotty and hottyterm, follow:
+until a host of yours speaks 0.8, a 0.8 program meets it at 0.7.
 
 hotty's 0.8 hosts and SDKs speak 0.7 too (SPEC.md §15), so versions meet
 as follows (§4, §14):
