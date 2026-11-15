@@ -285,6 +285,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | `MenuShow` | `a=menu:show=1` and `{"seq": [str]}`, the keys typed; with none, no payload, which shows the top level (SPEC.md §10.7) | keys | 2 |
 | `MenuHide` | `a=menu:show=0` | — | 2 |
 | `Touch` | `a=touch` and `{"areas": [area]}` as msgpack (below); with no areas, no payload, which leaves none (SPEC.md §9.6) | areas | 2 |
+| `Hit` | `a=hit:s:c:r`: which element is at the surface's cell (c, r), counted from its top left cell, negative above and to its left (SPEC.md §9.7) | surface, c, r | 0 |
 
 - **`Doc`, `Place` and `SetField` answer errors**, since a refused document
   or placement (`EQUOTA`, `ENOENT`), and a field the user changed first
@@ -354,9 +355,10 @@ Every builder but `Query`, `Sync` and `WithdrawLate` takes two options:
   implies, whatever the order in which the program gives them.
 
 **`q` goes out only when the wire does not imply it** (SPEC.md §3.5): it is
-left out where it would be 0 with `n`, or 1 without, and for the query. So
-`Doc` and `Place` carry no `q`, a delta carries `q=2`, and `Doc` with `N(4)`
-carries `n=4` alone.
+left out where it would be 0 with `n`, or 1 without, and for the query.
+`Hit`, a query too, implies 0 with `n` or without, so it carries `q` only
+when `Q` gives another level. So `Doc` and `Place` carry no `q`, a delta
+carries `q=2`, and `Doc` with `N(4)` carries `n=4` alone.
 
 `Query` takes one option of its own, **`Late`** (`late=1`): the program
 asks for a late answer (SPEC.md §4).
@@ -575,6 +577,7 @@ field as its type.
 | `Code`, `Detail` | the error's body, when not OK |
 | `Op` | `i`, as a number, in an error answering a delta: the op at fault (SPEC.md §6.1); absent otherwise |
 | `Caps` | the capabilities, the body of an ok reply to `q` |
+| `Hit` | what the cell holds, the body of an ok reply to `hit` (SPEC.md §9.7): `T`, the element, empty when absent, and `TX` and `TY`, each absent when the body has none; absent for any other reply |
 | `Err` | the reply as an error, carrying `Code` and `Detail`; none when OK |
 
 **`Event`** (SPEC.md §9), when the action is `ev`: `Surface` (absent for
@@ -956,6 +959,13 @@ program's pane is, and passes events back to the program whose surface they
 came from. This section is reserved: what a relay does will be specified
 here, with its own vectors.
 
+Until then, what the protocol already asks of one:
+- **A `hit`** (SPEC.md §9.7) it passes on with the host's name for the
+  surface, and the cell as the program counts it, since the surface's top
+  left cell is the same for both. It answers `ENOENT` for a surface it
+  does not hold, and passes the host's answer back to the program, its
+  `n` the program's.
+
 ### 4.6 Field
 
 A text field's value, caret and selection, edited as SPEC.md §10.2's actions
@@ -1106,6 +1116,7 @@ The canonical names, in each language's case.
 | `Detach`, `Focus`, `Blur`, `Sync` | the same | `detach`, `focus`, `blur`, `sync` | as Python | as Python | `detach`, `focus`, `blur`, `sync` |
 | `WithdrawLate` | `hotty.WithdrawLate` | `withdraw_late` | `withdraw_late` | `withdraw_late` | `withdrawLate` |
 | `Edit`, `Menu`, `MenuShow`, `MenuHide` | `hotty.Edit`, `hotty.Menu`, `hotty.MenuShow`, `hotty.MenuHide` | `edit`, `menu`, `menu_show`, `menu_hide` | as Python | as Python | `edit`, `menu`, `menuShow`, `menuHide` |
+| `Hit`, and `Reply`'s `Hit` with its fields | `hotty.Hit`; `Reply.Hit`, a `*hotty.HitCell{T, TX, TY}`, `TX` and `TY` as `*int` | `hit`; `Reply.hit`, a `HitCell(t, tx, ty)`, absent as `None` | `hit`; `reply.hit`, a table with those keys | `hit`; `Reply.hit`, an `Option<HitCell { t, tx, ty }>`, each step an `Option` | `hit`; `reply.hit`, `{ t, tx?, ty? }` |
 | `Touch`, `TouchArea` and its fields | `hotty.Touch`, `hotty.TouchArea{C, R, W, H, Drag}` | `touch`, `TouchArea(c, r, w, h, drag)` | `touch`, tables with those keys | `touch`, `TouchArea { c, r, w, h, drag }` | `touch`, `{ c, r, w, h, drag }` |
 | `MenuTree`, `MenuItem` and their fields | `hotty.MenuTree{Label, Items}`, `hotty.MenuItem{Key, Label, Name, Enabled, Items}` | `MenuTree(label, items)`, `MenuItem(key, label, name, enabled, items)` | tables with those keys | `MenuTree { label, items }` | `{ label, items }` |
 | `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor, Backdrop}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor, backdrop)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor, backdrop }` |

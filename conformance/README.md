@@ -84,8 +84,9 @@ writes it as msgpack, its numbers as Numbers (above) say, and sends that.
 - `"reply": {…}`: the first reply (`a=ok` or `a=err`) must match. Every key
   but `code`, `detail`, `body` and `types` is compared with the reply's
   control, and one whose value is `null` must be absent from it; `code` and `detail` with the body of an `a=err`. `body` gives
-  fields the body of an `a=ok` must have, equal as values (Numbers, above);
-  fields it does not name are not checked. `types` gives the type of
+  fields the body of an `a=ok` must have, equal as values (Numbers, above),
+  and one whose value is `null` must be absent from it; fields it does not
+  name are not checked. `types` gives the type of
   each field of the body (SPEC §3.3): `"int"`, `"float"`, `"str"`, `"bool"`,
   `[T]` an array of T, `{"name": T, …}` a map with those fields, and
   `{"*": T}` a map of any names to T. The body must decode (SDK.md §3.9) and
@@ -279,7 +280,8 @@ and `invalid` its count after the last. `messages` are the complete ones,
 in order:
 - `control`: exactly these keys and values;
 - `reply`: `Reply`'s fields (`ok`, `re`, `n`, `surface`, `cols`, `rows`,
-  `code`, `detail`, `op`);
+  `code`, `detail`, `op`, and `hit` with `t`, `tx` and `ty`, `null` where
+  the reply carries none);
 - `event`: `Event`'s fields and accessors (`surface`, `kind`, `target`,
   `value`, `checked`, `rev`, `sel` as a list of two, `fields` as a list of `[name, value]`, `mods`, `link`
   with `href` and `url`, `fit_rows`, `drag` with `c`, `r`, `x`, `y`, `tx`

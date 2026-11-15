@@ -126,6 +126,7 @@ def build(b):
         "detach": lambda: hotty.detach(a["surface"], **ro),
         "focus": lambda: hotty.focus(a["surface"], a.get("target", ""), **ro),
         "blur": lambda: hotty.blur(a["surface"], **ro),
+        "hit": lambda: hotty.hit(a["surface"], a["c"], a["r"], **ro),
         "edit": lambda: hotty.edit(a.get("names", []), **ro),
         "menu": lambda: hotty.menu(menu_tree(a["menu"]) if "menu" in a else None, **ro),
         "menu_show": lambda: hotty.menu_show(a.get("keys", []), **ro),
@@ -221,7 +222,8 @@ def num_eq(a, b):
 
 
 def reply_view(r):
-    return {"ok": r.ok, "re": r.re, "n": r.n, "surface": r.surface, "cols": r.cols, "rows": r.rows, "code": r.code, "detail": r.detail, "op": r.op}
+    return {"ok": r.ok, "re": r.re, "n": r.n, "surface": r.surface, "cols": r.cols, "rows": r.rows, "code": r.code, "detail": r.detail, "op": r.op,
+            "hit": None if r.hit is None else {"t": r.hit.t, "tx": r.hit.tx, "ty": r.hit.ty}}
 
 
 def event_view(e):

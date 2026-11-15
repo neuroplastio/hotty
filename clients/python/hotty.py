@@ -538,6 +538,18 @@ def blur(surface, n=None, q=None):
     return _command([("a", "blur"), ("s", surface)], b"", NO_REPLY, n, q)
 
 
+def hit(surface, c, r, n=None, q=None):
+    """Asks which element is at the surface's cell (c, r), counted from its
+    top left cell and negative above it and to its left (SPEC §9.7). A
+    query: it is answered whatever the quiet level, unless q says not to."""
+    pairs = [("a", "hit"), ("s", surface), ("c", int(c)), ("r", int(r))]
+    if n is not None:
+        _set(pairs, "n", n)
+    if q is not None and q != REPLY_ALWAYS:
+        _set(pairs, "q", q)
+    return encode(pairs, b"")
+
+
 @dataclass
 class FieldChange:
     """A change to a control the user may be changing (SPEC §6.4): the
@@ -642,6 +654,11 @@ class Reply:
         self.rows = _int(m["r"])
         self.op = _int(m["i"])  # the op of a delta at fault, from 0 (SPEC §3.6, §6.1)
         self.code = self.detail = None
+        self.hit = None  # what a cell holds, in an ok reply to hit (SPEC §9.7)
+        if self.ok and self.re == "hit":
+            body = _typed_body(m, _HIT)
+            if body is not None:
+                self.hit = HitCell(body.get("t", ""), body.get("tx"), body.get("ty"))
         if not self.ok:
             body = _typed_body(m, _ERROR) or {}
             self.code = body.get("code")
@@ -658,6 +675,17 @@ class Reply:
     def err(self):
         """The reply as an error: None when ok."""
         return None if self.ok else HottyError(self.code or "", self.detail)
+
+
+@dataclass
+class HitCell:
+    """What a cell of a surface holds (SPEC §9.7): the element a drag would
+    name there, empty for none, and its steps tx and ty, None where it has
+    none."""
+
+    t: str = ""
+    tx: int = None
+    ty: int = None
 
 
 @dataclass
@@ -747,6 +775,7 @@ def _typed_body(m, t):
 
 
 _ERROR = {"code": "str", "detail": "str"}
+_HIT = {"t": "str", "tx": "int", "ty": "int"}
 _CAPS = {
     "v": "str",
     "cellcss": {"w": "float", "h": "float"},

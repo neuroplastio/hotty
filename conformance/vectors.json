@@ -1812,6 +1812,328 @@
    ]
   },
   {
+   "name": "hit names what a drag would at the centre of a cell: the nearest element with an id and drag or drop, from the one there outward, with tx and ty in a drop target with steps; none outside the surface, nor over an element that opts in to neither; it changes nothing and sends no event (SPEC \u00a79.7, \u00a79.1)",
+   "requires": [
+    "drop",
+    "steps"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(10*var(--hotty-cell-w))}#r3{height:calc(2*var(--hotty-cell-h))}</style><div id=r0 data-on=drop>zero</div><div id=r1 data-on=\"drag drop\">one</div><div>two <span id=s>s</span></div><div id=r3 data-on=drop data-steps=\"0 4\">three</div><div id=r4 data-on=drop><span id=in>four</span></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "6",
+      "v": "1",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "1",
+      "r": "0",
+      "n": "1"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hit",
+      "n": "1",
+      "s": "x",
+      "body": {
+       "t": "r0",
+       "tx": null,
+       "ty": null
+      }
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "1",
+      "r": "1",
+      "n": "2"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hit",
+      "n": "2",
+      "s": "x",
+      "body": {
+       "t": "r1"
+      }
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "6",
+      "r": "2",
+      "n": "3"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hit",
+      "n": "3",
+      "s": "x",
+      "body": {
+       "t": null
+      }
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "1",
+      "r": "3",
+      "n": "4"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hit",
+      "n": "4",
+      "s": "x",
+      "body": {
+       "t": "r3",
+       "tx": null,
+       "ty": 1
+      }
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "1",
+      "r": "4",
+      "n": "5"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hit",
+      "n": "5",
+      "s": "x",
+      "body": {
+       "t": "r3",
+       "tx": null,
+       "ty": 3
+      }
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "1",
+      "r": "5",
+      "n": "6"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hit",
+      "n": "6",
+      "s": "x",
+      "body": {
+       "t": "r4"
+      }
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "12",
+      "r": "0",
+      "n": "7"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hit",
+      "n": "7",
+      "s": "x",
+      "body": {
+       "t": null
+      }
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "-1",
+      "r": "0",
+      "n": "8"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hit",
+      "n": "8",
+      "s": "x",
+      "body": {
+       "t": null
+      }
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "1",
+      "r": "-1",
+      "n": "9"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hit",
+      "n": "9",
+      "s": "x",
+      "body": {
+       "t": null
+      }
+     },
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "hit is answered as a query is, with no q: ENOENT for no such surface, EINVAL for a missing or bad c or r, EDETACHED for a detached surface, and no t for a surface not placed (SPEC \u00a73.5, \u00a73.6, \u00a79.7)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<div id=a data-on=drop>a</div>"
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "0",
+      "r": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "hit",
+      "s": "x",
+      "body": {
+       "t": null
+      }
+     }
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "nope",
+      "c": "0",
+      "r": "0"
+     },
+     "reply": {
+      "a": "err",
+      "re": "hit",
+      "code": "ENOENT"
+     }
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "0"
+     },
+     "reply": {
+      "a": "err",
+      "re": "hit",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "0",
+      "r": "x"
+     },
+     "reply": {
+      "a": "err",
+      "re": "hit",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "1.5",
+      "r": "0"
+     },
+     "reply": {
+      "a": "err",
+      "re": "hit",
+      "code": "EINVAL"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "d",
+      "q": "2"
+     },
+     "payload": "<div id=a data-on=drop>a</div>"
+    },
+    {
+     "send": {
+      "a": "detach",
+      "s": "d",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "d",
+      "c": "0",
+      "r": "0"
+     },
+     "reply": {
+      "a": "err",
+      "re": "hit",
+      "code": "EDETACHED"
+     }
+    },
+    {
+     "send": {
+      "a": "hit",
+      "s": "x",
+      "c": "0",
+      "r": "0",
+      "q": "2"
+     },
+     "reply": null
+    }
+   ]
+  },
+  {
    "name": "steps: each event of a drag of an element with data-steps says where in it the pointer is, measured against that element wherever the pointer goes and clamped, and a drag goes out each time the step changes (SPEC \u00a79.1)",
    "requires": "steps",
    "steps": [
@@ -24626,6 +24948,77 @@
    ]
   },
   {
+   "name": "hit sends s, c and r, and no q: a query, answered whatever the level (SPEC \u00a73.5, \u00a79.7; SDK.md \u00a73.4.2)",
+   "build": "hit",
+   "args": {
+    "surface": "nav",
+    "c": 3,
+    "r": 7
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "hit",
+       "s": "nav",
+       "c": "3",
+       "r": "7"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "hit with n numbers it, still without q; a cell above and left of the surface is negative",
+   "build": "hit",
+   "args": {
+    "surface": "nav",
+    "c": -2,
+    "r": -1
+   },
+   "options": {
+    "n": 5
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "hit",
+       "s": "nav",
+       "c": "-2",
+       "r": "-1",
+       "n": "5"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "hit with a quiet level other than 0 carries it",
+   "build": "hit",
+   "args": {
+    "surface": "nav",
+    "c": 0,
+    "r": 0
+   },
+   "options": {
+    "q": 1
+   },
+   "out": [
+    {
+     "cmd": {
+      "control": {
+       "a": "hit",
+       "s": "nav",
+       "c": "0",
+       "r": "0",
+       "q": "1"
+      }
+     }
+    }
+   ]
+  },
+  {
    "name": "focus without a target sends no t",
    "build": "focus",
    "args": {
@@ -25587,6 +25980,107 @@
      "reply": {
       "ok": false,
       "code": "EBUDGET"
+     }
+    }
+   ]
+  },
+  {
+   "name": "a reply to hit carries what the cell holds: t, and tx and ty where t has steps, each absent where the body has none; an empty body is a cell with no element, and a body that does not decode leaves Hit absent (SPEC \u00a79.7, SDK.md \u00a73.9)",
+   "seqs": [
+    "\u001b]7279;a=ok:n=4:s=nav:re=hit;g6F0pXRhYi0zonR4AKJ0eQE=\u001b\\",
+    "\u001b]7279;a=ok:n=5:s=nav:re=hit;gaF0pXRhYi0x\u001b\\",
+    "\u001b]7279;a=ok:n=6:s=nav:re=hit;gA==\u001b\\",
+    "\u001b]7279;a=ok:n=7:s=nav:re=hit;gaF0Bw==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "t": "tab-3",
+     "tx": 0,
+     "ty": 1
+    },
+    {
+     "t": "tab-1"
+    },
+    {},
+    {
+     "t": 7
+    }
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ok",
+      "n": "4",
+      "s": "nav",
+      "re": "hit"
+     },
+     "reply": {
+      "ok": true,
+      "re": "hit",
+      "n": 4,
+      "surface": "nav",
+      "hit": {
+       "t": "tab-3",
+       "tx": 0,
+       "ty": 1
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "5",
+      "s": "nav",
+      "re": "hit"
+     },
+     "reply": {
+      "ok": true,
+      "re": "hit",
+      "n": 5,
+      "hit": {
+       "t": "tab-1",
+       "tx": null,
+       "ty": null
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "6",
+      "s": "nav",
+      "re": "hit"
+     },
+     "reply": {
+      "ok": true,
+      "re": "hit",
+      "n": 6,
+      "hit": {
+       "t": "",
+       "tx": null,
+       "ty": null
+      }
+     }
+    },
+    {
+     "control": {
+      "a": "ok",
+      "n": "7",
+      "s": "nav",
+      "re": "hit"
+     },
+     "reply": {
+      "ok": true,
+      "re": "hit",
+      "n": 7,
+      "hit": null
      }
     }
    ]

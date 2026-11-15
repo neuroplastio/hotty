@@ -223,10 +223,10 @@ into chunks of at most 4096 payload bytes each:
 
 | key | meaning |
 | --- | --- |
-| `a` | the action: `q`, `doc`, `place`, `hide`, `delta`, `field`, `res`, `del`, `detach`, `focus`, `blur`, `edit`, `menu`, `touch` from the program (§4–§10); `ok`, `err`, `ev` from the host |
+| `a` | the action: `q`, `doc`, `place`, `hide`, `delta`, `field`, `res`, `del`, `detach`, `focus`, `blur`, `edit`, `menu`, `touch`, `hit` from the program (§4–§10); `ok`, `err`, `ev` from the host |
 | `s` | a surface name: `[A-Za-z0-9_-]{1,64}` |
 | `n` | a request number chosen by the program, echoed in the reply |
-| `q` | quiet: `0` reply always, `1` reply only on error, `2` never reply. Absent: `0` for a query (`a=q`) and for a command with `n`, `1` for any other |
+| `q` | quiet: `0` reply always, `1` reply only on error, `2` never reply. Absent: `0` for a query (`a=q`, `a=hit`) and for a command with `n`, `1` for any other |
 | `o` | `z`: the payload is zlib-compressed |
 | `m` | `1`: more chunks follow; `0`: last chunk |
 
@@ -244,14 +244,15 @@ ESC ] 7279 ; a=ok|err [:n=<n>] [:s=<s>] :re=<action> [:<more>] [; <payload>] ST
   with an error, unless it has `n` or is a query (§3.5). A program numbers
   the commands whose answer it reads, such as a placement's rows (§5.2).
 - `a=ok` replies to `place` carry `c` and `r` (§5.2); the reply to `q`
-  carries the capabilities (§4).
+  carries the capabilities (§4), and the reply to `hit` what the cell
+  holds (§9.7).
 - `a=err` carries the body `{"code": str, "detail": str}`, and, answering a
   delta, the key `i` in its control: the index of the op that failed, from
   0 (§6.1). The codes:
 
 | code | when |
 | --- | --- |
-| `EINVAL` | an unknown action or op; a bad surface name; a missing `s`, `t`, `k`, `c` or `id`; `c` or `r` out of range; a program's body that does not decode, or holds a field of another type (§3.3); a document that is not UTF-8 (§3.3); an `a=field` that does not fit its target (§6.4); `a=focus` on a backdrop (§5.2) |
+| `EINVAL` | an unknown action or op; a bad surface name; a missing `s`, `t`, `k`, `c` or `id`, or `r` in an `a=hit`; `c` or `r` out of range; a program's body that does not decode, or holds a field of another type (§3.3); a document that is not UTF-8 (§3.3); an `a=field` that does not fit its target (§6.4); `a=focus` on a backdrop (§5.2) |
 | `ENOENT` | no surface of that name |
 | `ENOTARGET` | no element with that id. The detail is the id, or the missing ids comma-separated (§6.2) |
 | `EDETACHED` | the surface is detached (§5.5) |
@@ -272,6 +273,9 @@ place:
   `r=auto` placement (§5.2). Where the program asks for every answer
   (`q=0`), it answers `ENOTERM`. With `q=1` it answers nothing: it knows of
   no error.
+- **A `hit`** (§9.7) it answers `ENOTERM`, whatever `q` says, and keeps
+  none: an answer given later would name an element under a pointer long
+  gone.
 - The terminal that attaches gets every command kept. One it refuses then
   goes unanswered: what the multiplexer said for it stands.
 
@@ -1702,6 +1706,40 @@ ESC ] 7279 ; a=touch ; <base64 msgpack {"areas": [area]}> ST
 A host that takes no touch accepts `a=touch` as any host does, and nothing
 comes of it.
 
+### 9.7 What a cell holds: `a=hit`
+
+```
+ESC ] 7279 ; a=hit:s=<name>:c=<col>:r=<row>[:n=<n>] ST
+```
+
+A program asks which element of its surface is at a cell, as a page asks a
+browser with `elementFromPoint`. It needs to while it carries something of
+its own over the surface: a multiplexer that drags a pane in its cells
+hears the pointer as mouse input, over a surface too, and the surface
+hears nothing (§9.1), so nothing turns the cell into the row beneath it.
+
+- **The cell.** `c` and `r` count from the surface's top left cell, as an
+  event's do (§9.1), and may fall outside it. Each is a whole number in
+  decimal, with a `-` before it where it is negative, above the surface or
+  to its left. A missing or other `c` or `r` is `EINVAL`.
+- **The answer** is `a=ok` with the body `{"t": str, "tx": int, "ty":
+  int}`. `t` is what a `drag` would name with the pointer at the centre of
+  that cell (§9.1): the nearest element with an `id` and `drag` or `drop`
+  in its `data-on`, from the one there outward. Where `t` has `drop` and
+  steps, `tx` and `ty` are its steps at that point, as a `drag`'s are. Each
+  is absent where a `drag` would have none, outside the window (§5.2)
+  included. A surface that is not placed, or is hidden, answers with none.
+- **The surface's own document,** laid out and scrolled as the user sees
+  it, whatever is drawn above that cell: another surface, or the cells. A
+  backdrop (§5.2) answers as any surface, though it takes no pointer.
+- **Always answered,** as a query is (§3.5): a program numbers its hits
+  with `n` to match each answer to its cell.
+- **It changes nothing:** no focus, no hover, no `:hover` style, no event.
+  The program draws any mark of its own, with a delta.
+- **Errors:** `ENOENT` for no such surface, `EDETACHED` for a detached one
+  (§5.5), and `ENOTERM` from a multiplexer with no terminal attached, which
+  never keeps one (§3.6).
+
 ## 10. Keyboard and focus
 
 ### 10.1 Who has the keyboard
@@ -2579,7 +2617,7 @@ A host conforms to hotty version 0.7 when:
 
 The vectors check replies, error codes, every delta op, morph, context
 parsing, `a=field` and revisions, resources, drags and their steps, presses with Alt, secondary presses and long presses, `fit`, hover,
-`area`, scrolling and scroll snapping, `reveal`, `scroll` and `view`, touch in the
+`area`, scrolling and scroll snapping, `reveal`, `scroll` and `view`, `hit`, touch in the
 cells, backdrops, prefixes, edit commands, menus, keymaps and the envelope,
 and their `keys`, `keymap` and `edit` sections a host's key names (§10.4), keymaps and
 actions (§10.2). They inspect documents and events, not pixels. The vectors
@@ -2877,6 +2915,21 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   - **Not HTML's drag and drop** (`draggable`, `DataTransfer`). It moves
     data between pages and applications, through script, which a surface
     does not have. The program already holds the data.
+- **Why a `hit` query.** A program can't tell which of its elements is at
+  a cell, since the host lays the document out. During a drag of its own,
+  such as a pane a multiplexer carries in its cells, the pointer is the
+  terminal's, and the surface beneath hears nothing (§9.1).
+  - **What a host already resolves.** Every host finds a drag's `t` for
+    its own pointer, so `hit` asks for that, at a cell the program names.
+    It is one round trip each time the pointer enters another cell, and a
+    layout that changes between the query and its answer gives a `t` the
+    program can drop until the next cell.
+  - **Not an outside drag.** A command that told the host a drag of the
+    program's was over the surface would have it send `drag` and
+    `dragend` with drop targets and their styles, at the cost of a second
+    drag beside pointer capture in every host. `hit` leaves room for it.
+  - **Not geometry events.** Reporting the boxes of every drop target
+    would put a layout on the wire, and bytes on every relayout.
 - **Why hover is reported.** A multiplexer draws its own controls in cells
   next to the surfaces it relays, and lights them while the pointer is over
   them, from mouse reporting. When the pointer goes from such a control

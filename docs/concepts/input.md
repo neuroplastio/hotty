@@ -280,6 +280,26 @@ after.
   when the placement goes away, a new document replaces this one, or the
   host loses the pointer. A delta or a new placement does not end it.
 
+## What a cell holds
+
+> [!NOTE]
+> New in 0.8.
+
+A program that carries something of its own over a surface, such as a
+multiplexer dragging a pane in its cells, hears the pointer as mouse input,
+and the surface hears nothing. To know which row is under it, the program
+asks:
+
+```
+ESC ] 7279 ; a=hit:s=nav:c=3:r=7:n=4 ST
+```
+
+The host answers `a=ok` with `{"t": str, "tx": int, "ty": int}`: the
+element a drag would name at that cell, the nearest with an id and `drag`
+or `drop` in its `data-on`, and its steps where it has them
+([§9.7](../../SPEC.md#97-what-a-cell-holds-ahit)). It changes nothing: no
+focus, no hover, no event. The program draws its own mark with a delta.
+
 ## Touch on a surface
 
 A tap on a surface is a click, and a touch drag scrolls, as a wheel does
