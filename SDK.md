@@ -8,7 +8,7 @@ path: sdk-design
 
 # hotty SDKs
 
-    Version:  0.7, with SPEC.md 0.7
+    Version:  0.8, with SPEC.md 0.8
     Status:   Draft. It changes with SPEC.md (§15 there).
     Licence:  CC BY 4.0
 
@@ -38,7 +38,7 @@ The SDKs that follow it are listed in the documentation, not here
 4. The SDK layer
 5. Conformance
 
-Appendices: A. Names · B. Rationale
+Appendices: A. Names · B. Rationale · C–G. Moving from 0.2 to 0.7
 
 ---
 
@@ -195,8 +195,8 @@ An SDK **MUST** provide every component of this section.
 | `Chunk` | 4096, the most base64 bytes in one sequence |
 | `MaxSize` | 1000, the most columns or rows of a surface |
 | `MaxName` | 64, the longest surface name |
-| `Version` | `"0.7"`, the newest protocol version the SDK speaks (SPEC.md §4) |
-| `Versions` | `["0.6", "0.7"]`, every version the SDK speaks, which its query lists (§3.8) |
+| `Version` | `"0.8"`, the newest protocol version the SDK speaks (SPEC.md §4) |
+| `Versions` | `["0.7", "0.8"]`, every version the SDK speaks, which its query lists (§3.8) |
 | `DefaultMax` | 16777216 (16 MiB), the most bytes a Decoder decodes one message to unless its `Max` says otherwise (§3.6) |
 
 And these sets, each value under its canonical name:
@@ -502,16 +502,19 @@ by step.
   `Tick` next, or none once done.
 - **Every input first lets the time pass**: whatever was due at or before
   `now` happens before the input is taken.
-- **It speaks both 0.6 and 0.7.** An SDK of 0.7 lists `0.6,0.7` in its
+- **It speaks both 0.7 and 0.8.** An SDK of 0.8 lists `0.7,0.8` in its
   query (`Versions`), and takes the host that answers in either (SPEC.md
   §4, §15).
-  - **A 0.6 host** sends no secondary press, so a program meets none there.
-    The keys open its menus (§4.7), which already says so.
+  - **A 0.7 host** has neither the `scroll` op nor `hit`: it refuses a
+    delta that holds one, and a `hit`, with `EINVAL`. It ignores
+    `tab=program` and `default` in a keymap. A program that met one
+    scrolls by focus and `reveal`, finds no element at a cell, and keeps
+    Tab for focus.
   - **Which version it met** is the capabilities' `V`, in `Caps`, which the
     program reads when it must tell them apart. The host speaks that
     version from then on.
-  - A 0.7 host that speaks 0.6 too answers `v=0.6,0.7` in 0.7, and a 0.6
-    host answers it in 0.6. A host that speaks only 0.7 answers `v=0.6`
+  - An 0.8 host that speaks 0.7 too answers `v=0.7,0.8` in 0.8, and a 0.7
+    host answers it in 0.7. A host that speaks only 0.8 answers `v=0.7`
     with `EVERSION`, and the terminal is `text` (§3.8's second rule).
 
 The rules, with their times:
@@ -922,7 +925,7 @@ A host that runs inside a test, so that a program's tests need no terminal.
   passes the host vectors' `send`, `inspect` and `key` steps. It speaks
   the SDK's `Version` only: it answers a query that lists it with its
   capabilities, in it, and any other with `EVERSION` (SPEC.md §4). The
-  vectors that need a host that speaks 0.6 as well (`speaks-0.6`,
+  vectors that need a host that speaks 0.7 as well (`speaks-0.7`,
   conformance/README.md) are skipped by it, unless it does. It lays
   nothing out: `r=auto` gets an estimate the test may replace, nothing in
   it scrolls, so a key bound to a scroll action goes on as if its keymap
@@ -1034,9 +1037,8 @@ menu: SPEC.md Appendix B says why.
   (`ParseKey`, §3.10). They reach the program as keys while a surface has
   the keyboard (SPEC.md §10.2), and the last `focus` names the element, so
   the SDK opens that element's menu on them, at its `Area`. The same keys
-  open it in the cells, and on a 0.6 host, where a secondary press is never
-  reported: a program that speaks both versions opens menus from the keys
-  everywhere and from the press where the host sends it.
+  open it in the cells, so a program opens menus from the keys everywhere,
+  and from the press on a surface.
 - **The menu is a surface** placed at a higher `z` (SPEC.md §5.2), at the
   press's cell or under the element's `Area`, as a select's list is drawn
   where a host shows none (SPEC.md §10.2). The SDK gives it the keyboard
@@ -1088,8 +1090,8 @@ every SDK section, `edit` where it provides a Field.
   what keeps SDKs aligned.
 - **`requires`.** A vector that needs something an SDK may not have yet
   names it in `requires`. A runner declares what it implements, and skips
-  the vectors whose `requires` it lacks (the host sections' `speaks-0.6`
-  among them, for a test host that speaks 0.7 only), so the list of what an SDK lacks is
+  the vectors whose `requires` it lacks (the host sections' `speaks-0.7`
+  among them, for a test host that speaks 0.8 only), so the list of what an SDK lacks is
   its runner's, not a list kept by hand.
 - **A copy, checked.** An SDK keeps a copy of `vectors.json` in its tests,
   a way to refresh it from a checkout of this repository, and a test that
@@ -1317,3 +1319,29 @@ fake hosts with them. These are the places a port goes wrong:
   `input` the user changed sends `change`, and in a form `change` then
   `submit`. A program that read a lone field only on `blur` hears it on
   Enter too.
+
+## Appendix G. Moving from 0.7
+
+Informative. hotty 0.8 breaks 0.7 (SPEC.md §15) only for a host or a
+program that speaks one of them: the SDKs speak both (§3.8). These are the
+places a port goes wrong:
+
+- **`Version` is `"0.8"`, `Versions` `["0.7", "0.8"]`,** and the runner's
+  copy of the vectors moves with them (§5.2).
+- **`Scroll` and `ScrollOp`** take a scroll action as their value, which
+  always goes out, even where `reveal`'s `where` would not (§3.4.3). An
+  empty target sends no `t`: the root scrolls.
+- **`Hit` is a query.** It implies quiet level 0 with `n` or without, so
+  it carries `q` only when `Q` gives another level (§3.4.2), and its
+  answer is `Reply.Hit`: `T` empty for no element, `TX` and `TY` absent
+  where the body has none (§3.9).
+- **`Program("tab")`** is true only on a field's keymap, from `Resolve`,
+  bound to `program`; on every other keymap it is false (§3.10).
+  `ParseKeymap` keeps `tab=program` and `tab=default`, so `Format` writes
+  them.
+- **`default`** is an action `ParseKeymap` keeps. In a resolved keymap,
+  `Lookup` of a key bound to it answers from the default keymap, or
+  `insert`; outside a field it is none of `Program`'s, `Prefix`'s or
+  `Scroll`'s (§3.10).
+- **A test host** that speaks 0.8 only skips the `speaks-0.7` vectors
+  (§4.4).

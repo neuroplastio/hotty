@@ -8,6 +8,61 @@ path: changes
 
 # Changes
 
+## 0.8
+
+A draft, as every 0.x is, written on 2026-11-15 and not yet released: the
+spec, SDK.md and the vectors are on hotty's `hotty-0.8` branch, and the
+SDKs and hosts follow on theirs.
+
+hotty's 0.8 hosts and SDKs speak 0.7 too (SPEC.md §15), so versions meet
+as follows (§4, §14):
+- a 0.7 program on a 0.8 host that speaks 0.7 is answered in 0.7, and the
+  host speaks 0.7 to it from then on (HOST.md §5);
+- a 0.8 program, whose query lists `0.7,0.8`, on a 0.7 host is answered in
+  0.7, and has no `scroll` op and no `hit` there (SDK.md §3.8);
+- a host or a program that speaks only 0.8 meets a 0.7 one at `EVERSION`,
+  and the program falls back.
+
+### What changed
+
+- **`scroll`, a delta op** (SPEC.md §6.1, §5.3, §10.2). Its `v` is a scroll
+  action, and it scrolls as a key bound to that action would with focus on
+  the target, the root when `t` is empty: one of the host's steps for each
+  op, whether the surface has the keyboard or not. For a program that keeps
+  the keyboard and a keymap of its own, such as a reader's `j` and `k`.
+- **`a=hit`, what a cell holds** (SPEC.md §9.7). A query, answered with the
+  element a `drag` would name at that cell, and its steps: for a program
+  that carries something of its own over a surface, as plx does a pane.
+- **A text field may give the program `tab`** with `tab=program` in its
+  keymap (SPEC.md §10.2). `shift+tab` and `escape` keep their meaning.
+- **`default` gives a key back** to the host, for an element and what is
+  inside it, as if no element above had bound it (SPEC.md §10.2).
+  `tab=default` takes back a farther `tab=program`.
+- **`prefers-reduced-motion`** follows the user's setting on the system
+  the terminal runs on (SPEC.md §8; HOST.md §4).
+- **A session's resources are its own** (SPEC.md §7.1, §12): no host
+  resolves `cid:` across sessions, nor lets one session replace, delete or
+  learn of another's resources.
+- **Said outright:** §8's theme includes the colours a program sets with
+  OSC 4, 10 and 11; and a multiplexer that answers a program's query is
+  its host, so it lists only the features it carries (SPEC.md §2; SDK.md
+  §4.5).
+
+### Upgrading from 0.7
+
+**A program:**
+- Ask for `v=0.8`, or `v=0.7,0.8` to speak both.
+- On a 0.7 host, send no `scroll` op or `hit`: a delta that holds one is
+  refused whole with `EINVAL`. Check the capabilities' `v`.
+
+**A host:**
+- Speak 0.8, and a host that also speaks 0.7 answers a 0.7 program in 0.7
+  (HOST.md §5). One that does not answers it with `EVERSION`.
+- Take the `scroll` op and `a=hit`, `tab=program` in a field's keymap, and
+  `default` in any.
+- Follow the reduced-motion setting, and keep each session's resources
+  apart.
+
 ## 0.7
 
 A draft, as every 0.x is, landed across the stack on 2026-11-06, and

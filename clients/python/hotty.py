@@ -38,8 +38,8 @@ OSC_NUMBER = NUMBER  # the name this client had first
 CHUNK = 4096
 MAX_SIZE = 1000
 MAX_NAME = 64
-VERSION = "0.7"
-VERSIONS = ("0.6", "0.7")  # every version this client speaks, which its query lists
+VERSION = "0.8"
+VERSIONS = ("0.7", "0.8")  # every version this client speaks, which its query lists
 COMPRESS_FROM = 256
 SCAN_MAX = 64 << 10
 
@@ -196,7 +196,7 @@ def _command(pairs, payload, default_q, n=None, q=None):
 
 def query(n=1, late=False):
     """Asks whether the terminal is a host that speaks a version in
-    VERSIONS (0.6 and 0.7), fenced with DA1 (SPEC §4); with late, a late answer is welcome."""
+    VERSIONS (0.7 and 0.8), fenced with DA1 (SPEC §4); with late, a late answer is welcome."""
     pairs = [("a", "q"), ("n", n), ("v", ",".join(VERSIONS))]
     if late:
         pairs.append(("late", 1))

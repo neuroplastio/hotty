@@ -8,7 +8,7 @@ path: host-design
 
 # hotty hosts
 
-    Version:  0.7, with SPEC.md 0.7
+    Version:  0.8, with SPEC.md 0.8
     Status:   Draft. Guidance for hosts, not part of the protocol.
     Licence:  CC BY 4.0
 
@@ -30,7 +30,7 @@ ask for it. A document may use what it describes, but it can't count on it
 2. Fonts
 3. The secondary press
 4. Reduced motion
-5. Speaking 0.6 as well
+5. Speaking 0.7 as well
 6. Implementations
 
 Appendix: A. Rationale
@@ -187,9 +187,6 @@ Shift and Alt come first (SPEC.md §9.2). With either held, the host
 handles the press as one on the cells beneath the surface: the terminal's
 own menu with Shift, and the program's mouse report with Alt.
 
-In a 0.6 session (§5.1) Alt is all a 0.6 program could meet of this: see
-there.
-
 The keyboard's way to a menu is not the host's. `shift+f10` and the Menu key
 reach the program as keys (SPEC.md §10.2), and a host adds nothing for them.
 
@@ -207,29 +204,27 @@ Where a host reads the setting that `prefers-reduced-motion` follows
   `matchMedia('(prefers-reduced-motion: reduce)')`. The browser already
   applies it to the surfaces' CSS, so the addon does nothing.
 
-## 5. Speaking 0.6 as well
+## 5. Speaking 0.7 as well
 
-hotty's own stack, hosts and SDKs, speaks 0.6 along with 0.7. SPEC.md §15
+hotty's own stack, hosts and SDKs, speaks 0.7 along with 0.8. SPEC.md §15
 lets a host speak several versions, and the rest is what the stack does
-with it. A host that does not speak 0.6 answers a 0.6 program with
+with it. A host that does not speak 0.7 answers a 0.7 program with
 `EVERSION` (SPEC.md §4), and the program falls back.
 
-### 5.1 A 0.6 session
+### 5.1 A 0.7 session
 
-- **A host that speaks 0.6 as well** answers a program that lists 0.6 and
-  not 0.7 in 0.6, and speaks 0.6 to it from then on (SPEC.md §4). A query
-  that lists both is answered in 0.7, the highest the two share.
-- **One behaviour of 0.7 can reach a 0.6 program:** a press of the
-  secondary button with Alt held. In 0.7 it is the program's, and with
-  mouse reporting on the program hears `CSI < 10 ; <col> ; <row> M`
-  (SPEC.md §9.2). In a 0.6 session it stays the terminal's, as 0.6's §9.2
-  has it: not reported to the cells as `CSI < 10`.
-- **Nothing else of the secondary press reaches a 0.6 session.** A 0.6
-  document never asks for `secondary` in its `data-on`, so the host sends it
-  no secondary `press`: a secondary press over its elements is the
-  terminal's, as it was.
-- **A 0.7 program on a 0.6 host** is answered in 0.6 and meets no
-  secondary press; SDK.md §3.8 and §4.7 say what an SDK does.
+- **A host that speaks 0.7 as well** answers a program that lists 0.7 and
+  not 0.8 in 0.7, and speaks 0.7 to it from then on (SPEC.md §4). A query
+  that lists both is answered in 0.8, the highest the two share.
+- **What a 0.7 program sends is 0.7's.** It never sends a `scroll` op or
+  a `hit`, and a host may answer either with `EINVAL` in a 0.7 session, as
+  a 0.7 host would.
+- **Its keymaps hold as 0.8 has them.** A 0.7 document that wrote
+  `tab=program` in a field, or `default`, asked for what 0.8 gives, though
+  a 0.7 host ignored it: a host gives it in a 0.7 session too, and keeps
+  no second reading of keymaps.
+- **The rest is drawn, not told:** `prefers-reduced-motion` (SPEC.md §8)
+  follows the setting in every session.
 
 ## 6. Implementations
 

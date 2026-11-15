@@ -11,7 +11,7 @@ back to plain text where there is no host.
 
 ![hotty full screen in one terminal: the shell asks a form through askhot, plothot streams a chart, a metrics chart is hovered and pinned, a document scrolls, cards move in a feed, and an agent runs a diff, an approval and a load test.](demo.gif)
 
-[![status: 0.7 draft](https://img.shields.io/badge/status-0.7%20draft-orange)](#status)
+[![status: 0.8 draft](https://img.shields.io/badge/status-0.8%20draft-orange)](#status)
 [![spec: CC BY 4.0](https://img.shields.io/badge/spec-CC%20BY%204.0-lightgrey)](LICENSE-CC-BY-4.0)
 [![code: Apache-2.0](https://img.shields.io/badge/code-Apache--2.0-blue)](LICENSE-APACHE)
 
@@ -49,10 +49,11 @@ program's first byte to the user's click.
 
 ## Status
 
-**Version 0.7, a draft.** Versions 0.x may change incompatibly (§15 of the
-[spec](SPEC.md)). 0.7 breaks 0.6 for a program or host that speaks only one
-of them, and hotty's own hosts and SDKs speak both. An element can take a
-secondary press, for a menu of its own. [`CHANGES.md`](CHANGES.md) says what
+**Version 0.8, a draft.** Versions 0.x may change incompatibly (§15 of the
+[spec](SPEC.md)). 0.8 breaks 0.7 for a program or host that speaks only one
+of them, and hotty's own hosts and SDKs speak both. A program can scroll a
+surface by the keys' steps, ask which element is at a cell, let a field
+take Tab, and give a key back to the host. [`CHANGES.md`](CHANGES.md) says what
 changed and how to upgrade.
 
 Two hosts that share no code pass the conformance vectors:
