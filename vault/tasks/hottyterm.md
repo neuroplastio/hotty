@@ -111,3 +111,17 @@ Item template: as `tasks/0.4.md`.
         every surface on each one.
       - A test: OSC 11, then the host stylesheet's `--hotty-bg`.
       - hotty-blitz needs no change. The xterm addon is not checked.
+
+- [ ] **HT-04** The canary is red: move the Ghostty base to upstream 5ebe501a
+      status: paused 2026-11-17 (the maintainer's pause, via gov p-753): next step, build branch `base-5ebe501` | added: 2026-11-17
+      problem: the set didn't apply to upstream main (129 commits on).
+      0012 (hotty-focus-click) conflicted: upstream marks a macOS
+      focus-only click in `suppressLeftMouseUntilRelease`.
+      done so far: hottyterm branch `base-5ebe501` (f0d3c85, local, in
+      the worktree ../base-5ebe501) holds the rebased set, `ghostty-ref`,
+      `mod.md`'s base and Zig 0.17.1. The rebased fork is the worktree
+      ../ghostty-up (branch up-5ebe501). 0012 leaves the flag unset when
+      the setting passes; its .md still needs a line saying so.
+      next: `HOTTYTERM_GHOSTTY=../ghostty-up scripts/build.sh` (without
+      the branding commit, which brand.py adds), `make smoke`, a
+      probe-macos run for focus-click and emoji, then fast-forward main.
