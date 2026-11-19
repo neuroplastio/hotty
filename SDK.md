@@ -240,6 +240,10 @@ the program (compression), so the `encode` vectors compare bytes.
   and only when compressing makes it smaller. It compresses at zlib's
   default level, 6: a stylesheet of 20 KB comes out a third smaller than at
   level 1, for about a millisecond. `o=z` follows the other keys.
+  - **`Plain` turns it off for one document** (§3.4.2): a document that
+    never leaves the program's process, such as one a renderer inside the
+    program draws into cells, is sent uncompressed, so nothing is
+    compressed only to be inflated again.
 - **`o` and `m` are Encode's.** A control given with either goes out
   without it, and Encode sets them as this section says.
 - **Chunks.** A payload whose base64 is longer than 4096 bytes is split
@@ -258,7 +262,7 @@ which SPEC.md leaves to the program; these are the levels every SDK uses.
 | builder | sends | parameters | default `q` |
 | --- | --- | --- | --- |
 | `Query` | `a=q:n=<n>:v=<Versions>`, joined by `,`; `late=1` with the `Late` option, then DA1 (`ESC [ c`) | n | 0 |
-| `Doc` | `a=doc:s` and the HTML; `d=1` with the `Detached` option, `scroll` with `Scroll` | surface, html | 1 |
+| `Doc` | `a=doc:s` and the HTML; `d=1` with the `Detached` option, `scroll` with `Scroll`, never `o=z` with `Plain` | surface, html | 1 |
 | `Place` | `a=place` (§3.4.1) | surface, placement | 1 |
 | `PlaceAt` | `ESC 7`, `ESC [ <y+1> ; <x+1> H`, `Place` with `C=1`, `ESC 8` | surface, x, y, placement | 1 |
 | `Hide` | `a=hide:s` | surface | 2 |
@@ -366,7 +370,8 @@ asks for a late answer (SPEC.md §4).
 Each key goes out once. `Doc` also takes **`Detached`** (`d=1`) and
 **`Scroll(axes)`** (`scroll=<axes>`, SPEC.md §5.1): a bitmask of
 `ScrollVertical` (1) and `ScrollHorizontal` (2). `0`, the default, sends
-no key; any other value goes out as given, for the host to judge.
+no key; any other value goes out as given, for the host to judge. **`Plain`** sends the HTML uncompressed and adds no key
+(§3.3).
 
 #### 3.4.3 Ops
 
@@ -1133,7 +1138,7 @@ The canonical names, in each language's case.
 | `MenuTree`, `MenuItem` and their fields | `hotty.MenuTree{Label, Items}`, `hotty.MenuItem{Key, Label, Name, Enabled, Items}` | `MenuTree(label, items)`, `MenuItem(key, label, name, enabled, items)` | tables with those keys | `MenuTree { label, items }` | `{ label, items }` |
 | `Placement` and its fields | `Placement{Cols, Rows, Window, Z, Press, Fit, Hover, KeepCursor, Backdrop}` | `Placement(cols, rows, window, z, press, fit, hover, keep_cursor, backdrop)` | a table with those keys | `Placement { cols, rows, … }` | `{ cols, rows, window, z, press, fit, hover, keepCursor, backdrop }` |
 | a flag on, off or absent (`Press`, `Fit`, `Hover`) | `hotty.On`, `hotty.Off`, the zero value | `True`, `False`, `None` | `true`, `false`, `nil` | `Option<bool>` | `true`, `false`, `undefined` |
-| `N`, `Q`, `Detached`, `Scroll`, `Late` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)`, `hotty.Late()` | `n=`, `q=`, `detached=`, `scroll=`, `late=` | `{ n = …, q = …, detached = …, scroll = …, late = … }` | builder methods | `{ n, q, detached, scroll, late }` |
+| `N`, `Q`, `Detached`, `Scroll`, `Plain`, `Late` | `hotty.N(n)`, `hotty.Q(q)`, `hotty.Detached()`, `hotty.Scroll(axes)`, `hotty.Plain()`, `hotty.Late()` | `n=`, `q=`, `detached=`, `scroll=`, `plain=`, `late=` | `{ n = …, q = …, detached = …, scroll = …, plain = …, late = … }` | builder methods | `{ n, q, detached, scroll, plain, late }` |
 | `ScrollVertical`, `ScrollHorizontal` | `hotty.ScrollVertical`, `hotty.ScrollHorizontal` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` | `SCROLL_VERTICAL`, `SCROLL_HORIZONTAL` |
 | `Decoder.Feed`, `Invalid`, `Max` | `(*Decoder).Feed`, `.Invalid`, `.Max` | `Decoder.feed`, `.invalid`, `.max` | `decoder:feed`, `.invalid`, `hotty.decoder({ max = … })` | `Decoder::feed`, `.invalid`, `.max` | `Decoder.feed`, `.invalid`, `.max` |
 | `DefaultMax` | `hotty.DefaultMax` | `DEFAULT_MAX` | `DEFAULT_MAX` | `DEFAULT_MAX` | `DEFAULT_MAX` |
