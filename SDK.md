@@ -236,10 +236,13 @@ the program (compression), so the `encode` vectors compare bytes.
 - **The payload is base64**, the standard alphabet, padded. An empty payload
   is sent as nothing, with no `;` before it.
 - **Compression is the program's choice.** An SDK **MAY** compress a payload
-  with zlib and mark it `o=z`, and then only a payload of 256 bytes or more,
-  and only when compressing makes it smaller. It compresses at zlib's
-  default level, 6: a stylesheet of 20 KB comes out a third smaller than at
-  level 1, for about a millisecond. `o=z` follows the other keys.
+  with zlib and mark it `o=z`. It **SHOULD** compress only a payload longer
+  than one chunk holds plain, 3072 bytes, whose base64 is `Chunk`: below
+  that, compressing saves no sequence, and zlib's fixed cost per message is
+  several times the base64's. It compresses only when that makes the
+  payload smaller, and at zlib's fastest level, 1: on a recorded session of
+  plx, level 1 took 58% less time than the default level, 6, for 37% more
+  bytes, still a quarter of plain base64's. `o=z` follows the other keys.
   - **`Plain` turns it off for one document** (§3.4.2): a document that
     never leaves the program's process, such as one a renderer inside the
     program draws into cells, is sent uncompressed, so nothing is
