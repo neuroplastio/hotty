@@ -1187,7 +1187,7 @@ reads hotty messages from its input. A detached surface sends none (§5.5).
 | `e` | when | detail |
 | --- | --- | --- |
 | `click` | activating a `button`; an `a` or `summary`; an `input` of type `button`, `submit` or `reset`; or any element with `data-on~=click` | `{"area": area, "mods": int}`, the element's cells and the modifier keys held (below); with `"href": str` and `"url": str` for links (below), `"value": str` when the element has a `value` attribute, and `"count": int` for a repeated click (below) |
-| `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed: Enter in a text `input`, or focus leaving it (including when the surface loses the keyboard) | `{"checked": bool, "value": str, "rev": int}` for checkboxes and radio buttons, `{"value": str, "rev": int}` otherwise: with the control's `rev` (§6.4) |
+| `change` | a checkbox or radio button toggled, or an option of a `select` picked (§10.2), at once; a text control or `textarea` whose value changed, when the change is committed: Enter in a text `input`, or focus leaving it (including when the surface loses the keyboard, and focus fixup, §10.1) | `{"checked": bool, "value": str, "rev": int}` for checkboxes and radio buttons, `{"value": str, "rev": int}` otherwise: with the control's `rev` (§6.4) |
 | `input` | every edit of a control with `data-on~=input` | `{"value": str, "rev": int}`, with `"sel": [int, int]`, the selection after it, in a text field with `data-on~=caret` (below) |
 | `caret` | in a text field with `data-on~=caret`, the user moved the selection, and no `input` says so: a move, a click, or an edit in a field without `data-on~=input` | `{"sel": [int, int], "rev": int}`: the selection, its anchor then its caret, as `a=field` counts them (§6.4) |
 | `submit` | a form submitted (a submit button, or Enter in a text field, after the `change` it commits) | `{"fields": [[str, str]]}`: the form's fields, each its name and its value, in tree order, the submitter's included; `[]` for a form with none |
@@ -1865,7 +1865,10 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
 ```
 
 - **With `t`:** the element is focused (`ENOTARGET` if there is none). A
-  text field keeps its selection (§10.2).
+  text field keeps its selection (§10.2). An element that is not
+  focusable (below: it takes no focus and has no `tabindex`), or is
+  disabled, inert or not rendered, is not focused: the surface takes the
+  keyboard with nothing focused, as focus fixup leaves it.
 - **Without `t`:** the surface's focused element keeps focus, or else the
   first focusable element receives it.
 - **Echo:** no `focus` event is sent for focus the program gave.
@@ -1898,24 +1901,43 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
   cells, on another surface, or inside this one on an element that does not
   take focus. The host sends `blur`.
 - **The focused element goes away.** When the focused element leaves the
-  document, or stops taking focus, it loses focus, as HTML's focus fixup
-  has it. The surface keeps the keyboard with nothing focused (§10.2).
-  - **What counts:** the element removed, by a delta or a new document
-    (§5.1, §6); made `disabled` or `inert`, or put inside an `inert`
-    element; or no longer rendered, by `display: none`, `visibility:
-    hidden`, a closed `details` or a `hidden` attribute, its own or an
-    ancestor's. `opacity: 0` does not count, nor does anything else that
-    leaves the element rendered and focusable in a browser: scrolled out
-    of view, clipped, covered, or outside the placement's window (§5.2).
-  - **When the host checks:** each time it lays the document out, after
-    the program's changes and after a resize, as a browser runs focus
-    fixup when it updates the rendering.
-  - **The program is told nothing,** as HTML's focus fixup fires no
-    event: no `blur`, no `focus`, and no `change`. A program that removed
-    or disabled the element knows it did. For one that layout alone hid,
-    the next key reaches the program (§10.2), which shows it nothing is
-    focused. A value the user changed and did not commit stays in the
-    field, and a `submit` of its form still carries it.
+  document, or stops taking focus, it loses focus, as in HTML's focus
+  fixup. The surface keeps the keyboard with nothing focused (§10.2).
+  - **Leaving the document:** a delta removes it or what holds it (§6),
+    or a new document replaces the one it was in (§5.1).
+  - **Stopping taking focus:**
+    - **No longer focusable:** it is none of the elements that take focus
+      (above) and has no `tabindex`: a link whose `href` is removed, an
+      editing host no longer `contenteditable`, an element whose
+      `tabindex` is removed. An element with a `tabindex` of any value is
+      focusable, so a focused one whose `tabindex` goes from 0 to -1
+      keeps focus, and so does one with `tabindex=-1` that `a=focus`
+      gave focus, though no click would.
+    - **Disabled,** as HTML has it: its own `disabled`, or a disabled
+      `fieldset`'s, unless it is inside that fieldset's first `legend`.
+    - **Inert:** made `inert`, or inside an element made `inert`.
+    - **Not rendered:** `display: none`, its own or an ancestor's, which
+      a `hidden` attribute gives too; inside an element whose content is
+      skipped (`content-visibility: hidden`, a closed `details`); or
+      `visibility: hidden`, which browsers refuse focus though HTML counts
+      it rendered.
+
+    `opacity: 0` does not count, nor does anything else that leaves the
+    element rendered and focusable in a browser: scrolled out of view,
+    clipped, covered, or outside the placement's window (§5.2).
+  - **When:** a delta or a document that removes the focused element, or
+    makes it disabled, inert or no longer focusable, takes effect before
+    the next key or pointer event the surface is offered. What CSS hides
+    takes effect at the next layout, which the host runs before it offers
+    the next key; a resize lays the document out again.
+  - **No `blur`, no `focus`.** The surface keeps the keyboard, which is
+    what `blur` would deny, and no element was focused. A text control
+    the user changed commits it as focus leaving it does (§9), with its
+    `change`, as HTML's fixup does for an element still in the document;
+    one removed sends nothing. A program that removed or disabled the
+    element knows it did. One whose element layout alone hid is not told,
+    and the last `focus` it heard (§10.2, *Keys for the program*) is then
+    stale.
   - **With nothing focused,** the keymap is the `body`'s (§10.2,
     *Keymaps*): a key it gives the program, or binds to a scroll action,
     does that, and every other key but a scrolling document's own
@@ -3558,23 +3580,33 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     keyboard while focus moves inside it. A program that only wanted to
     know the surface has the keyboard reads the first `focus` after a
     `blur`, as before.
-- **Why focus fixup sends nothing.** A component that closes, such as a
+- **Why focus fixup sends no `blur`.** A component that closes, such as a
   toast whose button had focus, disables or hides what it shows, and the
-  host has to do something with the focus it held. HTML's answer is focus
-  fixup: the document keeps the keyboard with nothing focused, and no
-  event fires. A `blur` would say the terminal has the keyboard, which it
-  does not, and a `focus` on some other element would move the user where
-  neither they nor the program went.
-  - **The program knows already** where it removed or disabled the
-    element, and where layout alone hid it, the next key reaches it,
-    which is what nothing focused means to it.
+  host has to do something with the focus it held. HTML is silent when the
+  element is removed, and fires the element's `blur` (and a `change` for
+  an edit) when it is hidden or disabled. hotty has no element blur: its
+  `blur` says the terminal has the keyboard, which it does not, and a
+  `focus` on another element would move the user where neither they nor
+  the program went. So the host sends neither, and commits an edit as
+  HTML does, so that no media query loses what the user typed.
+  - **No event for layout alone.** A program that removed or disabled the
+    element knows it did. One that hides its focused element with a media
+    query is not told, and its last `focus` is stale. That is rare, and
+    such a program can avoid it, so it costs no event.
   - **No blur of its own.** With fixup, a program that wants nothing
     focused disables or hides the element, as a page does, so hotty needs
     no counterpart of a page's `activeElement.blur()`. `a=blur` still
     gives the keyboard to the terminal.
-  - **On layout,** because `display: none` and `visibility: hidden` come
-    from styles, a media query or a resize as much as from the program's
-    deltas, and only layout knows what is rendered.
+  - **Before the next key,** because a program's delta and the user's
+    next key race, and a key that reached the element the program had
+    just disabled would be lost. What CSS hides is known only after
+    layout, so the host lays out before it offers a key.
+  - **Tab from nothing focused** goes to the first focusable element, as
+    `a=focus` without `t` does, and Shift+Tab to the last. A browser goes
+    on from where the element was (its focus navigation starting point),
+    but HTML says nothing of a starting point that was removed, and
+    browsers differ there; the first and the last are one rule for every
+    host.
 - **Why scrolling keys.** Pagers and viewers in the terminal (less, vim,
   Bubble Tea's viewport, glow) share `j` and `k`, Space and `b`, `g` and
   `G`. A program that scrolls its cells with them should scroll its

@@ -965,10 +965,13 @@ A host that runs inside a test, so that a program's tests need no terminal.
   `data-steps` carries the steps the test gives, in it and in `t` (SPEC.md
   §9.1). A drag goes to the element the test names, which may be one with
   `drop` in its `data-on`. It keeps the focused element, and drops focus
-  as SPEC.md §10.1 has a host do when the element goes away, with no
-  event: when a delta or a document removes it, makes it `disabled` (by
-  a `disabled` fieldset too), or makes it or an ancestor `inert` or
-  `hidden`. What CSS hides it cannot see.
+  as SPEC.md §10.1 has a host do when the element goes away, sending only
+  the `change` of a field the user edited that is still in the document:
+  when a delta or a document removes it; makes it disabled, by its own
+  `disabled` or a disabled fieldset's, outside that fieldset's first
+  `legend`; makes it or an ancestor `inert` or `hidden`; or removes what
+  made it focusable, a `tabindex`, an `href` or `contenteditable`. What
+  CSS hides it cannot see.
   So it skips the vectors marked `scroll`, `steps`, `drop`, `view` and
   `layout` (conformance/README.md), which every other host passes.
 - **Strict by default.** A malformed message, an `EINVAL`, or a hotty

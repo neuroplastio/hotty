@@ -19393,7 +19393,7 @@
    ]
   },
   {
-   "name": "focus fixup: the focused element removed, made disabled, inside a disabled fieldset, or made inert loses focus with no event, no blur, focus or change; the surface keeps the keyboard and every key reaches the program; then tab, and a=focus without t, focus the first focusable element, and shift+tab with none left gives the keyboard back with blur (SPEC \u00a710.1)",
+   "name": "focus fixup: the focused element removed, disabled, no longer focusable, or gone with its document loses focus before the next key, with no blur or focus; a field the user edited that stays in the document commits it with change, one removed sends nothing; keys then reach the program, tab goes to the first focusable element and shift+tab to the last, not on from where the element was; a tabindex of -1 keeps focus (SPEC \u00a710.1)",
    "steps": [
     {
      "send": {
@@ -19401,14 +19401,14 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}</style><input id=a data-on=input><button id=b>ok</button><fieldset id=f><input id=c data-on=input></fieldset><input id=d data-on=input>"
+     "payload": "<style>body{margin:0}</style><input id=a data-on=input><input id=b data-on=input><input id=c data-on=input><div id=n tabindex=0>n</div>"
     },
     {
      "send": {
       "a": "place",
       "s": "x",
       "c": "30",
-      "r": "8",
+      "r": "6",
       "q": "2"
      }
     },
@@ -19416,10 +19416,57 @@
      "send": {
       "a": "focus",
       "s": "x",
-      "t": "a",
+      "t": "b",
       "q": "2"
      },
      "events": []
+    },
+    {
+     "key": "p",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "remove",
+        "t": "b"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "q",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "a"
+      }
+     ]
     },
     {
      "key": "p",
@@ -19445,8 +19492,94 @@
      "body": {
       "ops": [
        {
-        "op": "remove",
-        "t": "a"
+        "op": "attr",
+        "t": "a",
+        "k": "disabled",
+        "v": ""
+       }
+      ]
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": "q",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "n"
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "n",
+        "k": "tabindex",
+        "v": "-1"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "blur",
+       "s": "x",
+       "t": null
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "n",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "unattr",
+        "t": "n",
+        "k": "tabindex"
        }
       ]
      },
@@ -19464,43 +19597,12 @@
       {
        "e": "focus",
        "s": "x",
-       "t": "b"
+       "t": "c"
       }
      ]
     },
     {
-     "send": {
-      "a": "delta",
-      "s": "x",
-      "q": "2"
-     },
-     "body": {
-      "ops": [
-       {
-        "op": "attr",
-        "t": "b",
-        "k": "disabled",
-        "v": ""
-       }
-      ]
-     },
-     "events": []
-    },
-    {
-     "key": "Enter",
-     "terminal": true,
-     "events": []
-    },
-    {
-     "send": {
-      "a": "focus",
-      "s": "x",
-      "q": "2"
-     },
-     "events": []
-    },
-    {
-     "key": "r",
+     "key": "p",
      "terminal": false,
      "events": [
       {
@@ -19508,7 +19610,78 @@
        "s": "x",
        "t": "c",
        "detail": {
-        "value": "r",
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=d data-on=input>",
+     "events": []
+    },
+    {
+     "key": "q",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "d"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "focus fixup: a field in a fieldset made disabled, one inside an ancestor made inert, and one given a hidden attribute lose focus and commit what the user typed with change, and nothing else; a button in the disabled fieldset's first legend keeps focus; with none left, shift+tab gives the keyboard back with blur (SPEC \u00a710.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><fieldset id=f><legend><button id=l>l</button></legend><input id=g data-on=input></fieldset><div id=w><input id=h data-on=input></div><input id=i data-on=input><button id=z>z</button>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "8",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "g",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "p",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "value": "p",
         "rev": 1
        }
       }
@@ -19530,10 +19703,20 @@
        }
       ]
      },
-     "events": []
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
     },
     {
-     "key": "s",
+     "key": "q",
      "terminal": true,
      "events": []
     },
@@ -19541,21 +19724,32 @@
      "send": {
       "a": "focus",
       "s": "x",
-      "t": "d",
+      "t": "l",
       "q": "2"
      },
      "events": []
     },
     {
-     "key": "t",
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "h"
+      }
+     ]
+    },
+    {
+     "key": "p",
      "terminal": false,
      "events": [
       {
        "e": "input",
        "s": "x",
-       "t": "d",
+       "t": "h",
        "detail": {
-        "value": "t",
+        "value": "p",
         "rev": 1
        }
       }
@@ -19571,16 +19765,122 @@
       "ops": [
        {
         "op": "attr",
-        "t": "d",
+        "t": "w",
         "k": "inert",
         "v": ""
+       }
+      ]
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "h",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": "q",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "i",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "p",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "i",
+        "k": "hidden",
+        "v": ""
+       }
+      ]
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": "q",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "z"
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "remove",
+        "t": "z"
+       },
+       {
+        "op": "remove",
+        "t": "f"
        }
       ]
      },
      "events": []
     },
     {
-     "key": "u",
+     "key": "q",
      "terminal": true,
      "events": []
     },
@@ -19599,17 +19899,15 @@
      ]
     },
     {
-     "key": "v",
+     "key": "q",
      "terminal": true,
      "events": []
     }
    ]
   },
   {
-   "name": "focus fixup on layout: display: none from a class, visibility: hidden, a details closed, and a media query a resize turns on drop focus with no event, and keys then reach the program; opacity: 0 leaves the element focused (SPEC \u00a710.1)",
-   "requires": [
-    "layout"
-   ],
+   "name": "focus fixup on layout: display: none from a class, its own or an ancestor's, visibility: hidden, a details closed, and a media query a resize turns on drop focus before the next key, committing what the user typed with change; opacity: 0 leaves the element focused (SPEC \u00a710.1)",
+   "requires": "layout",
    "steps": [
     {
      "send": {
@@ -19617,14 +19915,14 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}.gone{display:none}.ghost{visibility:hidden}.clear{opacity:0}@media (orientation: portrait){#d{display:none}}</style><input id=a data-on=input><input id=b data-on=input><details id=e open><summary>e</summary><input id=c data-on=input></details><input id=d data-on=input>"
+     "payload": "<style>body{margin:0}.gone{display:none}.ghost{visibility:hidden}.clear{opacity:0}@media (orientation: portrait){#d{display:none}}</style><input id=a data-on=input><div id=wrap><input id=e data-on=input></div><input id=b data-on=input><details id=dt open><summary>s</summary><input id=c data-on=input></details><input id=d data-on=input>"
     },
     {
      "send": {
       "a": "place",
       "s": "x",
       "c": "30",
-      "r": "6",
+      "r": "8",
       "q": "2"
      }
     },
@@ -19701,7 +19999,74 @@
        }
       ]
      },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "pq",
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "key": "r",
+     "terminal": true,
      "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "e",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "p",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "e",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "wrap",
+        "k": "class",
+        "v": "gone"
+       }
+      ]
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "e",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
     },
     {
      "key": "r",
@@ -19748,7 +20113,17 @@
        }
       ]
      },
-     "events": []
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
     },
     {
      "key": "r",
@@ -19789,12 +20164,22 @@
       "ops": [
        {
         "op": "unattr",
-        "t": "e",
+        "t": "dt",
         "k": "open"
        }
       ]
      },
-     "events": []
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
     },
     {
      "key": "r",
@@ -19833,7 +20218,17 @@
       "r": "12",
       "q": "2"
      },
-     "events": []
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "d",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
     },
     {
      "key": "r",
