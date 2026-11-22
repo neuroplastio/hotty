@@ -8,6 +8,125 @@ path: changes
 
 # Changes
 
+## 0.9
+
+A draft, as every 0.x is, not yet released: the spec, SDK.md and the
+vectors are on hotty's `hotty-0.9` branch, and the SDKs and hosts follow
+on theirs.
+
+hotty's 0.9 hosts and SDKs speak 0.8 too, and no longer 0.7 (SPEC.md
+§15), so versions meet as follows (§4, §14):
+- an 0.8 program on a 0.9 host that speaks 0.8 is answered in 0.8, and
+  the host speaks 0.8 to it from then on: its `data-keys` holds for
+  everything inside its element, and its menus come from a `press` with
+  `button` 2 under `secondary` (HOST.md §5);
+- a 0.9 program, whose query lists `0.8,0.9`, on an 0.8 host is answered
+  in 0.8, and hears no `contextmenu` and no `auxclick` there (SDK.md
+  §3.8);
+- a 0.7 program meets a 0.9 host at `EVERSION`, and so does a host or a
+  program that speaks only 0.9 meet an 0.8 one, and the program falls
+  back.
+
+### What changed
+
+- **The focused element going away** loses focus, as in HTML's focus
+  fixup (SPEC.md §10.1, §9): removed, replaced, disabled, inert, no longer
+  focusable, or not rendered, `visibility: hidden` included and `opacity:
+  0` not. The surface keeps the keyboard with nothing focused, the host
+  sends no `blur`, and the next key reaches the program. A text control
+  the user changed sends its `change`.
+- **An identical resend may change nothing** (SPEC.md §7.1). A host
+  **MAY** ignore an `a=res` whose id, type as sent and bytes match the
+  stored resource, and either way **MUST NOT** change what is shown: an
+  animated image goes on from where it is, and no frame is drawn without
+  the resource.
+- **A key the keymap gives the program that is a command the program
+  took** reaches it as the command (SPEC.md §10.6, §10.2): `ctrl+c=program`
+  on Linux, with `copy` taken, sends `copy` with `"key": "ctrl+c"`.
+- **A wheel past a surface's edge no longer becomes keys** (SPEC.md §5.3,
+  §9). On the alternate screen, while the program has no mouse tracking
+  on, a gesture along an axis the document scrolls stops at the root,
+  whatever the terminal's alternate scroll setting. On the main screen it
+  still chains to the scrollback. A host that keeps a gesture's route
+  keeps one for each axis, and a multiplexer that relays the surface does
+  the same for the program behind it.
+- **A pointer's other buttons, as the DOM has them** (SPEC.md §9,
+  §9.1–§9.4, §3.3, §5.2, §10.2, §11; HOST.md §3.1, §3.2).
+  - **`contextmenu`**, an event and a word of `data-on`, replaces the
+    secondary press: the platform's gesture for a context menu (a mouse's
+    secondary button, Control with the primary on macOS, a pen's barrel,
+    a long press, and the menu key on a host that reports it), with
+    `area` and the pointer's cell.
+  - **`aux`** brings an `auxclick` at the release, for every other button
+    by its DOM number, and with `drag` a drag with those buttons, its
+    `button` in `dragstart`.
+  - **`rightbutton`** takes the secondary button as a plain button: the
+    nearest element with `contextmenu` or `rightbutton` decides.
+  - A `press` is the primary button's alone.
+- **A keymap is the element's own, or for what is inside it** (SPEC.md
+  §10.1, §10.2, §10.4, §10.5, §10.7, §11).
+  - **`data-keys`** holds only while its element is focused, and
+    **`data-keys-inner`** while something inside it is, never the element
+    itself. The focused element's keymap is the default keymap for a text
+    field, each ancestor's `data-keys-inner` from the root down, then its
+    own `data-keys`.
+  - **Each reader takes what it has a use for,** in a table: a binding it
+    does not take neither acts nor overrides. An element takes a key it
+    uses to `program` or `prefix` from its own `data-keys` only, and
+    `default` holds there alone.
+  - **With nothing focused** the body stands for the document: the root's
+    and the body's `data-keys-inner`, then the body's own `data-keys`. A
+    selection reads only those, and takes `copy` from the body's own.
+  - In the SDKs, `Resolve` takes `own` and `inner`, and its readers as a
+    closed set (SDK.md §3.10).
+
+### Upgrading from 0.8
+
+**A program:**
+- Ask for `v=0.9`, or `v=0.8,0.9` to speak both.
+- Open an element's menu from a `contextmenu`: write `contextmenu` in its
+  `data-on` where `secondary` was, and read `area`, `c` and `r` from it,
+  with no `c` and `r` from the menu key. For an 0.8 host as well, write
+  both words, and open the same menu from the `press` with `button` 2
+  (SDK.md §4.7). A program that acts on every `press` hears only the
+  primary button now.
+- Take the middle, back and forward buttons with `aux` (an `auxclick`
+  with `button`), and the secondary button as a plain one with
+  `rightbutton`.
+- Place each binding: one for the element alone in its `data-keys`, one
+  for what is inside it in its `data-keys-inner`, and one for both in
+  both. A wrapper's editing keys or leader, written in `data-keys` under
+  0.8, move to its `data-keys-inner`. A key an element uses, such as a
+  field's characters or a button's `space`, is given to `program` or
+  `prefix` only in that element's own `data-keys`, and so is `default`.
+  The document's keys go on the `body`, which holds them with nothing
+  focused.
+- Expect no arrow keys from a wheel at a surface's edge on the alternate
+  screen: the document keeps it.
+- After the focused element goes away, the next key comes to the
+  program with no `blur`: the last `focus` it heard is stale.
+
+**An SDK:**
+- `Resolve` takes `own` and `inner` and a reader from its closed set; an
+  0.8 call fails loudly (SDK.md §3.10, Appendix H).
+- Read `contextmenu` and `auxclick` (§3.1, §3.9), and keep
+  `ButtonSecondary`, 2, for an `auxclick` under `rightbutton` and an 0.8
+  session's press.
+
+**A host:**
+- Speak 0.9, and a host that also speaks 0.8 answers an 0.8 program in
+  0.8, reading its keymaps and its secondary press as HOST.md §5.1 and
+  §5.2 have it. A 0.7 program is answered with `EVERSION`.
+- Send `contextmenu` and `auxclick`, take `aux` and `rightbutton`, and
+  drag with the other buttons where `drag` asks.
+- Build a keymap from own and inner, by its reader, and run focus fixup
+  at each layout, with no `blur`.
+- Stop a wheel at the root on the alternate screen as §5.3 has it, with a
+  route for each axis.
+- Send a key the keymap gives the program as the command it is, where the
+  program took it. A byte-identical resend may be skipped, and never
+  restarts an animation.
+
 ## 0.8
 
 A draft, as every 0.x is, released across the stack on 2026-11-15:
