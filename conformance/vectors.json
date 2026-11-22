@@ -15507,7 +15507,7 @@
    ]
   },
   {
-   "name": "on the alternate screen, with no mouse tracking on, a route is kept per axis: a swipe that opens across, which goes to the terminal, and turns down still scrolls the document; a gesture stopped past its edge is the document's, and turned back it scrolls it (SPEC \u00a75.3)",
+   "name": "on the alternate screen, with no mouse tracking on, a route is kept per axis and each event goes whole by its main axis: a diagonal wheel down and slightly across over a document that scrolls only down scrolls it, and none of it goes to the terminal; a swipe that opens across, which goes to the terminal, and turns down still scrolls the document; a gesture stopped past its edge is the document's, and turned back it scrolls it (SPEC \u00a75.3)",
    "requires": "scroll",
    "steps": [
     {
@@ -15548,6 +15548,37 @@
        "e": "press",
        "s": "x",
        "t": "a",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      1,
+      5
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "f",
        "detail": {
         "area": {
          "c": 0,

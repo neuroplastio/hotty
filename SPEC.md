@@ -605,8 +605,8 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
     root to the terminal, as if over the cells beneath (§9), unless CSS
     `overscroll-behavior` stops it there, or the host does (below).
   - **Past the edge on the alternate screen.** On the alternate screen,
-    while the program has no mouse tracking on (DECSET 9, 1000, 1002 or
-    1003; an encoding such as 1006 alone is no tracking), a gesture along
+    while the program has no mouse tracking mode on (DECSET 9 or 1000 to
+    1003; an encoding such as 1006 alone is none), a gesture along
     an axis the document scrolls that goes past the root would reach the
     terminal only to become keys, or to do nothing, since that screen
     keeps no scrollback. The host **MUST** stop it at the root, as

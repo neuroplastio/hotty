@@ -1012,14 +1012,14 @@ Until then, what the protocol already asks of one:
   of its own beside its programs', such as a canvas behind their panes,
   keeps its own below, by `z`, and replaces a document rather than
   creating the surface again, which keeps its place (SPEC.md §5.1, §5.2).
-- **A wheel at a scrolling surface's edge** (SPEC.md §5.3): a wheel the
-  host passes on over the window of a relayed surface, along an axis its
-  document scrolls, the relay drops where it would turn it into keys for
-  that program (its alternate screen, with no mouse tracking on);
-  otherwise it passes it on as before. Over such a window the host passes
-  on only wheels past the edge, or stopped ones, so the relay needs no
-  word of which: the placement and the document's `scroll`, which it
-  relays already, are enough.
+- **A wheel at a scrolling surface's edge** (SPEC.md §5.3): a wheel the host
+  passes on over the window of a relayed surface, along an axis its document
+  scrolls, the relay drops where it would turn it into keys for that program
+  (its alternate screen, with no mouse tracking on); otherwise it passes it
+  on as before. Over such a window the host passes on only wheels past the
+  edge, and those along an axis its document does not scroll, so the relay
+  needs no word of which: the placement and the document's `scroll`, which
+  it relays already, are enough.
 - **A `hit`** (SPEC.md §9.7) it passes on with the host's name for the
   surface, and the cell as the program counts it, since the surface's top
   left cell is the same for both. It answers `ENOENT` for a surface it

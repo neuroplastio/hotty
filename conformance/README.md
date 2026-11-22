@@ -138,11 +138,13 @@ checked).
   It is one gesture: a runner may send it as several wheel events (a
   browser scrolls no more than a page for one), lets what it scrolls come
   to rest before the step's events are read, and lets the gesture end
-  before the next step, so each wheel step is a gesture of its own. `"by"`
-  may also be a list of such moves, `[[c, r], …]`, made in order within
-  that one gesture, each sent as events of its own that move along its
-  direction only, with no end of the gesture between them: a swipe that
-  opens across and turns down, or one turned back.
+  before the next step, so each wheel step is a gesture of its own. A
+  `"by"` with both parts nonzero is sent as events that each move in that
+  ratio, so no event of it moves along one axis alone. `"by"` may also be
+  a list of such moves, `[[c, r], …]`, made in order within that one
+  gesture, each sent as events of its own that move in its direction,
+  with no end of the gesture between them: a swipe that opens across and
+  turns down, or one turned back.
 - `"leave"` takes the pointer out of the terminal's window.
 - `"keys"`: the modifier keys held during the step (`shift`, `ctrl`, `alt`,
   `super`); none when absent.
