@@ -1010,14 +1010,22 @@ stylesheet shared by several surfaces, an image, a font.
   `<link rel=stylesheet>`, `poster`, SVG `href`) and in CSS `url()` and
   `@import`. Those include inline `style` attributes, `<style>` elements and
   stylesheet resources.
+- **Its type** says what it is, as a server's `Content-Type` does: a
+  stylesheet link or `@import` applies a resource whose type is
+  `text/css`, with or without parameters, and nothing else, as a browser
+  does in a page in standards mode.
 - **Updates:** sending a resource again replaces it, and every surface that
   refers to it is drawn again. `a=del:id=<id>` deletes it, after which
   references to it fail as if missing.
-  - **The same again.** A resend whose id, type and bytes match the stored
-    resource changes nothing, and a host **MAY** ignore it: it draws
-    nothing again, and is answered as any `a=res`. Ignored or not, a host
-    **MUST NOT** restart an animated image for one: the image goes on from
-    the frame it shows.
+  - **The same again.** A resend whose id, type as sent and bytes, after
+    reassembly (§3.4), match the stored resource changes nothing, and a
+    host **MAY** ignore it: it draws nothing again, and is answered as any
+    `a=res`. A type is compared as a string, so `text/css` and `text/css;
+    charset=utf-8` differ. Ignored or not, it **MUST NOT** change what is
+    shown: an animated image, a CSS animation or a transition goes on
+    from where it is, scroll offsets stay, and no frame is drawn without
+    the resource, such as one without the stylesheet or in a fallback
+    font.
 - **Late arrival:** a reference to a resource that does not exist yet is
   resolved when it arrives. A placement made with `f=1` hears whether that
   changed the document's height (§5.2).
@@ -3264,9 +3272,9 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   sends its stylesheet again, and each surface that links it is styled
   again for the same bytes. A host that compares them first skips that
   work, and the program sees no difference: the same bytes draw the same
-  pixels. An animated image is the one thing a redraw could change, by
-  starting it again, so that is ruled out whether the host compares or
-  not.
+  pixels. A redraw that reloads can change what is shown (an animation
+  starting again, a frame without the stylesheet, offsets clamped while
+  it loads), so that is ruled out whether the host compares or not.
 - **Why other buttons, by number.** A browser closes a tab on a middle
   click, and a mouse's back and forward buttons go back and forward
   through a history. A surface took only the primary and the secondary

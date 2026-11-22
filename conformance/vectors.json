@@ -4458,7 +4458,7 @@
    ]
   },
   {
-   "name": "a resource sent again with the same id, type and bytes is answered as any a=res and changes nothing: a placement with f=1 hears nothing; other bytes replace it, and are heard (SPEC \u00a77.1)",
+   "name": "a resource sent again with the same id, type and bytes is answered as any a=res and changes nothing: a placement with f=1 hears nothing; other bytes replace it, and so do the same bytes under another type, here one that is no stylesheet, and both are heard (SPEC \u00a77.1)",
    "steps": [
     {
      "send": {
@@ -4532,6 +4532,28 @@
        "s": "x",
        "detail": {
         "r": 3
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "res",
+      "id": "tall",
+      "type": "text/plain",
+      "q": "0"
+     },
+     "payload": "#d { height: calc(3 * var(--hotty-cell-h)) }",
+     "reply": {
+      "a": "ok",
+      "re": "res"
+     },
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "detail": {
+        "r": 1
        }
       }
      ]
