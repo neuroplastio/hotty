@@ -57,6 +57,8 @@ it. A list names several, all required:
   *A text field pastes*): on Linux, the primary selection, with the
   host's setting for it on. Its runner sets what the paste reads
   (Primary, below);
+- `"menu-key"`, a host that reports the menu key as `contextmenu` (SPEC
+  §9, *The menu key*);
 - `"paste-field"`, a host whose terminal's paste reaches the text field
   that has the keyboard (SPEC §11), a middle press's included. A browser
   host may not (HOST.md §3.2);
@@ -134,7 +136,13 @@ checked).
   `pointerdown` with the button, and for the secondary the `contextmenu`
   that follows, for another button the `pointerup`, `mouseup` and
   `auxclick` the browser makes, or real input (HOST.md §3.2). A
-  `"down"` while another button is down presses a second one. The
+  `"down"` while another button is down presses a second one. A host
+  that sends `contextmenu` at the release, as on Windows (SPEC §9), is
+  checked for a `"down"`'s `contextmenu` at the `"up"` that follows it.
+  With another button than the primary down, a `"move"` goes along the
+  straight line from where the pointer was, so it passes the host's slop
+  as a touch's does (SPEC §9.1); the vectors move such a pointer two cells
+  or more, and not at all for a release within the slop. The
   `"keys"` held apply as for any button, so a secondary press with Shift
   or Alt is a step too.
 - `"wheel"` turns the wheel where the pointer is, by `"by": [c, r]`, columns

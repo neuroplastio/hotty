@@ -18,7 +18,7 @@ A **host** draws a program's surfaces (SPEC.md §1). SPEC.md says what a
 host must do on the wire. This document says what a host should provide
 beyond it, so that a document looks the same on every host that follows
 it, and a user finds the same gestures: the font a host ships, and the
-gestures it calls a secondary press, and how it numbers and takes a mouse's
+gestures it makes a context menu's, and how it numbers and takes a mouse's
 other buttons.
 
 Nothing here is on the wire. A host doesn't report it, and a program can't
@@ -159,19 +159,25 @@ a host ships the font.
 
 ## 3. Buttons
 
-### 3.1 The secondary press
+### 3.1 The context menu
 
-SPEC.md §9 defines a secondary press and the event it makes. Which gesture
-a user makes for one is the platform's, and a host takes the ones its
-platform calls so. Nothing here is on the wire: a program hears a `press`
-with `button` 2, and can't tell which gesture made it.
+SPEC.md §9 defines `contextmenu` and the gestures that make it. Which
+gesture a user makes for one is the platform's, and a host takes the ones
+its platform calls so. Nothing here is on the wire: a program hears a
+`contextmenu`, and can't tell which gesture made it.
 
-| gesture | where it is a secondary press |
+| gesture | where it makes `contextmenu` |
 | --- | --- |
 | the mouse's secondary button | everywhere |
 | the primary button with Control held | macOS, where AppKit makes it a context click; `ctrl` is then left out of `mods` |
 | a pen's barrel button | where the platform reports one |
 | a touch held past the long-press time | everywhere, over an element that takes it (SPEC.md §9.1) |
+| the menu key, `context_menu` or `shift+f10` | only where the host reports it (below) |
+
+**When** is the platform's too: on the press on Linux and macOS, and on
+the release on Windows, where native menus and browsers open theirs then.
+A host on Windows holds the pointer from the press, as for a press it
+takes, and reports at the release.
 
 How a toolkit reports them:
 - **GTK:** a `GtkGestureClick` with button 3 (`GDK_BUTTON_SECONDARY`) for the
@@ -179,25 +185,30 @@ How a toolkit reports them:
 - **AppKit:** `rightMouseDown`, and `menu(for:)` for a context click, which
   covers Control with the primary button. A pen's barrel button comes with
   `rightMouseDown` too.
-- **A browser:** `pointerdown` with `button` 2 for a mouse and a pen's barrel
-  button, which is also the DOM's number for `button`. The `contextmenu`
-  event covers the rest: Control with the primary button on macOS, and a
-  touch's long press. A host that takes the press from `pointerdown` calls
-  `preventDefault` on the `contextmenu` that follows, so the browser's
-  menu does not open over a press the surface took.
+- **A browser:** the `contextmenu` event itself, which the browser sends
+  at its platform's time for each gesture: the secondary button, Control
+  with the primary on macOS, a pen's barrel and a touch's long press. The
+  host reports it there and cancels it, so the browser's menu does not
+  open, and cancels the secondary button's `pointerdown` too, for focus
+  and selection. It reports a `contextmenu` the browser makes from a key
+  only where its tests tell one from a pointer's, and otherwise not.
 
 Shift and Alt come first (SPEC.md §9.2). With either held, the host
-handles the press as one on the cells beneath the surface: the terminal's
-own menu with Shift, and the program's mouse report with Alt.
+handles the gesture as one on the cells beneath the surface: the
+terminal's own menu with Shift, and the program's mouse report with Alt.
 
-The keyboard's way to a menu is not the host's. `shift+f10` and the Menu key
-reach the program as keys (SPEC.md §10.2), and a host adds nothing for them.
+**The menu key** is optional (SPEC.md §9). A host that reads keys before
+it passes them on, as a terminal host does, can report `context_menu` and
+`shift+f10` where SPEC.md says. One that does not leaves them keys, which
+reach the program (SPEC.md §10.2), and a program offers its menu from
+them too.
 
 ### 3.2 Other buttons
 
 SPEC.md §9 reports a mouse's other buttons by the DOM's numbers, on an
-element with `aux` in its `data-on`. A host maps its platform's buttons to
-them:
+element with `aux` in its `data-on`, as an `auxclick` at the release, or a
+drag where the element has `drag` too. A host maps its platform's buttons
+to them:
 
 | platform | middle (1) | back (3), forward (4) | later (6 and up) |
 | --- | --- | --- | --- |
@@ -231,8 +242,8 @@ them:
 from it** (SPEC.md §9): autoscroll, the terminal's or the browser's paste,
 history navigation, a link opened in a new tab. A button it can't take
 whole stays the platform's or the terminal's, and is never half-taken: a
-program that heard a press while the page went back would be worse off
-than one that heard nothing.
+program that heard an `auxclick` while the page went back would be worse
+off than one that heard nothing.
 
 **A browser host** applies that rule per engine, decided up front, because
 it can't find out at run time: a navigation that wasn't cancelled has
@@ -268,6 +279,12 @@ already happened.
   all. Safari before the fix of WebKit bug 280755 (likely Safari 26.4)
   reported both side buttons as `button` 1 on macOS, with `buttons` 8 or
   16, and as 0 on iPadOS.
+- **The pointer, until the release.** It calls `setPointerCapture` on
+  the press it takes, so that the moves and the release reach it wherever
+  the pointer goes, outside the surface's frame included, as for a
+  primary drag. Its moves go to a drag once they pass its slop, where the
+  element has `drag` as well (SPEC.md §9.1), and nowhere otherwise; its
+  `pointerup` there is the `auxclick` or the `dragend`.
 - **Over an element without `aux`,** it passes the press to the program's
   mouse reporting, as it passes a press with Alt (SPEC.md §9.2), and
   cancels its `pointerdown`, as for any press it passes on over a surface,
@@ -294,9 +311,10 @@ already happened.
 
 **A terminal host** (hottyterm) asks the surface before the terminal does
 anything with a press: before its paste, its mouse report, and any return
-its toolkit's code makes first. A press the surface took has its release
-taken too, and so does any press while a surface holds a button (SPEC.md
-§9, *One button at a time*). A middle press on a field is taken, as a
+its toolkit's code makes first. A press the surface took has its moves and
+its release taken too, the moves going to a drag where the element drags
+with the button (SPEC.md §9.1), and so does any press while a surface
+holds a button (SPEC.md §9, *One button at a time*). A middle press on a field is taken, as a
 press the surface took: the host focuses the field and puts its caret at
 the pointer, then starts the terminal's read of what its middle press
 pastes itself, and the terminal's paste types it into the focused field
@@ -365,6 +383,21 @@ it speaks 0.7 too, with the same resolver, from other attributes:
   around its text; and with nothing focused the body's keymap holds.
 - **No second reading,** as in a 0.7 session (§5.1): one resolver, with
   the bindings taken from where 0.8 put them.
+
+### 5.3 Buttons in an 0.8 session
+
+From 0.9 a context menu's gesture is `contextmenu`, asked for with
+`contextmenu` in `data-on`, and another button is `aux`'s `auxclick`
+(SPEC.md §9). 0.7 and 0.8 had a `press` with `button` 2, asked for with
+`secondary`, and no other button. A host that speaks 0.8 as well keeps
+that in an 0.8 session, and in a 0.7 one where it speaks 0.7 too:
+- **`secondary` is read, and `contextmenu` and `aux` are not.** The
+  gesture is reported as a `press` with `button` 2, its `area`, and `c`
+  and `r`, at the press on every platform, as 0.8 had it, and never from
+  the menu key.
+- **No other button is the surface's:** each is the terminal's, as over
+  the cells, and no drag carries a `button`.
+- **Shift and Alt** are as 0.8 had them for the secondary press.
 
 ## 6. Implementations
 

@@ -49,6 +49,7 @@ EVENT_INPUT = "input"
 EVENT_CARET = "caret"
 EVENT_SUBMIT = "submit"
 EVENT_PRESS = "press"
+EVENT_CONTEXTMENU = "contextmenu"
 EVENT_AUXCLICK = "auxclick"
 EVENT_FOCUS = "focus"
 EVENT_BLUR = "blur"
@@ -77,11 +78,11 @@ FEATURE_COUNT = "count"
 FEATURE_MENU = "menu"
 FEATURE_BACKDROP = "backdrop"
 
-# Buttons as the DOM numbers them (SPEC §9). Another button's press, and its
-# auxclick, carry 1, 3, 4, or 6 and up for a later one, which has no name.
+# Buttons as the DOM numbers them (SPEC §9). An auxclick, and another button's
+# dragstart, carry 1, 3, 4, or 6 and up for a later one, which has no name. 2,
+# the secondary, is no event's: its gesture is a contextmenu.
 BUTTON_PRIMARY = 0
 BUTTON_MIDDLE = 1
-BUTTON_SECONDARY = 2
 BUTTON_BACK = 3
 BUTTON_FORWARD = 4
 
@@ -800,10 +801,12 @@ _CAPS = {
 }
 _AREA = {"c": "int", "r": "int", "w": "int", "h": "int"}
 _DRAG = {"c": "int", "r": "int", "mods": "int", "x": "int", "y": "int", "tx": "int", "ty": "int"}
+_DRAG_START = dict(_DRAG, button="int")
 # Each kind's detail (SPEC §9); a kind not here carries none a program reads.
 _DETAIL = {
     EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA, "mods": "int", "count": "int"},
-    EVENT_PRESS: {"button": "int", "area": _AREA, "c": "int", "r": "int", "mods": "int"},
+    EVENT_PRESS: {"area": _AREA, "mods": "int"},
+    EVENT_CONTEXTMENU: {"area": _AREA, "c": "int", "r": "int", "mods": "int"},
     EVENT_AUXCLICK: {
         "button": "int",
         "value": "str",
@@ -819,7 +822,7 @@ _DETAIL = {
     EVENT_CARET: {"sel": ("int", "int"), "rev": "int"},
     EVENT_SUBMIT: {"fields": [("str", "str")]},
     EVENT_FIT: {"r": "int"},
-    EVENT_DRAG_START: _DRAG,
+    EVENT_DRAG_START: _DRAG_START,
     EVENT_DRAG: _DRAG,
     EVENT_DRAG_END: _DRAG,
     EVENT_HOVER: {"c": "int", "r": "int", "out": "bool"},
@@ -871,7 +874,7 @@ class Event:
     def mods(self):
         """The modifier keys held, as bits (MOD_SHIFT, …); 0 when none was
         (SPEC §9)."""
-        if self.kind not in (EVENT_CLICK, EVENT_PRESS, EVENT_AUXCLICK, EVENT_DRAG_START, EVENT_DRAG, EVENT_DRAG_END):
+        if self.kind not in (EVENT_CLICK, EVENT_PRESS, EVENT_CONTEXTMENU, EVENT_AUXCLICK, EVENT_DRAG_START, EVENT_DRAG, EVENT_DRAG_END):
             return 0
         return self._d.get("mods", 0)
 
@@ -896,26 +899,28 @@ class Event:
         return Drag(c, r, d.get("x"), d.get("y"), d.get("tx"), d.get("ty"))
 
     def button(self):
-        """A press's or an auxclick's button as the DOM numbers it (SPEC §9):
-        2 for a secondary press, 1, 3, 4, or 6 and up for another button's,
-        0 for a press whose detail has none, the primary button's, and None
-        for an auxclick whose detail has none, and for other kinds. A
-        program ignores a button it does not use."""
+        """An auxclick's or a dragstart's button as the DOM numbers it
+        (SPEC §9, §9.1): 1, 3, 4, or 6 and up; 0 for a dragstart whose
+        detail has none, the primary button's or a touch's; None for an
+        auxclick whose detail has none, and for other kinds, a press
+        included, which is the primary button's alone. A drag's drag and
+        dragend belong to its dragstart's button. A program ignores a
+        button it does not use."""
         if self.kind == EVENT_AUXCLICK:
             return self._d.get("button")
-        if self.kind != EVENT_PRESS:
+        if self.kind != EVENT_DRAG_START:
             return None
         return self._d.get("button", 0)
 
     def c(self):
-        """The pointer's column, in a press of any button but the primary,
-        and at an auxclick's release (SPEC §9); None where the detail has
-        none."""
-        return self._d.get("c") if self.kind in (EVENT_PRESS, EVENT_AUXCLICK) else None
+        """The pointer's column, in a contextmenu and at an auxclick's
+        release (SPEC §9); None where the detail has none, as in a
+        contextmenu from the menu key."""
+        return self._d.get("c") if self.kind in (EVENT_CONTEXTMENU, EVENT_AUXCLICK) else None
 
     def r(self):
         """The pointer's row, as c is."""
-        return self._d.get("r") if self.kind in (EVENT_PRESS, EVENT_AUXCLICK) else None
+        return self._d.get("r") if self.kind in (EVENT_CONTEXTMENU, EVENT_AUXCLICK) else None
 
     def count(self):
         """A click's place in its run of clicks (SPEC §9): 2 for the second
@@ -925,8 +930,9 @@ class Event:
         return self._d.get("count") or 1
 
     def area(self):
-        """The cells of a click's, a press's or an auxclick's element (SPEC §9)."""
-        a = self._d.get("area") if self.kind in (EVENT_CLICK, EVENT_PRESS, EVENT_AUXCLICK) else None
+        """The cells of a click's, a press's, a contextmenu's or an
+        auxclick's element (SPEC §9)."""
+        a = self._d.get("area") if self.kind in (EVENT_CLICK, EVENT_PRESS, EVENT_CONTEXTMENU, EVENT_AUXCLICK) else None
         if a is None or any(k not in a for k in "crwh"):
             return None
         return Area(a["c"], a["r"], a["w"], a["h"])

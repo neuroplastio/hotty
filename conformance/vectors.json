@@ -11095,7 +11095,7 @@
    ]
   },
   {
-   "name": "a primary press is as it was on an element with secondary in its data-on: a press with no button, c or r when the surface asks for presses (SPEC \u00a79), none when p=0, and no click unless the element has click; secondary adds no event to the primary button",
+   "name": "a primary press is as it was on an element with contextmenu in its data-on: a press with no button, c or r when the surface asks for presses (SPEC \u00a79), none when p=0, and no click unless the element has click; contextmenu adds no event to the primary button",
    "steps": [
     {
      "send": {
@@ -11103,7 +11103,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b{position:absolute;display:block;width:calc(3*var(--hotty-cell-w));height:var(--hotty-cell-h);font-weight:normal}</style><b id=m data-on=secondary style=\"left:calc(2*var(--hotty-cell-w));top:0\">M</b><b id=k data-on=\"secondary click\" style=\"left:calc(6*var(--hotty-cell-w));top:var(--hotty-cell-h)\">K</b>"
+     "payload": "<style>body{margin:0}b{position:absolute;display:block;width:calc(3*var(--hotty-cell-w));height:var(--hotty-cell-h);font-weight:normal}</style><b id=m data-on=contextmenu style=\"left:calc(2*var(--hotty-cell-w));top:0\">M</b><b id=k data-on=\"contextmenu click\" style=\"left:calc(6*var(--hotty-cell-w));top:var(--hotty-cell-h)\">K</b>"
     },
     {
      "send": {
@@ -11240,7 +11240,7 @@
    ]
   },
   {
-   "name": "a secondary press on an element with secondary in its data-on is a press with button 2, its area, the pointer's cell and the modifier keys held, whatever p says; the nearest such element wins, and its release makes no event (SPEC \u00a79)",
+   "name": "a secondary press on an element with contextmenu in its data-on is a contextmenu, with its area, the pointer's cell and the modifier keys held, whatever p says, and no press; the nearest such element wins, and its release makes no event (SPEC \u00a79)",
    "steps": [
     {
      "send": {
@@ -11248,7 +11248,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=secondary><u id=i data-on=secondary>i</u></b><i id=n>n</i><i id=k data-on=\"secondary click\">k</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=contextmenu><u id=i data-on=contextmenu>i</u></b><i id=n>n</i><i id=k data-on=\"contextmenu click\">k</i><input id=f type=text>"
     },
     {
      "send": {
@@ -11271,11 +11271,10 @@
      "button": 2,
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "i",
        "detail": {
-        "button": 2,
         "area": {
          "c": 3,
          "r": 1,
@@ -11307,11 +11306,10 @@
      "button": 2,
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "o",
        "detail": {
-        "button": 2,
         "area": {
          "c": 0,
          "r": 0,
@@ -11343,11 +11341,10 @@
      "button": 2,
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "i",
        "detail": {
-        "button": 2,
         "area": {
          "c": 3,
          "r": 1,
@@ -11393,11 +11390,10 @@
      "button": 2,
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "i",
        "detail": {
-        "button": 2,
         "area": {
          "c": 3,
          "r": 1,
@@ -11418,7 +11414,7 @@
    ]
   },
   {
-   "name": "a secondary press over an element without secondary in its data-on is the terminal's, and with Shift or Alt held it is too, or the program's, over one with it: the surface hears nothing, whatever p asked for (SPEC \u00a79, \u00a79.2)",
+   "name": "a secondary press over an element without contextmenu in its data-on is the terminal's, and with Shift or Alt held it is too, or the program's, over one with it: the surface hears nothing, whatever p asked for (SPEC \u00a79, \u00a79.2)",
    "steps": [
     {
      "send": {
@@ -11426,7 +11422,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=secondary><u id=i data-on=secondary>i</u></b><i id=n>n</i><i id=k data-on=\"secondary click\">k</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=contextmenu><u id=i data-on=contextmenu>i</u></b><i id=n>n</i><i id=k data-on=\"contextmenu click\">k</i><input id=f type=text>"
     },
     {
      "send": {
@@ -11562,11 +11558,10 @@
      "button": 2,
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "i",
        "detail": {
-        "button": 2,
         "area": {
          "c": 3,
          "r": 1,
@@ -11587,7 +11582,7 @@
    ]
   },
   {
-   "name": "a secondary press makes no click on its release, even on an element with click, and moves no focus: a focused field keeps the keyboard, with no blur or focus, until a primary click elsewhere (SPEC \u00a79, \u00a710.1)",
+   "name": "a contextmenu makes no click on its release, even on an element with click, and moves no focus: a focused field keeps the keyboard, with no blur or focus, until a primary click elsewhere (SPEC \u00a79, \u00a710.1)",
    "steps": [
     {
      "send": {
@@ -11595,7 +11590,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=secondary><u id=i data-on=secondary>i</u></b><i id=n>n</i><i id=k data-on=\"secondary click\">k</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=contextmenu><u id=i data-on=contextmenu>i</u></b><i id=n>n</i><i id=k data-on=\"contextmenu click\">k</i><input id=f type=text>"
     },
     {
      "send": {
@@ -11642,11 +11637,10 @@
      "button": 2,
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "o",
        "detail": {
-        "button": 2,
         "area": {
          "c": 0,
          "r": 0,
@@ -11675,11 +11669,10 @@
      "button": 2,
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "k",
        "detail": {
-        "button": 2,
         "area": {
          "c": 0,
          "r": 4,
@@ -11751,7 +11744,7 @@
    ]
   },
   {
-   "name": "a long press on an element with secondary in its data-on is a secondary press, button 2 at the finger's cell, and its lift makes no click, even on an element with click; a tap is a click as before (SPEC \u00a79.1)",
+   "name": "a long press on an element with contextmenu in its data-on is a contextmenu at the finger's cell, and its lift makes no click, even on an element with click; a tap is a click as before (SPEC \u00a79.1)",
    "requires": "touch",
    "steps": [
     {
@@ -11760,7 +11753,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=secondary><u id=i data-on=secondary>i</u></b><i id=n>n</i><i id=k data-on=\"secondary click\">k</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:var(--hotty-cell-h);width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=contextmenu><u id=i data-on=contextmenu>i</u></b><i id=n>n</i><i id=k data-on=\"contextmenu click\">k</i><input id=f type=text>"
     },
     {
      "send": {
@@ -11785,11 +11778,10 @@
      "touch": "hold",
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "i",
        "detail": {
-        "button": 2,
         "area": {
          "c": 3,
          "r": 1,
@@ -11819,11 +11811,10 @@
      "touch": "hold",
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "k",
        "detail": {
-        "button": 2,
         "area": {
          "c": 0,
          "r": 4,
@@ -11870,7 +11861,8 @@
    ]
   },
   {
-   "name": "another button's press on an element with aux in its data-on is a press with its button, its area and the pointer's cell, whatever p says, and its release there an auxclick with the same, the cell and the keys held then; the nearest such element wins (SPEC \u00a79)",
+   "name": "on a host that reports the menu key, ContextMenu and Shift+F10 on a focused element with contextmenu in its data-on are its contextmenu, with its area, no cell and no mods, and do not reach the program; on an element without it they are keys as before (SPEC \u00a79, \u00a710.2)",
+   "requires": "menu-key",
    "steps": [
     {
      "send": {
@@ -11878,7 +11870,120 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#m{left:0;top:0;width:calc(4*var(--hotty-cell-w))}#q{left:calc(6*var(--hotty-cell-w));top:0;width:calc(4*var(--hotty-cell-w))}</style><i id=m tabindex=0 data-on=contextmenu>m</i><i id=q tabindex=0>q</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "m",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "m"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "key": "ContextMenu",
+     "terminal": false,
+     "events": [
+      {
+       "e": "contextmenu",
+       "s": "x",
+       "t": "m",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "F10",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "contextmenu",
+       "s": "x",
+       "t": "m",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "q",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "q"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "key": "ContextMenu",
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "another button's press on an element with aux in its data-on reports nothing, whatever p says, and its release there is an auxclick with its button, its area, the cell and the keys held then; the nearest such element wins (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "send": {
@@ -11899,24 +12004,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -11952,24 +12040,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "o",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 0,
-         "r": 0,
-         "w": 9,
-         "h": 3
-        },
-        "c": 7,
-        "r": 2
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -12005,25 +12076,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1,
-        "mods": 8
-       }
-      }
-     ],
+     "events": [],
      "keys": [
       "super"
      ]
@@ -12073,24 +12126,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -12125,7 +12161,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "send": {
@@ -12146,24 +12182,7 @@
     {
      "pointer": "down",
      "button": 3,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "k",
-       "detail": {
-        "button": 3,
-        "area": {
-         "c": 0,
-         "r": 4,
-         "w": 3,
-         "h": 1
-        },
-        "c": 1,
-        "r": 4
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -12190,24 +12209,7 @@
     {
      "pointer": "down",
      "button": 4,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "k",
-       "detail": {
-        "button": 4,
-        "area": {
-         "c": 0,
-         "r": 4,
-         "w": 3,
-         "h": 1
-        },
-        "c": 1,
-        "r": 4
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -12243,24 +12245,7 @@
     {
      "pointer": "down",
      "button": 3,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "o",
-       "detail": {
-        "button": 3,
-        "area": {
-         "c": 0,
-         "r": 0,
-         "w": 9,
-         "h": 3
-        },
-        "c": 7,
-        "r": 2
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -12287,7 +12272,7 @@
    ]
   },
   {
-   "name": "another button released anywhere but on the element it was pressed on reports nothing, its moves report nothing, and one moved off and back is an auxclick; the element is the nearest with aux, so a release on its ancestor is elsewhere (SPEC \u00a79)",
+   "name": "another button released anywhere but on the element it was pressed on reports nothing, its moves on an element without drag report nothing, and one moved off and back is an auxclick; the element is the nearest with aux, so a release on its ancestor is elsewhere (SPEC \u00a79)",
    "steps": [
     {
      "send": {
@@ -12295,7 +12280,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "send": {
@@ -12316,24 +12301,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "move",
@@ -12355,24 +12323,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "move",
@@ -12411,24 +12362,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "move",
@@ -12456,7 +12390,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "send": {
@@ -12488,24 +12422,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "move",
@@ -12543,7 +12460,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "send": {
@@ -12716,24 +12633,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1
-       }
-      }
-     ],
+     "events": [],
      "mouse": []
     },
     {
@@ -12773,7 +12673,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "send": {
@@ -12924,24 +12824,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -12972,7 +12855,7 @@
    ]
   },
   {
-   "name": "another button's press does nothing else: no click on its release, even on an element with click, and no focus: a focused field keeps the keyboard, with no blur or focus, until a primary click elsewhere (SPEC \u00a79, \u00a710.1)",
+   "name": "another button's press does nothing else: no press, no click on its release, even on an element with click, and no focus: a focused field keeps the keyboard, with no blur or focus, until a primary click elsewhere (SPEC \u00a79, \u00a710.1)",
    "steps": [
     {
      "send": {
@@ -12980,7 +12863,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "send": {
@@ -13023,24 +12906,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "k",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 0,
-         "r": 4,
-         "w": 3,
-         "h": 1
-        },
-        "c": 1,
-        "r": 4
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -13076,24 +12942,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "o",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 0,
-         "r": 0,
-         "w": 9,
-         "h": 3
-        },
-        "c": 7,
-        "r": 2
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -13171,7 +13020,7 @@
    ]
   },
   {
-   "name": "secondary and aux do not cross: secondary brings no other button, aux no secondary press, and an element with both hears each; a primary press on an element with aux is as it was, a press with no button only when the surface asks for presses (SPEC \u00a79)",
+   "name": "contextmenu and aux do not cross: contextmenu brings no other button, aux no secondary press, and an element with both hears each; a primary press on an element with aux is as it was, a press only when the surface asks for presses (SPEC \u00a79)",
    "steps": [
     {
      "send": {
@@ -13179,7 +13028,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#s{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#a{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#b{left:calc(8*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=s data-on=secondary>s</i><i id=a data-on=aux>a</i><i id=b data-on=\"secondary aux\">b</i>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#s{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#a{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#b{left:calc(8*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=s data-on=contextmenu>s</i><i id=a data-on=aux>a</i><i id=b data-on=\"contextmenu aux\">b</i>"
     },
     {
      "send": {
@@ -13244,11 +13093,10 @@
      "button": 2,
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "b",
        "detail": {
-        "button": 2,
         "area": {
          "c": 8,
          "r": 0,
@@ -13269,24 +13117,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "b",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 8,
-         "r": 0,
-         "w": 3,
-         "h": 1
-        },
-        "c": 9,
-        "r": 0
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -13361,7 +13192,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#d{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#i{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=d data-on=\"drag aux\">d</i><i id=i data-on=\"aux click secondary\">i</i>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#d{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#i{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=d data-on=\"drag aux\">d</i><i id=i data-on=\"aux click contextmenu\">i</i>"
     },
     {
      "send": {
@@ -13438,24 +13269,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 4,
-         "r": 0,
-         "w": 3,
-         "h": 1
-        },
-        "c": 5,
-        "r": 0
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "down",
@@ -13558,7 +13372,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#d{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#i{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=d data-on=\"drag aux\">d</i><i id=i data-on=\"aux click secondary\">i</i>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#d{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#i{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=d data-on=\"drag aux\">d</i><i id=i data-on=\"aux click contextmenu\">i</i>"
     },
     {
      "send": {
@@ -13579,24 +13393,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 4,
-         "r": 0,
-         "w": 3,
-         "h": 1
-        },
-        "c": 5,
-        "r": 0
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "down",
@@ -13643,24 +13440,7 @@
     {
      "pointer": "down",
      "button": 3,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 3,
-        "area": {
-         "c": 4,
-         "r": 0,
-         "w": 3,
-         "h": 1
-        },
-        "c": 5,
-        "r": 0
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -13699,7 +13479,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "send": {
@@ -13821,7 +13601,7 @@
    ]
   },
   {
-   "name": "the terminal's hold lasts until every button is released, its own released first included, and takes a secondary press over an element with secondary in its data-on too (SPEC \u00a79)",
+   "name": "the terminal's hold lasts until every button is released, its own released first included, and takes a secondary press over an element with contextmenu in its data-on too (SPEC \u00a79)",
    "requires": "mouse",
    "steps": [
     {
@@ -13833,7 +13613,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "send": {
@@ -14010,11 +13790,10 @@
      "button": 2,
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "s",
        "detail": {
-        "button": 2,
         "area": {
          "c": 4,
          "r": 4,
@@ -14040,7 +13819,7 @@
    ]
   },
   {
-   "name": "one button at a time, for the terminal too: the middle button pressed during a drag of an element without aux, or during a secondary press, reaches neither the surface nor the program's mouse reporting (SPEC \u00a79)",
+   "name": "one button at a time, for the terminal too: the middle button pressed during a drag of an element without aux, or during a contextmenu's press, reaches neither the surface nor the program's mouse reporting (SPEC \u00a79)",
    "requires": "mouse",
    "steps": [
     {
@@ -14052,7 +13831,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#g{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=g data-on=drag>g</i><i id=s data-on=secondary>s</i>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#g{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=g data-on=drag>g</i><i id=s data-on=contextmenu>s</i>"
     },
     {
      "send": {
@@ -14125,11 +13904,10 @@
      "button": 2,
      "events": [
       {
-       "e": "press",
+       "e": "contextmenu",
        "s": "x",
        "t": "s",
        "detail": {
-        "button": 2,
         "area": {
          "c": 4,
          "r": 0,
@@ -14167,7 +13945,7 @@
    ]
   },
   {
-   "name": "what ends a drag early ends another button's press, with no auxclick: its placement hidden, or a new document (SPEC \u00a79, \u00a79.1)",
+   "name": "what ends a drag early ends another button's hold, with no auxclick: its placement hidden, or a new document (SPEC \u00a79, \u00a79.1)",
    "steps": [
     {
      "send": {
@@ -14175,7 +13953,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "send": {
@@ -14196,24 +13974,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1
-       }
-      }
-     ]
+     "events": []
     },
     {
      "send": {
@@ -14246,24 +14007,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1
-       }
-      }
-     ]
+     "events": []
     },
     {
      "send": {
@@ -14271,7 +14015,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "pointer": "up",
@@ -14287,24 +14031,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "i",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 3,
-         "r": 1,
-         "w": 3,
-         "h": 1
-        },
-        "c": 4,
-        "r": 1
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -14324,6 +14051,278 @@
         },
         "c": 4,
         "r": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "an element with drag and aux is dragged with other buttons too: moved past the slop, the press is a dragstart with its button at the press's cell, its drag and dragend carry none, a primary press during it is not reported, and its release is no auxclick even where it began; released within the slop it is an auxclick; the nearest element with aux takes the button, and the nearest with drag the primary (SPEC \u00a79, \u00a79.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#c{left:0;top:0;width:calc(10*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#n{left:calc(2*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}</style><b id=c data-on=\"drag aux\"><i id=n data-on=drag>n</i></b>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      6,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      8,
+      2
+     ],
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "button": 1,
+        "c": 6,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      14,
+      1
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "c": 14,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      6,
+      0
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "c": 6,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "c": 6,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 10,
+         "h": 3
+        },
+        "c": 6,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 10,
+         "h": 3
+        },
+        "c": 3,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "n",
+       "detail": {
+        "area": {
+         "c": 2,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        }
+       }
+      },
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "n",
+       "detail": {
+        "c": 3,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "n",
+       "detail": {
+        "c": 3,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 3,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      5,
+      2
+     ],
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "button": 3,
+        "c": 1,
+        "r": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 3,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "c": 5,
+        "r": 2
        }
       }
      ]
@@ -14363,18 +14362,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": null,
-       "detail": {
-        "button": 1,
-        "c": 2,
-        "r": 0
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -14408,24 +14396,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "v",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 5,
-         "r": 0,
-         "w": 3,
-         "h": 1
-        },
-        "c": 6,
-        "r": 0
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -14481,18 +14452,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": null,
-       "detail": {
-        "button": 1,
-        "c": 15,
-        "r": 0
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -14522,24 +14482,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "w",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 0,
-         "r": 2,
-         "w": 9,
-         "h": 1
-        },
-        "c": 1,
-        "r": 2
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -14614,24 +14557,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "q",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 4,
-         "r": 0,
-         "w": 3,
-         "h": 1
-        },
-        "c": 5,
-        "r": 0
-       }
-      }
-     ],
+     "events": [],
      "through": false
     },
     {
@@ -14765,24 +14691,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "g",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 0,
-         "r": 3,
-         "w": 5,
-         "h": 1
-        },
-        "c": 2,
-        "r": 3
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -14818,24 +14727,7 @@
     {
      "pointer": "down",
      "button": 1,
-     "events": [
-      {
-       "e": "press",
-       "s": "x",
-       "t": "w",
-       "detail": {
-        "button": 1,
-        "area": {
-         "c": 0,
-         "r": 0,
-         "w": 12,
-         "h": 2
-        },
-        "c": 10,
-        "r": 1
-       }
-      }
-     ]
+     "events": []
     },
     {
      "pointer": "up",
@@ -14899,7 +14791,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"contextmenu click\">s</i><input id=f type=text>"
     },
     {
      "send": {
@@ -33436,15 +33328,25 @@
    ]
   },
   {
-   "name": "a press carries the button as the DOM numbers it, and the pointer's cell, on a secondary press only: a primary press has no button, which reads 0, and no c or r; a button that is no int makes the body undecodable, and the detail is read as none (SPEC \u00a73.3, \u00a79)",
+   "name": "a press carries its element's area and the modifier keys, and no button or cell: one a press carries is not read; a contextmenu carries its area, the pointer's cell and the modifier keys, with no cell from the menu key and no area without t; a cell that is no int makes the body undecodable, and the detail is read as none (SPEC \u00a73.3, \u00a79)",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=press:t=row;haZidXR0b24CpGFyZWGEoWMCoXIBoXcKoWgDoWMFoXICpG1vZHMB\u001b\\",
     "\u001b]7279;a=ev:s=f:e=press:t=row;gqRhcmVhhKFjAqFyAaF3CqFoA6Rtb2RzCA==\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=press;g6ZidXR0b24CoWMAoXL/\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=press:t=row;gqZidXR0b24ApGFyZWGEoWMAoXIAoXcBoWgB\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=press:t=row;g6ZidXR0b26hMqFjBKFyBA==\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=press:t=row;haZidXR0b24CpGFyZWGEoWMCoXIBoXcKoWgDoWMFoXICpG1vZHMB\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=contextmenu:t=row;hKRhcmVhhKFjAqFyAaF3CqFoA6FjBaFyAqRtb2RzAQ==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=contextmenu:t=row;gaRhcmVhhKFjAKFyAKF3AaFoAQ==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=contextmenu;gqFjAKFy/w==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=contextmenu:t=row;gqFjoTShcgQ=\u001b\\"
    ],
    "bodies": [
+    {
+     "area": {
+      "c": 2,
+      "r": 1,
+      "w": 10,
+      "h": 3
+     },
+     "mods": 8
+    },
     {
      "button": 2,
      "area": {
@@ -33464,15 +33366,11 @@
       "w": 10,
       "h": 3
      },
-     "mods": 8
+     "c": 5,
+     "r": 2,
+     "mods": 1
     },
     {
-     "button": 2,
-     "c": 0,
-     "r": -1
-    },
-    {
-     "button": 0,
      "area": {
       "c": 0,
       "r": 0,
@@ -33481,12 +33379,16 @@
      }
     },
     {
-     "button": "2",
-     "c": 4,
+     "c": 0,
+     "r": -1
+    },
+    {
+     "c": "4",
      "r": 4
     }
    ],
    "results": [
+    "complete",
     "complete",
     "complete",
     "complete",
@@ -33505,29 +33407,7 @@
      "event": {
       "kind": "press",
       "target": "row",
-      "button": 2,
-      "area": {
-       "c": 2,
-       "r": 1,
-       "w": 10,
-       "h": 3
-      },
-      "c": 5,
-      "r": 2,
-      "mods": 1
-     }
-    },
-    {
-     "control": {
-      "a": "ev",
-      "s": "f",
-      "e": "press",
-      "t": "row"
-     },
-     "event": {
-      "kind": "press",
-      "target": "row",
-      "button": 0,
+      "button": null,
       "area": {
        "c": 2,
        "r": 1,
@@ -33543,95 +33423,112 @@
      "control": {
       "a": "ev",
       "s": "f",
-      "e": "press"
-     },
-     "event": {
-      "kind": "press",
-      "target": "",
-      "button": 2,
-      "c": 0,
-      "r": -1,
-      "area": null
-     }
-    },
-    {
-     "control": {
-      "a": "ev",
-      "s": "f",
       "e": "press",
       "t": "row"
      },
      "event": {
       "kind": "press",
       "target": "row",
-      "button": 0,
+      "button": null,
+      "area": {
+       "c": 2,
+       "r": 1,
+       "w": 10,
+       "h": 3
+      },
       "c": null,
       "r": null,
+      "mods": 1
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "contextmenu",
+      "t": "row"
+     },
+     "event": {
+      "kind": "contextmenu",
+      "target": "row",
+      "button": null,
+      "area": {
+       "c": 2,
+       "r": 1,
+       "w": 10,
+       "h": 3
+      },
+      "c": 5,
+      "r": 2,
+      "mods": 1
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "contextmenu",
+      "t": "row"
+     },
+     "event": {
+      "kind": "contextmenu",
+      "target": "row",
       "area": {
        "c": 0,
        "r": 0,
        "w": 1,
        "h": 1
-      }
+      },
+      "c": null,
+      "r": null,
+      "mods": 0
      }
     },
     {
      "control": {
       "a": "ev",
       "s": "f",
-      "e": "press",
+      "e": "contextmenu"
+     },
+     "event": {
+      "kind": "contextmenu",
+      "target": "",
+      "area": null,
+      "c": 0,
+      "r": -1
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "contextmenu",
       "t": "row"
      },
      "event": {
-      "kind": "press",
+      "kind": "contextmenu",
       "target": "row",
-      "button": 0,
+      "area": null,
       "c": null,
-      "r": null
+      "r": null,
+      "mods": 0
      }
     }
    ]
   },
   {
-   "name": "another button's press carries its button and the pointer's cell, and a later button reads as its number; an auxclick carries a click's detail, its href, url and value, with the button and the release's cell and mods, and no count; a button that is no int makes the body undecodable, and the detail is read as none: an auxclick then has no button (SPEC \u00a73.3, \u00a79)",
+   "name": "an auxclick carries a click's detail, its href, url and value, with the button and the release's cell and mods, and no count, and a later button reads as its number; a button that is no int makes the body undecodable, and the detail is read as none: an auxclick then has no button; another button's dragstart carries its button, one without reads as the primary's, 0, and a drag's other events carry none (SPEC \u00a73.3, \u00a79, \u00a79.1)",
    "seqs": [
-    "\u001b]7279;a=ev:s=f:e=press:t=tab;hKZidXR0b24BpGFyZWGEoWMCoXIAoXcIoWgBoWMFoXIA\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=press;hKZidXR0b24DoWMBoXIApG1vZHME\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=press:t=tab;hKZidXR0b24HpGFyZWGEoWMCoXIAoXcIoWgBoWMDoXIA\u001b\\",
     "\u001b]7279;a=ev:s=f:e=auxclick:t=tab;haZidXR0b24BpGFyZWGEoWMCoXIAoXcIoWgBoWMGoXIApG1vZHMC\u001b\\",
     "\u001b]7279;a=ev:s=f:e=auxclick;hqZidXR0b24BpGhyZWakbmV4dKN1cmy4aHR0cHM6Ly9leGFtcGxlLmNvbS9uZXh0pGFyZWGEoWMAoXIBoXcEoWgBoWMBoXIB\u001b\\",
     "\u001b]7279;a=ev:s=f:e=auxclick:t=v;haZidXR0b24EpXZhbHVloXikYXJlYYShYwChcgKhdwOhaAGhYwChcgI=\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=auxclick:t=tab;g6ZidXR0b26hMaFjAKFyAA==\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=auxclick:t=tab;hKZidXR0b24HpGFyZWGEoWMCoXIAoXcIoWgBoWMDoXIA\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=auxclick:t=tab;g6ZidXR0b26hMaFjAKFyAA==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=dragstart:t=c;g6ZidXR0b24BoWMGoXIA\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=dragstart:t=c;g6FjAaFyAKRtb2RzAQ==\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=drag:t=c;g6ZidXR0b24BoWMCoXIA\u001b\\"
    ],
    "bodies": [
-    {
-     "button": 1,
-     "area": {
-      "c": 2,
-      "r": 0,
-      "w": 8,
-      "h": 1
-     },
-     "c": 5,
-     "r": 0
-    },
-    {
-     "button": 3,
-     "c": 1,
-     "r": 0,
-     "mods": 4
-    },
-    {
-     "button": 7,
-     "area": {
-      "c": 2,
-      "r": 0,
-      "w": 8,
-      "h": 1
-     },
-     "c": 3,
-     "r": 0
-    },
     {
      "button": 1,
      "area": {
@@ -33670,8 +33567,34 @@
      "r": 2
     },
     {
+     "button": 7,
+     "area": {
+      "c": 2,
+      "r": 0,
+      "w": 8,
+      "h": 1
+     },
+     "c": 3,
+     "r": 0
+    },
+    {
      "button": "1",
      "c": 0,
+     "r": 0
+    },
+    {
+     "button": 1,
+     "c": 6,
+     "r": 0
+    },
+    {
+     "c": 1,
+     "r": 0,
+     "mods": 1
+    },
+    {
+     "button": 1,
+     "c": 2,
      "r": 0
     }
    ],
@@ -33682,63 +33605,11 @@
     "complete",
     "complete",
     "complete",
+    "complete",
     "complete"
    ],
    "invalid": 0,
    "messages": [
-    {
-     "control": {
-      "a": "ev",
-      "s": "f",
-      "e": "press",
-      "t": "tab"
-     },
-     "event": {
-      "kind": "press",
-      "target": "tab",
-      "button": 1,
-      "area": {
-       "c": 2,
-       "r": 0,
-       "w": 8,
-       "h": 1
-      },
-      "c": 5,
-      "r": 0,
-      "mods": 0
-     }
-    },
-    {
-     "control": {
-      "a": "ev",
-      "s": "f",
-      "e": "press"
-     },
-     "event": {
-      "kind": "press",
-      "target": "",
-      "button": 3,
-      "area": null,
-      "c": 1,
-      "r": 0,
-      "mods": 4
-     }
-    },
-    {
-     "control": {
-      "a": "ev",
-      "s": "f",
-      "e": "press",
-      "t": "tab"
-     },
-     "event": {
-      "kind": "press",
-      "target": "tab",
-      "button": 7,
-      "c": 3,
-      "r": 0
-     }
-    },
     {
      "control": {
       "a": "ev",
@@ -33815,10 +33686,92 @@
      "event": {
       "kind": "auxclick",
       "target": "tab",
+      "button": 7,
+      "c": 3,
+      "r": 0
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "auxclick",
+      "t": "tab"
+     },
+     "event": {
+      "kind": "auxclick",
+      "target": "tab",
       "button": null,
       "c": null,
       "r": null,
       "area": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "dragstart",
+      "t": "c"
+     },
+     "event": {
+      "kind": "dragstart",
+      "target": "c",
+      "button": 1,
+      "drag": {
+       "c": 6,
+       "r": 0,
+       "x": null,
+       "y": null,
+       "tx": null,
+       "ty": null
+      },
+      "mods": 0,
+      "c": null,
+      "area": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "dragstart",
+      "t": "c"
+     },
+     "event": {
+      "kind": "dragstart",
+      "target": "c",
+      "button": 0,
+      "drag": {
+       "c": 1,
+       "r": 0,
+       "x": null,
+       "y": null,
+       "tx": null,
+       "ty": null
+      },
+      "mods": 1
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "drag",
+      "t": "c"
+     },
+     "event": {
+      "kind": "drag",
+      "target": "c",
+      "button": null,
+      "drag": {
+       "c": 2,
+       "r": 0,
+       "x": null,
+       "y": null,
+       "tx": null,
+       "ty": null
+      }
      }
     }
    ]

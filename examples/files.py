@@ -6,12 +6,13 @@
 Right-click a row (or focus it and press Shift+F10 or the Menu key): the
 program opens a menu of its own, a second surface at a higher z with its top
 left at the pointer, flipped left or up at the screen's edge. The rows say
-`secondary` in their data-on, so the terminal opens none; elsewhere a
-right-click is the terminal's own menu.
+`contextmenu` in their data-on, so the terminal opens none; elsewhere a
+right-click is the terminal's own menu. They say `secondary` too, which an
+0.8 session reads instead, as a press with button 2 (HOST.md §5.3).
 
 The menu's document is sent once, unplaced, and each open only places it and
 updates its items. It has the keyboard: Enter or a click does an item;
-Escape, a click elsewhere or a second secondary press closes it. Tab and
+Escape, a click elsewhere or a second right-click closes it. Tab and
 Shift+Tab move between items, and so do Up and Down: its data-keys-tree binds
 the arrows to `program` (SPEC §10.2) and the program turns them into a focus.
 A left click selects a row; q quits. --log appends every event as JSON lines.
@@ -43,7 +44,7 @@ LIST = """
 <div class=title>Files</div>
 @ROWS@
 <div id=status>Right-click a row for its menu</div>
-""".replace("@ROWS@", "\n".join(f'<div class=row id="{f}" tabindex=0 data-on="secondary click">{f}</div>' for f in FILES))
+""".replace("@ROWS@", "\n".join(f'<div class=row id="{f}" tabindex=0 data-on="contextmenu secondary click">{f}</div>' for f in FILES))
 
 MENU = """
 <style>
@@ -151,7 +152,7 @@ def main():
                             item = t
                         elif ev.kind == "blur":
                             close(refocus=False)
-                    elif ev.kind == "press" and ev.button() == 2 and t in FILES:
+                    elif t in FILES and (ev.kind == "contextmenu" or (ev.kind == "press" and (m.body or {}).get("button") == 2)):
                         row, areas[t] = t, ev.area()
                         # c, r are the list's cell: add its place on the screen.
                         open_menu(t, LIST_X + ev.c(), LIST_Y + ev.r(), below=1)

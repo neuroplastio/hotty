@@ -200,14 +200,16 @@ An SDK **MUST** provide every component of this section.
 | `DefaultMax` | 16777216 (16 MiB), the most bytes a Decoder decodes one message to unless its `Max` says otherwise (§3.6) |
 
 And these sets, each value under its canonical name:
-- **event kinds**: `click`, `change`, `input`, `caret`, `submit`, `press`, `auxclick`,
-  `focus`, `blur`, `fit`, `hover`, `view`, `dragstart`, `drag`, `dragend`,
-  `command`, `caps` (SPEC.md §9);
+- **event kinds**: `click`, `change`, `input`, `caret`, `submit`, `press`,
+  `contextmenu` (`EventContextMenu`), `auxclick`, `focus`, `blur`, `fit`,
+  `hover`, `view`, `dragstart`, `drag`, `dragend`, `command`, `caps`
+  (SPEC.md §9);
 - **features**: `passthrough`, `hover`, `count`, `menu`, `backdrop`
   (SPEC.md §4);
 - **buttons**, as the DOM numbers them: `ButtonPrimary` 0, `ButtonMiddle` 1,
-  `ButtonSecondary` 2, `ButtonBack` 3, `ButtonForward` 4 (SPEC.md §9; a
-  later button is 6 or more, and has no name);
+  `ButtonBack` 3, `ButtonForward` 4 (SPEC.md §9; a later button is 6 or
+  more, and has no name; 2, the secondary, is no event's, its gesture being
+  `contextmenu`);
 - **modifier bits**: `ModShift` 1, `ModAlt` 2, `ModCtrl` 4, `ModSuper` 8
   (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
@@ -606,27 +608,30 @@ carries, each absent when the event does not carry it:
 | `Rev` | `rev`: the control's revision (SPEC.md §6.4), which `SetField` sends back | `change`, `input`, `caret` |
 | `Sel` | `sel`: the selection, its anchor and its caret, in bytes of the value's UTF-8 (SPEC.md §6.4) | `input`, `caret` |
 | `Fields` | `fields`: the pairs of a name and a value, in order (SPEC.md §9) | `submit` |
-| `Mods` | `mods`: the modifier bits (§3.1), 0 when absent | `click`, `press`, `auxclick`, `dragstart`, `drag`, `dragend` |
+| `Mods` | `mods`: the modifier bits (§3.1), 0 when absent | `click`, `press`, `contextmenu`, `auxclick`, `dragstart`, `drag`, `dragend` |
 | `Link` | `href`, and `url` if present | `click` or `auxclick` on a link |
 | `FitRows` | `r` | `fit` |
 | `Drag` | `c` and `r`; the steps `x` and `y` in the element dragged, and `tx` and `ty` in a `t` with `drop` (as `TX` and `TY` where the language capitalises), each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover` | `c` and `r`, or `out` | `hover` |
-| `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press`, `auxclick` |
-| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 2 for a secondary press, 1, 3, 4, or 6 and up for another button's; on a `press`, 0 when absent, the primary button's, and on an `auxclick`, none when absent (0 where the language has no absent int) | `press`, `auxclick` |
-| `C`, `R` | `c` and `r`: the pointer's cell on a press of any button but the primary, and at an `auxclick`'s release, each absent when the detail has none (SPEC.md §9) | `press`, `auxclick` |
+| `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press`, `contextmenu`, `auxclick` |
+| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 1, 3, 4, or 6 and up; on an `auxclick`, none when absent (0 where the language has no absent int), and on a `dragstart`, 0 when absent, the primary button's or a touch's | `auxclick`, `dragstart` |
+| `C`, `R` | `c` and `r`: the pointer's cell on a `contextmenu` and at an `auxclick`'s release, each absent when the detail has none, as on a `contextmenu` from the menu key (SPEC.md §9) | `contextmenu`, `auxclick` |
 | `Count` | `count`: the click's place in its run of clicks (SPEC.md §9), 2 for the second click of a double click; 1 for a click whose detail has none | `click` |
 | `View` | `Areas`, from `in`: each id in view to its cells as `Area` holds them, leaving out one whose area lacks a field, and none when `in` is absent; and `AtEnd`, from `end`, false when absent (SPEC.md §9.5) | `view` |
 | `Command` | `Name`, `Key` and `Text`, from `name`, `key` and `text`, each empty when absent, and `HasText`, whether `text` is there (SPEC.md §10.6); absent when the detail has no `name` | `command` |
 | `Changed` | the capabilities that changed, a `Caps` with only the fields the detail has (SPEC.md §4) | `caps` |
 
-A handler of `press` that means the primary button checks `Button`: a
-secondary press comes to it too, from every element with `secondary` in its
-`data-on` (SPEC.md §9), and `T` names that element, and so does another
-button's, from every element with `aux`. A program that takes other buttons
-acts on the `auxclick`, which comes on the release where the press began,
-as a platform acts on these buttons. It ignores a `Button` it does not
-use: a later version may report more. A press and an `auxclick` the SDK
-decodes give it any `Button` they carry, a later one included.
+A handler of `press` hears the primary button only (SPEC.md §9), as
+before: a context menu's gesture is a `contextmenu`, and another button's
+an `auxclick` at the release where the press began, each from an element
+that asked, and `T` names that element. A handler of `dragstart` that
+means the primary button checks `Button`: an element with `drag` and
+`aux` is dragged with the other buttons too, and its `drag` and `dragend`
+carry no `Button`, so the program keeps the one its `dragstart` gave until
+the `dragend`. It ignores a `Button` it does not use, and the drag a
+`dragstart` with one begins: a later version may report more. An
+`auxclick` and a `dragstart` the SDK decodes give it any `Button` they
+carry, a later one included.
 
 The detail is read by the event's kind, so a form field named `value` is in
 `Fields` and nowhere else. An event of a kind the SDK does not know carries
@@ -991,10 +996,9 @@ A host that runs inside a test, so that a program's tests need no terminal.
   the test. A lenient host records them instead.
 - **The user.** It plays the user: typing, pressing a key as SPEC.md §10.2
   has a host take it, clicking, filling a field, checking a box, choosing
-  an option, submitting, pressing (with a button, the secondary included),
-  pressing and releasing another button (a `press`, then an `auxclick`),
-  dragging, and any event the test makes
-  up.
+  an option, submitting, pressing, opening a context menu
+  (`contextmenu`), pressing and releasing another button (an `auxclick`),
+  dragging with any button, and any event the test makes up.
 - **Inspection.** The test reads each surface: its document, an element's
   attributes and text, the focused element, whether it is detached, and
   where it is placed. It also reads the touch areas the program sent for
@@ -1084,20 +1088,23 @@ of more than one code point.
 
 ### 4.7 Context menus
 
-An element's own menu, opened by a secondary press (SPEC.md §9) or by a key,
+An element's own menu, opened by a `contextmenu` (SPEC.md §9) or by a key,
 for a program that draws it as a surface of its own. The host draws no
 menu: SPEC.md Appendix B says why.
 
-- **The element opts in** with `secondary` in its `data-on`. A `press` with
-  `Button` 2 then names it in `T`, with `Area`, and the pointer's cell in
-  `C` and `R`. A press with `Button` 0 is the primary button's, and a
-  program that acts on every `press` checks which it got.
+- **The element opts in** with `contextmenu` in its `data-on`. A
+  `contextmenu` then names it in `T`, with `Area`, and the pointer's cell
+  in `C` and `R`. A document meant for an 0.8 session as well writes
+  `secondary` beside it, and in that session hears a `press` with
+  `Button` 2 instead (HOST.md §5.3).
 - **The keys that open a menu** are `shift+f10` and `context_menu`
   (`ParseKey`, §3.10). They reach the program as keys while a surface has
   the keyboard (SPEC.md §10.2), and the last `focus` names the element, so
-  the SDK opens that element's menu on them, at its `Area`. The same keys
-  open it in the cells, so a program opens menus from the keys everywhere,
-  and from the press on a surface.
+  the SDK opens that element's menu on them, at its `Area`. A host may
+  report them as a `contextmenu` without `C` and `R` instead, which the SDK
+  opens at the `Area` too. The same keys open it in the cells, so a
+  program opens menus from the keys everywhere, and from the gesture on a
+  surface.
 - **The menu is a surface** placed at a higher `z` (SPEC.md §5.2), at the
   press's cell or under the element's `Area`, as a select's list is drawn
   where a host shows none (SPEC.md §10.2). The SDK gives it the keyboard
@@ -1202,7 +1209,7 @@ The canonical names, in each language's case.
 | `FitRows`, `Mods`, `CellCSS` | `FitRows`, `Mods`, `CellCSS` | `fit_rows`, `mods`, `cell_css` | as Python | as Python | `fitRows`, `mods`, `cellCss` |
 | `Button`, `C`, `R` | `Button`, `At` (`*hotty.Cell{Col, Row}`, nil when absent) | `button`, `c`, `r` | as Python | as Python | `button`, `c`, `r` |
 | `ModShift`, `ModAlt`, `ModCtrl`, `ModSuper` | `hotty.ModShift`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … |
-| `ButtonPrimary`, `ButtonMiddle`, `ButtonSecondary`, `ButtonBack`, `ButtonForward` | `hotty.ButtonPrimary`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … |
+| `ButtonPrimary`, `ButtonMiddle`, `ButtonBack`, `ButtonForward` | `hotty.ButtonPrimary`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … |
 | a message as a `Reply` or an `Event`, `Err` | `hotty.ReplyOf(m)`, `hotty.EventOf(m)`, `hotty.Err(r)` | `m.reply()`, `m.event()`, `r.err()` | `m:reply()`, `m:event()`, `r:err()` | methods | `m.reply()`, `m.event()`, `r.err()` |
 | `Has`, `Light`, `Merge` | `hotty.HasFeature(c, feature)` (`hotty.Has` asks a control), `hotty.Light(c)`, `hotty.Merge(c, changed)` | `c.has(feature)`, `c.light()`, `c.merge(changed)` | `c:has(feature)`, … | methods | `c.has(feature)`, … |
 | `Command`, `Changed` | `Event.Command`, `Event.Changed` | `e.command`, `e.changed` | as Python | methods | `e.command`, `e.changed` |
