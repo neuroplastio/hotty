@@ -20361,6 +20361,114 @@
    ]
   },
   {
+   "name": "a key a surface's keymap binds to program or prefix, and that is a key of an edit command the program takes, reaches it as the command, with its key; a prefix bound so starts all the same; with the command not taken it reaches it as terminal input (SPEC \u00a710.2, \u00a710.5, \u00a710.6)",
+   "requires": "commands",
+   "steps": [
+    {
+     "send": {
+      "a": "edit",
+      "take": "copy,undo",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=f data-keys=\"ctrl+c=program ctrl+z=prefix\">"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "f",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "c",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "command",
+       "s": null,
+       "t": null,
+       "detail": {
+        "name": "copy",
+        "key": "ctrl+c"
+       }
+      }
+     ]
+    },
+    {
+     "key": "z",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "command",
+       "s": null,
+       "t": null,
+       "detail": {
+        "name": "undo",
+        "key": "ctrl+z"
+       }
+      }
+     ]
+    },
+    {
+     "key": "a",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "edit",
+      "take": "",
+      "q": "2"
+     }
+    },
+    {
+     "key": "c",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "a",
+     "terminal": false,
+     "events": []
+    }
+   ]
+  },
+  {
    "name": "a delta's ops apply in order, as one: its reply, numbered, is one ok (SPEC \u00a76.1)",
    "steps": [
     {

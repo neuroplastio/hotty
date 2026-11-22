@@ -2111,7 +2111,9 @@ A key that the focused element's keymap binds to `program` or `prefix`
 reaches the program, before the element uses it and before the surface
 scrolls with it (§5.3), whatever the element. It reaches it as terminal
 input, which names no element: the last `focus` does (§10.1), or the
-program's own `a=focus`.
+program's own `a=focus`. A key of an edit command the program takes
+reaches it as that command instead (§10.6), since a key bound to `program`
+or `prefix` is one the surface does not use.
 - **Every focused element has a keymap**, read as a text field's is, but
   with its scroll actions: the `data-keys` of each element from the
   document's root down to it, the element's own last, each overriding what
@@ -2413,7 +2415,11 @@ ESC ] 7279 ; a=edit:take=copy,paste,undo,redo ST
   selected in the cells, a key of `copy` copies it, as the terminal's own
   copy does, and is not sent. A surface's selection is copied as §11 says.
 - **A surface that has the keyboard** is offered the key first (§10.2). A
-  key it does not use reaches the program as the command.
+  key it does not use reaches the program as the command, and so does one
+  the focused element's keymap gives the program, bound to `program` or
+  `prefix` (§10.2, §10.5): `ctrl+c=program` on Linux, with `copy` taken,
+  sends `copy` with `"key": "ctrl+c"`, which the program with nothing
+  selected takes as its key.
 - **The terminal's menus,** such as an Edit menu or a context menu, send
   the command they name, with no `key`, where its key would send one. Their
   copy copies the terminal's selection first, as above. A pick from the
@@ -3169,6 +3175,13 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   field decides on a surface. It takes them by name, per screen, as the
   kitty keyboard protocol's flags are taken, so a shell and a full-screen
   editor run in one terminal each get what they asked for.
+  - **A key given the program is the command too.** A surface that binds
+    `ctrl+c=program` hands the key over, the same key the program would
+    get with the surface not there. Sent as bytes, it would mean copy from
+    the cells and an interrupt from a surface, and a program with text
+    selected would copy in one and lose its selection in the other. The
+    command carries the key, so a program with nothing selected still
+    interrupts.
 - **Why a finger in the cells becomes the mouse.** A program that drags
   with the mouse in its cells already reads presses, moves and releases. A
   finger can give it the same, but not everywhere: a terminal that took
