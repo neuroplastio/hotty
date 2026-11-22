@@ -1021,9 +1021,9 @@ stylesheet shared by several surfaces, an image, a font.
   `@import`. Those include inline `style` attributes, `<style>` elements and
   stylesheet resources.
 - **Its type** says what it is, as a server's `Content-Type` does: a
-  stylesheet link or `@import` applies a resource whose type is
-  `text/css`, with or without parameters, and nothing else, as a browser
-  does in a page in standards mode.
+  stylesheet link or `@import` applies a resource whose type, ignoring
+  case and parameters, is `text/css`, and nothing else, as a browser does
+  in a page in standards mode.
 - **Updates:** sending a resource again replaces it, and every surface that
   refers to it is drawn again. `a=del:id=<id>` deletes it, after which
   references to it fail as if missing.
