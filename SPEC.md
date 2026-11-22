@@ -596,8 +596,9 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   - The user scrolls it with a wheel, a touchpad or a touch drag over its
     window that drags no element (§9.1), and, while the surface has the
     keyboard (§10), with the keys a browser scrolls with and those the
-    focused element's keymap binds to a scroll action, but not those it
-    gives the program (§10.2). A key a browser scrolls with that can move
+    keymap binds to a scroll action (§10.2, *Keymaps*: the focused
+    element's, or with nothing focused the body's), but not those it gives
+    the program. A key a browser scrolls with that can move
     nothing goes on to the program, as every key the surface does not use
     does. Focus scrolls an element into view.
   - A gesture scrolls the innermost element under the pointer that can
@@ -2074,28 +2075,41 @@ were not there: it neither acts nor overrides the bindings before it.
 | a text field | the editing actions, `program`, `prefix`, and `tab=program` |
 | any other element | `program`, `prefix` and the scroll actions |
 | the surface, with nothing focused | what any other element takes |
-| a selection in the document | `copy`, `program` and `prefix` |
+| a selection in the document | `copy`, with `program` and `prefix` as overrides of it (§11) |
 
-- **`default`** is taken by every reader, from an element's own
-  `data-keys` only.
-- **`program`, `prefix` and `default` are overrides for every reader.** A
-  nearer one replaces a farther binding of its key to any action, the
-  selection's `copy` included: under `mod+c=program`, `ctrl+c` on Linux
-  does not copy a selection (§11).
-- **A key a text field types,** a character or `space` with no modifier
-  but `shift`, it takes to `program` or `prefix` from its own `data-keys`
-  only, never from a `data-keys-tree`. A list or a pager that gives `j`
-  or `space` to the program in its `data-keys-tree` leaves its fields
-  typing them.
+- **`program`, `prefix` and `default` are overrides for every reader,**
+  `default` from an element's own `data-keys` only (above). A nearer one
+  replaces a farther binding of its key to any action, the selection's
+  `copy` included: under `mod+c=program`, `ctrl+c` on Linux does not copy
+  a selection (§11).
+- **A key the focused element uses** it takes to `program` or `prefix`
+  from its own `data-keys` only, never from a `data-keys-tree`. For a text
+  field these are the keys it types: a character or `space`, with no
+  modifier but `shift`. For any other element they are its row of the
+  table at the start of §10.2: a button's `space` and `enter`, a select's
+  characters and moves, a date input's keys. A list or a pager that gives
+  `j` or `space` to the program in its `data-keys-tree` leaves its fields
+  typing them, its buttons pressing on `space`, and its selects picking
+  with `j`. A text field's editing keys are not among them: a tree's
+  `arrow_down=program` reaches a field inside it, which takes the key
+  back with `arrow_down=default` in its own `data-keys`.
 - **With nothing focused,** the keymap is the `body`'s, as HTML makes the
   body the active element then: the `data-keys-tree` of the root and of
   the body, then the body's own `data-keys`, read as any other element's.
   A program writes them on its `body`: `<body
-  data-keys-tree="mod+k=prefix">` in a payload, a document or a
-  fragment, gives the body that attribute, as the HTML parsing algorithm
-  does (§5.1).
-- **A selection's keymap** is the default keymap, then the body's own
-  `data-keys`. No `data-keys-tree` applies to it (§11).
+  data-keys-tree="mod+k=prefix">` in an `a=doc` payload, a whole document
+  or a fragment, gives the body that attribute, as the HTML parsing
+  algorithm does (§5.1). A payload with no `<body>` gives the body no
+  keys of its own, and only the root's `data-keys-tree` holds; a second
+  `<body>` in one adds only the attributes the body does not have yet. A delta's HTML never sets the body's attributes,
+  since `<body>` is ignored where a fragment is parsed for an element: to
+  change the body's keys later, a program gives the body an `id` and sets
+  them with `attr` (§6.1), or sends a new document.
+- **A selection's keymap** is the default keymap, then the
+  `data-keys-tree` of the root and of the body, of which it takes
+  `program` and `prefix` only, then the body's own `data-keys`. It takes
+  `copy` from the body's own `data-keys` alone, and reads no other
+  element's keymap (§11).
 
 #### Selects
 
@@ -2305,9 +2319,11 @@ The actions:
 
 #### Keys for the program
 
-A key that the focused element's keymap binds to `program` or `prefix`
-reaches the program, before the element uses it and before the surface
-scrolls with it (§5.3), whatever the element. It reaches it as terminal
+A key that the keymap (*Keymaps*: the focused element's, or with nothing
+focused the body's) binds to `program` or `prefix` reaches the program,
+before the element uses it and before the surface scrolls with it (§5.3),
+whatever the element. A key the element uses it takes so from its own
+`data-keys` only (*Keymaps*). It reaches it as terminal
 input, which names no element: the last `focus` does (§10.1), or the
 program's own `a=focus`. A key of an edit command the program takes
 reaches it as that command instead (§10.6), since a key bound to `program`
@@ -2317,7 +2333,9 @@ or `prefix` is one the surface does not use.
   character and is not bound is looked up again without it.
 - **Outside a text field,** an element takes only `program`, `prefix` and
   the scroll actions (below), and `default` in its own `data-keys`, and
-  never `tab` (*Text fields*, above). Its other bindings are as if they
+  never `tab` (*Text fields*, above). A `data-keys-tree`'s `program` or
+  `prefix` of a key the element uses it does not take: a button keeps
+  `space` and `enter`. Its other bindings are as if they
   were not there, such as the editing actions a program gives its fields
   in a `data-keys-tree` above it, and the element uses those keys as the
   table at the start of §10.2 says.
@@ -2328,8 +2346,10 @@ or `prefix` is one the surface does not use.
 **A key given back.** `key=default` in an element's own `data-keys` gives
 the key back to the host's own meaning, for that element, as if no element
 above had bound it. A `data-keys-tree` binding to `default` is ignored
-(*Keymaps*): each element inside one that gives a key to the program takes
-the key back in its own `data-keys`.
+(*Keymaps*). An element needs it only for a key it does not use as the
+table at the start of §10.2 has it, since a key it uses no
+`data-keys-tree` gives the program: a text field's editing keys, and a
+key that would otherwise scroll.
 - **In a text field** the key does what the default keymap has it do, or
   types if it is a character, as in a field under no keymap of the
   program's.
@@ -2338,13 +2358,12 @@ the key back in its own `data-keys`.
   the program's as ordinary terminal input: `space` presses a button, and
   an arrow scrolls.
 
-So a list whose rows take focus gives `space` to the program in its
-`data-keys-tree`, to toggle them, and a button in a row takes it back with
-`space=default` in its own `data-keys`. A field in a row types a space
-with no binding (*Keymaps*). A list that has focus itself, and moves a
-highlight over its rows, binds `space=program` in its own `data-keys`,
-and the buttons inside it keep Space. A browser's page does the same in
-script by not calling `preventDefault`; `default` is that, as data.
+So a list whose rows take focus gives `space` and `backspace` to the
+program in its `data-keys-tree`, to toggle and delete them. A button in a
+row presses on Space, and a field in a row types a space, with no binding
+(*Keymaps*). A field in a row that edits a name takes `backspace` back with
+`backspace=default` in its own `data-keys`. A browser's page does the same
+in script by not calling `preventDefault`; `default` is that, as data.
 
 So a program that works a list, a menu or a table with the arrows binds
 them in the `data-keys-tree` of the element that holds it, or in its own
@@ -2370,7 +2389,10 @@ surfaces where the host scrolls them (§5.3):
 - **What scrolls** is the nearest element that scrolls (the root, or an
   element whose `overflow` is `auto` or `scroll`), from the focused element
   outward, itself included, wherever the binding stands; with nothing
-  focused, the root. Where it cannot move that way, the key goes
+  focused, the root, so in a document whose root does not scroll, as one
+  that scrolls a `main` inside it, such a key does nothing until an
+  element inside the scroller is focused. Where it cannot move that way,
+  the key goes
   outward as a gesture does (§5.3), as far as `overscroll-behavior` lets
   it, and never past the root: a key never scrolls the terminal. Where
   nothing it may reach can move, the key is used, and does nothing, unlike
@@ -2548,8 +2570,9 @@ which keys can follow one with its menu (§10.7). On a surface it needs two
 things of the host: the keys after the first, whatever is focused, and a
 place to show the menu.
 
-**A prefix.** A key that the focused element's keymap binds to `prefix`
-(§10.2) reaches the program, as one bound to `program` does, and so does
+**A prefix.** A key that the keymap binds to `prefix` (§10.2,
+*Keymaps*: the focused element's, or with nothing focused the body's)
+reaches the program, as one bound to `program` does, and so does
 every key after it, whatever the focused element or the scrolling (§5.3)
 would do with it: `tab`, `shift+tab` and `escape` too.
 
@@ -2622,8 +2645,8 @@ ESC ] 7279 ; a=edit:take=copy,paste,undo,redo ST
   copy does, and is not sent. A surface's selection is copied as §11 says.
 - **A surface that has the keyboard** is offered the key first (§10.2). A
   key it does not use reaches the program as the command, and so does one
-  the focused element's keymap gives the program, bound to `program` or
-  `prefix` (§10.2, §10.5): `ctrl+c=program` on Linux, with `copy` taken,
+  the keymap gives the program, bound to `program` or `prefix` (§10.2,
+  *Keymaps*; §10.5): `ctrl+c=program` on Linux, with `copy` taken,
   sends `copy` with `"key": "ctrl+c"`, which the program with nothing
   selected takes as its key.
 - **The terminal's menus,** such as an Edit menu or a context menu, send
@@ -2732,12 +2755,15 @@ document, and therefore its text.
   pasting are. A focused text field's selection is copied by a key its
   keymap binds to `copy`, and a password field's never is.
 - **A selection in a document,** outside a text field, is copied by a key
-  that the selection's keymap binds to `copy`: the default keymap, then
-  the `body`'s own `data-keys`, of which it takes `copy`, `program`,
-  `prefix` and `default` (§10.2, *Keymaps*). No `data-keys-tree` applies,
-  so the edit shortcuts a program gives its fields there never copy a
-  selection: on macOS, `ctrl+c=copy` for the fields leaves `ctrl+c` to the
-  program while text is selected. The host offers the selection each key
+  that the selection's keymap binds to `copy` (§10.2, *Keymaps*): the
+  default keymap; then the `data-keys-tree` of the root and of the body,
+  of which it takes `program` and `prefix`; then the `body`'s own
+  `data-keys`, of which it takes `copy`, `program`, `prefix` and
+  `default`. It reads no other element's keymap, and no `copy` from a
+  `data-keys-tree`, so the edit shortcuts a program gives its fields never
+  copy a selection: on macOS, `ctrl+c=copy` for the fields leaves `ctrl+c`
+  to the program while text is selected. A REPL's `mod+c=program` in the
+  body's `data-keys-tree` holds for its fields and its selections alike. The host offers the selection each key
   first, before the surface that has the keyboard and the terminal's own
   shortcuts, whether or not the surface has the keyboard. A key its keymap
   does not bind to `copy`, `program` included, goes on as if nothing were
@@ -3558,24 +3584,26 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     field. Forward Tab past such a field takes Shift+Tab or a key the
     program binds: an accessibility cost a program takes on by binding it.
 - **Why a key given back.** A key an element gives the program in its
-  `data-keys-tree` holds for everything inside it (§10.2). A list whose
-  rows take focus, and that gives them Space to toggle them, takes Space
-  from a button in a row, which Space should press. A framework that wrote
-  such a keymap before `default` put stand-ins on the button
+  `data-keys-tree` holds for everything inside it (§10.2), but for the keys
+  each element uses itself. A list that gives Backspace to the program, to
+  delete a row, takes it from a field in a row that edits the row's name,
+  since Backspace is an editing key, not one a field types. A framework
+  that wrote such a keymap before `default` put stand-ins on the element
   (`space=scroll-page-down`). `default` is the browser's model: the
   default action is the host's, and an inner element keeps it by not
   taking it.
   - **In an element's own `data-keys` only,** as a browser's handler that
-    does not call `preventDefault` is the element's own. A field needs
-    none for the keys it types (below).
+    does not call `preventDefault` is the element's own. An element needs
+    none for the keys it uses (below).
 - **Why an element's own keys, and the keys for what is inside.** Until
   0.9 every `data-keys` held for every focused element inside it, of every
   kind, and a selection's copy read the same chain. So a binding reached
   where it did not belong:
   - `ctrl+c=copy` for the fields of a container also copied a selection
     in the document on macOS, where `ctrl+c` should interrupt;
-  - a list's `space=program` reached its buttons and fields, each of which
-    then needed `space=default`;
+  - a list's `space=program` reached its buttons and fields, and a
+    scope's `j=program` its selects, each of which then needed
+    `space=default` or `j=default`;
   - a framework that avoided both wrote the edit shortcuts on every field,
     about 200 bytes a field, and a list's keys on every row. In a
     multiplexer's list of 31 tabs, under its own keys and a leader, that
@@ -3598,20 +3626,29 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     say where a key goes rather than what it does there. A selection that
     took only `copy` would copy on `ctrl+c` under `mod+c=program`, where a
     REPL means to interrupt.
-  - **A field keeps the keys it types.** A list's, a scope's or a pager's
-    `j`, `k` and Space are for the rows and the page. A field among them
-    should type them, as it does in a browser, where a page's handler for
-    `j` checks it is not in a field. As the field's own rule, no program
-    writes that check on every field; a field that wants one of those keys
-    for the program says so itself.
+  - **An element keeps the keys it uses.** A list's, a scope's or a
+    pager's `j`, `k` and Space are for the rows and the page. A field among
+    them should type them, a button press on Space and a select pick with
+    `j`, as they do in a browser, where a page's handler for `j` or Space
+    checks what it is in. As the element's own rule, no program writes that
+    check on every element; one that wants such a key for the program says
+    so itself. A field's editing keys are not kept: a list's arrows,
+    Backspace or Enter given to the program reach a field in a row, as a
+    combobox wants them, and the field takes back the ones it edits with
+    by `default`.
   - **With nothing focused, the body's,** as HTML makes the body the
     active element then. A toast that closes leaves the keyboard on nothing
     (focus fixup, §10.1), and a leader or a list's arrows bound for the
     whole document hold all the same.
-  - **A selection reads the body's own keys alone.** One that read the
-    keys around the text it starts in would let a region change its copy
-    key, which no program asked for, and would read every field's edit
-    shortcuts with it.
+  - **A selection reads the root's and the body's keys alone.** One that
+    read the keys around the text it starts in would let a region change
+    its copy key, which no program asked for, and would read every field's
+    edit shortcuts with it. It takes `program` and `prefix` from the
+    root's and the body's `data-keys-tree` too: a program that puts a
+    leader there for the whole document puts a REPL's `mod+c=program`
+    there as well, and a selection that read only the body's own keys
+    would copy on it. It takes no `copy` from a `data-keys-tree`, which is
+    where the fields' edit shortcuts go.
 - **Why `focus` names the element.** Those keys reach the program as
   terminal input, which names no element, and Tab moves focus inside the
   host. A program with a field and a list could not tell which one the

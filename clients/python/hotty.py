@@ -2031,7 +2031,7 @@ class Keymap:
         """Whether the keymap gives the key to the program (SPEC.md §10.2):
         it binds the key to `program` or `prefix`. On an element that is not
         a text field, a host asks it of the keymap `resolve` makes for the
-        "element" reader, before the element or a scroll uses it."""
+        element's reader, before the element or a scroll uses it."""
         k = self._key(key)
         if k == "tab" and not self.field:
             return False
@@ -2125,9 +2125,34 @@ _DEFAULT_MOD = {
 
 
 # The readers of a keymap (SPEC.md §10.2, Keymaps): a text field, an
-# `input` or a multi-line one; any other element, and the surface with
-# nothing focused; and a selection in the document (§11).
-READERS = ("input", "multiline", "element", "selection")
+# `input` or a multi-line one; the other focused elements, by the row of
+# SPEC.md §10.2's first table they are in (a button, a link, a summary, a
+# checkbox or a radio button; a select; a date or time input; any other),
+# where "element" is also the surface with nothing focused; and a selection
+# in the document (§11).
+READERS = ("input", "multiline", "button", "select", "date", "element", "selection")
+
+# The keys each reader uses, unmodified or with shift only (SPEC.md §10.2,
+# the first table), besides the characters a select and a date input use.
+_USES = {
+    "button": frozenset(("space", "enter")),
+    "select": frozenset(("space", "arrow_up", "arrow_down", "home", "end", "page_up", "page_down", "enter")),
+    "date": frozenset(("space", "backspace", "delete", "arrow_up", "arrow_down", "arrow_left", "arrow_right",
+                       "home", "end", "page_up", "page_down", "enter")),
+}
+
+
+def _uses(reader, k):
+    """Whether the reader uses canonical key k itself: the keys a text field
+    types, and an element's row of SPEC.md §10.2's first table."""
+    if reader in ("input", "multiline"):
+        return key_text(k) is not None
+    if reader not in _USES:
+        return False
+    mods, value, kind = _split(k)
+    if set(mods) - {"shift"}:
+        return False
+    return value in _USES[reader] or (reader != "button" and kind == "character")
 
 
 def _takes(reader, k, a, own):
@@ -2137,23 +2162,25 @@ def _takes(reader, k, a, own):
     if a == "default":
         return own
     if a in ("program", "prefix"):
-        # A text field takes no data-keys-tree binding to program or prefix
-        # of a key it types.
-        return own or reader not in ("input", "multiline") or key_text(k) is None
-    if a in SCROLL_ACTIONS:
-        return reader == "element"
+        # A data-keys-tree binding to program or prefix never takes a key
+        # the element uses itself.
+        return own or not _uses(reader, k)
     if reader == "selection":
-        return a == "copy"
+        return a == "copy" and own
+    if a in SCROLL_ACTIONS:
+        return reader not in ("input", "multiline")
     return reader in ("input", "multiline")
 
 
 def resolve(platform, reader, own="", *tree):
-    """A focused element's keymap (SPEC.md §10.2, Keymaps), for a reader of
-    READERS: the default keymap for a text field and a selection, then each
+    """A keymap (SPEC.md §10.2, Keymaps) for a reader of READERS: the
+    default keymap for a text field and a selection, then each
     data-keys-tree value, the root's first, then the element's own
     data-keys, each less the bindings the reader does not take. With
-    nothing focused, `own` and `tree` are the body's, for "element". A
-    selection reads `own`, the body's data-keys, and no data-keys-tree."""
+    nothing focused, the reader is "element", `own` is the body's
+    data-keys, and `tree` the root's and the body's data-keys-tree. A
+    selection reads the same `own` and `tree` as that, and takes `copy`
+    from `own` only."""
     if reader not in READERS:
         raise ValueError(f"resolve: no reader {reader!r}")
     platform = platform or Platform()
@@ -2161,7 +2188,7 @@ def resolve(platform, reader, own="", *tree):
     m = Keymap(multiline, platform)
     m.field = reader in ("input", "multiline")
     m.reader = reader
-    if reader != "element":
+    if reader in ("input", "multiline", "selection"):
         for k, a in _DEFAULT + (("enter", "newline" if multiline else "submit"),) + _DEFAULT_MOD[platform.mod]:
             m.bind(k, a)
         edit = platform.edit if platform.edit is not None else default_edit(platform.mod)
@@ -2174,8 +2201,7 @@ def resolve(platform, reader, own="", *tree):
                     m.bind(k, a, _read(key, platform.mod, True))
         m.base = Keymap(multiline, platform)
         m.base.bindings, m.base.written = dict(m.bindings), dict(m.written)
-    layers = ([] if reader == "selection" else [(v, False) for v in tree]) + [(own or "", True)]
-    for v, is_own in layers:
+    for v, is_own in [(v, False) for v in tree] + [(own or "", True)]:
         for k, a, w in _bindings(platform, v):
             if _takes(reader, k, a, is_own):
                 m.bind(k, a, w)

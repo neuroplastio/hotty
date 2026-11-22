@@ -379,8 +379,9 @@ the default edit shortcuts) where absent, in two forms:
 - `{ "parse": text, "format": text }`: `ParseKeymap(platform, parse).Format()` must be
   `format`; with `"terminal_keys": true` and no `parse`, `TerminalKeys`
   formatted must be `format`;
-- `{ "reader": "input" | "multiline" | "element" | "selection",
-  "terminal_keys"?: true, "tree"?: [ … ], "own"?: text, … }`:
+- `{ "reader": "input" | "multiline" | "button" | "select" | "date" |
+  "element" | "selection", "terminal_keys"?: true, "tree"?: [ … ],
+  "own"?: text, … }`:
   `Resolve(platform, reader, own, tree…)`, the keymap its reader reads
   (SPEC §10.2, *Keymaps*; SDK.md §3.10). `own` is the focused element's
   `data-keys`, empty when absent, and `tree` the `data-keys-tree` values

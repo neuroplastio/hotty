@@ -20920,7 +20920,7 @@
    ]
   },
   {
-   "name": "with nothing focused, the keymap is the body's: its data-keys-tree and then its own data-keys, as HTML makes the body the active element; after focus fixup, a prefix it binds starts, so tab reaches the program and focuses nothing, until the program gives the keys back (SPEC \u00a710.1, \u00a710.2, \u00a710.5)",
+   "name": "with nothing focused, the keymap is the body's, as HTML makes the body the active element: after focus fixup, a prefix the body's data-keys-tree binds starts, so tab reaches the program and focuses nothing, until the program gives the keys back (SPEC \u00a710.1, \u00a710.2, \u00a710.5)",
    "steps": [
     {
      "send": {
@@ -20990,6 +20990,202 @@
        "e": "blur",
        "s": "x",
        "t": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "with nothing focused, the keymap is the root's and the body's data-keys-tree, then the body's own data-keys, and no other element's: after focus fixup, an ancestor's prefix no longer starts, the body's own space=program holds where space would scroll, the body's data-keys-tree scrolls the root, and the root's data-keys-tree starts a prefix (SPEC \u00a710.1, \u00a710.2, \u00a710.5)",
+   "requires": "scroll",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<html data-keys-tree=\"p=prefix\"><head><style>body{margin:0}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style></head><body data-keys-tree=\"shift+g=scroll-end\" data-keys=\"space=program\"><div id=w data-keys-tree=\"k=prefix\"><button id=b>b</button></div><button id=r1>1</button><button id=r2>2</button><button id=r3>3</button><button id=r4>4</button><button id=r5>5</button><button id=r6>6</button></body></html>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "k",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "remove",
+        "t": "b"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "k",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "G",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "key": "p",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      0,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "r5"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "r5",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a payload with no body element gives the body no keymap: after focus fixup, a prefix an ancestor's data-keys-tree binds no longer starts, so tab focuses the first focusable element (SPEC \u00a710.1, \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><div id=w data-keys-tree=\"g=prefix\"><button id=b>b</button></div><button id=c>c</button>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "remove",
+        "t": "b"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "c"
       }
      ]
     }
@@ -22041,7 +22237,7 @@
    ]
   },
   {
-   "name": "a key given back, and what is inside: under a list whose data-keys-tree gives space and a to the program, a button gives them on, and with space=default in its own data-keys presses on space; a field types both, since it takes no such binding of a key it types, and gives a only by its own a=program; a list whose own data-keys gives space keeps it from a button inside it (SPEC \u00a710.2)",
+   "name": "a key given back, and what is inside: under a list whose data-keys-tree gives space, a and backspace to the program, the list gives them on; a button presses on space, a key it uses, gives a on, and gives space by its own data-keys; a field types space and a, keys it types, gives backspace on, and with backspace=default in its own data-keys deletes; a list whose own data-keys gives space keeps it from a button inside it (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -22049,7 +22245,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input{font-family:monospace}</style><div id=l tabindex=0 data-keys-tree=\"space=program a=program\"><button id=b1>1</button><button id=b2 data-keys=\"space=default\">2</button><input id=f data-on=input><input id=g data-on=input data-keys=\"a=program\"></div><div id=m tabindex=0 data-keys=\"space=program\"><button id=b3>3</button></div>"
+     "payload": "<style>body{margin:0}input{font-family:monospace}</style><div id=l tabindex=0 data-keys-tree=\"space=program a=program backspace=program\"><button id=b1>1</button><button id=b2 data-keys=\"space=program\">2</button><input id=f data-on=input><input id=g data-on=input data-keys=\"backspace=default\"></div><div id=m tabindex=0 data-keys=\"space=program\"><button id=b3>3</button></div>"
     },
     {
      "send": {
@@ -22064,7 +22260,7 @@
      "send": {
       "a": "focus",
       "s": "x",
-      "t": "b1",
+      "t": "l",
       "q": "2"
      },
      "events": []
@@ -22073,6 +22269,26 @@
      "key": " ",
      "terminal": true,
      "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b1",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b1"
+      }
+     ]
     },
     {
      "key": "a",
@@ -22090,17 +22306,6 @@
     },
     {
      "key": " ",
-     "terminal": false,
-     "events": [
-      {
-       "e": "click",
-       "s": "x",
-       "t": "b2"
-      }
-     ]
-    },
-    {
-     "key": "a",
      "terminal": true,
      "events": []
     },
@@ -22144,6 +22349,11 @@
      ]
     },
     {
+     "key": "Backspace",
+     "terminal": true,
+     "events": []
+    },
+    {
      "send": {
       "a": "focus",
       "s": "x",
@@ -22163,7 +22373,7 @@
      ]
     },
     {
-     "key": " ",
+     "key": "a",
      "terminal": false,
      "events": [
       {
@@ -22171,16 +22381,26 @@
        "s": "x",
        "t": "g",
        "detail": {
-        "value": " ",
+        "value": "a",
         "rev": 1
        }
       }
      ]
     },
     {
-     "key": "a",
-     "terminal": true,
-     "events": []
+     "key": "Backspace",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "value": "",
+        "rev": 2
+       }
+      }
+     ]
     },
     {
      "send": {
@@ -22195,8 +22415,8 @@
        "s": "x",
        "t": "g",
        "detail": {
-        "value": " ",
-        "rev": 1
+        "value": "",
+        "rev": 2
        }
       }
      ]
@@ -23385,6 +23605,105 @@
    ]
   },
   {
+   "name": "a data-keys-tree binding to program never takes a key the focused element uses: under space=program j=program arrow_down=program ctrl+j=program, a button presses on space and gives j on, and a select picks with j and Down and gives ctrl+j on (SPEC \u00a710.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><div data-keys-tree=\"space=program j=program arrow_down=program ctrl+j=program\"><button id=b>b</button><select id=s><option>a<option>jay<option>kay</select></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "40",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b"
+      }
+     ]
+    },
+    {
+     "key": "j",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "s",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "j",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "value": "jay",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "value": "kay",
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "key": "j",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
    "name": "a key a data-keys-tree above a focused button binds to program reaches the program before the surface scrolls with it; a button takes no editing action, so its own end=line-end is as if it were not there, and the farther end=program holds (SPEC \u00a710.2, \u00a75.3)",
    "requires": "scroll",
    "steps": [
@@ -24269,6 +24588,78 @@
     {
      "key": "a",
      "terminal": false,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a focused button takes no editing action, so a key a data-keys-tree above it binds to copy is one the surface does not use: it reaches the program as the copy command it takes, with its key, and as terminal input once it takes none (SPEC \u00a710.2, \u00a710.6)",
+   "requires": "commands",
+   "steps": [
+    {
+     "send": {
+      "a": "edit",
+      "take": "copy",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><div data-keys-tree=\"mod+c=copy\"><button id=b>b</button></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "c",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "command",
+       "s": null,
+       "t": null,
+       "detail": {
+        "name": "copy",
+        "key": "ctrl+c"
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "edit",
+      "take": "",
+      "q": "2"
+     }
+    },
+    {
+     "key": "c",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
      "events": []
     }
    ]
@@ -37017,6 +37408,109 @@
    }
   },
   {
+   "name": "a multi-line field, too, takes no data-keys-tree binding to program or prefix of a key it types, and takes one of any other key (SPEC \u00a710.2)",
+   "reader": "multiline",
+   "tree": [
+    "j=program space=prefix arrow_down=program enter=program"
+   ],
+   "lookup": {
+    "j": "insert",
+    "space": "insert",
+    "arrow_down": null,
+    "enter": null
+   },
+   "program": {
+    "j": false,
+    "space": false,
+    "arrow_down": true,
+    "enter": true
+   }
+  },
+  {
+   "name": "a button, a link, a summary, a checkbox or a radio button takes no data-keys-tree binding to program or prefix of space or enter, with shift or none: it uses them; it takes one of any other key (SPEC \u00a710.2)",
+   "reader": "button",
+   "tree": [
+    "j=program shift+j=program space=program enter=prefix shift+enter=program arrow_down=program arrow_left=program ctrl+j=program"
+   ],
+   "program": {
+    "space": false,
+    "enter": false,
+    "shift+enter": false,
+    "j": true,
+    "shift+j": true,
+    "arrow_down": true,
+    "arrow_left": true,
+    "ctrl+j": true
+   },
+   "prefix": {
+    "enter": false
+   }
+  },
+  {
+   "name": "a select takes no data-keys-tree binding to program or prefix of a key it uses: a character, space, enter, and its moves (SPEC \u00a710.2)",
+   "reader": "select",
+   "tree": [
+    "j=program shift+j=program space=program enter=prefix shift+enter=program arrow_down=program arrow_left=program ctrl+j=program"
+   ],
+   "program": {
+    "j": false,
+    "shift+j": false,
+    "space": false,
+    "enter": false,
+    "shift+enter": false,
+    "arrow_down": false,
+    "arrow_left": true,
+    "ctrl+j": true
+   },
+   "prefix": {
+    "enter": false
+   }
+  },
+  {
+   "name": "a date or time input takes no data-keys-tree binding to program or prefix of a key it uses, the left and right arrows among them (SPEC \u00a710.2)",
+   "reader": "date",
+   "tree": [
+    "j=program shift+j=program space=program enter=prefix shift+enter=program arrow_down=program arrow_left=program ctrl+j=program"
+   ],
+   "program": {
+    "j": false,
+    "space": false,
+    "enter": false,
+    "arrow_down": false,
+    "arrow_left": false,
+    "ctrl+j": true
+   }
+  },
+  {
+   "name": "an element's own data-keys gives the program a key the element uses (SPEC \u00a710.2)",
+   "reader": "button",
+   "tree": [
+    "space=program enter=program"
+   ],
+   "own": "space=program",
+   "program": {
+    "space": true,
+    "enter": false
+   }
+  },
+  {
+   "name": "an element that uses no keys of its own, as one with a tabindex, takes every data-keys-tree binding to program or prefix (SPEC \u00a710.2)",
+   "reader": "element",
+   "tree": [
+    "j=program shift+j=program space=program enter=prefix shift+enter=program arrow_down=program arrow_left=program ctrl+j=program"
+   ],
+   "program": {
+    "j": true,
+    "space": true,
+    "enter": true,
+    "arrow_down": true,
+    "ctrl+j": true
+   },
+   "prefix": {
+    "enter": true
+   }
+  },
+  {
    "name": "outside a text field, a data-keys-tree gives the program a character and space (SPEC \u00a710.2)",
    "reader": "element",
    "tree": [
@@ -37053,26 +37547,88 @@
    }
   },
   {
-   "name": "a selection takes program from the body's own data-keys: under mod+c=program, ctrl+c on Linux goes on as if nothing were selected; default gives copy back (SPEC \u00a711, \u00a710.2)",
+   "name": "a selection takes program from the body's own data-keys: under mod+c=program, ctrl+c on Linux goes on as if nothing were selected (SPEC \u00a711, \u00a710.2)",
    "reader": "selection",
-   "own": "mod+c=program mod+x=program mod+x=default",
+   "own": "mod+c=program",
    "lookup": {
-    "ctrl+c": null,
-    "ctrl+x": null
+    "ctrl+c": null
+   },
+   "program": {
+    "ctrl+c": true
    }
   },
   {
-   "name": "a selection takes copy, program, prefix and default from the body's own data-keys, and nothing from a data-keys-tree: another editing action is as if it were not there (SPEC \u00a711, \u00a710.2)",
+   "name": "a selection takes prefix from the body's own data-keys, as an override of copy: under mod+c=prefix, ctrl+c on Linux copies nothing (SPEC \u00a711, \u00a710.2)",
+   "reader": "selection",
+   "own": "mod+c=prefix",
+   "lookup": {
+    "ctrl+c": null
+   },
+   "prefix": {
+    "ctrl+c": true
+   }
+  },
+  {
+   "name": "default in the body's own data-keys gives copy back to a selection, under a data-keys-tree's mod+c=program (SPEC \u00a711, \u00a710.2)",
    "reader": "selection",
    "tree": [
-    "ctrl+c=program ctrl+x=copy"
+    "mod+c=program"
    ],
-   "own": "ctrl+c=cut ctrl+k=copy ctrl+v=default",
+   "own": "mod+c=default",
+   "lookup": {
+    "ctrl+c": "copy"
+   },
+   "program": {
+    "ctrl+c": false
+   }
+  },
+  {
+   "name": "a selection takes program from the root's and the body's data-keys-tree: under mod+c=program there, ctrl+c on Linux copies nothing (SPEC \u00a711, \u00a710.2)",
+   "reader": "selection",
+   "tree": [
+    "mod+c=program"
+   ],
+   "lookup": {
+    "ctrl+c": null
+   },
+   "program": {
+    "ctrl+c": true
+   }
+  },
+  {
+   "name": "a selection takes no copy from a data-keys-tree, which neither acts nor overrides: a nearer mod+c=copy leaves a farther mod+c=program holding (SPEC \u00a711, \u00a710.2)",
+   "reader": "selection",
+   "tree": [
+    "mod+c=program",
+    "mod+c=copy alt+c=copy"
+   ],
+   "lookup": {
+    "ctrl+c": null,
+    "alt+c": null
+   },
+   "program": {
+    "ctrl+c": true
+   }
+  },
+  {
+   "name": "a selection takes copy, program, prefix and default from the body's own data-keys, and only program and prefix from a data-keys-tree: another action is as if it were not there (SPEC \u00a711, \u00a710.2)",
+   "reader": "selection",
+   "tree": [
+    "ctrl+x=copy ctrl+k=prefix ctrl+v=default"
+   ],
+   "own": "ctrl+c=cut ctrl+j=copy ctrl+v=program ctrl+v=default",
    "lookup": {
     "ctrl+c": "copy",
     "ctrl+x": null,
-    "ctrl+k": "copy",
+    "ctrl+j": "copy",
+    "ctrl+k": null,
     "ctrl+v": null
+   },
+   "prefix": {
+    "ctrl+k": true
+   },
+   "program": {
+    "ctrl+v": false
    }
   },
   {

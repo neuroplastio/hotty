@@ -680,8 +680,8 @@ host.
   character's, a letter with `shift` as its capital, a space for `space`,
   and none for any other key, or a key with `ctrl`, `alt` or `super`.
 - **`Keymap`** is a set of bindings, key to action, read on a Platform.
-  `ParseKeymap(platform, value)` reads a `data-keys` value as SPEC.md
-  §10.2 has hosts read it, dropping the bindings a host ignores (it keeps
+  `ParseKeymap(platform, value)` reads a `data-keys` or a
+  `data-keys-tree` value as SPEC.md §10.2 has hosts read it, dropping the bindings a host ignores (it keeps
   `tab=program`, which a field honours, and `tab=default`), each key
   with `ReadKey`: on `ctrl`, `mod+a` and `ctrl+a` are one key, the later
   binding's. `Format()` writes one back: each key once, where it was
@@ -695,20 +695,29 @@ host.
   - **`input`** and **`multiline`**, a text field: SPEC.md's default
     keymap for the Platform's `mod`, with its `Edit`, for an `input` or for
     a multi-line field, then each `tree` value in turn, then `own`;
-  - **`element`**, any other focused element, and the surface with nothing
-    focused, whose `own` and `tree` are the `body`'s: no default keymap,
-    then each `tree` value, then `own`;
+  - **`button`**, **`select`**, **`date`** and **`element`**, any other
+    focused element, by its row of SPEC.md §10.2's first table: a button,
+    a link, a summary, a checkbox or a radio button; a select; an `input`
+    of a date or time type; and any other, such as one with a `tabindex`.
+    No default keymap, then each `tree` value, then `own`. With nothing
+    focused the reader is `element`, `own` is the body's `data-keys`, and
+    `tree` the root's and the body's `data-keys-tree`;
   - **`selection`**, a selection in the document (SPEC.md §11): the
-    default keymap for an `input`, then `own`, the body's; it reads no
-    `tree`.
+    default keymap for an `input`, then `tree` and `own` as with nothing
+    focused.
 
   A binding its reader does not take is left out where it stands: it
   neither acts nor overrides an earlier binding of its key. A field takes
-  the editing actions, `program` and `prefix`, and no scroll action, nor a
-  `tree` binding to `program` or `prefix` of a key it types (`KeyText`
-  has text for it). An element takes `program`, `prefix` and the scroll
-  actions, and a selection `copy`, `program` and `prefix`. Each takes
-  `default` from `own` only. A binding to `default` gives the key back:
+  the editing actions, `program` and `prefix`, and no scroll action. Any
+  other element takes `program`, `prefix` and the scroll actions, and a
+  selection `copy` from `own` only, and `program` and `prefix`. No reader
+  takes a `tree` binding to `program` or `prefix` of a key it uses: the
+  keys a field types (`KeyText` has text for them), and an element's row
+  of the table, unmodified or with `shift` only (a button's `space` and
+  `enter`; a select's characters, `space`, `enter` and its moves; a date
+  input's characters and keys). Each takes `default` from `own` only. In
+  an 0.8 session a host passes each `data-keys` value from the root down
+  as `tree`, and the focused element's as `own` too (HOST.md §5.2). A binding to `default` gives the key back:
   `Lookup` then answers as with no keymap of the program's, from the
   default keymap or `insert`.
 - **`Binds(key)`** says whether a keymap binds the key, or, for a key with
@@ -733,9 +742,10 @@ host.
   to `program` (SPEC.md §10.2, a field may give the program `tab`); on any
   other keymap `Program("tab")` is false, and `tab` moves focus. On
   an element that is not a text field, a host asks it of
-  `Resolve(platform, element, own, tree…)`, and with nothing focused of
-  the same for the body; a key it gives reaches the program before the
-  element or a scroll uses it (SPEC.md §10.2, keys for the program).
+  `Resolve(platform, reader, own, tree…)` with the element's reader, and
+  with nothing focused of `element` for the body; a key it gives reaches
+  the program before the element or a scroll uses it (SPEC.md §10.2, keys
+  for the program).
 - **`Prefix(key)`** says whether a keymap binds the key to `prefix`, with
   the same fallback without Shift. A host asks it of a key `Program` gives
   the program, and from then on gives the program every key (SPEC.md
@@ -1391,8 +1401,12 @@ places a port goes wrong:
   `Lookup` of a key bound to it answers from the default keymap, or
   `insert`; outside a field it is none of `Program`'s, `Prefix`'s or
   `Scroll`'s (§3.10). `Resolve` takes it from `own` only.
-- **`Resolve`'s readers** are `input`, `multiline`, `element` and
-  `selection`, each as its language names a closed set of values (§3.10).
+- **`Resolve`'s readers** are `input`, `multiline`, `button`, `select`,
+  `date`, `element` and `selection`, each as its language names a closed
+  set of values (§3.10). A reader outside them is an error, raised or
+  returned as its language does, never read as one of them: in the
+  languages without a type to check it, Lua and TypeScript among them, an
+  0.8 call such as `resolve(platform, false, …)` fails loudly.
   `input` and `multiline` take the place of the `multiline` flag that
   `Resolve` took before 0.9.
 - **A test host** that speaks 0.8 only skips the `speaks-0.7` vectors
