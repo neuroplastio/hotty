@@ -680,14 +680,14 @@ host.
   character's, a letter with `shift` as its capital, a space for `space`,
   and none for any other key, or a key with `ctrl`, `alt` or `super`.
 - **`Keymap`** is a set of bindings, key to action, read on a Platform.
-  `ParseKeymap(platform, value)` reads a `data-keys` or a
-  `data-keys-tree` value as SPEC.md §10.2 has hosts read it, dropping the bindings a host ignores (it keeps
-  `tab=program`, which a field honours, and `tab=default`), each key
-  with `ReadKey`: on `ctrl`, `mod+a` and `ctrl+a` are one key, the later
-  binding's. `Format()` writes one back: each key once, where it was
-  first bound, as its last binding wrote it, with its last action, as
-  `key=action`, separated by a space. A key is written canonical, and one
-  written with `mod` keeps it, first (`mod+shift+z`).
+  `ParseKeymap(platform, value)` reads a `data-keys` or a `data-keys-tree`
+  value as SPEC.md §10.2 has hosts read it, dropping the bindings a host
+  ignores (it keeps `tab=program`, which a field honours, and
+  `tab=default`), each key with `ReadKey`: on `ctrl`, `mod+a` and `ctrl+a`
+  are one key, the later binding's. `Format()` writes one back: each key
+  once, where it was first bound, as its last binding wrote it, with its
+  last action, as `key=action`, separated by a space. A key is written
+  canonical, and one written with `mod` keeps it, first (`mod+shift+z`).
 - **`Resolve(platform, reader, own, tree…)`** builds the keymap a reader
   reads (SPEC.md §10.2, *Keymaps*). `own` is the focused element's
   `data-keys` value, and `tree` the `data-keys-tree` values from the
@@ -697,11 +697,12 @@ host.
     a multi-line field, then each `tree` value in turn, then `own`;
   - **`button`**, **`select`**, **`date`** and **`element`**, any other
     focused element, by its row of SPEC.md §10.2's first table: a button,
-    a link, a summary, a checkbox or a radio button; a select; an `input`
-    of a date or time type; and any other, such as one with a `tabindex`.
-    No default keymap, then each `tree` value, then `own`. With nothing
-    focused the reader is `element`, `own` is the body's `data-keys`, and
-    `tree` the root's and the body's `data-keys-tree`;
+    an `input` of type `button`, `submit` or `reset`, a link, a summary, a
+    checkbox or a radio button; a select; an `input` of a date or time
+    type; and any other, such as one with a `tabindex`. No default keymap,
+    then each `tree` value, then `own`. With nothing focused the reader is
+    `element`, `own` is the body's `data-keys`, and `tree` the root's and
+    the body's `data-keys-tree`;
   - **`selection`**, a selection in the document (SPEC.md §11): the
     default keymap for an `input`, then `tree` and `own` as with nothing
     focused.
@@ -717,9 +718,10 @@ host.
   `enter`; a select's characters, `space`, `enter` and its moves; a date
   input's characters and keys). Each takes `default` from `own` only. In
   an 0.8 session a host passes each `data-keys` value from the root down
-  as `tree`, and the focused element's as `own` too (HOST.md §5.2). A binding to `default` gives the key back:
-  `Lookup` then answers as with no keymap of the program's, from the
-  default keymap or `insert`.
+  as `tree`, and the focused element's as `own` too, or with nothing
+  focused and for a selection the body's (HOST.md §5.2). A binding to
+  `default` gives the key back: `Lookup` then answers as with no keymap of
+  the program's, from the default keymap or `insert`.
 - **`Binds(key)`** says whether a keymap binds the key, or, for a key with
   `shift` that is not a character and that it does not bind, the key
   without `shift` (SPEC.md §10.2). A host that has two names for a press

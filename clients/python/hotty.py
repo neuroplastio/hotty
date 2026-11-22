@@ -2126,8 +2126,9 @@ _DEFAULT_MOD = {
 
 # The readers of a keymap (SPEC.md §10.2, Keymaps): a text field, an
 # `input` or a multi-line one; the other focused elements, by the row of
-# SPEC.md §10.2's first table they are in (a button, a link, a summary, a
-# checkbox or a radio button; a select; a date or time input; any other),
+# SPEC.md §10.2's first table they are in (a button, an `input` of type
+# button, submit or reset, a link, a summary, a checkbox or a radio button;
+# a select; a date or time input; any other),
 # where "element" is also the surface with nothing focused; and a selection
 # in the document (§11).
 READERS = ("input", "multiline", "button", "select", "date", "element", "selection")

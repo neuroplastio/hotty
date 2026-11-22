@@ -24107,7 +24107,7 @@
    ]
   },
   {
-   "name": "a data-keys-tree binding to program never takes a key the focused element uses: under space=program j=program arrow_down=program ctrl+j=program, a button presses on space and gives j on, and a select picks with j and Down and gives ctrl+j on (SPEC \u00a710.2)",
+   "name": "a data-keys-tree binding to program never takes a key the focused element uses: under space=program j=program arrow_down=program ctrl+j=program, a button presses on space and gives j on, an input of type submit presses on space, a checkbox toggles on space, and a select picks with j and Down and gives ctrl+j on (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -24115,7 +24115,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}</style><div data-keys-tree=\"space=program j=program arrow_down=program ctrl+j=program\"><button id=b>b</button><select id=s><option>a<option>jay<option>kay</select></div>"
+     "payload": "<style>body{margin:0}</style><div data-keys-tree=\"space=program j=program arrow_down=program ctrl+j=program\"><button id=b>b</button><input type=submit id=u value=u><input type=checkbox id=c><select id=s><option>a<option>jay<option>kay</select></div>"
     },
     {
      "send": {
@@ -24153,6 +24153,61 @@
     },
     {
      "key": "ArrowDown",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "u",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "u"
+      }
+     ]
+    },
+    {
+     "key": "j",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "c",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "checked": true,
+        "value": "on",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": "j",
      "terminal": true,
      "events": []
     },
@@ -38013,6 +38068,37 @@
    }
   },
   {
+   "name": "a button takes a data-keys-tree's scroll actions (SPEC \u00a710.2)",
+   "reader": "button",
+   "tree": [
+    "j=scroll-down ctrl+d=scroll-half-page-down"
+   ],
+   "scroll": {
+    "j": "scroll-down",
+    "ctrl+d": "scroll-half-page-down"
+   }
+  },
+  {
+   "name": "a select takes a data-keys-tree's scroll action of a key it does not use (SPEC \u00a710.2)",
+   "reader": "select",
+   "tree": [
+    "ctrl+d=scroll-half-page-down"
+   ],
+   "scroll": {
+    "ctrl+d": "scroll-half-page-down"
+   }
+  },
+  {
+   "name": "a date input takes a data-keys-tree's scroll action of a key it does not use (SPEC \u00a710.2)",
+   "reader": "date",
+   "tree": [
+    "ctrl+d=scroll-half-page-down"
+   ],
+   "scroll": {
+    "ctrl+d": "scroll-half-page-down"
+   }
+  },
+  {
    "name": "outside a text field, a data-keys-tree gives the program a character and space (SPEC \u00a710.2)",
    "reader": "element",
    "tree": [
@@ -38113,12 +38199,12 @@
    }
   },
   {
-   "name": "a selection takes copy, program, prefix and default from the body's own data-keys, and only program and prefix from a data-keys-tree: another action is as if it were not there (SPEC \u00a711, \u00a710.2)",
+   "name": "a selection takes copy, program, prefix and default from the body's own data-keys, and only program and prefix from a data-keys-tree: another action, a scroll action among them, is as if it were not there (SPEC \u00a711, \u00a710.2)",
    "reader": "selection",
    "tree": [
-    "ctrl+x=copy ctrl+k=prefix ctrl+v=default"
+    "ctrl+x=copy ctrl+k=prefix ctrl+v=default j=scroll-down"
    ],
-   "own": "ctrl+c=cut ctrl+j=copy ctrl+v=program ctrl+v=default",
+   "own": "ctrl+c=cut ctrl+j=copy ctrl+v=program ctrl+v=default k=scroll-up",
    "lookup": {
     "ctrl+c": "copy",
     "ctrl+x": null,
@@ -38131,6 +38217,10 @@
    },
    "program": {
     "ctrl+v": false
+   },
+   "scroll": {
+    "j": null,
+    "k": null
    }
   },
   {

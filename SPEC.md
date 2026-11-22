@@ -2002,7 +2002,7 @@ is offered the second time as the key that input reads as.
 | text field: an `input` of type `text`, `search`, `url`, `tel`, `email`, `password` or `number` (or a type the host does not know, which is `text`), a `textarea`, an editing host (`contenteditable`) | the keys its keymap binds, and printable characters (below) |
 | an `input` of a date or time type | characters, `space`, `backspace`, `delete`, the arrows, `home`, `end`, `page_up`, `page_down`, `enter`, unmodified or with `shift` only |
 | `select` | characters, `space`, `arrow_up`, `arrow_down`, `home`, `end`, `page_up`, `page_down`, `enter`, unmodified or with `shift` only |
-| `button`, `a`, `summary`, checkbox, radio button | `space` and `enter`, unmodified or with `shift` only |
+| `button`, an `input` of type `button`, `submit` or `reset`, `a`, `summary`, checkbox, radio button | `space` and `enter`, unmodified or with `shift` only |
 
 - **`tab` and `shift+tab`** move between the elements of the surface that
   take focus (§10.1), and the host sends `focus` for the one they move to.
@@ -2099,12 +2099,13 @@ were not there: it neither acts nor overrides the bindings before it.
   A program writes them on its `body`: `<body
   data-keys-tree="mod+k=prefix">` in an `a=doc` payload, a whole document
   or a fragment, gives the body that attribute, as the HTML parsing
-  algorithm does (§5.1). A payload with no `<body>` gives the body no
-  keys of its own, and only the root's `data-keys-tree` holds; a second
-  `<body>` in one adds only the attributes the body does not have yet. A delta's HTML never sets the body's attributes,
-  since `<body>` is ignored where a fragment is parsed for an element: to
-  change the body's keys later, a program gives the body an `id` and sets
-  them with `attr` (§6.1), or sends a new document.
+  algorithm does (§5.1). A payload with no `<body>` gives the body no keys
+  of its own, and only the root's `data-keys-tree` holds; a second
+  `<body>` in one adds only the attributes the body does not have yet. A
+  delta's HTML never sets the body's attributes, since `<body>` is ignored
+  where a fragment is parsed for an element: to change the body's keys
+  later, a program gives the body an `id` and sets them with `attr`
+  (§6.1), or sends a new document.
 - **A selection's keymap** is the default keymap, then the
   `data-keys-tree` of the root and of the body, of which it takes
   `program` and `prefix` only, then the body's own `data-keys`. It takes
@@ -2322,12 +2323,12 @@ The actions:
 A key that the keymap (*Keymaps*: the focused element's, or with nothing
 focused the body's) binds to `program` or `prefix` reaches the program,
 before the element uses it and before the surface scrolls with it (§5.3),
-whatever the element. A key the element uses it takes so from its own
-`data-keys` only (*Keymaps*). It reaches it as terminal
-input, which names no element: the last `focus` does (§10.1), or the
-program's own `a=focus`. A key of an edit command the program takes
-reaches it as that command instead (§10.6), since a key bound to `program`
-or `prefix` is one the surface does not use.
+whatever the element. It takes a key it uses so only from its own
+`data-keys` (*Keymaps*). It reaches it as terminal input, which names no
+element: the last `focus` does (§10.1), or the program's own `a=focus`. A
+key of an edit command the program takes reaches it as that command
+instead (§10.6), since a key bound to `program` or `prefix` is one the
+surface does not use.
 - **Every focused element has a keymap** (*Keymaps*, above). Only a text
   field starts from the default keymap. A key with `shift` that is not a
   character and is not bound is looked up again without it.
@@ -2763,13 +2764,14 @@ document, and therefore its text.
   `data-keys-tree`, so the edit shortcuts a program gives its fields never
   copy a selection: on macOS, `ctrl+c=copy` for the fields leaves `ctrl+c`
   to the program while text is selected. A REPL's `mod+c=program` in the
-  body's `data-keys-tree` holds for its fields and its selections alike. The host offers the selection each key
-  first, before the surface that has the keyboard and the terminal's own
-  shortcuts, whether or not the surface has the keyboard. A key its keymap
-  does not bind to `copy`, `program` included, goes on as if nothing were
-  selected: under `mod+c=program` in the body's `data-keys`, `ctrl+c` on
-  Linux reaches the program while text is selected, as its bytes, which
-  interrupt it, or as `copy` where it takes that command (§10.6).
+  body's `data-keys-tree` holds for its fields and its selections alike.
+  The host offers the selection each key first, before the surface that
+  has the keyboard and the terminal's own shortcuts, whether or not the
+  surface has the keyboard. A key its keymap does not bind to `copy`,
+  `program` included, goes on as if nothing were selected: under
+  `mod+c=program` in the body's `data-keys`, `ctrl+c` on Linux reaches the
+  program while text is selected, as its bytes, which interrupt it, or as
+  `copy` where it takes that command (§10.6).
 - **The terminal's own copy** and paste, from its own keys, its menu or
   a middle press (§9), are the user's whatever the keymaps say. Its copy **SHOULD** copy a
   surface's selection, so that no document makes its text uncopyable, and
@@ -3609,7 +3611,7 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     about 200 bytes a field, and a list's keys on every row. In a
     multiplexer's list of 31 tabs, under its own keys and a leader, that
     was 4.2 KB of `data-keys`, and a change of the leader was a delta of
-    31 attribute operations. Written once for what is inside, it is 1.2 KB
+    31 attribute operations. Written once for what is inside, it is 1.1 KB
     and one operation, with every row's keys the same.
 
   Inheritance is still needed: a leader anywhere in a view, a list whose
