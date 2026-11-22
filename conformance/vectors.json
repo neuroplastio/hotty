@@ -37326,6 +37326,32 @@
    ]
   },
   {
+   "name": "a function key is its name: F1 as SS3 P or CSI P, F5 and on as CSI n ~, with its modifiers (SPEC \u00a710.4)",
+   "input": "\u001bOP\u001b[1;2P\u001b[15~\u001b[24;5~",
+   "keys": [
+    "f1",
+    "shift+f1",
+    "f5",
+    "ctrl+f12"
+   ]
+  },
+  {
+   "name": "Shift+F10, a key that opens a context menu, is shift+f10 (SPEC \u00a79, \u00a710.4)",
+   "input": "\u001b[21;2~\u001b[21~",
+   "keys": [
+    "shift+f10",
+    "f10"
+   ]
+  },
+  {
+   "name": "the menu key is context_menu, as CSI 29 ~ or the kitty protocol's 57363 (SPEC \u00a79, \u00a710.4)",
+   "input": "\u001b[29~\u001b[57363u",
+   "keys": [
+    "context_menu",
+    "context_menu"
+   ]
+  },
+  {
    "name": "myelin key names 0.1, read: \"a\"",
    "key": "a",
    "canon": "a"

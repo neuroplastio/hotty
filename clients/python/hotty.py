@@ -1821,12 +1821,16 @@ def _char(c, mods=()):
 
 _C0 = {0x00: "ctrl+space", 0x08: "ctrl+h", 0x09: "tab", 0x0D: "enter", 0x1B: "escape", 0x7F: "backspace",
        0x1C: "ctrl+\\", 0x1D: "ctrl+]", 0x1E: "ctrl+^", 0x1F: "ctrl+_"}
-_CSI_FINAL = {"A": "arrow_up", "B": "arrow_down", "C": "arrow_right", "D": "arrow_left", "H": "home", "F": "end"}
-_TILDE = {1: "home", 7: "home", 4: "end", 8: "end", 2: "insert", 3: "delete", 5: "page_up", 6: "page_down"}
+_CSI_FINAL = {"A": "arrow_up", "B": "arrow_down", "C": "arrow_right", "D": "arrow_left", "H": "home", "F": "end",
+              "P": "f1", "Q": "f2", "R": "f3", "S": "f4"}
+_TILDE = {1: "home", 7: "home", 4: "end", 8: "end", 2: "insert", 3: "delete", 5: "page_up", 6: "page_down",
+          11: "f1", 12: "f2", 13: "f3", 14: "f4", 15: "f5", 17: "f6", 18: "f7", 19: "f8", 20: "f9", 21: "f10",
+          23: "f11", 24: "f12", 29: "context_menu"}
 _CODES = {9: "tab", 13: "enter", 27: "escape", 8: "backspace", 127: "backspace", 32: "space"}
 # The kitty keyboard protocol's keypad codes, as a legacy terminal sends
-# the keys (SPEC.md §10.4).
+# the keys (SPEC.md §10.4), and its menu key.
 _KITTY = {57399 + i: str(i) for i in range(10)}
+_KITTY[57363] = "context_menu"
 _KITTY.update({57409: ".", 57410: "/", 57411: "*", 57412: "-", 57413: "+", 57414: "enter", 57415: "=",
                57417: "arrow_left", 57418: "arrow_right", 57419: "arrow_up", 57420: "arrow_down",
                57421: "page_up", 57422: "page_down", 57423: "home", 57424: "end", 57425: "insert", 57426: "delete"})
@@ -1941,7 +1945,7 @@ def decode_keys(data):
         nxt = data[i + 1]
         if nxt in (0x5B, 0x4F) and i + 2 < len(data):
             if nxt == 0x4F:
-                out.append(_CSI_FINAL.get(chr(data[i + 2])) if chr(data[i + 2]) in "ABCDHF" else None)
+                out.append(_CSI_FINAL.get(chr(data[i + 2])) if chr(data[i + 2]) in "ABCDHFPQRS" else None)
                 i += 3
                 continue
             j = i + 2
