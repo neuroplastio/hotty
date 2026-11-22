@@ -374,14 +374,19 @@ hotty's own stack, hosts and SDKs, speaks 0.8 along with 0.9. SPEC.md §15
 lets a host speak several versions, and the rest is what the stack does
 with it. A host that does not speak a program's version answers it with
 `EVERSION` (SPEC.md §4), and the program falls back: a 0.7 program meets
-a 0.9 host so. Each version is the session's: a host switches what it
-reads and reports by the version it answered in.
+a 0.9 host so. Each version is the session's, but only in its wire
+shapes: a host switches how it reads keymaps (§5.1) and reports buttons
+(§5.2) by the version it answered in, and nothing else.
 
 - **A host that speaks 0.8 as well** answers a program that lists 0.8 and
   not 0.9 in 0.8, and speaks 0.8 to it from then on (SPEC.md §4). A query
   that lists both is answered in 0.9, the highest the two share.
-- **The rest is drawn, not told:** `prefers-reduced-motion` (SPEC.md §8)
-  follows the setting in every session.
+- **The rest is 0.9's in every session,** an 0.8 one included (the
+  maintainer): focus fixup (SPEC.md §10.1), a wheel at a surface's edge
+  (SPEC.md §5.3), a key the keymap gives the program that is a command it
+  took (SPEC.md §10.6), an identical resend (SPEC.md §7.1), and
+  `prefers-reduced-motion` (SPEC.md §8). 0.8 left each of them open or to
+  the host, so no 0.8 reading is kept.
 
 ### 5.1 Keymaps in an 0.8 session
 

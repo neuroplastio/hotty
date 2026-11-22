@@ -518,19 +518,32 @@ by step.
   query (`Versions`), and takes the host that answers in either (SPEC.md
   §4, §15).
   - **An 0.8 host** reads each `data-keys` for its element and everything
-    inside it, and no `data-keys-inner`. It reports a context menu's
-    gesture as a `press` with `Button` 2 (`ButtonSecondary`), `C` and `R`,
-    for an element with `secondary` in its `data-on`, and sends no
-    `contextmenu` and no `auxclick`: every other button is the terminal's.
-    A program that met one writes both words, as HOST.md §5 has a 0.9 host
-    read an 0.8 session, and opens the same menu from either.
+    inside it, and no `data-keys-inner`; with nothing focused it reads no
+    keymap. It reports a context menu's gesture as a `press` with `Button`
+    2 (`ButtonSecondary`), `C` and `R`, for an element with `secondary` in
+    its `data-on`, and sends no `contextmenu` and no `auxclick`: every
+    other button is the terminal's. It may differ on what 0.9 settled: a
+    wheel at a surface's edge may become arrow keys, a key the keymap
+    gives the program may come as its bytes rather than as the command it
+    is, focus may be lost with a `blur`, and Tab from nothing focused may
+    start elsewhere.
+  - **A program that may meet one** writes `secondary` beside
+    `contextmenu` (§4.7), and opens the same menu from either. A binding
+    it places in a wrapper's `data-keys-inner` does not hold there, so one
+    it means for an 0.8 host as well it writes in that wrapper's
+    `data-keys` too, which 0.9 reads only while the wrapper itself is
+    focused. Or it writes its keymaps by `Caps.V`.
   - **Which version it met** is the capabilities' `V`, in `Caps`, which the
     program reads when it must tell them apart. The host speaks that
     version from then on.
   - A 0.9 host that speaks 0.8 too answers `v=0.8,0.9` in 0.9, and an 0.8
     host answers it in 0.8. A host that speaks only 0.9 answers `v=0.8`
-    with `EVERSION`, and so does a 0.7 host `v=0.8,0.9`: the terminal is
-    `text` (§3.8's second rule).
+    with `EVERSION`, and a 0.7 host answers `v=0.8,0.9` so: the terminal
+    is `text` (§3.8's second rule).
+  - **An 0.8 program on a 0.9 host** that speaks 0.8 too is read in 0.8
+    only in its keymaps and its buttons (HOST.md §5.1, §5.2). Focus fixup,
+    the edge wheel, a key given it as the command it took and an identical
+    resend are 0.9's in every session (HOST.md §5).
 
 The rules, with their times:
 
@@ -1438,6 +1451,10 @@ places a port goes wrong:
 - **`Version` is `"0.9"`, `Versions` `["0.8", "0.9"]`,** and the runner's
   copy of the vectors moves with them (§5.2). A 0.7 host is no longer
   one the SDK takes.
+- **The keymap vectors' shape:** a `Resolve` vector names its `reader`,
+  `own` and `inner` in place of `multiline` and `keys`
+  (conformance/README.md, *Keymap*), so every runner's reading of them
+  changes.
 - **`Resolve`'s readers** are `input`, `multiline`, `button`, `select`,
   `date`, `element` and `selection`, each as its language names a closed
   set of values (§3.10). A reader outside them is an error, raised or
@@ -1449,10 +1466,30 @@ places a port goes wrong:
 - **`Resolve` takes its keymaps as `own` and `inner`** (§3.10), and
   `default` from `own` only. In an 0.8 session a host passes each
   `data-keys` as both (HOST.md §5.1).
+- **The rest of §3.10:** `ParseKeymap` reads `data-keys-inner` values
+  too. On a selection's keymap, `Lookup` returns `copy` for a key that
+  copies, and none for every other. A host asks of an element that is
+  not a text field through `Resolve` with its reader, and with nothing
+  focused of `element` for the body, no longer of its joined `data-keys`.
 - **`contextmenu` and `auxclick`** are event kinds (§3.1), with `Area`,
-  `C`, `R` and `Button` (§3.9). The `Button` constants, `ButtonSecondary`
-  among them, name the DOM's numbers (§3.1). A `press` still reads
-  `Button`, `C` and `R` where present, which only an 0.8 session's
-  secondary press sends (HOST.md §5.2).
-- **A test host** that speaks 0.9 only skips the `speaks-0.8` vectors
-  (§4.4).
+  `C`, `R` and `Button` (§3.9), and an `auxclick` carries `Value`, `Mods`
+  and `Link` as a `click` does. The `Button` constants, from
+  `ButtonPrimary` to `ButtonForward`, name the DOM's numbers (§3.1). A
+  `press` still reads `Button`, `C` and `R` where present, which only an
+  0.8 session's secondary press sends (HOST.md §5.2). A `dragstart`
+  handler that means the primary button checks `Button` (§3.9).
+- **A Field** (§4.6) sets its keymap in the `data-keys-inner` of the
+  element that holds the fields, and its cells use `Resolve(platform,
+  input, "", TerminalKeys)`, or `multiline` for a multi-line field.
+- **A test host** (§4.4) drops focus when the focused element goes away,
+  sending only the `change` of a field the user edited that is still in
+  the document. It skips the `layout` vectors, and the `speaks-0.8` ones
+  where it speaks 0.9 only. Its test events open a context menu
+  (`contextmenu`), press and release another button (`auxclick`), and
+  drag with any button.
+- **A relay** (§4.5) drops a wheel over a relayed surface's window, along
+  an axis its document scrolls, where it would become keys for the
+  program behind it.
+- **Context menus** (§4.7): the word an element opts in with is
+  `contextmenu`, with `secondary` beside it for an 0.8 session, and the
+  menu key may come as a `contextmenu` with no `C` and `R`.
