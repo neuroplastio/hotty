@@ -13550,6 +13550,143 @@
    ]
   },
   {
+   "name": "one button at a time until every button is released: the surface's press released first, a press of another button while the swallowed one is still down is not reported, and its release goes nowhere (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#d{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#i{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=d data-on=\"drag aux\">d</i><i id=i data-on=\"aux click secondary\">i</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 4,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 5,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 4,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 5,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 3,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 3,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 3,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 3,
+        "area": {
+         "c": 4,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 5,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 3,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 3,
+        "area": {
+         "c": 4,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 5,
+        "r": 0
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "the other way round: while a press the terminal took is held, any other press is the terminal's too, over an element that would take it, until every button is released (SPEC \u00a79)",
    "requires": "mouse",
    "steps": [
@@ -13676,6 +13813,225 @@
        }
       }
      ],
+     "mouse": []
+    },
+    {
+     "write": "\u001b[?1002l"
+    }
+   ]
+  },
+  {
+   "name": "the terminal's hold lasts until every button is released, its own released first included, and takes a secondary press over an element with secondary in its data-on too (SPEC \u00a79)",
+   "requires": "mouse",
+   "steps": [
+    {
+     "write": "\u001b[?1002h\u001b[?1006h"
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "mouse": [
+      [
+       "down",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [],
+     "mouse": [
+      [
+       "down",
+       0
+      ]
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "mouse": [
+      [
+       "up",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "k",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 3,
+     "events": [],
+     "mouse": [
+      [
+       "down",
+       3
+      ]
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": [],
+     "mouse": [
+      [
+       "up",
+       0
+      ]
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 3,
+     "events": [],
+     "mouse": [
+      [
+       "up",
+       3
+      ]
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [],
+     "mouse": []
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ],
+     "mouse": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "mouse": [
+      [
+       "down",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "s",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [],
+     "mouse": [
+      [
+       "down",
+       2
+      ]
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [],
+     "mouse": [
+      [
+       "up",
+       2
+      ]
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "mouse": [
+      [
+       "up",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 4,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        },
+        "c": 5,
+        "r": 4
+       }
+      }
+     ],
+     "mouse": []
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [],
      "mouse": []
     },
     {
@@ -14304,7 +14660,7 @@
    ]
   },
   {
-   "name": "where the terminal's middle press pastes, a text field takes it as a browser's does, the paste going in at the pointer and the field taking focus, though an element around it has aux; a field with aux of its own is reported as any element; with Shift held the press is the terminal's, and the field takes no focus (SPEC \u00a79, \u00a79.2)",
+   "name": "where the terminal's middle press pastes, a text field takes it as a browser's does, the paste going in at the pointer, not at the caret, and the field taking focus, though an element around it has aux; a field with aux of its own is reported as any element; with Shift held the press is the terminal's, and the field takes no focus (SPEC \u00a79, \u00a79.2)",
    "requires": "middle-paste",
    "steps": [
     {
@@ -14313,7 +14669,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#w{left:0;top:0;width:calc(12*var(--hotty-cell-w));height:calc(2*var(--hotty-cell-h))}#f{left:calc(1*var(--hotty-cell-w));top:0;width:calc(5*var(--hotty-cell-w))}#g{left:0;top:calc(3*var(--hotty-cell-h));width:calc(5*var(--hotty-cell-w))}#h{left:calc(7*var(--hotty-cell-w));top:calc(3*var(--hotty-cell-h));width:calc(5*var(--hotty-cell-w))}</style><b id=w data-on=aux><input id=f type=text></b><input id=g type=text data-on=aux><input id=h type=text>"
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#w{left:0;top:0;width:calc(12*var(--hotty-cell-w));height:calc(2*var(--hotty-cell-h))}#f{left:calc(1*var(--hotty-cell-w));top:0;width:calc(5*var(--hotty-cell-w))}#g{left:0;top:calc(3*var(--hotty-cell-h));width:calc(5*var(--hotty-cell-w))}#h{left:calc(7*var(--hotty-cell-w));top:calc(3*var(--hotty-cell-h));width:calc(5*var(--hotty-cell-w))}#f{border:0;padding-left:calc(.5*var(--hotty-cell-w))}</style><b id=w data-on=aux><input id=f type=text value=ab></b><input id=g type=text data-on=aux><input id=h type=text>"
     },
     {
      "send": {
@@ -14351,6 +14707,15 @@
      "events": []
     },
     {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
      "pointer": "down",
      "button": 1,
      "events": []
@@ -14375,7 +14740,7 @@
        "s": "x",
        "t": "f",
        "detail": {
-        "value": "pasted",
+        "value": "pastedab",
         "rev": 1
        }
       },
@@ -14517,6 +14882,143 @@
      "events": [],
      "keys": [
       "shift"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "a paste the terminal makes of a middle press is its own paste: while a text field has the keyboard, a middle press over an element without aux, or one with Shift held, types into the field at its caret and not into the program (SPEC \u00a79, \u00a711)",
+   "requires": [
+    "middle-paste",
+    "paste-field"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "primary": "pasted"
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "f",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "f"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "k",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "f",
+       "detail": {
+        "value": "pastedpasted",
+        "rev": 2
+       }
+      },
+      {
+       "e": "blur",
+       "s": "x"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
      ]
     }
    ]

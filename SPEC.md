@@ -1348,12 +1348,12 @@ the program asked for it, and as often as this table says:
     its `auxclick` carries its `href`, and its `area`.
   - **It does nothing else.** No `click`, no drag, no selection, no change
     of focus or of the keyboard (§10.1), and the terminal does nothing with
-    it: no paste of the primary selection, no mouse report to the program.
+    it: no paste, no mouse report to the program.
   - **One button at a time.** While a press a surface took is held (a
     primary press or a drag, a secondary press, or another button's), a
     press of any other button is not reported and goes nowhere: not to
-    the terminal, nor to the program's mouse reporting. Its release goes
-    nowhere too. The other way round, while a press the terminal took is
+    the terminal, nor to the program's mouse reporting, until every
+    button is released. Its release goes nowhere too. The other way round, while a press the terminal took is
     held (another button's over an element without `aux`, say), any other
     press is the terminal's too, over a surface as well, until every
     button is released, as a gesture with Alt is the program's to its end
@@ -2915,7 +2915,8 @@ marked with a feature (`"passthrough"`, `"hover"`, `"count"`, `"menu"`,
 a host with a terminal that takes edit commands (§10.6), those marked
 `"mouse"` to a host with a terminal that reports the mouse (§9.6), and
 those marked `"middle-paste"` to a host whose terminal's middle press
-pastes (§9).
+pastes (§9), and those marked `"paste-field"` to a host whose terminal's
+paste reaches the text field that has the keyboard (§11).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;

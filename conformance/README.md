@@ -57,6 +57,9 @@ it. A list names several, all required:
   *A text field pastes*): on Linux, the primary selection, with the
   host's setting for it on. Its runner sets what the paste reads
   (Primary, below);
+- `"paste-field"`, a host whose terminal's paste reaches the text field
+  that has the keyboard (SPEC §11), a middle press's included. A browser
+  host may not (HOST.md §3.2);
 - `"undo"`, a host whose text fields keep a history and cut (§10.2);
 - `"pressed"`, a host that sees the key the user pressed (§10.4): its
   runner offers a key step's key as pressed, by both its names, and then
@@ -129,7 +132,8 @@ checked).
   runner presses it as the host's platform would: GTK's button 3 for the
   secondary, and 2, 8 and 9 for the middle, back and forward; a browser's
   `pointerdown` with the button, and for the secondary the `contextmenu`
-  that follows, for another button the `mouseup` and the `auxclick`. A
+  that follows, for another button the `pointerup`, `mouseup` and
+  `auxclick` the browser makes, or real input (HOST.md §3.2). A
   `"down"` while another button is down presses a second one. The
   `"keys"` held apply as for any button, so a secondary press with Shift
   or Alt is a step too.
@@ -221,7 +225,8 @@ the surface used it; absent, not checked. `"events"` as for a pointer step.
 application, so that it is what a middle press pastes (SPEC §9, §11): the
 platform's primary selection, set as the platform sets it, or the text a
 runner gives its host for the paste to read. Only in a vector that
-requires `"middle-paste"`.
+requires `"middle-paste"`. The read is asynchronous on GTK and AppKit, so
+a runner lets a middle press's paste land before the next step.
 
 **Write** `{ "write": text }`: the program writes text to the terminal,
 bytes that are not hotty's. The vectors write `CSI ? 1002 h` and `CSI ?

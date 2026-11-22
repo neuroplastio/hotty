@@ -201,7 +201,7 @@ them:
 
 | platform | middle (1) | back (3), forward (4) | later (6 and up) |
 | --- | --- | --- | --- |
-| GTK (GDK button numbers) | 2 | 8, 9; and 11, 10 | 12 → 6, 13 → 7, and on |
+| GTK (GDK button numbers) | 2 | 8 and 11; 9 and 10 | 12 → 6, 13 → 7, and on |
 | AppKit (`NSEvent.buttonNumber`) | 2 | 3, 4 | 5 → 6, 6 → 7, and on |
 | a browser (`MouseEvent.button`) | 1, with bit 4 in `buttons` (below) | 3, 4 | none: browsers report no more |
 
@@ -238,49 +238,74 @@ than one that heard nothing.
 it can't find out at run time: a navigation that wasn't cancelled has
 already happened.
 - **What it cancels,** for a press it takes:
-  - `pointerdown`, for focus, selection and autoscroll. Cancelling it
-    also keeps the compatibility `mousedown` and `mouseup` from being
-    sent at all, so `mouseup` can't be cancelled after it;
+  - `pointerdown`, for focus, selection (or in Firefox the caret's move)
+    and autoscroll. Cancelling it also keeps the page from seeing the
+    compatibility `mousedown` and `mouseup` (Chromium doesn't send them;
+    Firefox sends them only to itself, already cancelled), so the page
+    can't cancel `mouseup`. In Firefox it is also what stops the history
+    navigation for buttons 3 and 4;
   - `pointerup`, whose result Chromium merges with `mouseup`'s, for
     Chromium's history navigation on buttons 3 and 4 and its middle paste
-    on Linux;
-  - `auxclick`, for a link's new tab;
+    on Linux. Firefox doesn't merge it, and its cancel does nothing there;
+  - `auxclick`, for a link's new tab in both engines. It does not stop
+    Chromium's navigation;
   - the `paste` a middle press makes, which stops the paste in both
-    engines. Firefox pastes from a listener of its own on `auxclick` and
-    pays no heed to the other cancels.
+    engines. Firefox pastes from a listener of its own on `auxclick`,
+    which honours a cancelled `auxclick` but not the pointer and mouse
+    cancels.
 
   It tests each of these in each engine.
 - **Which buttons:** it reports buttons 3 and 4 only on the engines its
-  tests have checked, Chromium first. Firefox 162 (due 2026-12-08) sends
-  `mousedown`, `mouseup` and `auxclick` with buttons 3 and 4, and lets a
-  cancelled `mouseup` stop the navigation, as Chromium does; 160 and 161
+  tests have checked, Chromium first. Firefox 162 (likely 2026-12-08)
+  sends `mousedown`, `mouseup` and `auxclick` with buttons 3 and 4, and
+  lets a page that cancels the press stop the navigation; 160 and 161
   send none. No engine has been checked from inside a sandboxed frame,
   and a test that synthesises input does not go the browser's real way to
   back and forward, so the check is made with real input.
 - **The buttons bits.** It takes `button` 1 as the middle button only
   when `buttons` has bit 4. With 8 or 16 it is back or forward, which it
   reports as 3 or 4 only where the engine is checked, and otherwise not at
-  all. Safari before 26.4 reported both side buttons as `button` 1 on
-  macOS, with `buttons` 8 or 16, and as 0 on iPadOS.
+  all. Safari before the fix of WebKit bug 280755 (likely Safari 26.4)
+  reported both side buttons as `button` 1 on macOS, with `buttons` 8 or
+  16, and as 0 on iPadOS.
 - **Over an element without `aux`,** it passes the press to the program's
-  mouse reporting, as it passes a press with Alt (SPEC.md §9.2). The
-  terminal's own paste does not happen there: a browser pastes the
-  primary selection only on a press it made itself, into an editable
-  element, and a page reads it only in the `paste` event of such a press.
-- **A text field.** A middle press on a text field (SPEC.md §9) is left to
-  the browser, which focuses the field on `mousedown`, as it does for any
-  button, and pastes the selection into it on Linux. The host does not
-  cancel it. With Shift held it cancels it as for a press it takes, and
-  passes it on.
+  mouse reporting, as it passes a press with Alt (SPEC.md §9.2), and
+  cancels its `pointerdown`, as for any press it passes on over a surface,
+  since the surface hears nothing of it: no focus, and no autoscroll on
+  Windows. The terminal's own paste does not happen there: a browser
+  pastes the primary selection only on a press it made itself, into an
+  editable element, and a page reads it only in the `paste` event of such
+  a press.
+- **A text field.** On Linux, where a browser's middle press pastes, a
+  middle press on a text field (SPEC.md §9) is left to the browser, which
+  focuses the field on `mousedown`, as it does for any button, and pastes
+  the selection into it. The host does not cancel it. With Shift held it
+  cancels it as for a press it takes, and passes it on. Elsewhere the
+  field is like any element without `aux`: the press is passed on, and
+  its `pointerdown` cancelled, so the field takes no focus.
+- **The terminal's paste into a field** (SPEC.md §11) is not made over a
+  surface (above), and on the cells xterm.js moves its own text area under
+  the pointer for a middle press on Linux, so the browser pastes there, to
+  the program, and the field loses the keyboard. A browser host that can
+  route that paste, by cancelling the text area's `paste` and typing its
+  `clipboardData` into the field, does; one that can't leaves §11's
+  **SHOULD** unmet for a middle press, and skips the vectors marked
+  `"paste-field"`.
 
 **A terminal host** (hottyterm) asks the surface before the terminal does
 anything with a press: before its paste, its mouse report, and any return
 its toolkit's code makes first. A press the surface took has its release
 taken too, and so does any press while a surface holds a button (SPEC.md
-§9, *One button at a time*). A middle press on a field rides on the
-terminal's own paste: the host focuses the field and puts its caret at
-the pointer, then lets the terminal read what it would paste, which its
-paste types into the focused field (SPEC.md §11).
+§9, *One button at a time*). A middle press on a field is taken, as a
+press the surface took: the host focuses the field and puts its caret at
+the pointer, then starts the terminal's read of what its middle press
+pastes itself, and the terminal's paste types it into the focused field
+(SPEC.md §11). It does not fall through to the terminal's middle press,
+which mouse reporting or the toolkit would stop first. The terminal's
+middle press pastes (SPEC.md §9, *A text field pastes*) only where its
+setting makes it paste and the platform can: not where the setting is to
+ignore it, nor on GTK with `gtk-enable-primary-paste` off, nor with the
+primary selection on a platform that has none (macOS).
 
 ## 4. Reduced motion
 
