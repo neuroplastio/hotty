@@ -113,7 +113,7 @@ Item template: as `tasks/0.4.md`.
       - hotty-blitz needs no change. The xterm addon is not checked.
 
 - [ ] **HT-04** The canary is red: move the Ghostty base to upstream 5ebe501a
-      status: paused 2026-11-17 (the maintainer's pause, via gov p-753): next step, build branch `base-5ebe501` | added: 2026-11-17
+      status: paused 2026-11-17 (the maintainer's pause, relayed by gov): next step, build branch `base-5ebe501` | added: 2026-11-17
       problem: the set didn't apply to upstream main (129 commits on).
       0012 (hotty-focus-click) conflicted: upstream marks a macOS
       focus-only click in `suppressLeftMouseUntilRelease`.
