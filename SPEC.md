@@ -1996,7 +1996,8 @@ is offered the second time as the key that input reads as.
   anything below.
 - **A key the element gives the program**, bound to `program` or
   `prefix`, reaches it, whatever the element or the scrolling (§5.3) would
-  do with it (below, *Keys for the program*).
+  do with it (below, *Keys for the program*), as a command it takes where
+  the key is one (§10.6).
 - **A key the element binds to a scroll action**, and does not use, scrolls
   the surface's document (below, *Scrolling keys*).
 - **Every other key** reaches the program as ordinary terminal input, in the
@@ -2721,7 +2722,8 @@ document, and therefore its text.
   shortcuts, whether or not the surface has the keyboard. A key its keymap
   does not bind to `copy`, `program` included, goes on as if nothing were
   selected: under `mod+c=program` in the body's `data-keys`, `ctrl+c` on
-  Linux interrupts the program while text is selected.
+  Linux reaches the program while text is selected, as its bytes, which
+  interrupt it, or as `copy` where it takes that command (§10.6).
 - **The terminal's own copy** and paste, from its own keys or its menu,
   are the user's whatever the keymaps say. Its copy **SHOULD** copy a
   surface's selection, so that no document makes its text uncopyable, and
