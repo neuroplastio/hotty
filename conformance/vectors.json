@@ -12671,6 +12671,168 @@
    ]
   },
   {
+   "name": "on the alternate screen, while the program reports no mouse, a wheel past the edge of a document that scrolls that way goes nowhere, since the terminal would make it arrow keys; across, an axis it does not scroll, it is the terminal's; to a program that reports the mouse it goes on as its wheel, and on the main screen to the scrollback (SPEC \u00a75.3, \u00a79)",
+   "requires": "scroll",
+   "steps": [
+    {
+     "write": "\u001b[?1049h"
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}#t{height:calc(10*var(--hotty-cell-h));width:calc(4*var(--hotty-cell-w))}</style><div id=t></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      2,
+      1
+     ],
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      -20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      -20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      20,
+      0
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "write": "\u001b[?1002h\u001b[?1006h"
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      -20
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "write": "\u001b[?1002l"
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      -20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "write": "\u001b[?1049l"
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}#t{height:calc(10*var(--hotty-cell-h));width:calc(4*var(--hotty-cell-w))}</style><div id=t></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      2,
+      1
+     ],
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      -20
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      0,
+      20
+     ],
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
    "name": "a delta keeps the scroll offsets; a new document starts at the top left, and one without scroll=1, 2 or 3 does not scroll",
    "requires": "scroll",
    "steps": [

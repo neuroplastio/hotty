@@ -143,8 +143,8 @@ checked).
   not checked.
 - `"terminal"`, for a wheel: `true` if the gesture went on to the terminal,
   as over the cells beneath (SPEC §9), `false` if it did not (the document
-  scrolled, or `overscroll-behavior` stopped it, §5.3). Absent: not
-  checked.
+  scrolled, `overscroll-behavior` stopped it, or the host kept it from
+  becoming keys, §5.3). Absent: not checked.
 - `"events"`: every event (`a=ev`) the step makes the host send, in order,
   and nothing more. Each is compared as a reply is: every key but `detail`
   with the event's control, `null` for a key it must not have (`"t":

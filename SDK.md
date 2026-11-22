@@ -985,6 +985,12 @@ Until then, what the protocol already asks of one:
   of its own beside its programs', such as a canvas behind their panes,
   keeps its own below, by `z`, and replaces a document rather than
   creating the surface again, which keeps its place (SPEC.md §5.1, §5.2).
+- **A wheel at a scrolling surface's edge** (SPEC.md §5.3): a wheel the
+  host passes on over the window of a program's surface, along an axis
+  the surface's document scrolls, the relay turns into no keys for that
+  program, as on the alternate screen it would for a program that
+  reports no mouse. Along any other axis, and to a program that reports
+  the mouse, it goes on as before.
 - **A `hit`** (SPEC.md §9.7) it passes on with the host's name for the
   surface, and the cell as the program counts it, since the surface's top
   left cell is the same for both. It answers `ENOENT` for a surface it
