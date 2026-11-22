@@ -8,7 +8,7 @@ path: host-design
 
 # hotty hosts
 
-    Version:  0.8, with SPEC.md 0.8
+    Version:  0.9, with SPEC.md 0.9
     Status:   Draft. Guidance for hosts, not part of the protocol.
     Licence:  CC BY 4.0
 
@@ -416,9 +416,9 @@ From 0.9 a context menu's gesture is `contextmenu`, asked for with
 `secondary`, and no other button. A host that speaks 0.8 as well keeps
 that in an 0.8 session:
 - **`secondary` is read, and `contextmenu`, `aux` and `rightbutton` are
-  not.** The gesture is reported as a `press` with `button` 2, its `area`, and `c`
-  and `r`, at the press on every platform, as 0.8 had it, and never from
-  the menu key.
+  not.** The gesture is reported as a `press` with `button` 2, its `area`,
+  and `c` and `r`, at the press on every platform, as 0.8 had it, and never
+  from the menu key.
 - **No other button is the surface's:** each is the terminal's, as over
   the cells, and no drag carries a `button`.
 - **Shift and Alt** are as 0.8 had them for the secondary press.

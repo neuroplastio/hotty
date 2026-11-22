@@ -1173,9 +1173,8 @@ every SDK section, `edit` where it provides a Field.
 - **`requires`.** A vector that needs something an SDK may not have yet
   names it in `requires`. A runner declares what it implements, and skips
   the vectors whose `requires` it lacks (the host sections' `speaks-0.8`
-  among them, for a test host that speaks 0.9 only), so the list of what
-  an SDK lacks is
-  its runner's, not a list kept by hand.
+  among them, for a test host that speaks 0.9 only), so the list of what an
+  SDK lacks is its runner's, not a list kept by hand.
 - **A copy, checked.** An SDK keeps a copy of `vectors.json` in its tests,
   a way to refresh it from a checkout of this repository, and a test that
   fails when it differs from the spec's, where a checkout is at hand. The

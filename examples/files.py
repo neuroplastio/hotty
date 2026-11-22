@@ -15,6 +15,8 @@ updates its items. It has the keyboard: Enter or a click does an item;
 Escape, a click elsewhere or a second right-click closes it. Tab and
 Shift+Tab move between items, and so do Up and Down: its data-keys-inner binds
 the arrows to `program` (SPEC §10.2) and the program turns them into a focus.
+The card writes them in data-keys too, which an 0.8 session reads for what is
+inside it (HOST.md §5.1); the card takes no focus, so in 0.9 it binds nothing.
 A left click selects a row; q quits. --log appends every event as JSON lines.
 """
 import json
@@ -60,7 +62,8 @@ MENU = """
   .item:disabled { opacity: .4; background: none; }
   hr { margin: calc(var(--hotty-cell-h) / 2 - 1px) 3px; border: 0; border-top: 1px solid var(--hotty-ansi-8); }
 </style>
-<div id=card data-keys-inner="arrow_up=program arrow_down=program">
+<div id=card data-keys-inner="arrow_up=program arrow_down=program"
+     data-keys="arrow_up=program arrow_down=program">
   <button class=item id=open data-on=click>Open</button>
   <button class=item id=rename data-on=click>Rename</button>
   <button class=item id=copy data-on=click>Copy path</button>

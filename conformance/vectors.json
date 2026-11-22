@@ -70,7 +70,7 @@
    ]
   },
   {
-   "name": "a query that lists no version the host speaks, or none at all, is EVERSION, its detail the versions the host speaks: a 0.7 program meets a 0.9 host so; a query that wants no answer gets none (SPEC \u00a73.6, \u00a74)",
+   "name": "a query that lists no version the host speaks, or none at all, is EVERSION, its detail the versions the host speaks: a 0.7 program meets a 0.9 host so, and versions compare as numbers, so 0.90 is not 0.9 and 0.09 is none; a query that wants no answer gets none (SPEC \u00a73.6, \u00a74)",
    "steps": [
     {
      "send": {
@@ -114,12 +114,25 @@
      "send": {
       "a": "q",
       "n": "4",
-      "v": "0.70"
+      "v": "0.90"
      },
      "reply": {
       "a": "err",
       "re": "q",
       "n": "4",
+      "code": "EVERSION"
+     }
+    },
+    {
+     "send": {
+      "a": "q",
+      "n": "5",
+      "v": "0.09"
+     },
+     "reply": {
+      "a": "err",
+      "re": "q",
+      "n": "5",
       "code": "EVERSION"
      }
     },
@@ -139,13 +152,13 @@
     {
      "send": {
       "a": "q",
-      "n": "5",
+      "n": "7",
       "v": ""
      },
      "reply": {
       "a": "err",
       "re": "q",
-      "n": "5",
+      "n": "7",
       "code": "EVERSION"
      }
     },
@@ -34437,7 +34450,7 @@
    ]
   },
   {
-   "name": "a press carries its element's area and the modifier keys; button, c and r are read where present, which only an 0.8 session's secondary press sends; a contextmenu carries its area, the pointer's cell and the modifier keys, with no cell from the menu key and no area without t; a cell or a button that is no int makes the body undecodable, and the detail is read as none (SPEC \u00a73.3, \u00a79; HOST.md \u00a75.3)",
+   "name": "a press carries its element's area and the modifier keys; button, c and r are read where present, which only an 0.8 session's secondary press sends; a contextmenu carries its area, the pointer's cell and the modifier keys, with no cell from the menu key and no area without t; a cell or a button that is no int makes the body undecodable, and the detail is read as none (SPEC \u00a73.3, \u00a79; HOST.md \u00a75.2)",
    "seqs": [
     "\u001b]7279;a=ev:s=f:e=press:t=row;gqRhcmVhhKFjAqFyAaF3CqFoA6Rtb2RzCA==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=press:t=row;haZidXR0b24CpGFyZWGEoWMCoXIBoXcKoWgDoWMFoXICpG1vZHMB\u001b\\",
@@ -36881,6 +36894,33 @@
      "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuMQ==\u001b\\",
      "body": {
       "v": "0.1"
+     },
+     "took": true,
+     "state": "text",
+     "decided": true,
+     "done": false
+    },
+    {
+     "at": 25,
+     "da1": true,
+     "took": true,
+     "done": true
+    }
+   ],
+   "caps": null
+  },
+  {
+   "name": "capabilities that name 0.7, which the SDK no longer speaks: text (SPEC \u00a74)",
+   "steps": [
+    {
+     "at": 0,
+     "start": true
+    },
+    {
+     "at": 20,
+     "osc": "\u001b]7279;a=ok:n=1:re=q;gaF2ozAuNw==\u001b\\",
+     "body": {
+      "v": "0.7"
      },
      "took": true,
      "state": "text",

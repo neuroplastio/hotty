@@ -55,8 +55,8 @@ of them, and hotty's own hosts and SDKs speak both. A program can open an
 element's menu from the DOM's `contextmenu`, take the middle, back and
 forward buttons, and write a keymap for an element alone or for what is
 inside it; the focused element going away keeps the keyboard in the
-surface, and a wheel at a list's end no longer becomes arrow keys. [`CHANGES.md`](CHANGES.md) says what
-changed and how to upgrade.
+surface, and a wheel at a list's end no longer becomes arrow keys.
+[`CHANGES.md`](CHANGES.md) says what changed and how to upgrade.
 
 Two hosts that share no code pass the conformance vectors:
 [hotty-blitz](https://github.com/neuroplastio/hotty-blitz), the renderer
