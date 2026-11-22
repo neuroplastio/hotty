@@ -2920,6 +2920,11 @@ A library that speaks hotty for programs, an SDK, conforms when it meets
 `decode`, `scan`, `detect`, `keys` and `keymap`, and `edit` where it edits
 fields (SDK.md §4.6).
 
+A multiplexer that is a host itself (§2) conforms as a host. One that
+passes hotty through conforms when it does what this document says of
+one (§2, §3.6, §4, §5.2 to §5.4, §7.1, §9.6, §9.7, §10.5 to §10.7, §13).
+The vectors do not test it.
+
 ---
 
 ## Appendix A. Examples
