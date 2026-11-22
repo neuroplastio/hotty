@@ -624,9 +624,9 @@ A handler of `press` hears the primary button only (SPEC.md §9), as
 before: a context menu's gesture is a `contextmenu`, and another button's
 an `auxclick` at the release where the press began, each from an element
 that asked, and `T` names that element. The secondary button is one of
-the other buttons, `ButtonSecondary`: an element with `aux` hears it as an
-`auxclick` or a drag, and no `contextmenu` from it even where it has
-`contextmenu` too, which then comes only from the other gestures (a long
+the other buttons, `ButtonSecondary`, where an element takes it with
+`rightbutton`: it hears it as an `auxclick` or a drag, and no
+`contextmenu` from it even where it has `contextmenu` too, which then comes only from the other gestures (a long
 press, a pen's barrel, Control-click, the menu key). A handler of `dragstart` that
 means the primary button checks `Button`: an element with `drag` and
 `aux` is dragged with the other buttons too, and its `drag` and `dragend`
@@ -1096,7 +1096,7 @@ for a program that draws it as a surface of its own. The host draws no
 menu: SPEC.md Appendix B says why.
 
 - **The element opts in** with `contextmenu` in its `data-on`; one that
-  also has `aux` takes the secondary button itself, and opens its menu
+  also has `rightbutton` takes the secondary button itself, and opens its menu
   from an `auxclick` with `Button` 2 where it wants one. A
   `contextmenu` then names it in `T`, with `Area`, and the pointer's cell
   in `C` and `R`. A document meant for an 0.8 session as well writes

@@ -79,7 +79,8 @@ FEATURE_MENU = "menu"
 FEATURE_BACKDROP = "backdrop"
 
 # Buttons as the DOM numbers them (SPEC §9). An auxclick, and another button's
-# dragstart, carry 1, 2, 3, 4, or 6 and up for a later one, which has no name.
+# dragstart, carry 1, 3, 4, or 6 and up for a later one, which has no name, and
+# 2 where an element takes the secondary button with rightbutton.
 BUTTON_PRIMARY = 0
 BUTTON_MIDDLE = 1
 BUTTON_SECONDARY = 2

@@ -168,7 +168,7 @@ its platform calls so. Nothing here is on the wire: a program hears a
 
 | gesture | where it makes `contextmenu` |
 | --- | --- |
-| the mouse's secondary button | everywhere, unless an element with `aux` takes the button (SPEC.md §9) |
+| the mouse's secondary button | everywhere, unless an element with `rightbutton` takes the button (SPEC.md §9) |
 | the primary button with Control held | macOS, where AppKit makes it a context click; `ctrl` is then left out of `mods`, so that it reads as a secondary press does, and no `press` or `click` comes of it |
 | a pen's barrel button | where the platform reports one |
 | a touch held past the long-press time | everywhere, over an element that takes it (SPEC.md §9.1) |
@@ -196,7 +196,7 @@ How a toolkit reports them:
   open, and cancels the secondary button's `pointerdown` too, for focus
   and selection. It reports a `contextmenu` the browser makes from a key
   only where its tests tell one from a pointer's, and otherwise not.
-  Where an element with `aux` takes the secondary button, it cancels the
+  Where an element with `rightbutton` takes the secondary button, it cancels the
   `contextmenu` that button makes and reports none, as a page does that
   keeps the button: the browser sends it on the press on Linux and
   macOS, and after the release on Windows. A `contextmenu` from Control
@@ -218,9 +218,10 @@ them too.
 
 SPEC.md §9 reports a mouse's other buttons by the DOM's numbers, on an
 element with `aux` in its `data-on`, as an `auxclick` at the release, or a
-drag where the element has `drag` too. The secondary button is one of
-them, as `button` 2: GDK's 3, AppKit's `rightMouseDown` (`buttonNumber`
-1), and a browser's 2, the same on every engine. A host maps its
+drag where the element has `drag` too. The secondary button is reported
+the same way on an element with `rightbutton`, as `button` 2: GDK's 3,
+AppKit's `rightMouseDown` (`buttonNumber` 1), and a browser's 2, the same
+on every engine. A host maps its
 platform's other buttons to them:
 
 | platform | middle (1) | back (3), forward (4) | later (6 and up) |
@@ -416,7 +417,8 @@ From 0.9 a context menu's gesture is `contextmenu`, asked for with
 (SPEC.md §9). 0.7 and 0.8 had a `press` with `button` 2, asked for with
 `secondary`, and no other button. A host that speaks 0.8 as well keeps
 that in an 0.8 session, and in a 0.7 one where it speaks 0.7 too:
-- **`secondary` is read, and `contextmenu` and `aux` are not.** The
+- **`secondary` is read, and `contextmenu`, `aux` and `rightbutton` are
+  not.** The
   gesture is reported as a `press` with `button` 2, its `area`, and `c`
   and `r`, at the press on every platform, as 0.8 had it, and never from
   the menu key.
