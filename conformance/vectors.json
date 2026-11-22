@@ -13020,7 +13020,7 @@
    ]
   },
   {
-   "name": "contextmenu and aux do not cross: contextmenu brings no other button, aux no secondary press, and an element with both hears each; a primary press on an element with aux is as it was, a press only when the surface asks for presses (SPEC \u00a79)",
+   "name": "contextmenu and aux: contextmenu brings no other button; aux takes the secondary button as a button, an auxclick with button 2 at its release; on an element with both, aux takes the secondary button and no contextmenu comes of it; a primary press on an element with aux is as it was, a press only when the surface asks for presses (SPEC \u00a79)",
    "steps": [
     {
      "send": {
@@ -13070,7 +13070,24 @@
     {
      "pointer": "up",
      "button": 2,
-     "events": []
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 4,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 5,
+        "r": 0
+       }
+      }
+     ]
     },
     {
      "pointer": "down",
@@ -13091,12 +13108,18 @@
     {
      "pointer": "down",
      "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 2,
      "events": [
       {
-       "e": "contextmenu",
+       "e": "auxclick",
        "s": "x",
        "t": "b",
        "detail": {
+        "button": 2,
         "area": {
          "c": 8,
          "r": 0,
@@ -13108,11 +13131,6 @@
        }
       }
      ]
-    },
-    {
-     "pointer": "up",
-     "button": 2,
-     "events": []
     },
     {
      "pointer": "down",
@@ -14325,6 +14343,262 @@
         "r": 2
        }
       }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "the secondary button on an element with drag and aux, though it has contextmenu too: released within the slop an auxclick with button 2, moved past it a drag whose dragstart has button 2, and no contextmenu from either; on an element with contextmenu alone it is a contextmenu, as before (SPEC \u00a79, \u00a79.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#v{left:0;top:0;width:calc(10*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#m{left:calc(12*var(--hotty-cell-w));top:0;width:calc(4*var(--hotty-cell-w))}</style><b id=v data-on=\"drag aux contextmenu\"></b><i id=m data-on=contextmenu>m</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      4,
+      1
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "v",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 10,
+         "h": 3
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      7,
+      2
+     ],
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "v",
+       "detail": {
+        "button": 2,
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "v",
+       "detail": {
+        "c": 7,
+        "r": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "m",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "contextmenu",
+       "s": "x",
+       "t": "m",
+       "detail": {
+        "area": {
+         "c": 12,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        },
+        "c": 13,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "where aux takes the secondary button, a long press on an element with contextmenu too is still its contextmenu (SPEC \u00a79, \u00a79.1)",
+   "requires": "touch",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#v{left:0;top:0;width:calc(10*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#m{left:calc(12*var(--hotty-cell-w));top:0;width:calc(4*var(--hotty-cell-w))}</style><b id=v data-on=\"drag aux contextmenu\"></b><i id=m data-on=contextmenu>m</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      4,
+      1
+     ],
+     "events": []
+    },
+    {
+     "touch": "hold",
+     "events": [
+      {
+       "e": "contextmenu",
+       "s": "x",
+       "t": "v",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 10,
+         "h": 3
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "touch": "up",
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "where aux takes the secondary button, Control with the primary button on an element with contextmenu too is still its contextmenu, without ctrl in its mods (SPEC \u00a79)",
+   "requires": "control-click",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#v{left:0;top:0;width:calc(10*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#m{left:calc(12*var(--hotty-cell-w));top:0;width:calc(4*var(--hotty-cell-w))}</style><b id=v data-on=\"drag aux contextmenu\"></b><i id=m data-on=contextmenu>m</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      4,
+      1
+     ],
+     "events": [],
+     "keys": [
+      "ctrl"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "contextmenu",
+       "s": "x",
+       "t": "v",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 10,
+         "h": 3
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ],
+     "keys": [
+      "ctrl"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": [],
+     "keys": [
+      "ctrl"
      ]
     }
    ]

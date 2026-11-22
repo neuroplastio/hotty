@@ -59,6 +59,8 @@ it. A list names several, all required:
   (Primary, below);
 - `"menu-key"`, a host that reports the menu key as `contextmenu` (SPEC
   §9, *The menu key*);
+- `"control-click"`, a host whose platform makes Control with the primary
+  button a context click (macOS, SPEC §9);
 - `"paste-field"`, a host whose terminal's paste reaches the text field
   that has the keyboard (SPEC §11), a middle press's included. A browser
   host may not (HOST.md §3.2);

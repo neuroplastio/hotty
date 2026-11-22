@@ -207,9 +207,8 @@ And these sets, each value under its canonical name:
 - **features**: `passthrough`, `hover`, `count`, `menu`, `backdrop`
   (SPEC.md §4);
 - **buttons**, as the DOM numbers them: `ButtonPrimary` 0, `ButtonMiddle` 1,
-  `ButtonBack` 3, `ButtonForward` 4 (SPEC.md §9; a later button is 6 or
-  more, and has no name; 2, the secondary, is no event's, its gesture being
-  `contextmenu`);
+  `ButtonSecondary` 2, `ButtonBack` 3, `ButtonForward` 4 (SPEC.md §9; a
+  later button is 6 or more, and has no name);
 - **modifier bits**: `ModShift` 1, `ModAlt` 2, `ModCtrl` 4, `ModSuper` 8
   (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
@@ -614,7 +613,7 @@ carries, each absent when the event does not carry it:
 | `Drag` | `c` and `r`; the steps `x` and `y` in the element dragged, and `tx` and `ty` in a `t` with `drop` (as `TX` and `TY` where the language capitalises), each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover` | `c` and `r`, or `out` | `hover` |
 | `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press`, `contextmenu`, `auxclick` |
-| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 1, 3, 4, or 6 and up; on an `auxclick`, none when absent (0 where the language has no absent int), and on a `dragstart`, 0 when absent, the primary button's or a touch's | `auxclick`, `dragstart` |
+| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 1, 2, 3, 4, or 6 and up; on an `auxclick`, none when absent (0 where the language has no absent int), and on a `dragstart`, 0 when absent, the primary button's or a touch's | `auxclick`, `dragstart` |
 | `C`, `R` | `c` and `r`: the pointer's cell on a `contextmenu` and at an `auxclick`'s release, each absent when the detail has none, as on a `contextmenu` from the menu key (SPEC.md §9) | `contextmenu`, `auxclick` |
 | `Count` | `count`: the click's place in its run of clicks (SPEC.md §9), 2 for the second click of a double click; 1 for a click whose detail has none | `click` |
 | `View` | `Areas`, from `in`: each id in view to its cells as `Area` holds them, leaving out one whose area lacks a field, and none when `in` is absent; and `AtEnd`, from `end`, false when absent (SPEC.md §9.5) | `view` |
@@ -624,7 +623,11 @@ carries, each absent when the event does not carry it:
 A handler of `press` hears the primary button only (SPEC.md §9), as
 before: a context menu's gesture is a `contextmenu`, and another button's
 an `auxclick` at the release where the press began, each from an element
-that asked, and `T` names that element. A handler of `dragstart` that
+that asked, and `T` names that element. The secondary button is one of
+the other buttons, `ButtonSecondary`: an element with `aux` hears it as an
+`auxclick` or a drag, and no `contextmenu` from it even where it has
+`contextmenu` too, which then comes only from the other gestures (a long
+press, a pen's barrel, Control-click, the menu key). A handler of `dragstart` that
 means the primary button checks `Button`: an element with `drag` and
 `aux` is dragged with the other buttons too, and its `drag` and `dragend`
 carry no `Button`, so the program keeps the one its `dragstart` gave until
@@ -1092,7 +1095,9 @@ An element's own menu, opened by a `contextmenu` (SPEC.md §9) or by a key,
 for a program that draws it as a surface of its own. The host draws no
 menu: SPEC.md Appendix B says why.
 
-- **The element opts in** with `contextmenu` in its `data-on`. A
+- **The element opts in** with `contextmenu` in its `data-on`; one that
+  also has `aux` takes the secondary button itself, and opens its menu
+  from an `auxclick` with `Button` 2 where it wants one. A
   `contextmenu` then names it in `T`, with `Area`, and the pointer's cell
   in `C` and `R`. A document meant for an 0.8 session as well writes
   `secondary` beside it, and in that session hears a `press` with
@@ -1209,7 +1214,7 @@ The canonical names, in each language's case.
 | `FitRows`, `Mods`, `CellCSS` | `FitRows`, `Mods`, `CellCSS` | `fit_rows`, `mods`, `cell_css` | as Python | as Python | `fitRows`, `mods`, `cellCss` |
 | `Button`, `C`, `R` | `Button`, `At` (`*hotty.Cell{Col, Row}`, nil when absent) | `button`, `c`, `r` | as Python | as Python | `button`, `c`, `r` |
 | `ModShift`, `ModAlt`, `ModCtrl`, `ModSuper` | `hotty.ModShift`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … |
-| `ButtonPrimary`, `ButtonMiddle`, `ButtonBack`, `ButtonForward` | `hotty.ButtonPrimary`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … |
+| `ButtonPrimary`, `ButtonMiddle`, `ButtonSecondary`, `ButtonBack`, `ButtonForward` | `hotty.ButtonPrimary`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … |
 | a message as a `Reply` or an `Event`, `Err` | `hotty.ReplyOf(m)`, `hotty.EventOf(m)`, `hotty.Err(r)` | `m.reply()`, `m.event()`, `r.err()` | `m:reply()`, `m:event()`, `r:err()` | methods | `m.reply()`, `m.event()`, `r.err()` |
 | `Has`, `Light`, `Merge` | `hotty.HasFeature(c, feature)` (`hotty.Has` asks a control), `hotty.Light(c)`, `hotty.Merge(c, changed)` | `c.has(feature)`, `c.light()`, `c.merge(changed)` | `c:has(feature)`, … | methods | `c.has(feature)`, … |
 | `Command`, `Changed` | `Event.Command`, `Event.Changed` | `e.command`, `e.changed` | as Python | methods | `e.command`, `e.changed` |

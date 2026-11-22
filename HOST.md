@@ -168,7 +168,7 @@ its platform calls so. Nothing here is on the wire: a program hears a
 
 | gesture | where it makes `contextmenu` |
 | --- | --- |
-| the mouse's secondary button | everywhere |
+| the mouse's secondary button | everywhere, unless an element with `aux` takes the button (SPEC.md §9) |
 | the primary button with Control held | macOS, where AppKit makes it a context click; `ctrl` is then left out of `mods` |
 | a pen's barrel button | where the platform reports one |
 | a touch held past the long-press time | everywhere, over an element that takes it (SPEC.md §9.1) |
@@ -192,6 +192,13 @@ How a toolkit reports them:
   open, and cancels the secondary button's `pointerdown` too, for focus
   and selection. It reports a `contextmenu` the browser makes from a key
   only where its tests tell one from a pointer's, and otherwise not.
+  Where an element with `aux` takes the secondary button, it cancels the
+  `contextmenu` that button makes and reports none, as a page does that
+  keeps the button: the browser sends it on the press on Linux and
+  macOS, and after the release on Windows. A `contextmenu` from Control
+  with the primary, a pen's barrel or a long press is still reported
+  there; the host tells them apart by the press it saw before
+  (`pointerdown` with `button` 2 and `pointerType` `mouse`).
 
 Shift and Alt come first (SPEC.md §9.2). With either held, the host
 handles the gesture as one on the cells beneath the surface: the
@@ -207,8 +214,10 @@ them too.
 
 SPEC.md §9 reports a mouse's other buttons by the DOM's numbers, on an
 element with `aux` in its `data-on`, as an `auxclick` at the release, or a
-drag where the element has `drag` too. A host maps its platform's buttons
-to them:
+drag where the element has `drag` too. The secondary button is one of
+them, as `button` 2: GDK's 3, AppKit's `rightMouseDown` (`buttonNumber`
+1), and a browser's 2, the same on every engine. A host maps its
+platform's other buttons to them:
 
 | platform | middle (1) | back (3), forward (4) | later (6 and up) |
 | --- | --- | --- | --- |

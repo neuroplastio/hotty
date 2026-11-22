@@ -1211,7 +1211,7 @@ reads hotty messages from its input. A detached surface sends none (§5.5).
 | `caret` | in a text field with `data-on~=caret`, the user moved the selection, and no `input` says so: a move, a click, or an edit in a field without `data-on~=input` | `{"sel": [int, int], "rev": int}`: the selection, its anchor then its caret, as `a=field` counts them (§6.4) |
 | `submit` | a form submitted (a submit button, or Enter in a text field, after the `change` it commits) | `{"fields": [[str, str]]}`: the form's fields, each its name and its value, in tree order, the submitter's included; `[]` for a form with none |
 | `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface whose `p` is on (§5.2); except a mouse's or a pen's press with Alt held (§9.2), where the pointer passes through (§9.3), and on a backdrop (§5.2). No other button makes one (below) | `{"area": area, "mods": int}`: the cells of the element `t` names (below), and the modifier keys held; no `area` without `t` |
-| `contextmenu` | a gesture for a context menu (below): a mouse's secondary button, a pen's barrel button, a touch's long press, the primary button with Control held on macOS, or the menu key where the host reports it, on an element with `contextmenu` in its `data-on`; except a pointer's with Shift or Alt held (§9.2), where the pointer passes through (§9.3), and on a backdrop (§5.2) | `{"area": area, "c": int, "r": int, "mods": int}`: the cells of the element `t` names, the pointer's cell (§9.1), and the modifier keys held; no `c` and `r` from the menu key, and no `area` without `t` |
+| `contextmenu` | a gesture for a context menu (below): a mouse's secondary button where no element with `aux` takes it, a pen's barrel button, a touch's long press, the primary button with Control held on macOS, or the menu key where the host reports it, on an element with `contextmenu` in its `data-on`; except a pointer's with Shift or Alt held (§9.2), where the pointer passes through (§9.3), and on a backdrop (§5.2) | `{"area": area, "c": int, "r": int, "mods": int}`: the cells of the element `t` names, the pointer's cell (§9.1), and the modifier keys held; no `c` and `r` from the menu key, and no `area` without `t` |
 | `auxclick` | another button (below), pressed on an element with `aux` in its `data-on` and released where it was pressed, without a drag (§9.1) | `{"button": int, "area": area, "c": int, "r": int, "mods": int}`: as a `click`'s, with `"href": str` and `"url": str` when the element is a link and `"value": str` when it has a `value` attribute, but no `count`; with the button, and the pointer's cell and the modifier keys held at the release; no `area` without `t`, but a link's |
 | `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2); or another button (below) moved past the slop on one with `aux` as well (§9.1) | `{"c": int, "r": int, "mods": int}`: the pointer's cell and the modifier keys held, with `"x": int` and `"y": int`, its step, on an element with `data-steps`, and `"button": int` in another button's drag (§9.1) |
 | `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element or in `t` (§9.1) | the same, with `"tx": int` and `"ty": int`, the step in `t`, where `t` has `drop` in its `data-on` and `data-steps` (§9.1) |
@@ -1302,7 +1302,8 @@ the program asked for it, and as often as this table says:
   a press with Alt held (§9.2), which is the program's.
 - **`contextmenu`** comes for what the user's platform makes a gesture for
   a context menu:
-  - a mouse's secondary button;
+  - a mouse's secondary button, unless an element with `aux` takes it
+    (below);
   - on macOS, the primary button with Control held, as AppKit makes it a
     context click, with `ctrl` left out of `mods`;
   - a pen's barrel button;
@@ -1315,6 +1316,15 @@ the program asked for it, and as often as this table says:
   the pressed element outward, and absent where that element has no id.
   `c` and `r` are the pointer's cell. A host with no such gesture sends
   none, as one with no pointer sends no click.
+  - **The button and the gesture are apart,** as in the DOM. For the
+    secondary button, the nearest element with `contextmenu` or `aux`,
+    from the pressed element outward, decides: where it has `aux`, the
+    press is that element's as another button's (below), an `auxclick` at
+    the release or a drag, and no `contextmenu` comes of it, as a page
+    that cancels the DOM's `contextmenu` keeps the button for itself.
+    Every other gesture for a context menu still makes one there: Control
+    with the primary button, a pen's barrel, a long press and the menu
+    key.
   - **When.** It comes when the platform opens its own context menus: on
     the press on Linux and macOS, and on the release on Windows, as
     browsers there send theirs; for a touch, once the host takes it as a
@@ -1334,24 +1344,26 @@ the program asked for it, and as often as this table says:
     key would reach the program as ordinary input (§10.2) and the focused
     element, or one around it, has `contextmenu` in its `data-on`. It then
     comes for that element, with no `c` and `r`, and without the key's own
-    Shift in `mods`, and the key does not reach the program. A host that does not leaves them keys, so a program
-    that offers a menu from the keyboard takes those keys as well.
+    Shift in `mods`, and the key does not reach the program. A host that
+    does not leaves them keys, so a program that offers a menu from the
+    keyboard takes those keys as well.
   - **Shift and Alt** make a pointer's gesture the terminal's or the
     program's (§9.2).
-- **Another button** is a mouse's button other than the primary and the
-  secondary: the middle button, back and forward, and any other the
+- **Another button** is a mouse's button other than the primary: the
+  secondary, the middle button, back and forward, and any other the
   platform reports. What the platform makes one of them is one, such as a
   touchpad's three-finger tap, which Linux makes the middle button. Its
-  `button` is its number as the DOM gives it: 1 the middle button, 3 back,
-  4 forward. A button the DOM has no number for is 6 or more, in the order
+  `button` is its number as the DOM gives it: 1 the middle button, 2 the
+  secondary, 3 back, 4 forward. A button the DOM has no number for is 6 or more, in the order
   the platform numbers its buttons (HOST.md). A host **MUST NOT** send
   `button` 5 in this version: Pointer Events give it to a pen's eraser.
   - **One subscription for every button.** An element takes them all with
     `aux` in its `data-on`, as `contextmenu` is one subscription for every
     gesture of a context menu: the surface needs no `p`, and `p` alone
-    never brings one. `aux` never takes the secondary button, whose
-    gesture is `contextmenu`. The DOM's `auxclick` comes for every button
-    but the primary; hotty's leaves the secondary out (Appendix B).
+    never brings one. As the DOM's `auxclick`, it comes for every button
+    but the primary, the secondary included; the secondary's
+    `contextmenu` is another event, from the same press only where no
+    element with `aux` takes it (above).
   - **One event, at the release.** The press reports nothing. It is the
     press of the nearest element with `aux`, from the pressed element
     outward, that is not a hyperlink (below), and until the button is
@@ -1384,7 +1396,8 @@ the program asked for it, and as often as this table says:
     released, as a gesture with Alt is the program's to its end (§9.2).
   - **Only where asked.** Over an element without `aux`, inside or outside
     a surface, the press is the terminal's, as over the cells, and the
-    surface hears nothing of it. The terminal does what it does with the
+    surface hears nothing of it; the secondary button's is a
+    `contextmenu` where an element asks for one (above). The terminal does what it does with the
     press there: it pastes, say, or reports the press to a program that
     reads the mouse. A paste it makes of the press is its own paste
     (§11): while a text field has the keyboard, it goes into that field,
@@ -2959,7 +2972,8 @@ a host with a terminal that takes edit commands (§10.6), those marked
 `"mouse"` to a host with a terminal that reports the mouse (§9.6), and
 those marked `"middle-paste"` to a host whose terminal's middle press
 pastes (§9), those marked `"menu-key"` to a host that reports the menu
-key (§9), and those marked `"paste-field"` to a host whose terminal's
+key (§9), those marked `"control-click"` to a host on a platform where
+Control with the primary button is a context click (§9), and those marked `"paste-field"` to a host whose terminal's
 paste reaches the text field that has the keyboard (§11).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
@@ -3328,10 +3342,10 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   `dragend` are a drag's start, its moves and its end; `focus`, `blur`,
   `input`, `change` and `submit` are a form's. `press` has no DOM name: it
   is a `pointerdown` of the primary button alone (below, *The terminal
-  keeps the rest*). One difference is stated: the DOM's `auxclick` comes
-  for the secondary button too, and hotty's does not, because the
-  secondary button's gesture is `contextmenu`, which a program then hears
-  once.
+  keeps the rest*). The physical button and the menu's gesture are apart,
+  as in the DOM: `aux` takes the secondary button as a button, and an
+  element that has it hears no `contextmenu` from that button, as a page
+  that cancels the DOM's `contextmenu` does not (below).
 - **Why `contextmenu`.** A file list or a list of notifications has a menu
   for the row under the pointer, and a native application opens it from
   the secondary button, a long press or a key. A surface took only the
@@ -3351,6 +3365,15 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     session as well carries both words, each version reading its own
     (HOST.md §5.3). `aux` keeps its name: it names buttons, not an event,
     and with `drag` it brings their drags too.
+  - **`aux` over `contextmenu` for the button,** because a program may
+    want the secondary button for itself: a 3D view writes `drag aux`,
+    orbits on a secondary drag, and opens its own menu on an `auxclick`
+    with `button` 2, as a page that cancels the DOM's `contextmenu` does.
+    It keeps `contextmenu` for the gestures that are not that button, so
+    a long press, a pen's barrel, Control-click and the menu key still
+    open its menu. An element with `contextmenu` alone has the menu from
+    the button too, and one with neither leaves the button to the
+    terminal.
   - **When the platform says,** on the press or on the release, because a
     user's hand knows its platform's menus, and a browser on each sends
     the DOM's event when its own menus open.
@@ -3409,8 +3432,8 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     platform makes one of, such as Linux's three-finger tap on a touchpad,
     is one as far as a program can tell. Back's and forward's other forms,
     a touchpad's swipes, are scrolls here (§9). A word for each button
-    would also need a new version for each. So `aux` takes them all,
-    `button` says which as the DOM numbers them, and a later button needs
+    would also need a new version for each. So `aux` takes them all, the
+    secondary as a button too, `button` says which as the DOM numbers them, and a later button needs
     nothing new: a program ignores one it does not use.
   - **One event, at the release.** These buttons act on their release: a
     browser closes a tab when the middle button comes up over it, so a
@@ -3429,8 +3452,8 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   - **`auxclick`, not `click`.** `click` is activation, which a key makes
     too, and every handler of it would have to check the button: the trap
     the DOM added `auxclick` to avoid. Its detail is a click's, with the
-    button and the cell. Unlike the DOM's, it never comes for the
-    secondary button, whose gesture is `contextmenu` (above).
+    button and the cell. As the DOM's, it comes for the secondary button
+    too, where an element with `aux` takes it (above).
   - **One button at a time,** and no `buttons` field. hotty has no gesture
     of two buttons. A button pressed by chance during a drag should neither
     end the drag nor reach the program. A field can be added if chords are

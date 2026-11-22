@@ -79,10 +79,10 @@ FEATURE_MENU = "menu"
 FEATURE_BACKDROP = "backdrop"
 
 # Buttons as the DOM numbers them (SPEC §9). An auxclick, and another button's
-# dragstart, carry 1, 3, 4, or 6 and up for a later one, which has no name. 2,
-# the secondary, is no event's: its gesture is a contextmenu.
+# dragstart, carry 1, 2, 3, 4, or 6 and up for a later one, which has no name.
 BUTTON_PRIMARY = 0
 BUTTON_MIDDLE = 1
+BUTTON_SECONDARY = 2
 BUTTON_BACK = 3
 BUTTON_FORWARD = 4
 
@@ -900,7 +900,7 @@ class Event:
 
     def button(self):
         """An auxclick's or a dragstart's button as the DOM numbers it
-        (SPEC §9, §9.1): 1, 3, 4, or 6 and up; 0 for a dragstart whose
+        (SPEC §9, §9.1): 1, 2, 3, 4, or 6 and up; 0 for a dragstart whose
         detail has none, the primary button's or a touch's; None for an
         auxclick whose detail has none, and for other kinds, a press
         included, which is the primary button's alone. A drag's drag and
