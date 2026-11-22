@@ -17,39 +17,49 @@ on theirs.
 hotty's 0.9 hosts and SDKs speak 0.8 too, and no longer 0.7 (SPEC.md
 §15), so versions meet as follows (§4, §14):
 - an 0.8 program on a 0.9 host that speaks 0.8 is answered in 0.8, and
-  the host speaks 0.8 to it from then on: its `data-keys` holds for
-  everything inside its element, and its menus come from a `press` with
-  `button` 2 under `secondary` (HOST.md §5);
+  the host speaks 0.8 to it from then on in its wire shapes: its
+  `data-keys` holds for everything inside its element, and its menus come
+  from a `press` with `button` 2 under `secondary` (HOST.md §5.1, §5.2).
+  Focus fixup, the edge wheel, a program key sent as the command and an
+  identical resend are 0.9's in every session, an 0.8 one included
+  (HOST.md §5);
 - a 0.9 program, whose query lists `0.8,0.9`, on an 0.8 host is answered
-  in 0.8, and hears no `contextmenu` and no `auxclick` there (SDK.md
-  §3.8);
-- a 0.7 program meets a 0.9 host at `EVERSION`, and so does a host or a
-  program that speaks only 0.9 meet an 0.8 one, and the program falls
-  back.
+  in 0.8: it hears no `contextmenu` and no `auxclick` there, and its
+  `data-keys-inner` is not read (SDK.md §3.8);
+- a 0.7 program meets a 0.9 host at `EVERSION`, as a host or a program
+  that speaks only 0.9 meets an 0.8 one, and the program falls back.
 
 ### What changed
 
 - **The focused element going away** loses focus, as in HTML's focus
-  fixup (SPEC.md §10.1, §9): removed, replaced, disabled, inert, no longer
-  focusable, or not rendered, `visibility: hidden` included and `opacity:
-  0` not. The surface keeps the keyboard with nothing focused, the host
-  sends no `blur`, and the next key reaches the program. A text control
-  the user changed sends its `change`.
+  fixup (SPEC.md §10.1, §10.2, §9): removed, replaced, disabled, inert, no
+  longer focusable, or not rendered, `visibility: hidden` included and
+  `opacity: 0` not. The surface keeps the keyboard with nothing focused,
+  the host sends no `blur`, and the next key reaches the program. A text
+  control the user changed sends its `change`.
+  - **From nothing focused,** Tab goes to the first of the elements that
+    take focus and Shift+Tab to the last.
+  - **`a=focus` with `t`** on an element that is not focusable, or is
+    disabled, inert or not rendered, focuses nothing, and is no error: an
+    element that had focus keeps it.
 - **An identical resend may change nothing** (SPEC.md §7.1). A host
   **MAY** ignore an `a=res` whose id, type as sent and bytes match the
   stored resource, and either way **MUST NOT** change what is shown: an
   animated image goes on from where it is, and no frame is drawn without
-  the resource.
-- **A key the keymap gives the program that is a command the program
-  took** reaches it as the command (SPEC.md §10.6, §10.2): `ctrl+c=program`
-  on Linux, with `copy` taken, sends `copy` with `"key": "ctrl+c"`.
+  the resource. **A resource's type** says what it is: a stylesheet link
+  or `@import` applies only a resource whose type, ignoring case and
+  parameters, is `text/css`.
+- **A key the keymap gives the program,** bound to `program` or `prefix`,
+  that is a command the program took reaches it as the command (SPEC.md
+  §10.6, §10.2, §10.5, §11): `ctrl+c=program` on Linux, with `copy` taken,
+  sends `copy` with `"key": "ctrl+c"`, and does not copy a selection.
 - **A wheel past a surface's edge no longer becomes keys** (SPEC.md §5.3,
-  §9). On the alternate screen, while the program has no mouse tracking
-  on, a gesture along an axis the document scrolls stops at the root,
-  whatever the terminal's alternate scroll setting. On the main screen it
-  still chains to the scrollback. A host that keeps a gesture's route
-  keeps one for each axis, and a multiplexer that relays the surface does
-  the same for the program behind it.
+  §9; SDK.md §4.5). On the alternate screen, while the program has no
+  mouse tracking on, a gesture along an axis the document scrolls stops at
+  the root, whatever the terminal's alternate scroll setting. On the main
+  screen it still chains to the scrollback. A host that keeps a gesture's
+  route keeps one for each axis, and a multiplexer that relays the surface
+  does the same for the program behind it.
 - **A pointer's other buttons, as the DOM has them** (SPEC.md §9,
   §9.1–§9.4, §3.3, §5.2, §10.2, §11; HOST.md §3.1, §3.2).
   - **`contextmenu`**, an event and a word of `data-on`, replaces the
@@ -79,6 +89,10 @@ hotty's 0.9 hosts and SDKs speak 0.8 too, and no longer 0.7 (SPEC.md
     selection reads only those, and takes `copy` from the body's own.
   - In the SDKs, `Resolve` takes `own` and `inner`, and its readers as a
     closed set (SDK.md §3.10).
+- **Said outright:** a multiplexer that is a host itself conforms as a
+  host, and one that passes hotty through conforms by doing what the spec
+  says of one (SPEC.md §16, which lists the sections). The vectors do not
+  test it.
 
 ### Upgrading from 0.8
 
@@ -100,32 +114,64 @@ hotty's 0.9 hosts and SDKs speak 0.8 too, and no longer 0.7 (SPEC.md
   field's characters or a button's `space`, is given to `program` or
   `prefix` only in that element's own `data-keys`, and so is `default`.
   The document's keys go on the `body`, which holds them with nothing
-  focused.
+  focused. For an 0.8 host as well, write a wrapper's inner bindings in
+  its `data-keys` too, or write the keymaps by the capabilities' `v`
+  (SDK.md §3.8): an 0.8 host reads no `data-keys-inner`, and the program
+  would lose its leader and editing keys there.
+- A program that takes edit commands and gives a key to `program` or
+  `prefix` now hears that key as the `command`, with its `key`: a REPL
+  with `copy` taken and `ctrl+c=program` interrupts on a `copy` when
+  nothing is selected.
+- Send stylesheets as `text/css`: one sent under another type no longer
+  applies.
 - Expect no arrow keys from a wheel at a surface's edge on the alternate
   screen: the document keeps it.
 - After the focused element goes away, the next key comes to the
   program with no `blur`: the last `focus` it heard is stale.
 
 **An SDK:**
+- `Version` is `"0.9"`, `Versions` `["0.8", "0.9"]`, and the copy of the
+  vectors moves with them (SDK.md Appendix H).
 - `Resolve` takes `own` and `inner` and a reader from its closed set; an
-  0.8 call fails loudly (SDK.md §3.10, Appendix H).
-- Read `contextmenu` and `auxclick` (§3.1, §3.9), and keep
-  `ButtonSecondary`, 2, for an `auxclick` under `rightbutton` and an 0.8
-  session's press.
+  0.8 call fails loudly (SDK.md §3.10). The keymap vectors name `reader`,
+  `own` and `inner` in place of `multiline` and `keys`.
+- A Field sets its keymap in the `data-keys-inner` of the element that
+  holds the fields (SDK.md §4.6).
+- Read `contextmenu` and `auxclick` (§3.1, §3.9). The five `Button`
+  constants, `ButtonPrimary` to `ButtonForward`, name the DOM's numbers,
+  where only `ButtonSecondary` was before.
+- The test host does focus fixup, sending only the `change`, and skips
+  the `layout` vectors, and the `speaks-0.8` ones where it speaks 0.9
+  only (SDK.md §4.4).
+- A relay drops a wheel over a relayed surface's window, along an axis
+  its document scrolls, where it would become keys (SDK.md §4.5).
 
 **A host:**
 - Speak 0.9, and a host that also speaks 0.8 answers an 0.8 program in
   0.8, reading its keymaps and its secondary press as HOST.md §5.1 and
-  §5.2 have it. A 0.7 program is answered with `EVERSION`.
+  §5.2 have it, and everything else as 0.9 has it. A 0.7 program is
+  answered with `EVERSION`.
 - Send `contextmenu` and `auxclick`, take `aux` and `rightbutton`, and
-  drag with the other buttons where `drag` asks.
-- Build a keymap from own and inner, by its reader, and run focus fixup
-  at each layout, with no `blur`.
+  drag with the other buttons where `drag` asks. Let §16's test interface
+  press the secondary button and the other buttons too. The runner
+  declares the new requires its host has: `middle-paste`, `menu-key` and
+  `control-click`, and `layout` from focus fixup.
+- Build a keymap from own and inner, by its reader.
+- Run focus fixup at each layout, with no `blur`, committing a changed
+  text control with its `change`. Take Tab and Shift+Tab from nothing
+  focused to the first and last element, and focus nothing on an
+  `a=focus` whose element takes no focus.
 - Stop a wheel at the root on the alternate screen as §5.3 has it, with a
   route for each axis.
 - Send a key the keymap gives the program as the command it is, where the
-  program took it. A byte-identical resend may be skipped, and never
-  restarts an animation.
+  program took it.
+- A byte-identical resend may be skipped, and never restarts an
+  animation. Apply only a `text/css` resource as a stylesheet.
+
+**A multiplexer:**
+- One that relays a surface drops a wheel over its window, along an axis
+  the document scrolls, where it would turn it into keys for the program
+  behind it (SPEC.md §5.3), and does what §16 says of one.
 
 ## 0.8
 
