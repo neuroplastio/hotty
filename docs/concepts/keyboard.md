@@ -114,19 +114,31 @@ without hotty ([§10.3](../../SPEC.md#103-key-releases)).
 ## Keymaps
 
 A keymap says which keys an element uses, and which it gives to the
-program. The program writes it in `data-keys`, as bindings of a key to an
-action, separated by spaces:
+program. The program writes it as bindings of a key to an action,
+separated by spaces, in two attributes
+([keymaps](../../SPEC.md#keymaps)):
+- **`data-keys`** is the element's own, and holds only while it is
+  focused.
+- **`data-keys-inner`** holds while something inside the element is
+  focused, never the element itself. A key meant for both is written in
+  both.
 
 ```html
-<main data-keys="ctrl+u=delete-to-line-start mod+k=prefix">
+<main data-keys-inner="ctrl+u=delete-to-line-start mod+k=prefix">
   <input id=cmd name=cmd data-keys="ctrl+c=program">
 </main>
 ```
 
-- **Inherited.** An element's keymap is the `data-keys` of each element
-  from the root down to it, its own last. Each overrides the ones before
-  it key by key. Set yours once on an element that holds the fields, and
-  override where one field differs.
+- **Own and inner.** The focused element's keymap is the
+  `data-keys-inner` of each element from the root down to its parent,
+  then its own `data-keys`. Each overrides the ones before it key by key.
+  Set your fields' keys once in the `data-keys-inner` of an element that
+  holds them, and give a field that differs its own `data-keys`.
+- **A key the element uses is its own to give.** A field's characters
+  and a button's `space` go to `program` or `prefix` only from that
+  element's own `data-keys`, never from a `data-keys-inner` above it, and
+  so does `default`. A list that gives `j` to the program in its
+  `data-keys-inner` leaves its fields typing `j`.
 - **A text field starts from a default**: the keys every host binds,
   those of the platform's `mod`, and the host's edit shortcuts
   ([text fields](../../SPEC.md#text-fields)). They are a browser field's
@@ -137,24 +149,33 @@ action, separated by spaces:
 - **Scroll actions**, such as `scroll-down` and `scroll-page-up`, scroll
   the surface where its document scrolls.
 - **Ignored:** a binding whose key does not parse, an action the host
-  does not know, and bindings of `tab`, `shift+tab` and `escape`.
+  does not know, `default` in a `data-keys-inner`, and bindings of `tab`,
+  `shift+tab` and `escape`.
 
-Outside a text field, a keymap gives only `program`, `prefix` and scroll
-actions. A focused button in a scrolling surface would scroll with the
-arrows, and `data-keys="arrow_up=program arrow_down=program"` sends them to
-the program instead. With no element focused there is no keymap, so give
-an element a `tabindex` and focus it.
+Each reader takes what it has a use for, and a binding it does not take
+is as if it were not there. Outside a text field, a keymap gives only
+`program`, `prefix` and scroll actions, and a selection in the document
+takes `copy` as well. A focused button in a scrolling surface would scroll
+with the arrows, and `data-keys="arrow_up=program arrow_down=program"`
+sends them to the program instead. With no element focused, the keymap
+is the `body`'s, which stands for the whole document: the root's and the
+body's `data-keys-inner`, then the body's own `data-keys`. Write a
+document's keys on its `<body>`.
 
 **Scrolling keys** let a surface scroll with the keys a program pages its
 cells with ([scrolling keys](../../SPEC.md#scrolling-keys)). A pager binds
-them on what it scrolls:
+them on what it scrolls, in its own `data-keys` for when it is focused and
+in its `data-keys-inner` for when a link inside it is:
 
 ```html
-<article tabindex=0 data-keys="j=scroll-down k=scroll-up g=scroll-start shift+g=scroll-end space=scroll-page-down shift+space=scroll-page-up b=scroll-page-up">…</article>
+<article tabindex=0
+  data-keys="j=scroll-down k=scroll-up g=scroll-start shift+g=scroll-end space=scroll-page-down shift+space=scroll-page-up b=scroll-page-up"
+  data-keys-inner="j=scroll-down k=scroll-up g=scroll-start shift+g=scroll-end space=scroll-page-down shift+space=scroll-page-up b=scroll-page-up">…</article>
 ```
 
-A text field leaves scroll actions out, so a field inside still types `j`,
-and a button keeps `space`. A key never scrolls the terminal itself. These
+Where the root scrolls, its `data-keys-inner` alone does both, since it
+holds with nothing focused too. A text field leaves scroll actions out, so
+a field inside still types `j`, and a button keeps `space`. A key never scrolls the terminal itself. These
 keys need a document that scrolls
 ([§5.3](../../SPEC.md#53-geometry)). The host's stylesheet draws no focus
 ring round the article, only round controls
@@ -162,8 +183,8 @@ ring round the article, only round controls
 
 An SDK has the keymap as data. `TerminalKeys` has the keys of Bubble
 Tea's text input and text area, the same in every SDK
-([SDK design §3.10](../../SDK.md#310-keys)). Put it in the `data-keys` of
-the element that holds your fields, and edit your fields in cells with the
+([SDK design §3.10](../../SDK.md#310-keys)). Put it in the `data-keys-inner`
+of the element that holds your fields, and edit your fields in cells with the
 same keymap.
 
 ## Key names
@@ -247,12 +268,12 @@ its cells ([§10.5](../../SPEC.md#105-key-sequences)). A leader key, or
 the first. That is what `prefix` does:
 
 ```html
-<main data-keys="mod+k=prefix">
+<main data-keys-inner="mod+k=prefix">
   <ul id=files tabindex=0 data-keys="g=prefix">…</ul>
 </main>
 ```
 
-Here `mod+k` anywhere in `main`, and `g` on the list, hand the program the
+Here `mod+k` anywhere inside `main`, and `g` on the list, hand the program the
 keys that follow, `tab` and `escape` included. The program keeps the
 sequence's time. Once the sequence ends, by a key, a timeout or `escape`,
 it gives the keys back with `a=focus`:
@@ -268,8 +289,11 @@ program → ESC ] 7279 ; a=focus:s=browser ST
 `a=focus` without `t` leaves focus where it was. A prefix also ends when
 the program sends `a=blur`, when the surface loses the keyboard, or when
 the user focuses an element with a press. The program hears of each it
-did not send, as `blur` or `focus`, so it always knows where its keys
-come from.
+did not send, as `blur` or `focus`, so it knows where its keys come from,
+except after focus fixup: when the focused element goes away by layout
+alone, nothing is focused and the program is not told
+([§10.1](../../SPEC.md#101-who-has-the-keyboard)), so the last `focus` it
+heard is stale.
 
 ## Edit commands in the cells
 

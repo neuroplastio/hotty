@@ -32,8 +32,9 @@ Each word below links to the section that defines it, in the
   ([§4](../SPEC.md#4-detection-and-capabilities)).
 - **host**: what draws a program's surfaces: usually the terminal itself,
   sometimes a polyfill or a multiplexer ([§2](../SPEC.md#2-conventions)).
-- **keymap**: the keys an element binds to actions, from the `data-keys`
-  of it and the elements around it ([§10.2](../SPEC.md#102-keys)).
+- **keymap**: the keys an element binds to actions: its own `data-keys`,
+  over the `data-keys-inner` of the elements around it, and with nothing
+  focused the body's ([§10.2](../SPEC.md#102-keys)).
 - **morph**: changing an element into new HTML while keeping what the user
   was doing in it ([§6.2](../SPEC.md#62-morph)).
 - **op**: one change in a delta, such as `text`, `attr` or `morph`, on an
