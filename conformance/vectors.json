@@ -11744,6 +11744,78 @@
    ]
   },
   {
+   "name": "a contextmenu's press holds the pointer and hover to its release: moved onto another element, no hover comes until the release, and the release makes no click there (SPEC \u00a79, \u00a79.4)",
+   "requires": "hover",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#m{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#k{left:calc(6*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=m data-on=contextmenu>m</i><i id=k data-on=click>k</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0",
+      "v": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "m"
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "contextmenu",
+       "s": "x",
+       "t": "m",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 1,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "k",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [
+      {
+       "e": "hover",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "c": 7,
+        "r": 0
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "a long press on an element with contextmenu in its data-on is a contextmenu at the finger's cell, and its lift makes no click, even on an element with click; a tap is a click as before (SPEC \u00a79.1)",
    "requires": "touch",
    "steps": [
@@ -11971,6 +12043,132 @@
      "key": "ContextMenu",
      "terminal": true,
      "events": []
+    }
+   ]
+  },
+  {
+   "name": "the menu key with nothing focused stays a key; on an element inside one with contextmenu it is that one's contextmenu; where the element's keymap gives shift+f10 to the program it stays a key there (SPEC \u00a79, \u00a710.2)",
+   "requires": "menu-key",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#w{left:0;top:0;width:calc(6*var(--hotty-cell-w))}#c{left:calc(1*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#p{left:calc(8*var(--hotty-cell-w));top:0;width:calc(4*var(--hotty-cell-w))}</style><b id=w data-on=contextmenu><i id=c tabindex=0>c</i></b><i id=p tabindex=0 data-on=contextmenu data-keys=\"shift+f10=program\">p</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "w"
+     }
+    },
+    {
+     "key": "ContextMenu",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "c",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "c"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "key": "ContextMenu",
+     "terminal": false,
+     "events": [
+      {
+       "e": "contextmenu",
+       "s": "x",
+       "t": "w",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 6,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "p",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "p"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "key": "F10",
+     "keys": [
+      "shift"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "ContextMenu",
+     "terminal": false,
+     "events": [
+      {
+       "e": "contextmenu",
+       "s": "x",
+       "t": "p",
+       "detail": {
+        "area": {
+         "c": 8,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
     }
    ]
   },
@@ -13382,6 +13580,75 @@
    ]
   },
   {
+   "name": "one button at a time: a secondary press during a primary drag of an element with contextmenu makes no contextmenu and does not end the drag (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#g{left:0;top:0;width:calc(5*var(--hotty-cell-w))}</style><i id=g data-on=\"drag contextmenu\">g</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "g",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "c": 2,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "c": 2,
+        "r": 0
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "one button at a time until every button is released: the surface's press released first, a press of another button while the swallowed one is still down is not reported, and its release goes nowhere (SPEC \u00a79)",
    "steps": [
     {
@@ -14341,6 +14608,197 @@
        "detail": {
         "c": 5,
         "r": 2
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "another button's drag of an element with data-steps has the press's step in its dragstart, then a drag at the new step; onto a drop target it reports t, tx and ty as a primary drag does (SPEC \u00a79.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{display:block;margin-left:calc(4*var(--hotty-cell-w));height:var(--hotty-cell-h);width:calc(8*var(--hotty-cell-w));font-style:normal}</style><i id=track data-on=\"drag aux\" data-steps=\"16\">track</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "3",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      4,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      7,
+      0
+     ],
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "track",
+       "detail": {
+        "button": 1,
+        "c": 4,
+        "r": 0,
+        "x": 1
+       }
+      },
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "track",
+       "detail": {
+        "c": 7,
+        "r": 0,
+        "x": 7
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "track",
+       "detail": {
+        "c": 7,
+        "r": 0,
+        "x": 7
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}i{display:block;height:var(--hotty-cell-h);width:calc(6*var(--hotty-cell-w));font-style:normal}#col{height:calc(3*var(--hotty-cell-h))}</style><i id=card data-on=\"drag aux\">card</i><i id=ada data-on=\"drop\">Ada</i><i id=col data-on=\"drop\" data-steps=\"3 2\">col</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      4,
+      0
+     ],
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "card",
+       "detail": {
+        "button": 1,
+        "c": 1,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      4,
+      1
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "ada",
+       "detail": {
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      4,
+      2
+     ],
+     "events": [
+      {
+       "e": "drag",
+       "s": "x",
+       "t": "col",
+       "detail": {
+        "c": 4,
+        "r": 2,
+        "tx": 2,
+        "ty": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "col",
+       "detail": {
+        "c": 4,
+        "r": 2,
+        "tx": 2,
+        "ty": 0
        }
       }
      ]
@@ -33602,7 +34060,7 @@
    ]
   },
   {
-   "name": "a press carries its element's area and the modifier keys, and no button or cell: one a press carries is not read; a contextmenu carries its area, the pointer's cell and the modifier keys, with no cell from the menu key and no area without t; a cell that is no int makes the body undecodable, and the detail is read as none (SPEC \u00a73.3, \u00a79)",
+   "name": "a press carries its element's area and the modifier keys; button, c and r are read where present, which only an 0.8 session's secondary press sends; a contextmenu carries its area, the pointer's cell and the modifier keys, with no cell from the menu key and no area without t; a cell that is no int makes the body undecodable, and the detail is read as none (SPEC \u00a73.3, \u00a79; HOST.md \u00a75.3)",
    "seqs": [
     "\u001b]7279;a=ev:s=f:e=press:t=row;gqRhcmVhhKFjAqFyAaF3CqFoA6Rtb2RzCA==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=press:t=row;haZidXR0b24CpGFyZWGEoWMCoXIBoXcKoWgDoWMFoXICpG1vZHMB\u001b\\",
@@ -33703,15 +34161,15 @@
      "event": {
       "kind": "press",
       "target": "row",
-      "button": null,
+      "button": 2,
       "area": {
        "c": 2,
        "r": 1,
        "w": 10,
        "h": 3
       },
-      "c": null,
-      "r": null,
+      "c": 5,
+      "r": 2,
       "mods": 1
      }
     },
@@ -33791,7 +34249,7 @@
    ]
   },
   {
-   "name": "an auxclick carries a click's detail, its href, url and value, with the button and the release's cell and mods, and no count, and a later button reads as its number; a button that is no int makes the body undecodable, and the detail is read as none: an auxclick then has no button; another button's dragstart carries its button, one without reads as the primary's, 0, and a drag's other events carry none (SPEC \u00a73.3, \u00a79, \u00a79.1)",
+   "name": "an auxclick carries a click's detail, its href, url and value, with the button and the release's cell and mods, and no count, and the secondary button reads 2 and a later button its number; a button that is no int makes the body undecodable, and the detail is read as none: an auxclick then has no button; another button's dragstart carries its button, one without reads as the primary's, 0, and a drag's other events carry none (SPEC \u00a73.3, \u00a79, \u00a79.1)",
    "seqs": [
     "\u001b]7279;a=ev:s=f:e=auxclick:t=tab;haZidXR0b24BpGFyZWGEoWMCoXIAoXcIoWgBoWMGoXIApG1vZHMC\u001b\\",
     "\u001b]7279;a=ev:s=f:e=auxclick;hqZidXR0b24BpGhyZWakbmV4dKN1cmy4aHR0cHM6Ly9leGFtcGxlLmNvbS9uZXh0pGFyZWGEoWMAoXIBoXcEoWgBoWMBoXIB\u001b\\",
@@ -33800,7 +34258,8 @@
     "\u001b]7279;a=ev:s=f:e=auxclick:t=tab;g6ZidXR0b26hMaFjAKFyAA==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=dragstart:t=c;g6ZidXR0b24BoWMGoXIA\u001b\\",
     "\u001b]7279;a=ev:s=f:e=dragstart:t=c;g6FjAaFyAKRtb2RzAQ==\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=drag:t=c;g6ZidXR0b24BoWMCoXIA\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=drag:t=c;g6ZidXR0b24BoWMCoXIA\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=auxclick:t=tab;hKZidXR0b24CpGFyZWGEoWMCoXIAoXcIoWgBoWMEoXIA\u001b\\"
    ],
    "bodies": [
     {
@@ -33870,9 +34329,21 @@
      "button": 1,
      "c": 2,
      "r": 0
+    },
+    {
+     "button": 2,
+     "area": {
+      "c": 2,
+      "r": 0,
+      "w": 8,
+      "h": 1
+     },
+     "c": 4,
+     "r": 0
     }
    ],
    "results": [
+    "complete",
     "complete",
     "complete",
     "complete",
@@ -34046,6 +34517,27 @@
        "tx": null,
        "ty": null
       }
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "auxclick",
+      "t": "tab"
+     },
+     "event": {
+      "kind": "auxclick",
+      "target": "tab",
+      "button": 2,
+      "area": {
+       "c": 2,
+       "r": 0,
+       "w": 8,
+       "h": 1
+      },
+      "c": 4,
+      "r": 0
      }
     }
    ]

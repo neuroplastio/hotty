@@ -152,10 +152,13 @@ def main():
                             item = t
                         elif ev.kind == "blur":
                             close(refocus=False)
-                    elif t in FILES and (ev.kind == "contextmenu" or (ev.kind == "press" and (m.body or {}).get("button") == 2)):
+                    elif t in FILES and (ev.kind == "contextmenu" or (ev.kind == "press" and ev.button() == hotty.BUTTON_SECONDARY)):
                         row, areas[t] = t, ev.area()
-                        # c, r are the list's cell: add its place on the screen.
-                        open_menu(t, LIST_X + ev.c(), LIST_Y + ev.r(), below=1)
+                        if ev.c() is None:  # from the menu key: under the row
+                            a = ev.area()
+                            open_menu(t, LIST_X + a.c, LIST_Y + a.r + a.h, below=a.h)
+                        else:  # c, r are the list's cell: add its place on the screen.
+                            open_menu(t, LIST_X + ev.c(), LIST_Y + ev.r(), below=1)
                     elif ev.kind == "click" and t in FILES:
                         row, areas[t] = t, ev.area()
                         for f in FILES:

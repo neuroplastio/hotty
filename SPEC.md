@@ -1304,8 +1304,10 @@ the program asked for it, and as often as this table says:
   a context menu:
   - a mouse's secondary button, unless an element with `aux` takes it
     (below);
-  - on macOS, the primary button with Control held, as AppKit makes it a
-    context click, with `ctrl` left out of `mods`;
+  - on macOS, the primary button with Control held, which AppKit makes a
+    context click: `ctrl` is left out of its `mods`, so that it reads as a
+    secondary press does, and it is no `press` and no `click`, whatever
+    `p` asks for (Appendix B);
   - a pen's barrel button;
   - a touch's long press (§9.1);
   - on a host that reports it, the keyboard's menu key (below).
@@ -1331,7 +1333,8 @@ the program asked for it, and as often as this table says:
     long press. The host decides, by its platform. The press decides which
     element it is for: on the release, it is that element's wherever the
     pointer is then, with the pointer's cell then. From the press to the
-    release the pointer is the surface's, and its moves go nowhere.
+    release the pointer is the surface's, its moves go nowhere, and hover
+    is held (§9.4).
   - **It does nothing else.** No `click` on its release, no drag, no
     selection, no change of focus or of the keyboard (§10.1), and the
     terminal's menu does not open. What it means is the program's: the
@@ -1340,13 +1343,14 @@ the program asked for it, and as often as this table says:
     outside a surface, the gesture is the terminal's, as over the cells,
     and the surface hears nothing of it.
   - **The menu key.** A host **MAY** report `context_menu` and `shift+f10`
-    (§10.4) as `contextmenu`, while a surface has the keyboard, where the
-    key would reach the program as ordinary input (§10.2) and the focused
-    element, or one around it, has `contextmenu` in its `data-on`. It then
-    comes for that element, with no `c` and `r`, and without the key's own
-    Shift in `mods`, and the key does not reach the program. A host that
-    does not leaves them keys, so a program that offers a menu from the
-    keyboard takes those keys as well.
+    (§10.4) as `contextmenu` while a surface has the keyboard. It does so
+    only where the key would reach the program as ordinary input (§10.2),
+    and the focused element, or one around it, has `contextmenu` in its
+    `data-on`. The event is then that element's, with no `c` and `r`, and
+    no Shift of the key's own in `mods`, and the key does not reach the
+    program. With nothing focused (§10.1), none comes, and the key is a
+    key. A host that does not report the key leaves it a key, so a
+    program that offers a menu from the keyboard takes those keys as well.
   - **Shift and Alt** make a pointer's gesture the terminal's or the
     program's (§9.2).
 - **Another button** is a mouse's button other than the primary: the
@@ -1494,7 +1498,9 @@ let go. An element that is only a place to drop on opts in with `drop`
     drags, below). `t` is the element that opted in: the nearest one, from
     the pressed element outward, with `drag` in its `data-on`; for another
     button, the nearest with `aux` (§9), where it has `drag` too. If it has
-    no `id`, there is no drag.
+    no `id`, there is no drag: another button's press there is as on an
+    element with `aux` alone, an `auxclick` without `t` on its release
+    where it was pressed (§9).
   - `drag`, each time the element under the pointer changes. `t` is the
     nearest element with an `id` and `drag` or `drop` in its `data-on`,
     from the one under the pointer outward, and absent where there is none,
@@ -1619,7 +1625,9 @@ let go. An element that is only a place to drop on opts in with `drop`
 - **Order.** The press that starts a drag is a press like any other
   (§10.1). `press`, if the placement asked for it, comes first, then
   `dragstart`, then everything else the press causes (`change`, `blur`,
-  `focus`). On the release, `dragend` comes before any `click`.
+  `focus`). On the release, `dragend` comes before any `click`. Another
+  button's drag is the exception: its press moves no focus and selects
+  nothing, as §9 has it for another button, and it has no `press`.
 - **A drag is a click only where it began.** When it ends on the element
   it started on (the nearest element with an `id` and `drag` in its
   `data-on`, from the one under the pointer outward, is `dragstart`'s `t`;
@@ -1683,9 +1691,12 @@ its `z`, the host handles it as a press on the cells beneath the surface.
   copy and paste, for the secondary button, or pasting for the middle one,
   where its paste goes (§11). Shift is the terminal's way past a
   program's mouse reporting too. The surface hears nothing of it, as of a
-  press with Alt, and the program no `contextmenu`, `auxclick` or drag. It moves no keyboard: a
+  press with Alt, and the program no `contextmenu`, `auxclick` or drag.
+  It moves no keyboard: a
   surface that has it keeps it. A primary press with Shift held is as
-  without it.
+  without it, except Control with the primary button on macOS, a gesture
+  for a context menu (§9), which Shift gives the terminal as it gives the
+  secondary button.
 
 ### 9.3 Where the pointer passes through
 
@@ -3346,6 +3357,21 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   as in the DOM: `aux` takes the secondary button as a button, and an
   element that has it hears no `contextmenu` from that button, as a page
   that cancels the DOM's `contextmenu` does not (below).
+  - **Where hotty differs from the DOM,** each for a reason given here:
+    - one button at a time (*Why other buttons*), where the DOM reports a
+      second button as a `pointermove`;
+    - Control-click on macOS is a `contextmenu` without `ctrl`, and no
+      `press` or `click`, where browsers send `pointerdown`, a
+      `contextmenu` with `ctrlKey` and `button` 0, and in Safari a `click`
+      (*Why `contextmenu`*);
+    - on Windows the `contextmenu` is the press's element's, not the
+      release's (*Why `contextmenu`*);
+    - an `auxclick` has no `count`, where the DOM's `detail` counts;
+    - nested elements with `aux`: the nearest at the press must be the
+      nearest at the release, where the DOM's `auxclick` goes to the
+      press's and the release's common ancestor;
+    - a touch's `press` comes at a tap's lift (§9.1), where `pointerdown`
+      comes at contact, as it has since 0.1.
 - **Why `contextmenu`.** A file list or a list of notifications has a menu
   for the row under the pointer, and a native application opens it from
   the secondary button, a long press or a key. A surface took only the
@@ -3405,20 +3431,24 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     and the key would have been ordinary input, so it takes the key from
     no program that bound it. It is optional because not every host can
     tell the key from the input it passes on.
-  - **On macOS, Control** with the primary button is a context click, with
-    `ctrl` left out of `mods`, as AppKit and browsers there make it.
+  - **On macOS, Control** with the primary button is a context click, as
+    AppKit makes it. `ctrl` is left out of its `mods`, though browsers
+    keep `ctrlKey`, so that a context click and a secondary press read
+    alike, and a program needs no check of the platform. It is no `press`
+    or `click`, since it is the menu's gesture and not the primary
+    button's, and a press the program heard would select what the menu
+    is for twice.
+  - **The press decides, on Windows too.** The menu is for what the user
+    pressed on, as on the other platforms, and the pointer is held from
+    the press, as for every gesture a surface takes (§9.4).
+  - **Held to the release,** so a menu opened at the press cannot be
+    pressed, dragged to an item and released on it, as native menus on
+    Linux and macOS allow: the release goes nowhere. A program's menu
+    takes the click that follows.
   - **No focus.** The program opens its menu, and focus moving under it
     would send a `blur` and a `focus` it did not ask for.
   - **No feature.** It is part of 0.9, as its press was part of 0.7: a
     feature would only say what the version says.
-- **Why an identical resend may change nothing.** A program that keeps
-  no record of what the host holds, such as a multiplexer switching tabs,
-  sends its stylesheet again, and each surface that links it is styled
-  again for the same bytes. A host that compares them first skips that
-  work, and the program sees no difference: the same bytes draw the same
-  pixels. A redraw that reloads can change what is shown (an animation
-  starting again, a frame without the stylesheet, offsets clamped while
-  it loads), so that is ruled out whether the host compares or not.
 - **Why other buttons, by number.** A browser closes a tab on a middle
   click, a mouse's back and forward buttons go back and forward through a
   history, and a canvas, a map or a node editor pans on a middle drag. A
@@ -3478,6 +3508,14 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     being a `contextmenu`; a pen makes the primary, its barrel makes a
     `contextmenu`, and its eraser would be 5. A later field naming the
     device needs no change to it.
+- **Why an identical resend may change nothing.** A program that keeps
+  no record of what the host holds, such as a multiplexer switching tabs,
+  sends its stylesheet again, and each surface that links it is styled
+  again for the same bytes. A host that compares them first skips that
+  work, and the program sees no difference: the same bytes draw the same
+  pixels. A redraw that reloads can change what is shown (an animation
+  starting again, a frame without the stylesheet, offsets clamped while
+  it loads), so that is ruled out whether the host compares or not.
 - **Why hide:** sending a document and laying it out costs far more than
   placing it. A program scrolling through many surfaces keeps the ones that
   will come back, and only it knows which those are.

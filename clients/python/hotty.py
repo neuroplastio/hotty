@@ -805,7 +805,8 @@ _DRAG_START = dict(_DRAG, button="int")
 # Each kind's detail (SPEC §9); a kind not here carries none a program reads.
 _DETAIL = {
     EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA, "mods": "int", "count": "int"},
-    EVENT_PRESS: {"area": _AREA, "mods": "int"},
+    # button, c and r only from an 0.8 session's secondary press (HOST.md §5.3).
+    EVENT_PRESS: {"button": "int", "area": _AREA, "c": "int", "r": "int", "mods": "int"},
     EVENT_CONTEXTMENU: {"area": _AREA, "c": "int", "r": "int", "mods": "int"},
     EVENT_AUXCLICK: {
         "button": "int",
@@ -904,9 +905,10 @@ class Event:
         detail has none, the primary button's or a touch's; None for an
         auxclick whose detail has none, and for other kinds, a press
         included, which is the primary button's alone. A drag's drag and
-        dragend belong to its dragstart's button. A program ignores a
-        button it does not use."""
-        if self.kind == EVENT_AUXCLICK:
+        dragend belong to its dragstart's button. A press's is read where
+        present, which only an 0.8 session's secondary press sends (2,
+        HOST.md §5.3). A program ignores a button it does not use."""
+        if self.kind in (EVENT_AUXCLICK, EVENT_PRESS):
             return self._d.get("button")
         if self.kind != EVENT_DRAG_START:
             return None
@@ -914,13 +916,13 @@ class Event:
 
     def c(self):
         """The pointer's column, in a contextmenu and at an auxclick's
-        release (SPEC §9); None where the detail has none, as in a
-        contextmenu from the menu key."""
-        return self._d.get("c") if self.kind in (EVENT_CONTEXTMENU, EVENT_AUXCLICK) else None
+        release (SPEC §9), and in an 0.8 session's secondary press; None
+        where the detail has none, as in a contextmenu from the menu key."""
+        return self._d.get("c") if self.kind in (EVENT_PRESS, EVENT_CONTEXTMENU, EVENT_AUXCLICK) else None
 
     def r(self):
         """The pointer's row, as c is."""
-        return self._d.get("r") if self.kind in (EVENT_CONTEXTMENU, EVENT_AUXCLICK) else None
+        return self._d.get("r") if self.kind in (EVENT_PRESS, EVENT_CONTEXTMENU, EVENT_AUXCLICK) else None
 
     def count(self):
         """A click's place in its run of clicks (SPEC §9): 2 for the second

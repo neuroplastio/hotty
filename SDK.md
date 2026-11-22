@@ -613,8 +613,8 @@ carries, each absent when the event does not carry it:
 | `Drag` | `c` and `r`; the steps `x` and `y` in the element dragged, and `tx` and `ty` in a `t` with `drop` (as `TX` and `TY` where the language capitalises), each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover` | `c` and `r`, or `out` | `hover` |
 | `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press`, `contextmenu`, `auxclick` |
-| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 1, 2, 3, 4, or 6 and up; on an `auxclick`, none when absent (0 where the language has no absent int), and on a `dragstart`, 0 when absent, the primary button's or a touch's | `auxclick`, `dragstart` |
-| `C`, `R` | `c` and `r`: the pointer's cell on a `contextmenu` and at an `auxclick`'s release, each absent when the detail has none, as on a `contextmenu` from the menu key (SPEC.md §9) | `contextmenu`, `auxclick` |
+| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 1, 2, 3, 4, or 6 and up; on an `auxclick`, none when absent (0 where the language has no absent int), and on a `dragstart`, 0 when absent, the primary button's or a touch's. On a `press`, read where present, which only an 0.8 session's secondary press sends (2, HOST.md §5.3), and none when absent | `auxclick`, `dragstart`, `press` |
+| `C`, `R` | `c` and `r`: the pointer's cell on a `contextmenu` and at an `auxclick`'s release, each absent when the detail has none, as on a `contextmenu` from the menu key (SPEC.md §9); on a `press`, read where present, as `Button` is | `contextmenu`, `auxclick`, `press` |
 | `Count` | `count`: the click's place in its run of clicks (SPEC.md §9), 2 for the second click of a double click; 1 for a click whose detail has none | `click` |
 | `View` | `Areas`, from `in`: each id in view to its cells as `Area` holds them, leaving out one whose area lacks a field, and none when `in` is absent; and `AtEnd`, from `end`, false when absent (SPEC.md §9.5) | `view` |
 | `Command` | `Name`, `Key` and `Text`, from `name`, `key` and `text`, each empty when absent, and `HasText`, whether `text` is there (SPEC.md §10.6); absent when the detail has no `name` | `command` |
@@ -1101,7 +1101,9 @@ menu: SPEC.md Appendix B says why.
   `contextmenu` then names it in `T`, with `Area`, and the pointer's cell
   in `C` and `R`. A document meant for an 0.8 session as well writes
   `secondary` beside it, and in that session hears a `press` with
-  `Button` 2 instead (HOST.md §5.3).
+  `Button` 2 (`ButtonSecondary`), `C` and `R` instead (HOST.md §5.3): the
+  SDK reads them on a `press` where present. A program opens the same
+  menu from either.
 - **The keys that open a menu** are `shift+f10` and `context_menu`
   (`ParseKey`, §3.10). They reach the program as keys while a surface has
   the keyboard (SPEC.md §10.2), and the last `focus` names the element, so

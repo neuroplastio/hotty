@@ -169,15 +169,19 @@ its platform calls so. Nothing here is on the wire: a program hears a
 | gesture | where it makes `contextmenu` |
 | --- | --- |
 | the mouse's secondary button | everywhere, unless an element with `aux` takes the button (SPEC.md §9) |
-| the primary button with Control held | macOS, where AppKit makes it a context click; `ctrl` is then left out of `mods` |
+| the primary button with Control held | macOS, where AppKit makes it a context click; `ctrl` is then left out of `mods`, so that it reads as a secondary press does, and no `press` or `click` comes of it |
 | a pen's barrel button | where the platform reports one |
 | a touch held past the long-press time | everywhere, over an element that takes it (SPEC.md §9.1) |
 | the menu key, `context_menu` or `shift+f10` | only where the host reports it (below) |
 
 **When** is the platform's too: on the press on Linux and macOS, and on
 the release on Windows, where native menus and browsers open theirs then.
-A host on Windows holds the pointer from the press, as for a press it
-takes, and reports at the release.
+A host on Windows finds the element at the press, the nearest with
+`contextmenu`, holds the pointer and hover from then, as for a press it
+takes, and reports for that element at the release, with the release's
+cell. A browser host records the element at the secondary `pointerdown`,
+calls `setPointerCapture`, and reports the browser's later `contextmenu`
+for it, wherever the browser aims that event.
 
 How a toolkit reports them:
 - **GTK:** a `GtkGestureClick` with button 3 (`GDK_BUTTON_SECONDARY`) for the
@@ -318,6 +322,16 @@ already happened.
   **SHOULD** unmet for a middle press, and skips the vectors marked
   `"paste-field"`.
 
+**On GTK, a second button cancels the first.** A `GtkGestureClick` for
+every button (`button` 0), as Ghostty's is, resets itself when a button
+other than the held one is pressed (GTK 4.24's `gtkgesturesingle.c`): it
+emits `cancel`, the second press never comes as `pressed`, and the first
+button's release never comes as `released`, its point being gone. A host
+that holds a button, for a surface or for the terminal, would hold it for
+good. It takes presses and releases where every one arrives, a
+`GtkEventControllerLegacy` beside the gesture, or ends its hold on the
+gesture's `cancel` and swallows the releases still to come.
+
 **A terminal host** (hottyterm) asks the surface before the terminal does
 anything with a press: before its paste, its mouse report, and any return
 its toolkit's code makes first. A press the surface took has its moves and
@@ -348,12 +362,14 @@ Where a host reads the setting that `prefers-reduced-motion` follows
   `matchMedia('(prefers-reduced-motion: reduce)')`. The browser already
   applies it to the surfaces' CSS, so the addon does nothing.
 
-## 5. Speaking 0.7 as well
+## 5. Speaking older versions
 
-hotty's own stack, hosts and SDKs, speaks 0.7 along with 0.8. SPEC.md §15
-lets a host speak several versions, and the rest is what the stack does
-with it. A host that does not speak 0.7 answers a 0.7 program with
-`EVERSION` (SPEC.md §4), and the program falls back.
+hotty's own stack, hosts and SDKs, speaks the versions before its newest
+too: 0.7 and 0.8 along with 0.9. SPEC.md §15 lets a host speak several
+versions, and the rest is what the stack does with it. A host that does
+not speak a program's version answers it with `EVERSION` (SPEC.md §4),
+and the program falls back. Each version is the session's: a host
+switches what it reads and reports by the version it answered in.
 
 ### 5.1 A 0.7 session
 
