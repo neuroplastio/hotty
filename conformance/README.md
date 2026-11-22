@@ -356,23 +356,26 @@ holds after the stream `held` (none when absent), what `Flush` returns
 
 **Keymap** checks keymaps (SPEC §10.2, SDK.md §3.10), each on the
 Platform in `"platform": { "mod"?, "edit"? }`, the zero Platform (`ctrl`,
-the default edit shortcuts) where absent, in three forms:
+the default edit shortcuts) where absent, in two forms:
 - `{ "parse": text, "format": text }`: `ParseKeymap(platform, parse).Format()` must be
   `format`; with `"terminal_keys": true` and no `parse`, `TerminalKeys`
   formatted must be `format`;
-- `{ "multiline": bool, "terminal_keys"?: true, "keys": [ … ], "lookup": {
-  key: action | null } }`: `Resolve(platform, multiline, …)` with `TerminalKeys`
-  first when `terminal_keys` is true, then each of `keys`. `Lookup` of each
-  key of `lookup` must return its value: an action, `"insert"`, or `null`
-  when the key is not the field's. `Selects` of each key of `selects`,
-  `Binds` of each key of `binds`, and `Program` of each key of `program`,
-  if there is one, must return its value;
-- `{ "keys": [ … ], "program"?: { key: bool }, "prefix"?: { key: bool },
-  "scroll"?: { key: action | null } }`: an element's keymap outside a text
-  field, with no default keymap: `ParseKeymap` of `keys` joined with a
-  space, the root's first. `Program` of each key of `program`, `Prefix` of
-  each key of `prefix`, and `Scroll` of each key of `scroll`, must return
-  its value, `null` for none.
+- `{ "reader": "input" | "multiline" | "element" | "selection",
+  "terminal_keys"?: true, "tree"?: [ … ], "own"?: text, … }`:
+  `Resolve(platform, reader, own, tree…)`, the keymap its reader reads
+  (SPEC §10.2, *Keymaps*; SDK.md §3.10). `own` is the focused element's
+  `data-keys`, empty when absent, and `tree` the `data-keys-tree` values
+  from the root down, after `TerminalKeys` when `terminal_keys` is true.
+  For each check the vector has, the method must return its value for each
+  of the check's keys:
+  - `"lookup": { key: action | null }`, `Lookup`: an action, `"insert"`,
+    or `null` when the key is not the field's; on a selection's keymap,
+    `"copy"` or `null`;
+  - `"selects": { key: bool }`, `Selects`;
+  - `"binds": { key: bool }`, `Binds`;
+  - `"program": { key: bool }`, `Program`;
+  - `"prefix": { key: bool }`, `Prefix`;
+  - `"scroll": { key: action | null }`, `Scroll`, `null` for none.
 
 **Edit** `{ "field": { "value", "caret", "anchor"?, "multiline"?,
 "password"?, "rows"? }, "steps": [ … ] }`: a Field (SDK.md §4.6) made from

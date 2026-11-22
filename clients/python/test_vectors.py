@@ -453,42 +453,17 @@ def platform(v):
 
 
 def run_keymap(v):
-    if ("program" in v or "scroll" in v or "prefix" in v) and "lookup" not in v:
-        m = hotty.parse_keymap(platform(v), " ".join(v["keys"]))
-        for key, want in v.get("program", {}).items():
-            got = m.program(key)
-            if got != want:
-                return False, f"{key!r}: program {got!r}, want {want!r}"
-        for key, want in v.get("prefix", {}).items():
-            got = m.prefix(key)
-            if got != want:
-                return False, f"{key!r}: prefix {got!r}, want {want!r}"
-        for key, want in v.get("scroll", {}).items():
-            got = m.scroll(key)
-            if got != want:
-                return False, f"{key!r}: scroll {got!r}, want {want!r}"
-        return True, ""
-    if "lookup" not in v:
+    if "reader" not in v:
         got = hotty.parse_keymap(platform(v), v["parse"] if "parse" in v else hotty.TERMINAL_KEYS).format()
         return got == v["format"], f"{got!r}, want {v['format']!r}"
-    layers = ([hotty.TERMINAL_KEYS] if v.get("terminal_keys") else []) + v["keys"]
-    m = hotty.resolve(platform(v), v["multiline"], *layers)
-    for key, want in v["lookup"].items():
-        got = m.lookup(key)
-        if got != want:
-            return False, f"{key!r}: {got!r}, want {want!r}"
-    for key, want in v.get("selects", {}).items():
-        got = m.selects(key)
-        if got != want:
-            return False, f"{key!r}: selects {got!r}, want {want!r}"
-    for key, want in v.get("binds", {}).items():
-        got = m.binds(key)
-        if got != want:
-            return False, f"{key!r}: binds {got!r}, want {want!r}"
-    for key, want in v.get("program", {}).items():
-        got = m.program(key)
-        if got != want:
-            return False, f"{key!r}: program {got!r}, want {want!r}"
+    tree = ([hotty.TERMINAL_KEYS] if v.get("terminal_keys") else []) + v.get("tree", [])
+    m = hotty.resolve(platform(v), v["reader"], v.get("own", ""), *tree)
+    for check, fn in (("lookup", m.lookup), ("selects", m.selects), ("binds", m.binds),
+                      ("program", m.program), ("prefix", m.prefix), ("scroll", m.scroll)):
+        for key, want in v.get(check, {}).items():
+            got = fn(key)
+            if got != want:
+                return False, f"{key!r}: {check} {got!r}, want {want!r}"
     return True, ""
 
 

@@ -19843,6 +19843,82 @@
    ]
   },
   {
+   "name": "with nothing focused, the keymap is the body's: its data-keys-tree and then its own data-keys, as HTML makes the body the active element; after focus fixup, a prefix it binds starts, so tab reaches the program and focuses nothing, until the program gives the keys back (SPEC \u00a710.1, \u00a710.2, \u00a710.5)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><body data-keys-tree=\"g=prefix\"><button id=b>b</button><button id=c>c</button>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "remove",
+        "t": "b"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "g",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "blur",
+       "s": "x",
+       "t": null
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "the user moving focus sends focus naming the element focused, or the nearest one outward with an id: on a click, on tab and shift+tab, after the change it commits; focus the program gives sends none, and tab past the last sends blur (SPEC \u00a710.1, \u00a710.2)",
    "steps": [
     {
@@ -20476,7 +20552,7 @@
    ]
   },
   {
-   "name": "data-keys on an ancestor binds keys to actions in the fields under it: ctrl+a and ctrl+e to the line's ends, alt+b and alt+f by words, ctrl+w and alt+d delete words, ctrl+u and ctrl+k to the line's ends; an unbound ctrl key still reaches the program (SPEC \u00a710.2)",
+   "name": "data-keys-tree on an ancestor binds keys to actions in the fields under it: ctrl+a and ctrl+e to the line's ends, alt+b and alt+f by words, ctrl+w and alt+d delete words, ctrl+u and ctrl+k to the line's ends; an unbound ctrl key still reaches the program (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -20484,7 +20560,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form id=f data-keys=\"ctrl+a=line-start ctrl+e=line-end alt+b=word-backward alt+f=word-forward ctrl+w=delete-word-backward alt+d=delete-word-forward ctrl+u=delete-to-line-start ctrl+k=delete-to-line-end\"><input id=t data-on=input value=\"foo bar baz\"></form>"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form id=f data-keys-tree=\"ctrl+a=line-start ctrl+e=line-end alt+b=word-backward alt+f=word-forward ctrl+w=delete-word-backward alt+d=delete-word-forward ctrl+u=delete-to-line-start ctrl+k=delete-to-line-end\"><input id=t data-on=input value=\"foo bar baz\"></form>"
     },
     {
      "send": {
@@ -20616,7 +20692,7 @@
    ]
   },
   {
-   "name": "a nearer data-keys overrides a farther one key by key, and program gives a key back to the program: the field's ctrl+a and arrow_left reach the program, its form's ctrl+e still moves the caret (SPEC \u00a710.2)",
+   "name": "a field's own data-keys overrides an ancestor's data-keys-tree key by key, and program gives a key back to the program: the field's ctrl+a and arrow_left reach the program, its form's ctrl+e still moves the caret (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -20624,7 +20700,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form data-keys=\"ctrl+a=line-start ctrl+e=line-end\"><input id=t data-on=input value=ab data-keys=\"ctrl+a=program arrow_left=program\"></form>"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form data-keys-tree=\"ctrl+a=line-start ctrl+e=line-end\"><input id=t data-on=input value=ab data-keys=\"ctrl+a=program arrow_left=program\"></form>"
     },
     {
      "send": {
@@ -20788,7 +20864,7 @@
    ]
   },
   {
-   "name": "a text field may give the program tab: with tab=program in its keymap tab reaches the program and focus stays, shift+tab still moves focus back and escape still reaches the program; a button under the same binding moves focus on tab, and a field without it too (SPEC \u00a710.2)",
+   "name": "a text field may give the program tab: with tab=program in a data-keys-tree above it tab reaches the program and focus stays, shift+tab still moves focus back and escape still reaches the program; a button under the same binding moves focus on tab, and a field without it too (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -20796,7 +20872,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input{font-family:monospace}</style><div data-keys=\"tab=program\"><input id=f><button id=b>b</button></div><input id=g>"
+     "payload": "<style>body{margin:0}input{font-family:monospace}</style><div data-keys-tree=\"tab=program\"><input id=f><button id=b>b</button></div><input id=g>"
     },
     {
      "send": {
@@ -20888,7 +20964,7 @@
    ]
   },
   {
-   "name": "a key given back: under a list that gives space and a to the program, a button with space=default presses on space and a field with both types them, while a button and a field without still give them to the program (SPEC \u00a710.2)",
+   "name": "a key given back, and what is inside: under a list whose data-keys-tree gives space and a to the program, a button gives them on, and with space=default in its own data-keys presses on space; a field types both, since it takes no such binding of a key it types, and gives a only by its own a=program; a list whose own data-keys gives space keeps it from a button inside it (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -20896,7 +20972,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input{font-family:monospace}</style><div id=l tabindex=0 data-keys=\"space=program a=program\"><button id=b1>1</button><button id=b2 data-keys=\"space=default\">2</button><input id=f data-on=input data-keys=\"space=default a=default\"><input id=g data-on=input></div>"
+     "payload": "<style>body{margin:0}input{font-family:monospace}</style><div id=l tabindex=0 data-keys-tree=\"space=program a=program\"><button id=b1>1</button><button id=b2 data-keys=\"space=default\">2</button><input id=f data-on=input><input id=g data-on=input data-keys=\"a=program\"></div><div id=m tabindex=0 data-keys=\"space=program\"><button id=b3>3</button></div>"
     },
     {
      "send": {
@@ -20918,6 +20994,11 @@
     },
     {
      "key": " ",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "a",
      "terminal": true,
      "events": []
     },
@@ -21006,13 +21087,67 @@
     },
     {
      "key": " ",
-     "terminal": true,
-     "events": []
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "value": " ",
+        "rev": 1
+       }
+      }
+     ]
     },
     {
      "key": "a",
      "terminal": true,
      "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "m",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "value": " ",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": " ",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b3",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": " ",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b3"
+      }
+     ]
     }
    ]
   },
@@ -21464,7 +21599,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys=\"ctrl+p=line-previous ctrl+n=line-next alt+<=input-start alt+>=input-end\"><input id=i data-on=input><textarea id=t data-on=input cols=20 rows=3></textarea></div>"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys-tree=\"ctrl+p=line-previous ctrl+n=line-next alt+<=input-start alt+>=input-end\"><input id=i data-on=input><textarea id=t data-on=input cols=20 rows=3></textarea></div>"
     },
     {
      "send": {
@@ -21774,7 +21909,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form id=f data-keys=\"ctrl+s=submit\"><input id=t name=q value=hi></form>"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><form id=f data-keys-tree=\"ctrl+s=submit\"><input id=t name=q value=hi></form>"
     },
     {
      "send": {
@@ -21819,7 +21954,7 @@
    ]
   },
   {
-   "name": "SDK.md's TerminalKeys as data-keys: ctrl+arrow_left and alt+arrow_right move by words, alt+backspace and ctrl+delete delete them, ctrl+home and ctrl+end go to the ends of a textarea's value, and ctrl+a selects all (SPEC \u00a710.2, SDK.md \u00a73.10)",
+   "name": "SDK.md's TerminalKeys as data-keys-tree: ctrl+arrow_left and alt+arrow_right move by words, alt+backspace and ctrl+delete delete them, ctrl+home and ctrl+end go to the ends of a textarea's value, and ctrl+a selects all (SPEC \u00a710.2, SDK.md \u00a73.10)",
    "steps": [
     {
      "send": {
@@ -21827,7 +21962,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys=\"arrow_left=char-backward ctrl+b=char-backward arrow_right=char-forward ctrl+f=char-forward alt+arrow_left=word-backward ctrl+arrow_left=word-backward alt+b=word-backward alt+arrow_right=word-forward ctrl+arrow_right=word-forward alt+f=word-forward home=line-start end=line-end ctrl+e=line-end backspace=delete-char-backward ctrl+h=delete-char-backward delete=delete-char-forward ctrl+d=delete-char-forward alt+backspace=delete-word-backward ctrl+w=delete-word-backward ctrl+backspace=delete-word-backward alt+delete=delete-word-forward alt+d=delete-word-forward ctrl+delete=delete-word-forward ctrl+u=delete-to-line-start ctrl+k=delete-to-line-end arrow_up=line-previous ctrl+p=line-previous arrow_down=line-next ctrl+n=line-next page_up=page-up page_down=page-down alt+<=input-start ctrl+home=input-start alt+>=input-end ctrl+end=input-end ctrl+a=select-all ctrl+m=newline\"><textarea id=t data-on=input cols=24 rows=3>one two\nthree four</textarea></div>"
+     "payload": "<style>body{margin:0}input,textarea{font-family:monospace}</style><div data-keys-tree=\"arrow_left=char-backward ctrl+b=char-backward arrow_right=char-forward ctrl+f=char-forward alt+arrow_left=word-backward ctrl+arrow_left=word-backward alt+b=word-backward alt+arrow_right=word-forward ctrl+arrow_right=word-forward alt+f=word-forward home=line-start end=line-end ctrl+e=line-end backspace=delete-char-backward ctrl+h=delete-char-backward delete=delete-char-forward ctrl+d=delete-char-forward alt+backspace=delete-word-backward ctrl+w=delete-word-backward ctrl+backspace=delete-word-backward alt+delete=delete-word-forward alt+d=delete-word-forward ctrl+delete=delete-word-forward ctrl+u=delete-to-line-start ctrl+k=delete-to-line-end arrow_up=line-previous ctrl+p=line-previous arrow_down=line-next ctrl+n=line-next page_up=page-up page_down=page-down alt+<=input-start ctrl+home=input-start alt+>=input-end ctrl+end=input-end ctrl+a=select-all ctrl+m=newline\"><textarea id=t data-on=input cols=24 rows=3>one two\nthree four</textarea></div>"
     },
     {
      "send": {
@@ -22173,7 +22308,7 @@
    ]
   },
   {
-   "name": "a key a focused button's data-keys binds to program reaches the program before the surface scrolls with it; outside a text field other actions are ignored, so a nearer binding of the key to one lets it scroll again (SPEC \u00a710.2, \u00a75.3)",
+   "name": "a key a data-keys-tree above a focused button binds to program reaches the program before the surface scrolls with it; a button takes no editing action, so its own end=line-end is as if it were not there, and the farther end=program holds (SPEC \u00a710.2, \u00a75.3)",
    "requires": "scroll",
    "steps": [
     {
@@ -22183,7 +22318,7 @@
       "scroll": "1",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div data-keys=\"arrow_down=program end=program\"><button id=k data-keys=\"end=line-end\">k</button></div><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div>"
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div data-keys-tree=\"arrow_down=program end=program\"><button id=k data-keys=\"end=line-end\">k</button></div><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div>"
     },
     {
      "send": {
@@ -22229,36 +22364,7 @@
     },
     {
      "key": "End",
-     "terminal": false,
-     "events": []
-    },
-    {
-     "key": "Enter",
-     "terminal": false,
-     "events": [
-      {
-       "e": "click",
-       "s": "x",
-       "t": "k",
-       "detail": {
-        "area": {
-         "c": 0,
-         "r": -5,
-         "w": 4,
-         "h": 1
-        }
-       }
-      }
-     ]
-    },
-    {
-     "key": "ArrowDown",
      "terminal": true,
-     "events": []
-    },
-    {
-     "key": "Home",
-     "terminal": false,
      "events": []
     },
     {
@@ -22279,6 +22385,11 @@
        }
       }
      ]
+    },
+    {
+     "key": "ArrowDown",
+     "terminal": true,
+     "events": []
     }
    ]
   },
@@ -22293,7 +22404,7 @@
       "scroll": "1",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}#v{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#t{height:var(--hotty-cell-h)}</style><div id=v tabindex=0 data-keys=\"j=scroll-down l=scroll-right g=scroll-start shift+g=scroll-end space=scroll-page-down\"><button id=b0>0</button><button id=b1>1</button><button id=b2>2</button><button id=b3>3</button><button id=b4>4</button><button id=b5>5</button></div><div id=t>t</div>"
+     "payload": "<style>body{margin:0}#v{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#t{height:var(--hotty-cell-h)}</style><div id=v tabindex=0 data-keys-tree=\"j=scroll-down l=scroll-right g=scroll-start shift+g=scroll-end space=scroll-page-down\"><button id=b0>0</button><button id=b1>1</button><button id=b2>2</button><button id=b3>3</button><button id=b4>4</button><button id=b5>5</button></div><div id=t>t</div>"
     },
     {
      "send": {
@@ -22490,7 +22601,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}#v{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#t{height:var(--hotty-cell-h)}</style><div id=v tabindex=0 data-keys=\"shift+g=scroll-end\"><button id=b0 data-keys=\"j=scroll-down\">0</button></div>"
+     "payload": "<style>body{margin:0}#v{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}#t{height:var(--hotty-cell-h)}</style><div id=v tabindex=0 data-keys-tree=\"shift+g=scroll-end\"><button id=b0 data-keys=\"j=scroll-down\">0</button></div>"
     },
     {
      "send": {
@@ -22543,7 +22654,7 @@
    ]
   },
   {
-   "name": "a text field's keymap leaves scroll actions out: an inherited j=scroll-down types j, and a nearer k=scroll-up leaves k to a farther program (SPEC \u00a710.2)",
+   "name": "a text field takes no scroll action, and no data-keys-tree binding to program of a key it types: under a farther k=program and a nearer j=scroll-down k=scroll-up, it types j and k, a farther ctrl+k=program still holds over a nearer ctrl+k=scroll-up, and a field's own k=program gives k to the program (SPEC \u00a710.2)",
    "steps": [
     {
      "send": {
@@ -22551,7 +22662,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}</style><div data-keys=\"k=program\"><div data-keys=\"j=scroll-down k=scroll-up\"><input id=i data-on=input></div></div>"
+     "payload": "<style>body{margin:0}</style><div data-keys-tree=\"k=program ctrl+k=program\"><div data-keys-tree=\"j=scroll-down k=scroll-up ctrl+k=scroll-up\"><input id=i data-on=input><input id=o data-on=input data-keys=\"k=program\"></div></div>"
     },
     {
      "send": {
@@ -22582,6 +22693,48 @@
        "detail": {
         "value": "j",
         "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "key": "k",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "value": "jk",
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "key": "k",
+     "keys": [
+      "ctrl"
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "o",
+      "q": "2"
+     },
+     "events": [
+      {
+       "e": "change",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "value": "jk",
+        "rev": 2
        }
       }
      ]
@@ -34971,8 +35124,7 @@
   },
   {
    "name": "the default keymap, in an input, where mod is ctrl: a browser field's keys on Linux, and Shift selects with a move (SPEC \u00a710.2)",
-   "multiline": false,
-   "keys": [],
+   "reader": "input",
    "lookup": {
     "arrow_left": "char-backward",
     "arrow_right": "char-forward",
@@ -35069,8 +35221,7 @@
   },
   {
    "name": "the default keymap, in a multi-line field, where mod is ctrl",
-   "multiline": true,
-   "keys": [],
+   "reader": "multiline",
    "lookup": {
     "enter": "newline",
     "shift+enter": "newline",
@@ -35103,9 +35254,8 @@
   },
   {
    "name": "TerminalKeys in an input: multi-line actions are not the field's",
-   "multiline": false,
+   "reader": "input",
    "terminal_keys": true,
-   "keys": [],
    "lookup": {
     "ctrl+a": "select-all",
     "ctrl+e": "line-end",
@@ -35146,9 +35296,8 @@
   },
   {
    "name": "TerminalKeys in a multi-line field",
-   "multiline": true,
+   "reader": "multiline",
    "terminal_keys": true,
-   "keys": [],
    "lookup": {
     "ctrl+p": "line-previous",
     "ctrl+n": "line-next",
@@ -35163,12 +35312,12 @@
    }
   },
   {
-   "name": "a nearer value overrides key by key; program gives a key back",
-   "multiline": false,
-   "keys": [
-    "ctrl+a=line-start ctrl+e=line-end",
-    "ctrl+a=program arrow_left=program"
+   "name": "a field's own data-keys overrides its data-keys-tree key by key; program gives a key back",
+   "reader": "input",
+   "tree": [
+    "ctrl+a=line-start ctrl+e=line-end"
    ],
+   "own": "ctrl+a=program arrow_left=program",
    "lookup": {
     "ctrl+a": null,
     "arrow_left": null,
@@ -35178,10 +35327,8 @@
   },
   {
    "name": "a binding with Shift wins over the fallback",
-   "multiline": false,
-   "keys": [
-    "shift+arrow_left=program"
-   ],
+   "reader": "input",
+   "own": "shift+arrow_left=program",
    "lookup": {
     "shift+arrow_left": null,
     "arrow_left": "char-backward",
@@ -35194,10 +35341,8 @@
   },
   {
    "name": "a move bound with Shift selects as one looked up without it; a key without Shift does not, whatever its action (SPEC \u00a710.2)",
-   "multiline": false,
-   "keys": [
-    "shift+arrow_up=line-start ctrl+e=input-end shift+delete=delete-word-forward"
-   ],
+   "reader": "input",
+   "own": "shift+arrow_up=line-start ctrl+e=input-end shift+delete=delete-word-forward",
    "lookup": {
     "shift+arrow_up": "line-start",
     "ctrl+e": "input-end",
@@ -35213,10 +35358,8 @@
   },
   {
    "name": "a character can be bound, or given to the program",
-   "multiline": false,
-   "keys": [
-    "a=line-start x=program space=program"
-   ],
+   "reader": "input",
+   "own": "a=line-start x=program space=program",
    "lookup": {
     "a": "line-start",
     "x": null,
@@ -35226,10 +35369,8 @@
   },
   {
    "name": "tab and escape cannot be bound",
-   "multiline": false,
-   "keys": [
-    "tab=line-end escape=line-start shift+tab=line-end"
-   ],
+   "reader": "input",
+   "own": "tab=line-end escape=line-start shift+tab=line-end",
    "lookup": {
     "tab": null,
     "escape": null,
@@ -35242,12 +35383,12 @@
    "format": "tab=program a=line-start"
   },
   {
-   "name": "a text field may give the program tab: a field's keymap with tab=program, its own or a farther one, gives tab and nothing else; shift+tab and escape stay out, and tab is never the field's (SPEC \u00a710.2)",
-   "multiline": false,
-   "keys": [
-    "tab=program",
-    "a=line-start"
+   "name": "a text field may give the program tab: a field's keymap with tab=program, in its own data-keys or a data-keys-tree above it, gives tab and nothing else; shift+tab and escape stay out, and tab is never the field's (SPEC \u00a710.2)",
+   "reader": "input",
+   "tree": [
+    "tab=program"
    ],
+   "own": "a=line-start",
    "lookup": {
     "tab": null,
     "shift+tab": null,
@@ -35266,10 +35407,8 @@
   },
   {
    "name": "without tab=program, a field gives the program no tab: tab bound to anything else is dropped and does not cancel a farther tab=program (SPEC \u00a710.2)",
-   "multiline": true,
-   "keys": [
-    "tab=line-end"
-   ],
+   "reader": "multiline",
+   "own": "tab=line-end",
    "lookup": {
     "tab": null
    },
@@ -35279,11 +35418,11 @@
   },
   {
    "name": "a farther tab=program holds in a field under a nearer tab bound to another action, which a host drops (SPEC \u00a710.2)",
-   "multiline": false,
-   "keys": [
-    "tab=program",
-    "tab=line-end"
+   "reader": "input",
+   "tree": [
+    "tab=program"
    ],
+   "own": "tab=line-end",
    "lookup": {
     "tab": null
    },
@@ -35297,12 +35436,12 @@
    "format": "space=default a=default tab=default"
   },
   {
-   "name": "in a text field, default gives a key back as if no element above had bound it: a character types, a key of the default keymap does what it has it do, Shift's fallback follows, and tab moves focus again (SPEC \u00a710.2)",
-   "multiline": false,
-   "keys": [
-    "space=program a=program arrow_left=program tab=program",
-    "space=default a=default arrow_left=default tab=default"
+   "name": "in a text field, default in its own data-keys gives a key back as if no element above had bound it: a character types, a key of the default keymap does what it has it do, Shift's fallback follows, and tab moves focus again (SPEC \u00a710.2)",
+   "reader": "input",
+   "tree": [
+    "space=program a=program arrow_left=program tab=program"
    ],
+   "own": "space=default a=default arrow_left=default tab=default",
    "lookup": {
     "space": "insert",
     "a": "insert",
@@ -35322,37 +35461,37 @@
   },
   {
    "name": "default in a multi-line field gives back the default keymap's line and page moves (SPEC \u00a710.2)",
-   "multiline": true,
-   "keys": [
-    "arrow_up=program page_down=program",
-    "arrow_up=default page_down=default"
+   "reader": "multiline",
+   "tree": [
+    "arrow_up=program page_down=program"
    ],
+   "own": "arrow_up=default page_down=default",
    "lookup": {
     "arrow_up": "line-previous",
     "page_down": "page-down"
    }
   },
   {
-   "name": "default is an override like any other: a nearer binding of the key wins over it (SPEC \u00a710.2)",
-   "multiline": false,
-   "keys": [
-    "space=program",
-    "space=default",
-    "space=program"
+   "name": "default holds only in an element's own data-keys: in a data-keys-tree it is ignored, and a farther binding of the key holds (SPEC \u00a710.2)",
+   "reader": "input",
+   "tree": [
+    "arrow_left=program",
+    "arrow_left=default"
    ],
    "lookup": {
-    "space": null
+    "arrow_left": null
    },
    "program": {
-    "space": true
+    "arrow_left": true
    }
   },
   {
    "name": "outside a text field, a key bound to default is neither the program's, a prefix nor a scroll (SPEC \u00a710.2)",
-   "keys": [
-    "space=program arrow_down=scroll-down g=prefix",
-    "space=default arrow_down=default g=default"
+   "reader": "element",
+   "tree": [
+    "space=program arrow_down=scroll-down g=prefix"
    ],
+   "own": "space=default arrow_down=default g=default",
    "program": {
     "space": false,
     "g": false
@@ -35366,20 +35505,16 @@
   },
   {
    "name": "a binding splits at its last =",
-   "multiline": false,
-   "keys": [
-    "alt+==line-start"
-   ],
+   "reader": "input",
+   "own": "alt+==line-start",
    "lookup": {
     "alt+=": "line-start"
    }
   },
   {
    "name": "an action the field does not have, in an input",
-   "multiline": false,
-   "keys": [
-    "ctrl+j=newline ctrl+s=submit"
-   ],
+   "reader": "input",
+   "own": "ctrl+j=newline ctrl+s=submit",
    "lookup": {
     "ctrl+j": null,
     "ctrl+s": "submit"
@@ -35387,10 +35522,8 @@
   },
   {
    "name": "the same, in a multi-line field",
-   "multiline": true,
-   "keys": [
-    "ctrl+j=newline ctrl+s=submit enter=submit"
-   ],
+   "reader": "multiline",
+   "own": "ctrl+j=newline ctrl+s=submit enter=submit",
    "lookup": {
     "ctrl+j": "newline",
     "ctrl+s": "submit",
@@ -35398,17 +35531,18 @@
    }
   },
   {
-   "name": "outside a text field a keymap has no default, and only program gives keys to the program: a key bound to it, or an unbound key with Shift whose key without it is; a nearer binding of the key to another action cancels it, and escape and tab cannot be bound (SPEC \u00a710.2)",
-   "keys": [
-    "arrow_down=program end=program page_up=program ctrl+n=program escape=program tab=program",
-    "end=line-end"
+   "name": "outside a text field a keymap has no default and takes no editing action: only program gives keys to the program, a key bound to it, or an unbound key with Shift whose key without it is; a nearer binding of the key to an editing action is as if it were not there, and escape and tab cannot be bound (SPEC \u00a710.2)",
+   "reader": "element",
+   "tree": [
+    "arrow_down=program end=program page_up=program ctrl+n=program escape=program tab=program"
    ],
+   "own": "end=line-end",
    "program": {
     "arrow_down": true,
     "shift+arrow_down": true,
     "page_up": true,
     "ctrl+n": true,
-    "end": false,
+    "end": true,
     "arrow_up": false,
     "ctrl+arrow_down": false,
     "enter": false,
@@ -35418,13 +35552,18 @@
   },
   {
    "name": "a nearer binding with Shift takes that key, and leaves the key without Shift to the farther program (SPEC \u00a710.2)",
-   "keys": [
-    "arrow_down=program",
-    "shift+arrow_down=line-next"
+   "reader": "element",
+   "tree": [
+    "arrow_down=program"
    ],
+   "own": "shift+arrow_down=scroll-down",
    "program": {
     "arrow_down": true,
     "shift+arrow_down": false
+   },
+   "scroll": {
+    "shift+arrow_down": "scroll-down",
+    "arrow_down": null
    }
   },
   {
@@ -35433,34 +35572,38 @@
    "format": "j=scroll-down k=scroll-up h=scroll-left l=scroll-right space=scroll-page-down b=scroll-page-up d=scroll-half-page-down u=scroll-half-page-up g=scroll-start shift+g=scroll-end"
   },
   {
-   "name": "a text field's keymap leaves scroll actions out: they neither act nor override what came before, so j is typed, a farther program keeps k, and page_down keeps page-down (SPEC \u00a710.2)",
-   "multiline": true,
-   "keys": [
-    "k=program",
-    "j=scroll-down k=scroll-up page_down=scroll-page-down"
+   "name": "a text field takes no scroll action, nor a data-keys-tree binding to program of a key it types: they neither act nor override what came before, so j and k are typed and page_down keeps page-down, while a farther ctrl+k=program holds (SPEC \u00a710.2)",
+   "reader": "multiline",
+   "tree": [
+    "k=program ctrl+k=program"
    ],
+   "own": "j=scroll-down k=scroll-up page_down=scroll-page-down ctrl+k=scroll-up",
    "lookup": {
     "j": "insert",
-    "k": null,
-    "page_down": "page-down"
+    "k": "insert",
+    "page_down": "page-down",
+    "ctrl+k": null
+   },
+   "program": {
+    "k": false,
+    "ctrl+k": true
    }
   },
   {
    "name": "a field leaves a scroll binding out where it stands: in the same value, it does not override an earlier binding of its key (SPEC \u00a710.2)",
-   "multiline": false,
-   "keys": [
-    "ctrl+d=delete-char-forward ctrl+d=scroll-half-page-down"
-   ],
+   "reader": "input",
+   "own": "ctrl+d=delete-char-forward ctrl+d=scroll-half-page-down",
    "lookup": {
     "ctrl+d": "delete-char-forward"
    }
   },
   {
    "name": "outside a text field, Scroll gives the action a key is bound to, with the fallback without Shift; a nearer scroll binding takes the key from a farther program (SPEC \u00a710.2)",
-   "keys": [
-    "k=program j=program arrow_down=scroll-up",
-    "j=scroll-down arrow_down=scroll-down"
+   "reader": "element",
+   "tree": [
+    "k=program j=program arrow_down=scroll-up"
    ],
+   "own": "j=scroll-down arrow_down=scroll-down",
    "program": {
     "k": true,
     "j": false,
@@ -35477,11 +35620,10 @@
   },
   {
    "name": "the default keymap where mod is super: macOS's field keys, Command as super, and Cocoa's ctrl keys (SPEC \u00a710.2)",
+   "reader": "input",
    "platform": {
     "mod": "super"
    },
-   "multiline": false,
-   "keys": [],
    "lookup": {
     "super+a": "select-all",
     "super+c": "copy",
@@ -35529,11 +35671,10 @@
   },
   {
    "name": "the same in a multi-line field: ctrl+p and ctrl+n move by a row",
+   "reader": "multiline",
    "platform": {
     "mod": "super"
    },
-   "multiline": true,
-   "keys": [],
    "lookup": {
     "ctrl+p": "line-previous",
     "ctrl+n": "line-next",
@@ -35544,6 +35685,7 @@
   },
   {
    "name": "the edit shortcuts are the host's: its own replace the defaults, and the keys they leave are not bound (SPEC \u00a710.2)",
+   "reader": "input",
    "platform": {
     "mod": "ctrl",
     "edit": {
@@ -35559,8 +35701,6 @@
      ]
     }
    },
-   "multiline": false,
-   "keys": [],
    "lookup": {
     "ctrl+shift+c": "copy",
     "ctrl+shift+v": "paste",
@@ -35575,12 +35715,11 @@
   },
   {
    "name": "TerminalKeys where mod is super: super+a selects all, and ctrl+a goes to the line's start (SDK.md \u00a73.10)",
+   "reader": "input",
    "platform": {
     "mod": "super"
    },
-   "multiline": false,
    "terminal_keys": true,
-   "keys": [],
    "lookup": {
     "super+a": "select-all",
     "ctrl+a": "line-start",
@@ -35607,13 +35746,11 @@
   },
   {
    "name": "a field's data-keys with mod: mod+c given to the program is super+c where mod is super, and ctrl+c stays unbound",
+   "reader": "input",
    "platform": {
     "mod": "super"
    },
-   "multiline": false,
-   "keys": [
-    "mod+c=program mod+arrow_left=word-backward"
-   ],
+   "own": "mod+c=program mod+arrow_left=word-backward",
    "lookup": {
     "super+c": null,
     "ctrl+c": null,
@@ -35623,12 +35760,11 @@
   },
   {
    "name": "outside a text field, a binding's mod is the platform's (SPEC \u00a710.2, \u00a710.4)",
+   "reader": "element",
    "platform": {
     "mod": "super"
    },
-   "keys": [
-    "mod+j=program mod+k=scroll-up"
-   ],
+   "own": "mod+j=program mod+k=scroll-up",
    "program": {
     "super+j": true,
     "ctrl+j": false
@@ -35645,10 +35781,11 @@
   },
   {
    "name": "outside a text field, a key bound to prefix is the program's, and Prefix says so of it alone, with the fallback without Shift (SPEC \u00a710.2, \u00a710.5)",
-   "keys": [
-    "g=prefix j=program arrow_down=prefix",
-    "k=scroll-down"
+   "reader": "element",
+   "tree": [
+    "g=prefix j=program arrow_down=prefix"
    ],
+   "own": "k=scroll-down",
    "program": {
     "g": true,
     "j": true,
@@ -35667,10 +35804,11 @@
   },
   {
    "name": "a nearer binding of the key takes it from a farther prefix (SPEC \u00a710.2)",
-   "keys": [
-    "g=prefix",
-    "g=program"
+   "reader": "element",
+   "tree": [
+    "g=prefix"
    ],
+   "own": "g=program",
    "program": {
     "g": true
    },
@@ -35680,12 +35818,11 @@
   },
   {
    "name": "a prefix's mod is the platform's (SPEC \u00a710.4, \u00a710.5)",
+   "reader": "element",
    "platform": {
     "mod": "super"
    },
-   "keys": [
-    "mod+k=prefix"
-   ],
+   "own": "mod+k=prefix",
    "prefix": {
     "super+k": true,
     "ctrl+k": false
@@ -35696,10 +35833,8 @@
   },
   {
    "name": "in a text field, a key bound to prefix is not the field's: it reaches the program (SPEC \u00a710.2, \u00a710.5)",
-   "multiline": false,
-   "keys": [
-    "ctrl+k=prefix"
-   ],
+   "reader": "input",
+   "own": "ctrl+k=prefix",
    "lookup": {
     "ctrl+k": null,
     "a": "insert",
@@ -35713,10 +35848,8 @@
   },
   {
    "name": "a character with shift is a key of its own: it is not looked up without shift, so it types, and stays out of a program binding of its letter (SPEC \u00a710.2)",
-   "multiline": false,
-   "keys": [
-    "g=program"
-   ],
+   "reader": "input",
+   "own": "g=program",
    "lookup": {
     "g": null,
     "shift+g": "insert"
@@ -35724,9 +35857,8 @@
   },
   {
    "name": "Program gives no fallback to a character with shift (SPEC \u00a710.2)",
-   "keys": [
-    "g=program arrow_down=program"
-   ],
+   "reader": "element",
+   "own": "g=program arrow_down=program",
    "program": {
     "g": true,
     "shift+g": false,
@@ -35736,10 +35868,8 @@
   },
   {
    "name": "Binds: the key, or a key with shift that is not a character, without it; a physical key and a character are different keys (SPEC \u00a710.2, \u00a710.4)",
-   "multiline": false,
-   "keys": [
-    "ctrl+key_w=program ctrl+w=line-start arrow_left=program"
-   ],
+   "reader": "input",
+   "own": "ctrl+key_w=program ctrl+w=line-start arrow_left=program",
    "lookup": {
     "ctrl+key_w": null,
     "ctrl+w": "line-start",
@@ -35757,13 +35887,129 @@
   },
   {
    "name": "space types, and shift+space with it, unless bound (SPEC \u00a710.2)",
-   "multiline": false,
-   "keys": [],
+   "reader": "input",
    "lookup": {
     "space": "insert",
     "shift+space": "insert",
     "ctrl+space": null,
     "alt+space": null
+   }
+  },
+  {
+   "name": "a text field takes no data-keys-tree binding to program or prefix of a key it types, a character or space with no modifier but shift: those it types; a key it does not type, with ctrl or none, still reaches the program (SPEC \u00a710.2)",
+   "reader": "input",
+   "tree": [
+    "j=program shift+g=prefix space=program ctrl+j=program arrow_down=prefix"
+   ],
+   "lookup": {
+    "j": "insert",
+    "shift+g": "insert",
+    "space": "insert",
+    "ctrl+j": null,
+    "arrow_down": null
+   },
+   "program": {
+    "j": false,
+    "shift+g": false,
+    "space": false,
+    "ctrl+j": true,
+    "arrow_down": true
+   },
+   "prefix": {
+    "arrow_down": true,
+    "shift+g": false
+   }
+  },
+  {
+   "name": "a text field's own data-keys gives the program a key it types, to program or to prefix (SPEC \u00a710.2)",
+   "reader": "input",
+   "tree": [
+    "j=program"
+   ],
+   "own": "j=program space=prefix",
+   "lookup": {
+    "j": null,
+    "space": null
+   },
+   "program": {
+    "j": true,
+    "space": true
+   },
+   "prefix": {
+    "space": true
+   }
+  },
+  {
+   "name": "outside a text field, a data-keys-tree gives the program a character and space (SPEC \u00a710.2)",
+   "reader": "element",
+   "tree": [
+    "j=program space=program"
+   ],
+   "program": {
+    "j": true,
+    "space": true
+   }
+  },
+  {
+   "name": "outside a text field, default in a data-keys-tree is ignored, and a farther prefix holds (SPEC \u00a710.2)",
+   "reader": "element",
+   "tree": [
+    "g=prefix",
+    "g=default"
+   ],
+   "program": {
+    "g": true
+   },
+   "prefix": {
+    "g": true
+   }
+  },
+  {
+   "name": "a selection's keymap is the default keymap: the edit shortcut of copy copies, and no other key does (SPEC \u00a711, \u00a710.2)",
+   "reader": "selection",
+   "lookup": {
+    "ctrl+c": "copy",
+    "ctrl+x": null,
+    "ctrl+a": null,
+    "c": null,
+    "arrow_left": null
+   }
+  },
+  {
+   "name": "a selection takes program from the body's own data-keys: under mod+c=program, ctrl+c on Linux goes on as if nothing were selected; default gives copy back (SPEC \u00a711, \u00a710.2)",
+   "reader": "selection",
+   "own": "mod+c=program mod+x=program mod+x=default",
+   "lookup": {
+    "ctrl+c": null,
+    "ctrl+x": null
+   }
+  },
+  {
+   "name": "a selection takes copy, program, prefix and default from the body's own data-keys, and nothing from a data-keys-tree: another editing action is as if it were not there (SPEC \u00a711, \u00a710.2)",
+   "reader": "selection",
+   "tree": [
+    "ctrl+c=program ctrl+x=copy"
+   ],
+   "own": "ctrl+c=cut ctrl+k=copy ctrl+v=default",
+   "lookup": {
+    "ctrl+c": "copy",
+    "ctrl+x": null,
+    "ctrl+k": "copy",
+    "ctrl+v": null
+   }
+  },
+  {
+   "name": "the edit shortcuts a program gives its fields in a data-keys-tree never copy a selection: on macOS, ctrl+c=copy there leaves ctrl+c to the program, and super+c copies (SPEC \u00a711, \u00a710.2)",
+   "reader": "selection",
+   "platform": {
+    "mod": "super"
+   },
+   "tree": [
+    "ctrl+c=copy"
+   ],
+   "lookup": {
+    "ctrl+c": null,
+    "super+c": "copy"
    }
   }
  ],

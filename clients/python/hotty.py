@@ -1979,8 +1979,8 @@ def default_edit(mod="ctrl"):
 
 class Keymap:
     """Bindings of keys to actions (SPEC.md §10.2), read on a Platform.
-    `resolve` makes the one a field uses, whose `lookup` says what the field
-    does with a key."""
+    `resolve` makes the one a reader reads: a field's, whose `lookup` says
+    what the field does with a key, another element's, or a selection's."""
 
     def __init__(self, multiline=False, platform=None):
         self.bindings = {}  # key, mod read, to action
@@ -1988,6 +1988,7 @@ class Keymap:
         self.multiline = multiline
         self.platform = platform or Platform()
         self.field = False  # a field's keymap, from resolve: it may give tab
+        self.reader = None  # the reader resolve made it for, None from parse_keymap
         self.base = None  # a field's default keymap, which `default` gives a key back to
 
     def bind(self, key, action, written=None):
@@ -2026,8 +2027,8 @@ class Keymap:
     def program(self, key):
         """Whether the keymap gives the key to the program (SPEC.md §10.2):
         it binds the key to `program` or `prefix`. On an element that is not
-        a text field, a host asks it of the element's data-keys alone, before
-        the element or a scroll uses it."""
+        a text field, a host asks it of the keymap `resolve` makes for the
+        "element" reader, before the element or a scroll uses it."""
         k = self._key(key)
         if k == "tab" and not self.field:
             return False
@@ -2050,7 +2051,12 @@ class Keymap:
 
     def lookup(self, key):
         """An action, INSERT for a key the field types (key_text), or None
-        when the key is not the field's."""
+        when the key is not the field's. On a selection's keymap, "copy"
+        for a key that copies the selection, and None for any other."""
+        a = self._lookup(key)
+        return a if self.reader != "selection" or a == "copy" else None
+
+    def _lookup(self, key):
         k = self._key(key)
         if k is None or k in _UNBOUND:
             return None
@@ -2115,27 +2121,60 @@ _DEFAULT_MOD = {
 }
 
 
-def resolve(platform, multiline, *values):
-    """A field's keymap: SPEC.md's default for the platform, then each
-    data-keys value, the root's first, less their scroll actions."""
+# The readers of a keymap (SPEC.md §10.2, Keymaps): a text field, an
+# `input` or a multi-line one; any other element, and the surface with
+# nothing focused; and a selection in the document (§11).
+READERS = ("input", "multiline", "element", "selection")
+
+
+def _takes(reader, k, a, own):
+    """Whether the reader takes the binding of canonical key k to action a,
+    from the element's own data-keys (own) or a data-keys-tree. One it does
+    not take is as if it were not there: it neither acts nor overrides."""
+    if a == "default":
+        return own
+    if a in ("program", "prefix"):
+        # A text field takes no data-keys-tree binding to program or prefix
+        # of a key it types.
+        return own or reader not in ("input", "multiline") or key_text(k) is None
+    if a in SCROLL_ACTIONS:
+        return reader == "element"
+    if reader == "selection":
+        return a == "copy"
+    return reader in ("input", "multiline")
+
+
+def resolve(platform, reader, own="", *tree):
+    """A focused element's keymap (SPEC.md §10.2, Keymaps), for a reader of
+    READERS: the default keymap for a text field and a selection, then each
+    data-keys-tree value, the root's first, then the element's own
+    data-keys, each less the bindings the reader does not take. With
+    nothing focused, `own` and `tree` are the body's, for "element". A
+    selection reads `own`, the body's data-keys, and no data-keys-tree."""
+    if reader not in READERS:
+        raise ValueError(f"resolve: no reader {reader!r}")
     platform = platform or Platform()
+    multiline = reader == "multiline"
     m = Keymap(multiline, platform)
-    m.field = True
-    for k, a in _DEFAULT + (("enter", "newline" if multiline else "submit"),) + _DEFAULT_MOD[platform.mod]:
-        m.bind(k, a)
-    edit = platform.edit if platform.edit is not None else default_edit(platform.mod)
-    for a, keys in edit.items():
-        if a not in _EDIT_ACTIONS:
-            continue
-        for key in keys:
-            k = read_key(platform, key)
-            if k is not None and k not in _UNBOUND:
-                m.bind(k, a, _read(key, platform.mod, True))
-    m.base = Keymap(multiline, platform)
-    m.base.bindings, m.base.written = dict(m.bindings), dict(m.written)
-    for v in values:
+    m.field = reader in ("input", "multiline")
+    m.reader = reader
+    if reader != "element":
+        for k, a in _DEFAULT + (("enter", "newline" if multiline else "submit"),) + _DEFAULT_MOD[platform.mod]:
+            m.bind(k, a)
+        edit = platform.edit if platform.edit is not None else default_edit(platform.mod)
+        for a, keys in edit.items():
+            if a not in _EDIT_ACTIONS:
+                continue
+            for key in keys:
+                k = read_key(platform, key)
+                if k is not None and k not in _UNBOUND:
+                    m.bind(k, a, _read(key, platform.mod, True))
+        m.base = Keymap(multiline, platform)
+        m.base.bindings, m.base.written = dict(m.bindings), dict(m.written)
+    layers = ([] if reader == "selection" else [(v, False) for v in tree]) + [(own or "", True)]
+    for v, is_own in layers:
         for k, a, w in _bindings(platform, v):
-            if a not in SCROLL_ACTIONS:
+            if _takes(reader, k, a, is_own):
                 m.bind(k, a, w)
     return m
 
