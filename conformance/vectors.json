@@ -16737,6 +16737,456 @@
    ]
   },
   {
+   "name": "focus fixup: the focused element removed, made disabled, inside a disabled fieldset, or made inert loses focus with no event, no blur, focus or change; the surface keeps the keyboard and every key reaches the program; then tab, and a=focus without t, focus the first focusable element, and shift+tab with none left gives the keyboard back with blur (SPEC \u00a710.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=a data-on=input><button id=b>ok</button><fieldset id=f><input id=c data-on=input></fieldset><input id=d data-on=input>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "8",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "p",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "remove",
+        "t": "a"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "q",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "b"
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "b",
+        "k": "disabled",
+        "v": ""
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "r",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "value": "r",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "f",
+        "k": "disabled",
+        "v": ""
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "s",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "d",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "t",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "d",
+       "detail": {
+        "value": "t",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "d",
+        "k": "inert",
+        "v": ""
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "u",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "keys": [
+      "shift"
+     ],
+     "terminal": false,
+     "events": [
+      {
+       "e": "blur",
+       "s": "x",
+       "t": null
+      }
+     ]
+    },
+    {
+     "key": "v",
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "focus fixup on layout: display: none from a class, visibility: hidden, a details closed, and a media query a resize turns on drop focus with no event, and keys then reach the program; opacity: 0 leaves the element focused (SPEC \u00a710.1)",
+   "requires": [
+    "layout"
+   ],
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}.gone{display:none}.ghost{visibility:hidden}.clear{opacity:0}@media (orientation: portrait){#d{display:none}}</style><input id=a data-on=input><input id=b data-on=input><details id=e open><summary>e</summary><input id=c data-on=input></details><input id=d data-on=input>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "6",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "a",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "p",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "a",
+        "k": "class",
+        "v": "clear"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "q",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "pq",
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "a",
+        "k": "class",
+        "v": "gone"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "r",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "p",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "b",
+        "k": "class",
+        "v": "ghost"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "r",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "c",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "p",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "c",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "unattr",
+        "t": "e",
+        "k": "open"
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "key": "r",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "d",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "p",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "d",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "4",
+      "r": "12",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "r",
+     "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
    "name": "the user moving focus sends focus naming the element focused, or the nearest one outward with an id: on a click, on tab and shift+tab, after the change it commits; focus the program gives sends none, and tab past the last sends blur (SPEC \u00a710.1, \u00a710.2)",
    "steps": [
     {

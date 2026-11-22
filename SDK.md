@@ -941,9 +941,13 @@ A host that runs inside a test, so that a program's tests need no terminal.
   measure where in an element the pointer is: a drag of an element with
   `data-steps` carries the steps the test gives, in it and in `t` (SPEC.md
   §9.1). A drag goes to the element the test names, which may be one with
-  `drop` in its `data-on`. So it skips the vectors marked `scroll`,
-  `steps`, `drop` and `view` (conformance/README.md), which every other
-  host passes.
+  `drop` in its `data-on`. It keeps the focused element, and drops focus
+  as SPEC.md §10.1 has a host do when the element goes away, with no
+  event: when a delta or a document removes it, makes it `disabled` (by
+  a `disabled` fieldset too), or makes it or an ancestor `inert` or
+  `hidden`. What CSS hides it cannot see.
+  So it skips the vectors marked `scroll`, `steps`, `drop`, `view` and
+  `layout` (conformance/README.md), which every other host passes.
 - **Strict by default.** A malformed message, an `EINVAL`, or a hotty
   command other than the query sent to a terminal that is not a host fails
   the test. A lenient host records them instead.

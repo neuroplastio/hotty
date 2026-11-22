@@ -65,7 +65,8 @@ it. A list names several, all required:
   an `EVERSION` reply is checked for its code, not its detail (the versions
   the host speaks, SPEC §4), which differs between a host that speaks 0.7
   and one that does not;
-- `"scroll"` (§5.3), `"steps"`, `"drop"` (§9.1) and `"view"` (§9.5): what
+- `"scroll"` (§5.3), `"steps"`, `"drop"` (§9.1), `"view"` (§9.5) and
+  `"layout"`, whether CSS renders an element (§10.1, focus fixup): what
   every host of this version does, named so that a host that lays nothing
   out, an SDK's test host (SDK.md §4.4), skips it. Nor do test hosts keep a
   history, so they skip `"undo"`.

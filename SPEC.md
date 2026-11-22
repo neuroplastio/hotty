@@ -1799,6 +1799,31 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
 - **A click elsewhere gives the keyboard back** to the terminal: on the
   cells, on another surface, or inside this one on an element that does not
   take focus. The host sends `blur`.
+- **The focused element goes away.** When the focused element leaves the
+  document, or stops taking focus, it loses focus, as HTML's focus fixup
+  has it. The surface keeps the keyboard with nothing focused (§10.2).
+  - **What counts:** the element removed, by a delta or a new document
+    (§5.1, §6); made `disabled` or `inert`, or put inside an `inert`
+    element; or no longer rendered, by `display: none`, `visibility:
+    hidden`, a closed `details` or a `hidden` attribute, its own or an
+    ancestor's. `opacity: 0` does not count, nor does anything else that
+    leaves the element rendered and focusable in a browser: scrolled out
+    of view, clipped, covered, or outside the placement's window (§5.2).
+  - **When the host checks:** each time it lays the document out, after
+    the program's changes and after a resize, as a browser runs focus
+    fixup when it updates the rendering.
+  - **The program is told nothing,** as HTML's focus fixup fires no
+    event: no `blur`, no `focus`, and no `change`. A program that removed
+    or disabled the element knows it did. For one that layout alone hid,
+    the next key reaches the program (§10.2), which shows it nothing is
+    focused. A value the user changed and did not commit stays in the
+    field, and a `submit` of its form still carries it.
+  - **With nothing focused,** every key but a scrolling document's own
+    scrolling keys (§5.3) reaches the program, with no keymap (§10.2,
+    *Keys for the program*). `tab` focuses the first focusable element,
+    as `a=focus` without `t` does, and `shift+tab` the last; with none,
+    the surface loses the keyboard, as past the last (§10.2). A prefix
+    (§10.5) goes on, since the surface kept the keyboard.
 - **A detached surface** (§5.5) never has the keyboard: `a=focus` is
   `EDETACHED`, whatever its `t`, and `a=blur` does nothing.
 - **A backdrop** (§5.2) never has the keyboard either: `a=focus` on a
@@ -2635,7 +2660,7 @@ A host conforms to hotty version 0.8 when:
 The vectors check replies, error codes, every delta op, morph, context
 parsing, `a=field` and revisions, resources, drags and their steps, presses with Alt, secondary presses and long presses, `fit`, hover,
 `area`, scrolling and scroll snapping, `reveal`, `scroll` and `view`, `hit`, touch in the
-cells, backdrops, prefixes, edit commands, menus, keymaps and the envelope,
+cells, backdrops, focus fixup, prefixes, edit commands, menus, keymaps and the envelope,
 and their `keys`, `keymap` and `edit` sections a host's key names (§10.4), keymaps and
 actions (§10.2). They inspect documents and events, not pixels. The vectors
 marked with a feature (`"passthrough"`, `"hover"`, `"count"`, `"menu"`,
@@ -3243,6 +3268,23 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     keyboard while focus moves inside it. A program that only wanted to
     know the surface has the keyboard reads the first `focus` after a
     `blur`, as before.
+- **Why focus fixup sends nothing.** A component that closes, such as a
+  toast whose button had focus, disables or hides what it shows, and the
+  host has to do something with the focus it held. HTML's answer is focus
+  fixup: the document keeps the keyboard with nothing focused, and no
+  event fires. A `blur` would say the terminal has the keyboard, which it
+  does not, and a `focus` on some other element would move the user where
+  neither they nor the program went.
+  - **The program knows already** where it removed or disabled the
+    element, and where layout alone hid it, the next key reaches it,
+    which is what nothing focused means to it.
+  - **No blur of its own.** With fixup, a program that wants nothing
+    focused disables or hides the element, as a page does, so hotty needs
+    no counterpart of a page's `activeElement.blur()`. `a=blur` still
+    gives the keyboard to the terminal.
+  - **On layout,** because `display: none` and `visibility: hidden` come
+    from styles, a media query or a resize as much as from the program's
+    deltas, and only layout knows what is rendered.
 - **Why scrolling keys.** Pagers and viewers in the terminal (less, vim,
   Bubble Tea's viewport, glow) share `j` and `k`, Space and `b`, `g` and
   `G`. A program that scrolls its cells with them should scroll its
