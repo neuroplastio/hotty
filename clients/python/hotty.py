@@ -898,9 +898,12 @@ class Event:
     def button(self):
         """A press's or an auxclick's button as the DOM numbers it (SPEC §9):
         2 for a secondary press, 1, 3, 4, or 6 and up for another button's,
-        0 for a press whose detail has none, the primary button's. None for
-        other kinds. A program ignores a button it does not use."""
-        if self.kind not in (EVENT_PRESS, EVENT_AUXCLICK):
+        0 for a press whose detail has none, the primary button's, and None
+        for an auxclick whose detail has none, and for other kinds. A
+        program ignores a button it does not use."""
+        if self.kind == EVENT_AUXCLICK:
+            return self._d.get("button")
+        if self.kind != EVENT_PRESS:
             return None
         return self._d.get("button", 0)
 

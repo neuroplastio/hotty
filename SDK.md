@@ -612,7 +612,7 @@ carries, each absent when the event does not carry it:
 | `Drag` | `c` and `r`; the steps `x` and `y` in the element dragged, and `tx` and `ty` in a `t` with `drop` (as `TX` and `TY` where the language capitalises), each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover` | `c` and `r`, or `out` | `hover` |
 | `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press`, `auxclick` |
-| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 2 for a secondary press, 1, 3, 4, or 6 and up for another button's, 0 when absent, the primary button's | `press`, `auxclick` |
+| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 2 for a secondary press, 1, 3, 4, or 6 and up for another button's; on a `press`, 0 when absent, the primary button's, and on an `auxclick`, none when absent (0 where the language has no absent int) | `press`, `auxclick` |
 | `C`, `R` | `c` and `r`: the pointer's cell on a press of any button but the primary, and at an `auxclick`'s release, each absent when the detail has none (SPEC.md §9) | `press`, `auxclick` |
 | `Count` | `count`: the click's place in its run of clicks (SPEC.md §9), 2 for the second click of a double click; 1 for a click whose detail has none | `click` |
 | `View` | `Areas`, from `in`: each id in view to its cells as `Area` holds them, leaving out one whose area lacks a field, and none when `in` is absent; and `AtEnd`, from `end`, false when absent (SPEC.md §9.5) | `view` |

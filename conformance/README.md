@@ -53,9 +53,10 @@ it. A list names several, all required:
 - `"commands"`, a host with a terminal that takes edit commands (§10.6);
 - `"mouse"`, a host with a terminal that reports the mouse (§9.6), whose
   runner tells what it reported (Pointer and Touch, below);
-- `"primary"`, a host on a platform where a middle press pastes the
-  primary selection (SPEC §9, *A text field pastes*): Linux, with the
-  host's setting for it on;
+- `"middle-paste"`, a host whose terminal's middle press pastes (SPEC §9,
+  *A text field pastes*): on Linux, the primary selection, with the
+  host's setting for it on. Its runner sets what the paste reads
+  (Primary, below);
 - `"undo"`, a host whose text fields keep a history and cut (§10.2);
 - `"pressed"`, a host that sees the key the user pressed (§10.4): its
   runner offers a key step's key as pressed, by both its names, and then
@@ -152,9 +153,10 @@ checked).
 - `"through"`: `true` if the step passes through the surface (SPEC §9.3),
   as it passes a backdrop (§5.2), `false` if the surface gets it. Absent:
   not checked.
-- `"mouse"`, for `"down"` and `"up"`, in a vector that requires
-  `"mouse"`: what the terminal reported of the mouse's buttons for the
-  step (SPEC §9, §9.2), each `[kind, button]`, `kind` `"down"` or `"up"`
+- `"mouse"`, on a pointer step's `"down"` and `"up"`, in a vector that
+  requires `"mouse"`: what the terminal reported of the mouse's buttons
+  for the step (SPEC §9, §9.2), each `[kind, button]` (a touch step's
+  `"mouse"` is `[kind, c, r]`, below), `kind` `"down"` or `"up"`
   and `button` the DOM's number for the button the report names (SGR's 0,
   1, 2, 128 and 129 are 0, 1, 2, 3 and 4), its cell and its modifiers not
   checked; `[]` for nothing, and absent, not checked.
@@ -190,7 +192,8 @@ host the gesture directly if it can. `"keys"` are the modifier keys held,
 as for a pointer step.
 `"terminal"`, for a move: `true` if the touch went on to the terminal as a
 scroll (SPEC §9), `false` if the surface or the program's mouse took it
-(§9.6); absent, not checked. `"mouse"`: what the terminal reported of the
+(§9.6); absent, not checked. `"mouse"`, on a touch step (a pointer step's
+is `[kind, button]`, above): what the terminal reported of the
 mouse's primary button for the step (§9.6), each `[kind, c, r]`, `kind`
 `"down"`, `"move"` or `"up"` on the screen's cell `[c, r]`, counted from
 0; `[]` for nothing, and absent, not checked. How many moves it reports
@@ -211,6 +214,12 @@ key, but the physical name of a character's key (`ctrl+key_w`, beside
 `ctrl+w`). `"terminal"`:
 `true` if the key reached the program as terminal input (§10.2), `false` if
 the surface used it; absent, not checked. `"events"` as for a pointer step.
+
+**Primary** `{ "primary": text }`: the user selects `text` in another
+application, so that it is what a middle press pastes (SPEC §9, §11): the
+platform's primary selection, set as the platform sets it, or the text a
+runner gives its host for the paste to read. Only in a vector that
+requires `"middle-paste"`.
 
 **Write** `{ "write": text }`: the program writes text to the terminal,
 bytes that are not hotty's. The vectors write `CSI ? 1002 h` and `CSI ?
@@ -308,7 +317,7 @@ in order:
 - `event`: `Event`'s fields and accessors (`surface`, `kind`, `target`,
   `value`, `checked`, `rev`, `sel` as a list of two, `fields` as a list of `[name, value]`, `mods`, `link`
   with `href` and `url`, `fit_rows`, `drag` with `c`, `r`, `x`, `y`, `tx`
-  and `ty`, `hover` with `c`, `r` and `out`, `area`, `count`, `button` (0 for a press whose detail has none), `c` and `r`
+  and `ty`, `hover` with `c`, `r` and `out`, `area`, `count`, `button` (0 for a press whose detail has none, `null` for an `auxclick`'s), `c` and `r`
   of a press, `view` with
   `areas` and `at_end`, `command` with `name`, `key`, `text` and
   `has_text`);

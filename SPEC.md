@@ -1210,7 +1210,7 @@ reads hotty messages from its input. A detached surface sends none (§5.5).
 | `caret` | in a text field with `data-on~=caret`, the user moved the selection, and no `input` says so: a move, a click, or an edit in a field without `data-on~=input` | `{"sel": [int, int], "rev": int}`: the selection, its anchor then its caret, as `a=field` counts them (§6.4) |
 | `submit` | a form submitted (a submit button, or Enter in a text field, after the `change` it commits) | `{"fields": [[str, str]]}`: the form's fields, each its name and its value, in tree order, the submitter's included; `[]` for a form with none |
 | `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface whose `p` is on (§5.2); or a secondary press (below) on an element with `secondary` in its `data-on`, or a press of another button (below) on an element with `aux` in its `data-on`, whether `p` is on or not; except a mouse's or a pen's press with Alt held, and a press of any button but the primary with Shift held (§9.2), where the pointer passes through (§9.3), and on a backdrop (§5.2) | `{"area": area, "mods": int}`: the cells of the element `t` names (below), and the modifier keys held; no `area` without `t`. A secondary press has `{"button": 2, "area": area, "c": int, "r": int, "mods": int}`: the button as the DOM numbers it (`MouseEvent.button`; a primary press has no `button`, which means 0), and the pointer's cell (§9.1). A press of another button has the same, with its own `button` (below) |
-| `auxclick` | another button (below), pressed on an element with `aux` in its `data-on`, released where it was pressed | `{"button": int, "area": area, "c": int, "r": int, "mods": int}`: as a `click`'s, with `"href": str` and `"url": str` for links and `"value": str` when the element has a `value` attribute, but no `count`; with the button, and the pointer's cell and the modifier keys held at the release; no `area` without `t`, but a link's |
+| `auxclick` | another button (below), pressed on an element with `aux` in its `data-on`, released where it was pressed | `{"button": int, "area": area, "c": int, "r": int, "mods": int}`: as a `click`'s, with `"href": str` and `"url": str` when the element is a link and `"value": str` when it has a `value` attribute, but no `count`; with the button, and the pointer's cell and the modifier keys held at the release; no `area` without `t`, but a link's |
 | `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": int, "r": int, "mods": int}`: the pointer's cell and the modifier keys held, with `"x": int` and `"y": int`, its step, on an element with `data-steps` (§9.1) |
 | `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element or in `t` (§9.1) | the same, with `"tx": int` and `"ty": int`, the step in `t`, where `t` has `drop` in its `data-on` and `data-steps` (§9.1) |
 | `dragend` | the drag ended: the button released or the finger lifted, wherever the pointer is (§9.1) | as for `drag` |
@@ -1352,22 +1352,29 @@ the program asked for it, and as often as this table says:
     primary press or a drag, a secondary press, or another button's), a
     press of any other button is not reported and goes nowhere: not to
     the terminal, nor to the program's mouse reporting. Its release goes
-    nowhere too.
+    nowhere too. The other way round, while a press the terminal took is
+    held (another button's over an element without `aux`, say), any other
+    press is the terminal's too, over a surface as well, until every
+    button is released, as a gesture with Alt is the program's to its end
+    (§9.2).
   - **Only where asked.** Over an element without `aux`, inside or outside
     a surface, the press is the terminal's, as over the cells, and the
     surface hears nothing of it. The terminal does what it does with the
-    press there: it pastes the primary selection, say, or reports the
-    press to a program that reads the mouse. A press on a hyperlink is the
+    press there: it pastes, say, or reports the press to a program that
+    reads the mouse. A paste it makes of the press is its own paste
+    (§11): while a text field has the keyboard, it goes into that field,
+    and not to the program. A press on a hyperlink is the
     terminal's too, unless an element with `aux` holds it: a hyperlink
     belongs to the terminal (below), and its own `aux` counts for nothing.
     An `auxclick` never carries a hyperlink's `href`.
-  - **A text field pastes.** On a platform where a middle press pastes the
-    primary selection, as Linux's do where the host's settings let it (such
-    as Ghostty's `middle-click-action`), a middle press on a text field
-    (§10.2) is the field's, as in a browser. The field takes focus, as a
-    click on it would (§10.1). The primary selection goes in at the
-    pointer, as if typed, with the field's own `input`, `caret` and
-    `change`. Nothing else hears of the press. A field with `aux` in its
+  - **A text field pastes.** Where the terminal's middle press pastes (the
+    primary selection on Linux, or what the host's setting says, such as
+    Ghostty's `middle-click-action`), a middle press on a text field
+    (§10.2) is the field's, as in a browser. The field takes focus, and
+    its caret goes to the pointer, as a click on it would put them
+    (§10.1). What the terminal would paste goes in there, as its paste
+    does (§11), with the field's own `input`, `caret` and `change`.
+    Nothing else hears of the press. A field with `aux` in its
     own `data-on` takes the press as any element does, and the surface
     reports it. An `aux` on an element around the field does not take it.
     Elsewhere, and for back, forward and the later buttons, a field is like
@@ -1618,11 +1625,12 @@ its `z`, the host handles it as a press on the cells beneath the surface.
   `secondary` or `aux` in its `data-on`, and over a text field: the host
   handles it as that press on the cells beneath the surface, and the
   terminal does what it does with one, such as opening its own menu, with
-  copy and paste, for the secondary button, or pasting the primary
-  selection for the middle one. Shift is the terminal's way past a
+  copy and paste, for the secondary button, or pasting for the middle one,
+  where its paste goes (§11). Shift is the terminal's way past a
   program's mouse reporting too. The surface hears nothing of it, as of a
-  press with Alt, and the program no `press`. A primary press with Shift
-  held is as without it.
+  press with Alt, and the program no `press`. It moves no keyboard: a
+  surface that has it keeps it. A primary press with Shift held is as
+  without it.
 
 ### 9.3 Where the pointer passes through
 
@@ -2735,8 +2743,8 @@ document, and therefore its text.
   selected: under `mod+c=program` in the body's `data-keys`, `ctrl+c` on
   Linux reaches the program while text is selected, as its bytes, which
   interrupt it, or as `copy` where it takes that command (§10.6).
-- **The terminal's own copy** and paste, from its own keys or its menu,
-  are the user's whatever the keymaps say. Its copy **SHOULD** copy a
+- **The terminal's own copy** and paste, from its own keys, its menu or
+  a middle press (§9), are the user's whatever the keymaps say. Its copy **SHOULD** copy a
   surface's selection, so that no document makes its text uncopyable, and
   while a text field has the keyboard its paste **SHOULD** type into the
   field as `paste` does, and not reach the program. Its own selection on
@@ -2879,8 +2887,8 @@ marked with a feature (`"passthrough"`, `"hover"`, `"count"`, `"menu"`,
 `"backdrop"`, §4) apply to a host that has it, those marked `"commands"` to
 a host with a terminal that takes edit commands (§10.6), those marked
 `"mouse"` to a host with a terminal that reports the mouse (§9.6), and
-those marked `"primary"` to a host on a platform where a middle press
-pastes the primary selection (§9).
+those marked `"middle-paste"` to a host whose terminal's middle press
+pastes (§9).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
@@ -3319,8 +3327,9 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     of two buttons, and no move is reported while one is held. A button
     pressed by chance during a drag should neither end the drag nor reach
     the program. A field can be added if chords are ever wanted.
-  - **The terminal keeps the rest.** A middle press nobody asked for pastes
-    the primary selection on Linux, as it always has over the cells, and
+  - **The terminal keeps the rest.** A middle press nobody asked for
+    pastes, as it always has over the cells (the primary selection on
+    Linux), into the field with the keyboard if one has it (§11), and
     `p` brings only the primary button, so a surface that asks for presses
     takes nothing from the user. A text field pastes as a browser's does,
     and an `aux` around it leaves it that: a tab's rename field pastes, and

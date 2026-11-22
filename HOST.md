@@ -201,52 +201,86 @@ them:
 
 | platform | middle (1) | back (3), forward (4) | later (6 and up) |
 | --- | --- | --- | --- |
-| GTK (GDK button numbers) | 2 | 8, 9 | 10 → 6, 11 → 7, and on |
+| GTK (GDK button numbers) | 2 | 8, 9; and 11, 10 | 12 → 6, 13 → 7, and on |
 | AppKit (`NSEvent.buttonNumber`) | 2 | 3, 4 | 5 → 6, 6 → 7, and on |
-| a browser (`MouseEvent.button`) | 1 | 3, 4 | none: browsers report no more |
+| a browser (`MouseEvent.button`) | 1, with bit 4 in `buttons` (below) | 3, 4 | none: browsers report no more |
 
+- **GDK's 10 and 11** are libinput's `BTN_FORWARD` and `BTN_BACK`, which
+  some mice send for their thumb buttons. Chromium folds them into
+  forward and back, and a host does the same, so that one mouse has the
+  same numbers in a browser host and in a terminal host.
 - **Not the wheel.** GDK's buttons 4 to 7 are X11's wheel, which GTK 4
   sends as scrolls. A host never reports them as buttons.
 - **Later buttons** are numbered from 6 in the platform's order, so the
   same physical button may have different numbers on different platforms.
-  A program can't count on one anyway (SPEC.md §9).
+  A program can't count on one anyway (SPEC.md §9). A host reports only
+  those its toolkit names: Ghostty's buttons end at its eleventh, which is
+  GDK 11 and AppKit's `buttonNumber` 10, so hottyterm has no later button
+  on GTK, and six on macOS.
 - **What the platform makes a button** is a button. On Linux, libinput
   makes the middle button from a touchpad's three-finger tap, and from the
   primary and secondary pressed together. A host can't tell them from a
   mouse's, and doesn't try.
-- **Many mouse drivers on macOS** send back and forward as key presses,
-  not buttons. Those reach the program as keys (SPEC.md §10.2).
+- **Drivers that send no button.** Many mouse drivers on macOS send back
+  and forward as key presses, which reach the program as keys (SPEC.md
+  §10.2). On Windows, some send them as an app command instead of a
+  button, which no page can cancel: one more reason a browser host checks
+  each engine (below).
 
 **A host reports a button only where it can keep the platform's own action
-from it** (SPEC.md §9): autoscroll, the primary selection's paste, history
-navigation. A button it can't take whole stays the platform's or the
-terminal's, and is never half-taken: a program that heard a press while the
-page went back would be worse off than one that heard nothing.
+from it** (SPEC.md §9): autoscroll, the terminal's or the browser's paste,
+history navigation, a link opened in a new tab. A button it can't take
+whole stays the platform's or the terminal's, and is never half-taken: a
+program that heard a press while the page went back would be worse off
+than one that heard nothing.
 
 **A browser host** applies that rule per engine, decided up front, because
 it can't find out at run time: a navigation that wasn't cancelled has
 already happened.
-- For a press it takes, it cancels `pointerdown` and `mousedown` (for
-  autoscroll and focus), `mouseup` (Chromium's history navigation for
-  buttons 3 and 4 is `mouseup`'s default action) and `auxclick`.
-  Cancelling `auxclick` or the press alone does not stop the navigation.
-- It reports buttons 3 and 4 only on the engines its tests have checked,
-  Chromium first. Firefox has not always sent them to pages, nor let pages
-  cancel them. No engine has been checked from inside a sandboxed frame.
-- Over an element without `aux`, it passes the press to the program's mouse
-  reporting, as it passes a press with Alt (SPEC.md §9.2). The terminal's
-  own paste of the primary selection does not happen there: a browser
-  pastes it only on a press it made itself, into an editable element, and
-  a page can't read the selection to paste it.
-- A middle press on a text field (SPEC.md §9) is left to the browser, which
-  pastes the selection into the field on Linux. The host does not cancel
-  it.
+- **What it cancels,** for a press it takes:
+  - `pointerdown`, for focus, selection and autoscroll. Cancelling it
+    also keeps the compatibility `mousedown` and `mouseup` from being
+    sent at all, so `mouseup` can't be cancelled after it;
+  - `pointerup`, whose result Chromium merges with `mouseup`'s, for
+    Chromium's history navigation on buttons 3 and 4 and its middle paste
+    on Linux;
+  - `auxclick`, for a link's new tab;
+  - the `paste` a middle press makes, which stops the paste in both
+    engines. Firefox pastes from a listener of its own on `auxclick` and
+    pays no heed to the other cancels.
+
+  It tests each of these in each engine.
+- **Which buttons:** it reports buttons 3 and 4 only on the engines its
+  tests have checked, Chromium first. Firefox 162 (due 2026-12-08) sends
+  `mousedown`, `mouseup` and `auxclick` with buttons 3 and 4, and lets a
+  cancelled `mouseup` stop the navigation, as Chromium does; 160 and 161
+  send none. No engine has been checked from inside a sandboxed frame,
+  and a test that synthesises input does not go the browser's real way to
+  back and forward, so the check is made with real input.
+- **The buttons bits.** It takes `button` 1 as the middle button only
+  when `buttons` has bit 4. With 8 or 16 it is back or forward, which it
+  reports as 3 or 4 only where the engine is checked, and otherwise not at
+  all. Safari before 26.4 reported both side buttons as `button` 1 on
+  macOS, with `buttons` 8 or 16, and as 0 on iPadOS.
+- **Over an element without `aux`,** it passes the press to the program's
+  mouse reporting, as it passes a press with Alt (SPEC.md §9.2). The
+  terminal's own paste does not happen there: a browser pastes the
+  primary selection only on a press it made itself, into an editable
+  element, and a page reads it only in the `paste` event of such a press.
+- **A text field.** A middle press on a text field (SPEC.md §9) is left to
+  the browser, which focuses the field on `mousedown`, as it does for any
+  button, and pastes the selection into it on Linux. The host does not
+  cancel it. With Shift held it cancels it as for a press it takes, and
+  passes it on.
 
 **A terminal host** (hottyterm) asks the surface before the terminal does
-anything with a press: before its paste of the primary selection, its
-mouse report, and any return its toolkit's code makes first. A press the
-surface took has its release taken too, and so does any press while a
-surface holds a button (SPEC.md §9, *One button at a time*).
+anything with a press: before its paste, its mouse report, and any return
+its toolkit's code makes first. A press the surface took has its release
+taken too, and so does any press while a surface holds a button (SPEC.md
+§9, *One button at a time*). A middle press on a field rides on the
+terminal's own paste: the host focuses the field and puts its caret at
+the pointer, then lets the terminal read what it would paste, which its
+paste types into the focused field (SPEC.md §11).
 
 ## 4. Reduced motion
 
