@@ -20136,7 +20136,7 @@
    ]
   },
   {
-   "name": "focus fixup: a field in a fieldset made disabled, one inside an ancestor made inert, and one given a hidden attribute lose focus and commit what the user typed with change, and nothing else; a button in the disabled fieldset's first legend keeps focus; with none left, shift+tab gives the keyboard back with blur (SPEC \u00a710.1)",
+   "name": "focus fixup: a field in a fieldset made disabled, one inside an ancestor made inert, and one given a hidden attribute lose focus and commit what the user typed with change, and nothing else; a button in the disabled fieldset's first legend takes focus and clicks on Enter, and keeps it; with none left, shift+tab gives the keyboard back with blur (SPEC \u00a710.1)",
    "steps": [
     {
      "send": {
@@ -20144,7 +20144,7 @@
       "s": "x",
       "q": "2"
      },
-     "payload": "<style>body{margin:0}</style><fieldset id=f><legend><button id=l>l</button></legend><input id=g data-on=input></fieldset><div id=w><input id=h data-on=input></div><input id=i data-on=input><button id=z>z</button>"
+     "payload": "<style>body{margin:0}</style><fieldset id=f><legend><button id=l style=\"position:absolute;left:0;top:0;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;width:calc(4*var(--hotty-cell-w));height:var(--hotty-cell-h)\">l</button></legend><input id=g data-on=input></fieldset><div id=w><input id=h data-on=input></div><input id=i data-on=input><button id=z>z</button>"
     },
     {
      "send": {
@@ -20220,6 +20220,25 @@
       "q": "2"
      },
      "events": []
+    },
+    {
+     "key": "Enter",
+     "terminal": false,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "l",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
     },
     {
      "key": "Tab",
@@ -20394,6 +20413,146 @@
      "key": "q",
      "terminal": true,
      "events": []
+    }
+   ]
+  },
+  {
+   "name": "a=focus with t on an element that is not focusable, or is disabled, is no error: the surface takes the keyboard with nothing focused where nothing was, so tab goes to the first element that takes focus, and an element that had focus keeps it, as HTML's focus() leaves it (SPEC \u00a710.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><input id=a data-on=input><div id=d>d</div><input id=b data-on=input>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "30",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "d",
+      "q": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "focus"
+     },
+     "events": []
+    },
+    {
+     "key": "q",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "key": "Tab",
+     "terminal": false,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "a"
+      }
+     ]
+    },
+    {
+     "key": "p",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "p",
+        "rev": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "d",
+      "q": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "focus"
+     },
+     "events": []
+    },
+    {
+     "key": "r",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "pr",
+        "rev": 2
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "delta",
+      "s": "x",
+      "q": "2"
+     },
+     "body": {
+      "ops": [
+       {
+        "op": "attr",
+        "t": "b",
+        "k": "disabled",
+        "v": ""
+       }
+      ]
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "b",
+      "q": "0"
+     },
+     "reply": {
+      "a": "ok",
+      "re": "focus"
+     },
+     "events": []
+    },
+    {
+     "key": "s",
+     "terminal": false,
+     "events": [
+      {
+       "e": "input",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "value": "prs",
+        "rev": 3
+       }
+      }
+     ]
     }
    ]
   },

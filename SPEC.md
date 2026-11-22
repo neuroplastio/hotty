@@ -1894,10 +1894,11 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
 - **With `t`:** the element is focused (`ENOTARGET` if there is none). A
   text field keeps its selection (§10.2). An element that is not
   focusable (below: it takes no focus and has no `tabindex`), or is
-  disabled, inert or not rendered, is not focused: the surface takes the
-  keyboard with nothing focused, as focus fixup leaves it.
+  disabled, inert or not rendered, is not focused, and that is no error:
+  the surface takes the keyboard, and an element that had focus keeps
+  it, as HTML's `focus()` leaves it; with none, nothing is focused.
 - **Without `t`:** the surface's focused element keeps focus, or else the
-  first focusable element receives it.
+  first of the elements that take focus (below) receives it.
 - **Echo:** no `focus` event is sent for focus the program gave.
 - **A prefix ends** (§10.5) with either form, whether or not focus moves.
 - **The host says where the user puts focus.** Each time the user focuses
@@ -1935,10 +1936,10 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
   - **Stopping taking focus:**
     - **No longer focusable:** it is none of the elements that take focus
       (above) and has no `tabindex`: a link whose `href` is removed, an
-      editing host no longer `contenteditable`, an element whose
-      `tabindex` is removed. An element with a `tabindex` of any value is
-      focusable, so a focused one whose `tabindex` goes from 0 to -1
-      keeps focus, and so does one with `tabindex=-1` that `a=focus`
+      editing host no longer `contenteditable`, an element whose `tabindex`
+      is removed. An element with a `tabindex` that parses as an integer, of
+      any value, is focusable, so a focused one whose `tabindex` goes from 0
+      to -1 keeps focus, and so does one with `tabindex=-1` that `a=focus`
       gave focus, though no click would.
     - **Disabled,** as HTML has it: its own `disabled`, or a disabled
       `fieldset`'s, unless it is inside that fieldset's first `legend`.
@@ -1965,14 +1966,14 @@ ESC ] 7279 ; a=focus:s=<name>[:t=<element id>] ST
     element knows it did. One whose element layout alone hid is not told,
     and the last `focus` it heard (§10.2, *Keys for the program*) is then
     stale.
-  - **With nothing focused,** the keymap is the `body`'s (§10.2,
-    *Keymaps*): a key it gives the program, or binds to a scroll action,
-    does that, and every other key but a scrolling document's own
-    scrolling keys (§5.3) reaches the program. `tab` focuses the first
-    focusable element, as `a=focus` without `t` does, and `shift+tab` the
-    last; with none, the surface loses the keyboard, as past the last
-    (§10.2). A prefix (§10.5) goes on, since the surface kept the
-    keyboard, and so does one the body's keymap starts.
+  - **With nothing focused,** the keymap is the `body`'s (§10.2, *Keymaps*):
+    a key it gives the program, or binds to a scroll action, does that, and
+    every other key but a scrolling document's own scrolling keys (§5.3)
+    reaches the program. `tab` focuses the first of the elements that take
+    focus (above), as `a=focus` without `t` does, and `shift+tab` the last;
+    with none, the surface loses the keyboard, as past the last (§10.2). A
+    prefix (§10.5) goes on, since the surface kept the keyboard, and so does
+    one the body's keymap starts.
 - **A detached surface** (§5.5) never has the keyboard: `a=focus` is
   `EDETACHED`, whatever its `t`, and `a=blur` does nothing.
 - **A backdrop** (§5.2) never has the keyboard either: `a=focus` on a
@@ -2002,12 +2003,12 @@ is offered the second time as the key that input reads as.
 | `select` | characters, `space`, `arrow_up`, `arrow_down`, `home`, `end`, `page_up`, `page_down`, `enter`, unmodified or with `shift` only |
 | `button`, `a`, `summary`, checkbox, radio button | `space` and `enter`, unmodified or with `shift` only |
 
-- **`tab` and `shift+tab`** move between the surface's focusable elements, and
-  the host sends `focus` for the one they move to (§10.1). Past the last
-  one, or before the first, the surface loses the keyboard: the host sends
-  `blur` and the terminal has the keyboard again. The one exception is
-  `tab` in a text field whose keymap gives it the program (below, *Text
-  fields*).
+- **`tab` and `shift+tab`** move between the elements of the surface that
+  take focus (§10.1), and the host sends `focus` for the one they move to.
+  Past the last one, or before the first, the surface loses the keyboard:
+  the host sends `blur` and the terminal has the keyboard again. The one
+  exception is `tab` in a text field whose keymap gives it the program
+  (below, *Text fields*).
 - **`escape`** is never used by the surface, except by a select's open list
   (below). It reaches the program, which decides, for instance by sending
   `a=blur`.
@@ -3639,12 +3640,12 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     next key race, and a key that reached the element the program had
     just disabled would be lost. What CSS hides is known only after
     layout, so the host lays out before it offers a key.
-  - **Tab from nothing focused** goes to the first focusable element, as
-    `a=focus` without `t` does, and Shift+Tab to the last. A browser goes
-    on from where the element was (its focus navigation starting point),
-    but HTML says nothing of a starting point that was removed, and
-    browsers differ there; the first and the last are one rule for every
-    host.
+  - **Tab from nothing focused** goes to the first of the elements that take
+    focus (§10.1), as `a=focus` without `t` does, and Shift+Tab to the last.
+    A browser goes on from where the element was (its focus navigation
+    starting point), but HTML says nothing of a starting point that was
+    removed, and browsers differ there; the first and the last are one rule
+    for every host.
 - **Why scrolling keys.** Pagers and viewers in the terminal (less, vim,
   Bubble Tea's viewport, glow) share `j` and `k`, Space and `b`, `g` and
   `G`. A program that scrolls its cells with them should scroll its
