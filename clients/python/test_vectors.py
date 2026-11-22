@@ -456,8 +456,8 @@ def run_keymap(v):
     if "reader" not in v:
         got = hotty.parse_keymap(platform(v), v["parse"] if "parse" in v else hotty.TERMINAL_KEYS).format()
         return got == v["format"], f"{got!r}, want {v['format']!r}"
-    tree = ([hotty.TERMINAL_KEYS] if v.get("terminal_keys") else []) + v.get("tree", [])
-    m = hotty.resolve(platform(v), v["reader"], v.get("own", ""), *tree)
+    inner = ([hotty.TERMINAL_KEYS] if v.get("terminal_keys") else []) + v.get("inner", [])
+    m = hotty.resolve(platform(v), v["reader"], v.get("own", ""), *inner)
     for check, fn in (("lookup", m.lookup), ("selects", m.selects), ("binds", m.binds),
                       ("program", m.program), ("prefix", m.prefix), ("scroll", m.scroll)):
         for key, want in v.get(check, {}).items():

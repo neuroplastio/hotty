@@ -399,12 +399,13 @@ the default edit shortcuts) where absent, in two forms:
   `format`; with `"terminal_keys": true` and no `parse`, `TerminalKeys`
   formatted must be `format`;
 - `{ "reader": "input" | "multiline" | "button" | "select" | "date" |
-  "element" | "selection", "terminal_keys"?: true, "tree"?: [ … ],
+  "element" | "selection", "terminal_keys"?: true, "inner"?: [ … ],
   "own"?: text, … }`:
-  `Resolve(platform, reader, own, tree…)`, the keymap its reader reads
+  `Resolve(platform, reader, own, inner…)`, the keymap its reader reads
   (SPEC §10.2, *Keymaps*; SDK.md §3.10). `own` is the focused element's
-  `data-keys`, empty when absent, and `tree` the `data-keys-tree` values
-  from the root down, after `TerminalKeys` when `terminal_keys` is true.
+  `data-keys`, empty when absent, and `inner` its ancestors'
+  `data-keys-inner` values from the root down, after `TerminalKeys` when
+  `terminal_keys` is true.
   For each check the vector has, the method must return its value for each
   of the check's keys:
   - `"lookup": { key: action | null }`, `Lookup`: an action, `"insert"`,

@@ -690,7 +690,7 @@ host.
   character's, a letter with `shift` as its capital, a space for `space`,
   and none for any other key, or a key with `ctrl`, `alt` or `super`.
 - **`Keymap`** is a set of bindings, key to action, read on a Platform.
-  `ParseKeymap(platform, value)` reads a `data-keys` or a `data-keys-tree`
+  `ParseKeymap(platform, value)` reads a `data-keys` or a `data-keys-inner`
   value as SPEC.md §10.2 has hosts read it, dropping the bindings a host
   ignores (it keeps `tab=program`, which a field honours, and
   `tab=default`), each key with `ReadKey`: on `ctrl`, `mod+a` and `ctrl+a`
@@ -698,23 +698,25 @@ host.
   once, where it was first bound, as its last binding wrote it, with its
   last action, as `key=action`, separated by a space. A key is written
   canonical, and one written with `mod` keeps it, first (`mod+shift+z`).
-- **`Resolve(platform, reader, own, tree…)`** builds the keymap a reader
+- **`Resolve(platform, reader, own, inner…)`** builds the keymap a reader
   reads (SPEC.md §10.2, *Keymaps*). `own` is the focused element's
-  `data-keys` value, and `tree` the `data-keys-tree` values from the
-  document's root down to it, its own last. The readers:
+  `data-keys` value, and `inner` the `data-keys-inner` values of the
+  elements from the document's root down to its parent, not its own. The
+  readers:
   - **`input`** and **`multiline`**, a text field: SPEC.md's default
     keymap for the Platform's `mod`, with its `Edit`, for an `input` or for
-    a multi-line field, then each `tree` value in turn, then `own`;
+    a multi-line field, then each `inner` value in turn, then `own`;
   - **`button`**, **`select`**, **`date`** and **`element`**, any other
     focused element, by its row of SPEC.md §10.2's first table: a button,
     an `input` of type `button`, `submit` or `reset`, a link, a summary, a
     checkbox or a radio button; a select; an `input` of a date or time
     type; and any other, such as one with a `tabindex`. No default keymap,
-    then each `tree` value, then `own`. With nothing focused the reader is
-    `element`, `own` is the body's `data-keys`, and `tree` the root's and
-    the body's `data-keys-tree`;
+    then each `inner` value, then `own`. With nothing focused the reader
+    is `element`, `own` is the body's `data-keys`, and `inner` the root's
+    and the body's `data-keys-inner`, since the body then stands for the
+    whole document;
   - **`selection`**, a selection in the document (SPEC.md §11): the
-    default keymap for an `input`, then `tree` and `own` as with nothing
+    default keymap for an `input`, then `inner` and `own` as with nothing
     focused.
 
   A binding its reader does not take is left out where it stands: it
@@ -722,14 +724,16 @@ host.
   the editing actions, `program` and `prefix`, and no scroll action. Any
   other element takes `program`, `prefix` and the scroll actions, and a
   selection `copy` from `own` only, and `program` and `prefix`. No reader
-  takes a `tree` binding to `program` or `prefix` of a key it uses: the
+  takes an `inner` binding to `program` or `prefix` of a key it uses: the
   keys a field types (`KeyText` has text for them), and an element's row
   of the table, unmodified or with `shift` only (a button's `space` and
   `enter`; a select's characters, `space`, `enter` and its moves; a date
   input's characters and keys). Each takes `default` from `own` only. In
-  an 0.8 session a host passes each `data-keys` value from the root down
-  as `tree`, and the focused element's as `own` too, or with nothing
-  focused and for a selection the body's (HOST.md §5.2). A binding to
+  an 0.8 session each `data-keys` is both its element's own and its
+  inner: a host passes the ancestors' `data-keys` values as `inner` and
+  the focused element's as `own`, or with nothing focused and for a
+  selection the root's and the body's as `inner` and the body's as `own`
+  (HOST.md §5.2). A binding to
   `default` gives the key back: `Lookup` then answers as with no keymap of
   the program's, from the default keymap or `insert`.
 - **`Binds(key)`** says whether a keymap binds the key, or, for a key with
@@ -754,7 +758,7 @@ host.
   to `program` (SPEC.md §10.2, a field may give the program `tab`); on any
   other keymap `Program("tab")` is false, and `tab` moves focus. On
   an element that is not a text field, a host asks it of
-  `Resolve(platform, reader, own, tree…)` with the element's reader, and
+  `Resolve(platform, reader, own, inner…)` with the element's reader, and
   with nothing focused of `element` for the body; a key it gives reaches
   the program before the element or a scroll uses it (SPEC.md §10.2, keys
   for the program).
@@ -773,7 +777,7 @@ host.
   that edits fields in cells is likely to share, but for `mod+a`, which
   selects all, as in a GUI field and SPEC.md's default keymap: `ctrl+a`
   on Linux, while on macOS `ctrl+a` stays the line's start. A program puts it in the
-  `data-keys-tree` of an element that holds its fields, and gives its
+  `data-keys-inner` of an element that holds its fields, and gives its
   cells rendition the same keymap, `Resolve(platform, input, "",
   TerminalKeys)`, or `multiline` for a multi-line field.
 

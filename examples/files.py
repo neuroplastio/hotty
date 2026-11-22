@@ -13,7 +13,7 @@ right-click is the terminal's own menu. They say `secondary` too, which an
 The menu's document is sent once, unplaced, and each open only places it and
 updates its items. It has the keyboard: Enter or a click does an item;
 Escape, a click elsewhere or a second right-click closes it. Tab and
-Shift+Tab move between items, and so do Up and Down: its data-keys-tree binds
+Shift+Tab move between items, and so do Up and Down: its data-keys-inner binds
 the arrows to `program` (SPEC §10.2) and the program turns them into a focus.
 A left click selects a row; q quits. --log appends every event as JSON lines.
 """
@@ -60,7 +60,7 @@ MENU = """
   .item:disabled { opacity: .4; background: none; }
   hr { margin: calc(var(--hotty-cell-h) / 2 - 1px) 3px; border: 0; border-top: 1px solid var(--hotty-ansi-8); }
 </style>
-<div id=card data-keys-tree="arrow_up=program arrow_down=program">
+<div id=card data-keys-inner="arrow_up=program arrow_down=program">
   <button class=item id=open data-on=click>Open</button>
   <button class=item id=rename data-on=click>Rename</button>
   <button class=item id=copy data-on=click>Copy path</button>

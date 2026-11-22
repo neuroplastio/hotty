@@ -395,19 +395,21 @@ switches what it reads and reports by the version it answered in.
 ### 5.2 Keymaps in an 0.8 session
 
 From 0.9 a keymap is written in two attributes, an element's own
-`data-keys` and the `data-keys-tree` that holds for what is inside it
+`data-keys` and the `data-keys-inner` that holds for what is inside it
 (SPEC.md §10.2, *Keymaps*). An 0.8 document wrote one, `data-keys`, which
 held for everything inside its element, as a 0.7 one did. A host that
 speaks 0.8 as well reads an 0.8 document's keymaps, and a 0.7 one's where
 it speaks 0.7 too, with the same resolver, from other attributes:
-- **Each `data-keys` is read as its element's `data-keys-tree`,** and the
-  focused element's as its own `data-keys` as well; with nothing focused,
-  and for a selection, the body's is its own as well, so an 0.8 body's
-  `mod+c=copy` or `default` still holds. An 0.8 wrapper's editing keys and
-  leader then reach the fields and buttons inside it, as 0.8 had them.
-  `data-keys-tree`, which 0.8 had not, is not read.
+- **Each `data-keys` is read as both its element's own `data-keys` and
+  its `data-keys-inner`.** The keymap is then 0.8's: every ancestor's
+  `data-keys` from the root down, then the focused element's. With
+  nothing focused, and for a selection, the root's and the body's hold as
+  inner, and the body's as its own, so an 0.8 body's `mod+c=copy` or
+  `default` still holds. An 0.8 wrapper's editing keys and leader reach
+  the fields and buttons inside it, as 0.8 had them. `data-keys-inner`,
+  which 0.8 had not, is not read.
 - **Each reader takes what 0.9 has it take,** so what still differs is
-  what 0.9 changed: a tree's `program` or `prefix` no longer takes a key
+  what 0.9 changed: an inner `program` or `prefix` no longer takes a key
   the element uses (a field types its characters, a button keeps
   `space`); `default` holds where the focused element writes it, not
   above it; a selection reads the root's and the body's keymaps, not those

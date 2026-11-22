@@ -2171,12 +2171,13 @@ def _uses(reader, k):
 
 def _takes(reader, k, a, own):
     """Whether the reader takes the binding of canonical key k to action a,
-    from the element's own data-keys (own) or a data-keys-tree. One it does
-    not take is as if it were not there: it neither acts nor overrides."""
+    from the element's own data-keys (own) or an ancestor's
+    data-keys-inner. One it does not take is as if it were not there: it
+    neither acts nor overrides."""
     if a == "default":
         return own
     if a in ("program", "prefix"):
-        # A data-keys-tree binding to program or prefix never takes a key
+        # A data-keys-inner binding to program or prefix never takes a key
         # the element uses itself.
         return own or not _uses(reader, k)
     if reader == "selection":
@@ -2186,15 +2187,16 @@ def _takes(reader, k, a, own):
     return reader in ("input", "multiline")
 
 
-def resolve(platform, reader, own="", *tree):
+def resolve(platform, reader, own="", *inner):
     """A keymap (SPEC.md §10.2, Keymaps) for a reader of READERS: the
     default keymap for a text field and a selection, then each
-    data-keys-tree value, the root's first, then the element's own
-    data-keys, each less the bindings the reader does not take. With
-    nothing focused, the reader is "element", `own` is the body's
-    data-keys, and `tree` the root's and the body's data-keys-tree. A
-    selection reads the same `own` and `tree` as that, and takes `copy`
-    from `own` only."""
+    data-keys-inner value of the focused element's ancestors, the root's
+    first and not the element's own, then the element's own data-keys,
+    each less the bindings the reader does not take. With nothing focused,
+    the reader is "element", `own` is the body's data-keys, and `inner`
+    the root's and the body's data-keys-inner, since the body stands for
+    the whole document. A selection reads the same `own` and `inner` as
+    that, and takes `copy` from `own` only."""
     if reader not in READERS:
         raise ValueError(f"resolve: no reader {reader!r}")
     platform = platform or Platform()
@@ -2215,7 +2217,7 @@ def resolve(platform, reader, own="", *tree):
                     m.bind(k, a, _read(key, platform.mod, True))
         m.base = Keymap(multiline, platform)
         m.base.bindings, m.base.written = dict(m.bindings), dict(m.written)
-    for v, is_own in [(v, False) for v in tree] + [(own or "", True)]:
+    for v, is_own in [(v, False) for v in inner] + [(own or "", True)]:
         for k, a, w in _bindings(platform, v):
             if _takes(reader, k, a, is_own):
                 m.bind(k, a, w)
