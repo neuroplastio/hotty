@@ -2421,9 +2421,11 @@ surface does not use.
   were not there, such as the editing actions a program gives its fields
   in a `data-keys-inner` above it, and the element uses those keys as the
   table at the start of §10.2 says.
-- **With no element focused,** as after focus fixup (§10.1), the keymap
-  is the `body`'s (*Keymaps*). A program that wants keys in a surface
-  with nothing to focus gives an element a `tabindex` and focuses it.
+- **With no element focused,** as after focus fixup (§10.1), the keymap is
+  the `body`'s (*Keymaps*). A program that wants keys in a surface with
+  nothing to focus writes them on the body, whose keymap holds with
+  nothing focused; one that gives an element a `tabindex` and focuses it
+  writes them in that element's own `data-keys`.
 
 **A key given back.** `key=default` in an element's own `data-keys` gives
 the key back to the host's own meaning, for that element, as if no element
@@ -2500,7 +2502,9 @@ binds the same keys on the element that scrolls on a surface:
 space=scroll-page-down shift+space=scroll-page-up b=scroll-page-up"`
 (`shift+space`, or it would page down as `space` does), for when it is
 focused, and the same in its `data-keys-inner`, for when a link inside it
-is. Its buttons keep `space`, and its fields type every letter.
+is. Where the root scrolls, its `data-keys-inner` alone does both, since
+it holds with nothing focused too. Its buttons keep `space`, and its
+fields type every letter.
 
 A program that keeps the keyboard, or scrolls only on a condition of its
 own, scrolls by the same steps with the `scroll` op (§6.1).
@@ -3802,8 +3806,8 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   - **Each reader takes what it has a use for.** One rule replaces two: a
     field leaving scroll actions out, and other elements letting editing
     actions override and then do nothing. A program's edit shortcuts go
-    once on its `body`: its fields take them, its buttons do not see them,
-    and a selection never reads them.
+    once in its body's `data-keys-inner`: its fields take them, its
+    buttons do not see them, and a selection never reads them.
   - **`program`, `prefix` and `default` are every reader's,** because they
     say where a key goes rather than what it does there. A selection that
     took only `copy` would copy on `ctrl+c` under `mod+c=program`, where a

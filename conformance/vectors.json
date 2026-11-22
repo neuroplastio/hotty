@@ -23661,6 +23661,86 @@
    ]
   },
   {
+   "name": "a scroller focused itself takes no scroll action from its own data-keys-inner: with data-keys-inner=\"j=scroll-down\" alone, j on the focused scroller reaches the program and nothing scrolls; with a button inside it focused, j scrolls it (SPEC \u00a710.2)",
+   "requires": "scroll",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}#v{height:calc(2*var(--hotty-cell-h));width:calc(8*var(--hotty-cell-w));overflow:auto}button{display:block;margin:0;padding:0;border:0;box-sizing:border-box;font:inherit;height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=v tabindex=0 data-keys-inner=\"j=scroll-down\"><button id=b0>0</button><button id=b1>1</button><button id=b2>2</button><button id=b3>3</button><button id=b4>4</button><button id=b5>5</button></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "2",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "focus",
+      "s": "x",
+      "t": "v",
+      "q": "2"
+     },
+     "events": []
+    },
+    {
+     "key": "j",
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      0,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "b0"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "b0",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "key": "j",
+     "terminal": false,
+     "events": []
+    }
+   ]
+  },
+  {
    "name": "a key given back, and what is inside: under a list whose data-keys-inner gives space, a and backspace to the program, a button presses on space, a key it uses, gives a on, and gives space by its own data-keys; a field types space and a, keys it types, gives backspace on, and with backspace=default in its own data-keys deletes; a list whose own data-keys gives space keeps it from a button inside it (SPEC \u00a710.2)",
    "steps": [
     {
