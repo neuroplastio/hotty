@@ -169,7 +169,7 @@ its platform calls so. Nothing here is on the wire: a program hears a
 | gesture | where it makes `contextmenu` |
 | --- | --- |
 | the mouse's secondary button | everywhere, unless an element with `rightbutton` takes the button (SPEC.md §9) |
-| the primary button with Control held | macOS, where AppKit makes it a context click; `ctrl` is then left out of `mods`, so that it reads as a secondary press does, and no `press` or `click` comes of it |
+| the primary button with Control held | macOS, where AppKit makes it a context click; `ctrl` is then left out of `mods`, so that it reads as the secondary button's does, and no `press` or `click` comes of it |
 | a pen's barrel button | where the platform reports one |
 | a touch held past the long-press time | everywhere, over an element that takes it (SPEC.md §9.1) |
 | the menu key, `context_menu` or `shift+f10` | only where the host reports it (below) |

@@ -3462,8 +3462,8 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     tell the key from the input it passes on.
   - **On macOS, Control** with the primary button is a context click, as
     AppKit makes it. `ctrl` is left out of its `mods`, though browsers
-    keep `ctrlKey`, so that a context click and a secondary press read
-    alike, and a program needs no check of the platform. It is no `press`
+    keep `ctrlKey`, so that a context click's `contextmenu` and the
+    secondary button's read alike, and a program needs no check of the platform. It is no `press`
     or `click`, since it is the menu's gesture and not the primary
     button's, and a press the program heard would select what the menu
     is for twice.
