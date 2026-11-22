@@ -200,11 +200,14 @@ An SDK **MUST** provide every component of this section.
 | `DefaultMax` | 16777216 (16 MiB), the most bytes a Decoder decodes one message to unless its `Max` says otherwise (§3.6) |
 
 And these sets, each value under its canonical name:
-- **event kinds**: `click`, `change`, `input`, `caret`, `submit`, `press`,
+- **event kinds**: `click`, `change`, `input`, `caret`, `submit`, `press`, `auxclick`,
   `focus`, `blur`, `fit`, `hover`, `view`, `dragstart`, `drag`, `dragend`,
   `command`, `caps` (SPEC.md §9);
 - **features**: `passthrough`, `hover`, `count`, `menu`, `backdrop`
   (SPEC.md §4);
+- **buttons**, as the DOM numbers them: `ButtonPrimary` 0, `ButtonMiddle` 1,
+  `ButtonSecondary` 2, `ButtonBack` 3, `ButtonForward` 4 (SPEC.md §9; a
+  later button is 6 or more, and has no name);
 - **modifier bits**: `ModShift` 1, `ModAlt` 2, `ModCtrl` 4, `ModSuper` 8
   (SPEC.md §9);
 - **error codes**: `EINVAL`, `ENOENT`, `ENOTARGET`, `EDETACHED`, `EQUOTA`,
@@ -598,19 +601,19 @@ carries, each absent when the event does not carry it:
 
 | name | holds | for |
 | --- | --- | --- |
-| `Value` | `value`, a string | `click`, `change`, `input` |
+| `Value` | `value`, a string | `click`, `auxclick`, `change`, `input` |
 | `Checked` | `checked`, a boolean | `change` |
 | `Rev` | `rev`: the control's revision (SPEC.md §6.4), which `SetField` sends back | `change`, `input`, `caret` |
 | `Sel` | `sel`: the selection, its anchor and its caret, in bytes of the value's UTF-8 (SPEC.md §6.4) | `input`, `caret` |
 | `Fields` | `fields`: the pairs of a name and a value, in order (SPEC.md §9) | `submit` |
-| `Mods` | `mods`: the modifier bits (§3.1), 0 when absent | `click`, `press`, `dragstart`, `drag`, `dragend` |
-| `Link` | `href`, and `url` if present | `click` on a link |
+| `Mods` | `mods`: the modifier bits (§3.1), 0 when absent | `click`, `press`, `auxclick`, `dragstart`, `drag`, `dragend` |
+| `Link` | `href`, and `url` if present | `click` or `auxclick` on a link |
 | `FitRows` | `r` | `fit` |
 | `Drag` | `c` and `r`; the steps `x` and `y` in the element dragged, and `tx` and `ty` in a `t` with `drop` (as `TX` and `TY` where the language capitalises), each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover` | `c` and `r`, or `out` | `hover` |
-| `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press` |
-| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 2 for a secondary press, 0 when absent, the primary button's | `press` |
-| `C`, `R` | `c` and `r`: the pointer's cell on a secondary press, each absent when the detail has none (SPEC.md §9) | `press` |
+| `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press`, `auxclick` |
+| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 2 for a secondary press, 1, 3, 4, or 6 and up for another button's, 0 when absent, the primary button's | `press`, `auxclick` |
+| `C`, `R` | `c` and `r`: the pointer's cell on a press of any button but the primary, and at an `auxclick`'s release, each absent when the detail has none (SPEC.md §9) | `press`, `auxclick` |
 | `Count` | `count`: the click's place in its run of clicks (SPEC.md §9), 2 for the second click of a double click; 1 for a click whose detail has none | `click` |
 | `View` | `Areas`, from `in`: each id in view to its cells as `Area` holds them, leaving out one whose area lacks a field, and none when `in` is absent; and `AtEnd`, from `end`, false when absent (SPEC.md §9.5) | `view` |
 | `Command` | `Name`, `Key` and `Text`, from `name`, `key` and `text`, each empty when absent, and `HasText`, whether `text` is there (SPEC.md §10.6); absent when the detail has no `name` | `command` |
@@ -618,7 +621,12 @@ carries, each absent when the event does not carry it:
 
 A handler of `press` that means the primary button checks `Button`: a
 secondary press comes to it too, from every element with `secondary` in its
-`data-on` (SPEC.md §9), and `T` names that element.
+`data-on` (SPEC.md §9), and `T` names that element, and so does another
+button's, from every element with `aux`. A program that takes other buttons
+acts on the `auxclick`, which comes on the release where the press began,
+as a platform acts on these buttons. It ignores a `Button` it does not
+use: a later version may report more. A press and an `auxclick` the SDK
+decodes give it any `Button` they carry, a later one included.
 
 The detail is read by the event's kind, so a form field named `value` is in
 `Fields` and nowhere else. An event of a kind the SDK does not know carries
@@ -954,6 +962,7 @@ A host that runs inside a test, so that a program's tests need no terminal.
 - **The user.** It plays the user: typing, pressing a key as SPEC.md §10.2
   has a host take it, clicking, filling a field, checking a box, choosing
   an option, submitting, pressing (with a button, the secondary included),
+  pressing and releasing another button (a `press`, then an `auxclick`),
   dragging, and any event the test makes
   up.
 - **Inspection.** The test reads each surface: its document, an element's
@@ -1161,6 +1170,7 @@ The canonical names, in each language's case.
 | `FitRows`, `Mods`, `CellCSS` | `FitRows`, `Mods`, `CellCSS` | `fit_rows`, `mods`, `cell_css` | as Python | as Python | `fitRows`, `mods`, `cellCss` |
 | `Button`, `C`, `R` | `Button`, `At` (`*hotty.Cell{Col, Row}`, nil when absent) | `button`, `c`, `r` | as Python | as Python | `button`, `c`, `r` |
 | `ModShift`, `ModAlt`, `ModCtrl`, `ModSuper` | `hotty.ModShift`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … | `MOD_SHIFT`, … |
+| `ButtonPrimary`, `ButtonMiddle`, `ButtonSecondary`, `ButtonBack`, `ButtonForward` | `hotty.ButtonPrimary`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … | `BUTTON_PRIMARY`, … |
 | a message as a `Reply` or an `Event`, `Err` | `hotty.ReplyOf(m)`, `hotty.EventOf(m)`, `hotty.Err(r)` | `m.reply()`, `m.event()`, `r.err()` | `m:reply()`, `m:event()`, `r:err()` | methods | `m.reply()`, `m.event()`, `r.err()` |
 | `Has`, `Light`, `Merge` | `hotty.HasFeature(c, feature)` (`hotty.Has` asks a control), `hotty.Light(c)`, `hotty.Merge(c, changed)` | `c.has(feature)`, `c.light()`, `c.merge(changed)` | `c:has(feature)`, … | methods | `c.has(feature)`, … |
 | `Command`, `Changed` | `Event.Command`, `Event.Changed` | `e.command`, `e.changed` | as Python | methods | `e.command`, `e.changed` |

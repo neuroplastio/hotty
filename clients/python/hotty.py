@@ -49,6 +49,7 @@ EVENT_INPUT = "input"
 EVENT_CARET = "caret"
 EVENT_SUBMIT = "submit"
 EVENT_PRESS = "press"
+EVENT_AUXCLICK = "auxclick"
 EVENT_FOCUS = "focus"
 EVENT_BLUR = "blur"
 EVENT_FIT = "fit"
@@ -75,6 +76,14 @@ FEATURE_HOVER = "hover"
 FEATURE_COUNT = "count"
 FEATURE_MENU = "menu"
 FEATURE_BACKDROP = "backdrop"
+
+# Buttons as the DOM numbers them (SPEC §9). Another button's press, and its
+# auxclick, carry 1, 3, 4, or 6 and up for a later one, which has no name.
+BUTTON_PRIMARY = 0
+BUTTON_MIDDLE = 1
+BUTTON_SECONDARY = 2
+BUTTON_BACK = 3
+BUTTON_FORWARD = 4
 
 # The modifier bits of an event's `mods` (SPEC §9).
 MOD_SHIFT = 1
@@ -795,6 +804,16 @@ _DRAG = {"c": "int", "r": "int", "mods": "int", "x": "int", "y": "int", "tx": "i
 _DETAIL = {
     EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA, "mods": "int", "count": "int"},
     EVENT_PRESS: {"button": "int", "area": _AREA, "c": "int", "r": "int", "mods": "int"},
+    EVENT_AUXCLICK: {
+        "button": "int",
+        "value": "str",
+        "href": "str",
+        "url": "str",
+        "area": _AREA,
+        "c": "int",
+        "r": "int",
+        "mods": "int",
+    },
     EVENT_CHANGE: {"checked": "bool", "value": "str", "rev": "int"},
     EVENT_INPUT: {"value": "str", "rev": "int", "sel": ("int", "int")},
     EVENT_CARET: {"sel": ("int", "int"), "rev": "int"},
@@ -825,7 +844,7 @@ class Event:
         self._d = self._body or {}
 
     def value(self):
-        if self.kind not in (EVENT_CLICK, EVENT_CHANGE, EVENT_INPUT):
+        if self.kind not in (EVENT_CLICK, EVENT_AUXCLICK, EVENT_CHANGE, EVENT_INPUT):
             return None
         return self._d.get("value")
 
@@ -852,14 +871,15 @@ class Event:
     def mods(self):
         """The modifier keys held, as bits (MOD_SHIFT, …); 0 when none was
         (SPEC §9)."""
-        if self.kind not in (EVENT_CLICK, EVENT_PRESS, EVENT_DRAG_START, EVENT_DRAG, EVENT_DRAG_END):
+        if self.kind not in (EVENT_CLICK, EVENT_PRESS, EVENT_AUXCLICK, EVENT_DRAG_START, EVENT_DRAG, EVENT_DRAG_END):
             return 0
         return self._d.get("mods", 0)
 
     def link(self):
-        """(href, url) of a link's click; url is None when there is none."""
+        """(href, url) of a link's click or auxclick; url is None when there
+        is none."""
         href = self._d.get("href")
-        if self.kind != EVENT_CLICK or href is None:
+        if self.kind not in (EVENT_CLICK, EVENT_AUXCLICK) or href is None:
             return None
         return href, self._d.get("url")
 
@@ -876,21 +896,23 @@ class Event:
         return Drag(c, r, d.get("x"), d.get("y"), d.get("tx"), d.get("ty"))
 
     def button(self):
-        """A press's button as the DOM numbers it (SPEC §9): 2 for a
-        secondary press, 0 for a press whose detail has none, the primary
-        button's. None for other kinds."""
-        if self.kind != EVENT_PRESS:
+        """A press's or an auxclick's button as the DOM numbers it (SPEC §9):
+        2 for a secondary press, 1, 3, 4, or 6 and up for another button's,
+        0 for a press whose detail has none, the primary button's. None for
+        other kinds. A program ignores a button it does not use."""
+        if self.kind not in (EVENT_PRESS, EVENT_AUXCLICK):
             return None
         return self._d.get("button", 0)
 
     def c(self):
-        """The pointer's column, in a secondary press (SPEC §9); None where
-        the detail has none."""
-        return self._d.get("c") if self.kind == EVENT_PRESS else None
+        """The pointer's column, in a press of any button but the primary,
+        and at an auxclick's release (SPEC §9); None where the detail has
+        none."""
+        return self._d.get("c") if self.kind in (EVENT_PRESS, EVENT_AUXCLICK) else None
 
     def r(self):
         """The pointer's row, as c is."""
-        return self._d.get("r") if self.kind == EVENT_PRESS else None
+        return self._d.get("r") if self.kind in (EVENT_PRESS, EVENT_AUXCLICK) else None
 
     def count(self):
         """A click's place in its run of clicks (SPEC §9): 2 for the second
@@ -900,8 +922,8 @@ class Event:
         return self._d.get("count") or 1
 
     def area(self):
-        """The cells of a click's or a press's element (SPEC §9)."""
-        a = self._d.get("area") if self.kind in (EVENT_CLICK, EVENT_PRESS) else None
+        """The cells of a click's, a press's or an auxclick's element (SPEC §9)."""
+        a = self._d.get("area") if self.kind in (EVENT_CLICK, EVENT_PRESS, EVENT_AUXCLICK) else None
         if a is None or any(k not in a for k in "crwh"):
             return None
         return Area(a["c"], a["r"], a["w"], a["h"])

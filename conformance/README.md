@@ -52,7 +52,10 @@ it. A list names several, all required:
 - `"touch"`, a host that takes touch (SPEC §9.1, §16);
 - `"commands"`, a host with a terminal that takes edit commands (§10.6);
 - `"mouse"`, a host with a terminal that reports the mouse (§9.6), whose
-  runner tells what it reported (Touch, below);
+  runner tells what it reported (Pointer and Touch, below);
+- `"primary"`, a host on a platform where a middle press pastes the
+  primary selection (SPEC §9, *A text field pastes*): Linux, with the
+  host's setting for it on;
 - `"undo"`, a host whose text fields keep a history and cut (§10.2);
 - `"pressed"`, a host that sees the key the user pressed (§10.4): its
   runner offers a key step's key as pressed, by both its names, and then
@@ -120,11 +123,15 @@ checked).
   another surface `s`, with no button down, takes the pointer off the one
   it was on, as a terminal does: that one is left first (SPEC §9.4).
 - `"down"` and `"up"` press and release a button where the pointer is.
-  `"button"` is the button, as the DOM numbers it (0 the primary, 2 the
-  secondary); 0 when absent. A runner presses it as the host's platform
-  would: a GTK secondary button, a browser's `pointerdown` with button 2
-  and the `contextmenu` that follows. The `"keys"` held apply as for any
-  button, so a secondary press with Shift or Alt is a step too.
+  `"button"` is the button, as the DOM numbers it (0 the primary, 1 the
+  middle, 2 the secondary, 3 back, 4 forward, SPEC §9); 0 when absent. A
+  runner presses it as the host's platform would: GTK's button 3 for the
+  secondary, and 2, 8 and 9 for the middle, back and forward; a browser's
+  `pointerdown` with the button, and for the secondary the `contextmenu`
+  that follows, for another button the `mouseup` and the `auxclick`. A
+  `"down"` while another button is down presses a second one. The
+  `"keys"` held apply as for any button, so a secondary press with Shift
+  or Alt is a step too.
 - `"wheel"` turns the wheel where the pointer is, by `"by": [c, r]`, columns
   and rows of the surface (positive: right and down), a cell's pixels each.
   It is one gesture: a runner may send it as several wheel events (a
@@ -141,6 +148,12 @@ checked).
 - `"through"`: `true` if the step passes through the surface (SPEC §9.3),
   as it passes a backdrop (§5.2), `false` if the surface gets it. Absent:
   not checked.
+- `"mouse"`, for `"down"` and `"up"`, in a vector that requires
+  `"mouse"`: what the terminal reported of the mouse's buttons for the
+  step (SPEC §9, §9.2), each `[kind, button]`, `kind` `"down"` or `"up"`
+  and `button` the DOM's number for the button the report names (SGR's 0,
+  1, 2, 128 and 129 are 0, 1, 2, 3 and 4), its cell and its modifiers not
+  checked; `[]` for nothing, and absent, not checked.
 - `"terminal"`, for a wheel: `true` if the gesture went on to the terminal,
   as over the cells beneath (SPEC §9), `false` if it did not (the document
   scrolled, `overscroll-behavior` stopped it, or the host kept it from

@@ -11848,6 +11848,2419 @@
    ]
   },
   {
+   "name": "another button's press on an element with aux in its data-on is a press with its button, its area and the pointer's cell, whatever p says, and its release there an auxclick with the same, the cell and the keys held then; the nearest such element wins (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      7,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "o",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 9,
+         "h": 3
+        },
+        "c": 7,
+        "r": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "o",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 9,
+         "h": 3
+        },
+        "c": 7,
+        "r": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [],
+     "keys": [
+      "super"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1,
+        "mods": 8
+       }
+      }
+     ],
+     "keys": [
+      "super"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1,
+        "mods": 8
+       }
+      }
+     ],
+     "keys": [
+      "super"
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "back and forward come under the same aux as the middle button, with button 3 and 4; an element with click as well hears no click from them (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "k",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 3,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "button": 3,
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        },
+        "c": 1,
+        "r": 4
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 3,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "button": 3,
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        },
+        "c": 1,
+        "r": 4
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 4,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "button": 4,
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        },
+        "c": 1,
+        "r": 4
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 4,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "button": 4,
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        },
+        "c": 1,
+        "r": 4
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      7,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 3,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "o",
+       "detail": {
+        "button": 3,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 9,
+         "h": 3
+        },
+        "c": 7,
+        "r": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 3,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "o",
+       "detail": {
+        "button": 3,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 9,
+         "h": 3
+        },
+        "c": 7,
+        "r": 2
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "another button released anywhere but on the element it was pressed on reports nothing, its moves report nothing, and one moved off and back is an auxclick; the element is the nearest with aux, so a release on its ancestor is elsewhere (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      7,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "while another button is held no hover is sent, and its release reports where the pointer is then (SPEC \u00a79, \u00a79.4)",
+   "requires": "hover",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0",
+      "v": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [
+      {
+       "e": "hover",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "hover",
+       "s": "x",
+       "t": "n",
+       "detail": {
+        "c": 11,
+        "r": 0
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "another button over an element without aux is the terminal's, whatever p asked for and whatever else the element takes: the program that reads the mouse hears it, and with Alt held it does over an element with aux too (SPEC \u00a79, \u00a79.2)",
+   "requires": "mouse",
+   "steps": [
+    {
+     "write": "\u001b[?1002h\u001b[?1006h"
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "mouse": [
+      [
+       "down",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "mouse": [
+      [
+       "up",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "s",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "mouse": [
+      [
+       "down",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "mouse": [
+      [
+       "up",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      15,
+      5
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "mouse": [
+      [
+       "down",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "mouse": [
+      [
+       "up",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 3,
+     "events": [],
+     "mouse": [
+      [
+       "down",
+       3
+      ]
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 3,
+     "events": [],
+     "mouse": [
+      [
+       "up",
+       3
+      ]
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [],
+     "keys": [
+      "alt"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "keys": [
+      "alt"
+     ],
+     "mouse": [
+      [
+       "down",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "keys": [
+      "alt"
+     ],
+     "mouse": [
+      [
+       "up",
+       1
+      ]
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ],
+     "mouse": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ],
+     "mouse": []
+    },
+    {
+     "write": "\u001b[?1002l"
+    }
+   ]
+  },
+  {
+   "name": "another button with Shift held is the terminal's and with Alt the program's, over an element with aux too, and Alt gives the keyboard back; Alt pressed after the press changes only the auxclick's mods (SPEC \u00a79.2)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "f",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "f"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "k",
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 3,
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 3,
+     "events": [],
+     "keys": [
+      "shift"
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [],
+     "keys": [
+      "alt"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "blur",
+       "s": "x"
+      }
+     ],
+     "keys": [
+      "alt"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "keys": [
+      "alt"
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": [],
+     "keys": [
+      "shift",
+      "alt"
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "keys": [
+      "shift",
+      "alt"
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "keys": [
+      "shift",
+      "alt"
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1,
+        "mods": 2
+       }
+      }
+     ],
+     "keys": [
+      "alt"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "another button's press does nothing else: no click on its release, even on an element with click, and no focus: a focused field keeps the keyboard, with no blur or focus, until a primary click elsewhere (SPEC \u00a79, \u00a710.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "f",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "f"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "k",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        },
+        "c": 1,
+        "r": 4
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        },
+        "c": 1,
+        "r": 4
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      7,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "o",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 9,
+         "h": 3
+        },
+        "c": 7,
+        "r": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "o",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 9,
+         "h": 3
+        },
+        "c": 7,
+        "r": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "n",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "k",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "blur",
+       "s": "x"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": [
+      {
+       "e": "click",
+       "s": "x",
+       "t": "k",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 4,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "secondary and aux do not cross: secondary brings no other button, aux no secondary press, and an element with both hears each; a primary press on an element with aux is as it was, a press with no button only when the surface asks for presses (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#s{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#a{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#b{left:calc(8*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=s data-on=secondary>s</i><i id=a data-on=aux>a</i><i id=b data-on=\"secondary aux\">b</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "s",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "b",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 8,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 9,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 8,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 9,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "b",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 8,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 9,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "1"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "a",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "area": {
+         "c": 4,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "one button at a time: another button pressed during a drag is not reported and does not end it, and a primary press during another button's press is not reported, which then still makes its auxclick (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#d{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#i{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=d data-on=\"drag aux\">d</i><i id=i data-on=aux>i</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "d",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "d",
+       "detail": {
+        "c": 1,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "d",
+       "detail": {
+        "c": 1,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 4,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 5,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 4,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 5,
+        "r": 0
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "one button at a time, for the terminal too: the middle button pressed during a drag of an element without aux, or during a secondary press, reaches neither the surface nor the program's mouse reporting (SPEC \u00a79)",
+   "requires": "mouse",
+   "steps": [
+    {
+     "write": "\u001b[?1002h\u001b[?1006h"
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#g{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}</style><i id=g data-on=drag>g</i><i id=s data-on=secondary>s</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "g",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "dragstart",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "c": 1,
+        "r": 0
+       }
+      }
+     ],
+     "mouse": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "mouse": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "mouse": []
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": [
+      {
+       "e": "dragend",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "c": 1,
+        "r": 0
+       }
+      }
+     ],
+     "mouse": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "s",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "s",
+       "detail": {
+        "button": 2,
+        "area": {
+         "c": 4,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 5,
+        "r": 0
+       }
+      }
+     ],
+     "mouse": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "mouse": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "mouse": []
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": [],
+     "mouse": []
+    },
+    {
+     "write": "\u001b[?1002l"
+    }
+   ]
+  },
+  {
+   "name": "what ends a drag early ends another button's press, with no auxclick: its placement hidden, or a new document (SPEC \u00a79, \u00a79.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "hide",
+      "s": "x",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": []
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#o{left:0;top:0;width:calc(9*var(--hotty-cell-w));height:calc(3*var(--hotty-cell-h))}#i{left:calc(3*var(--hotty-cell-w));top:calc(1*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#n{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#k{left:0;top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#s{left:calc(4*var(--hotty-cell-w));top:calc(4*var(--hotty-cell-h));width:calc(3*var(--hotty-cell-w))}#f{left:calc(10*var(--hotty-cell-w));top:calc(2*var(--hotty-cell-h));width:calc(6*var(--hotty-cell-w))}</style><b id=o data-on=aux><u id=i data-on=aux>i</u></b><i id=n>n</i><i id=k data-on=\"aux click\">k</i><i id=s data-on=\"secondary click\">s</i><input id=f type=text>"
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "i",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 3,
+         "r": 1,
+         "w": 3,
+         "h": 1
+        },
+        "c": 4,
+        "r": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "an auxclick's detail is a click's: a link without an id is reported by its href, with its area, and an element's value comes with it; another element without an id has no t and no area; a hyperlink's own aux counts for nothing, so a press on one is the terminal's unless an element with aux holds it, and no auxclick carries its href (SPEC \u00a79)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}a.l{left:0;top:0;width:calc(4*var(--hotty-cell-w))}#v{left:calc(5*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}a.h{left:calc(10*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}i.q{left:calc(14*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w))}#w{left:0;top:calc(2*var(--hotty-cell-h));width:calc(9*var(--hotty-cell-w))}#w a{left:0;top:0;width:calc(3*var(--hotty-cell-w))}</style><a class=l href=next data-on=aux>next</a><i id=v value=x data-on=aux>v</i><a class=h href=\"https://example.com/h\" target=_blank data-on=aux>h</a><i class=q data-on=aux>q</i><b id=w data-on=aux><a href=\"https://example.com/w\" target=_blank data-on=aux>w</a></b>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      2,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "button": 1,
+        "c": 2,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "button": 1,
+        "href": "next",
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        },
+        "c": 2,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "v",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "v",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 5,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 6,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "v",
+       "detail": {
+        "button": 1,
+        "value": "x",
+        "area": {
+         "c": 5,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 6,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      11,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      15,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "button": 1,
+        "c": 15,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": null,
+       "detail": {
+        "button": 1,
+        "c": 15,
+        "r": 0
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      2
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "w",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 2,
+         "w": 9,
+         "h": 1
+        },
+        "c": 1,
+        "r": 2
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "w",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 2,
+         "w": 9,
+         "h": 1
+        },
+        "c": 1,
+        "r": 2
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "another button passes through where the surface takes no pointer, even over an element with aux, and is taken where it does (SPEC \u00a79, \u00a79.3)",
+   "requires": "passthrough",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>html{pointer-events:none}body{margin:0}i{position:absolute;display:block;height:var(--hotty-cell-h);font-style:normal}#p{left:0;top:0;width:calc(3*var(--hotty-cell-w))}#q{left:calc(4*var(--hotty-cell-w));top:0;width:calc(3*var(--hotty-cell-w));pointer-events:auto}</style><i id=p data-on=aux>p</i><i id=q data-on=aux>q</i>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "p",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [],
+     "through": true
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [],
+     "through": true
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "q",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 4,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 5,
+        "r": 0
+       }
+      }
+     ],
+     "through": false
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "q",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 4,
+         "r": 0,
+         "w": 3,
+         "h": 1
+        },
+        "c": 5,
+        "r": 0
+       }
+      }
+     ],
+     "through": false
+    }
+   ]
+  },
+  {
+   "name": "where a middle press pastes the primary selection, a text field takes it as a browser's does, focusing it, though an element around it has aux; a field with aux of its own is reported as any element (SPEC \u00a79)",
+   "requires": "primary",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}b,i,u,a,input{position:absolute;display:block;box-sizing:border-box;height:var(--hotty-cell-h);font-style:normal;font-weight:normal;text-decoration:none;margin:0;padding:0}#w{left:0;top:0;width:calc(12*var(--hotty-cell-w));height:calc(2*var(--hotty-cell-h))}#f{left:calc(1*var(--hotty-cell-w));top:0;width:calc(5*var(--hotty-cell-w))}#g{left:0;top:calc(3*var(--hotty-cell-h));width:calc(5*var(--hotty-cell-w))}#h{left:calc(7*var(--hotty-cell-w));top:calc(3*var(--hotty-cell-h));width:calc(5*var(--hotty-cell-w))}</style><b id=w data-on=aux><input id=f type=text></b><input id=g type=text data-on=aux><input id=h type=text>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "6",
+      "q": "2",
+      "p": "0"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "f",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 0,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "f"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 0,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "h",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "focus",
+       "s": "x",
+       "t": "h"
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "g",
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 3,
+         "w": 5,
+         "h": 1
+        },
+        "c": 2,
+        "r": 3
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 3,
+         "w": 5,
+         "h": 1
+        },
+        "c": 2,
+        "r": 3
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      10,
+      1
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 1,
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "w",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 12,
+         "h": 2
+        },
+        "c": 10,
+        "r": 1
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "button": 1,
+     "events": [
+      {
+       "e": "auxclick",
+       "s": "x",
+       "t": "w",
+       "detail": {
+        "button": 1,
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 12,
+         "h": 2
+        },
+        "c": 10,
+        "r": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "area counts from the surface's top left cell, not its window's",
    "steps": [
     {
@@ -28997,6 +31410,237 @@
       "button": 0,
       "c": null,
       "r": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "another button's press carries its button and the pointer's cell, and a later button reads as its number; an auxclick carries a click's detail, its href, url and value, with the button and the release's cell and mods, and no count; a button that is no int makes the body undecodable, and the detail is read as none (SPEC \u00a73.3, \u00a79)",
+   "seqs": [
+    "\u001b]7279;a=ev:s=f:e=press:t=tab;hKZidXR0b24BpGFyZWGEoWMCoXIAoXcIoWgBoWMFoXIA\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press;hKZidXR0b24DoWMBoXIApG1vZHME\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press:t=tab;hKZidXR0b24HpGFyZWGEoWMCoXIAoXcIoWgBoWMDoXIA\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=auxclick:t=tab;haZidXR0b24BpGFyZWGEoWMCoXIAoXcIoWgBoWMGoXIApG1vZHMC\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=auxclick;hqZidXR0b24BpGhyZWakbmV4dKN1cmy4aHR0cHM6Ly9leGFtcGxlLmNvbS9uZXh0pGFyZWGEoWMAoXIBoXcEoWgBoWMBoXIB\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=auxclick:t=v;haZidXR0b24EpXZhbHVloXikYXJlYYShYwChcgKhdwOhaAGhYwChcgI=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=auxclick:t=tab;g6ZidXR0b26hMaFjAKFyAA==\u001b\\"
+   ],
+   "bodies": [
+    {
+     "button": 1,
+     "area": {
+      "c": 2,
+      "r": 0,
+      "w": 8,
+      "h": 1
+     },
+     "c": 5,
+     "r": 0
+    },
+    {
+     "button": 3,
+     "c": 1,
+     "r": 0,
+     "mods": 4
+    },
+    {
+     "button": 7,
+     "area": {
+      "c": 2,
+      "r": 0,
+      "w": 8,
+      "h": 1
+     },
+     "c": 3,
+     "r": 0
+    },
+    {
+     "button": 1,
+     "area": {
+      "c": 2,
+      "r": 0,
+      "w": 8,
+      "h": 1
+     },
+     "c": 6,
+     "r": 0,
+     "mods": 2
+    },
+    {
+     "button": 1,
+     "href": "next",
+     "url": "https://example.com/next",
+     "area": {
+      "c": 0,
+      "r": 1,
+      "w": 4,
+      "h": 1
+     },
+     "c": 1,
+     "r": 1
+    },
+    {
+     "button": 4,
+     "value": "x",
+     "area": {
+      "c": 0,
+      "r": 2,
+      "w": 3,
+      "h": 1
+     },
+     "c": 0,
+     "r": 2
+    },
+    {
+     "button": "1",
+     "c": 0,
+     "r": 0
+    }
+   ],
+   "results": [
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ],
+   "invalid": 0,
+   "messages": [
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press",
+      "t": "tab"
+     },
+     "event": {
+      "kind": "press",
+      "target": "tab",
+      "button": 1,
+      "area": {
+       "c": 2,
+       "r": 0,
+       "w": 8,
+       "h": 1
+      },
+      "c": 5,
+      "r": 0,
+      "mods": 0
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press"
+     },
+     "event": {
+      "kind": "press",
+      "target": "",
+      "button": 3,
+      "area": null,
+      "c": 1,
+      "r": 0,
+      "mods": 4
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press",
+      "t": "tab"
+     },
+     "event": {
+      "kind": "press",
+      "target": "tab",
+      "button": 7,
+      "c": 3,
+      "r": 0
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "auxclick",
+      "t": "tab"
+     },
+     "event": {
+      "kind": "auxclick",
+      "target": "tab",
+      "button": 1,
+      "area": {
+       "c": 2,
+       "r": 0,
+       "w": 8,
+       "h": 1
+      },
+      "c": 6,
+      "r": 0,
+      "mods": 2,
+      "link": null,
+      "value": null,
+      "count": null
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "auxclick"
+     },
+     "event": {
+      "kind": "auxclick",
+      "target": "",
+      "button": 1,
+      "link": {
+       "href": "next",
+       "url": "https://example.com/next"
+      },
+      "area": {
+       "c": 0,
+       "r": 1,
+       "w": 4,
+       "h": 1
+      },
+      "c": 1,
+      "r": 1
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "auxclick",
+      "t": "v"
+     },
+     "event": {
+      "kind": "auxclick",
+      "target": "v",
+      "button": 4,
+      "value": "x",
+      "link": null,
+      "c": 0,
+      "r": 2
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "auxclick",
+      "t": "tab"
+     },
+     "event": {
+      "kind": "auxclick",
+      "target": "tab",
+      "button": 0,
+      "c": null,
+      "r": null,
+      "area": null
      }
     }
    ]

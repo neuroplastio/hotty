@@ -1191,7 +1191,8 @@ reads hotty messages from its input. A detached surface sends none (§5.5).
 | `input` | every edit of a control with `data-on~=input` | `{"value": str, "rev": int}`, with `"sel": [int, int]`, the selection after it, in a text field with `data-on~=caret` (below) |
 | `caret` | in a text field with `data-on~=caret`, the user moved the selection, and no `input` says so: a move, a click, or an edit in a field without `data-on~=input` | `{"sel": [int, int], "rev": int}`: the selection, its anchor then its caret, as `a=field` counts them (§6.4) |
 | `submit` | a form submitted (a submit button, or Enter in a text field, after the `change` it commits) | `{"fields": [[str, str]]}`: the form's fields, each its name and its value, in tree order, the submitter's included; `[]` for a form with none |
-| `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface whose `p` is on (§5.2); or a secondary press (below) on an element with `secondary` in its `data-on`, whether `p` is on or not; except a mouse's or a pen's press with Alt held, and a secondary press with Shift held (§9.2), where the pointer passes through (§9.3), and on a backdrop (§5.2) | `{"area": area, "mods": int}`: the cells of the element `t` names (below), and the modifier keys held; no `area` without `t`. A secondary press has `{"button": 2, "area": area, "c": int, "r": int, "mods": int}`: the button as the DOM numbers it (`MouseEvent.button`; a primary press has no `button`, which means 0), and the pointer's cell (§9.1) |
+| `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface whose `p` is on (§5.2); or a secondary press (below) on an element with `secondary` in its `data-on`, or a press of another button (below) on an element with `aux` in its `data-on`, whether `p` is on or not; except a mouse's or a pen's press with Alt held, and a press of any button but the primary with Shift held (§9.2), where the pointer passes through (§9.3), and on a backdrop (§5.2) | `{"area": area, "mods": int}`: the cells of the element `t` names (below), and the modifier keys held; no `area` without `t`. A secondary press has `{"button": 2, "area": area, "c": int, "r": int, "mods": int}`: the button as the DOM numbers it (`MouseEvent.button`; a primary press has no `button`, which means 0), and the pointer's cell (§9.1). A press of another button has the same, with its own `button` (below) |
+| `auxclick` | another button (below), pressed on an element with `aux` in its `data-on`, released where it was pressed | `{"button": int, "area": area, "c": int, "r": int, "mods": int}`: as a `click`'s, with `"href": str` and `"url": str` for links and `"value": str` when the element has a `value` attribute, but no `count`; with the button, and the pointer's cell and the modifier keys held at the release; no `area` without `t`, but a link's |
 | `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2) | `{"c": int, "r": int, "mods": int}`: the pointer's cell and the modifier keys held, with `"x": int` and `"y": int`, its step, on an element with `data-steps` (§9.1) |
 | `drag` | during a drag, the element under the pointer changed, or the pointer's step in the dragged element or in `t` (§9.1) | the same, with `"tx": int` and `"ty": int`, the step in `t`, where `t` has `drop` in its `data-on` and `data-steps` (§9.1) |
 | `dragend` | the drag ended: the button released or the finger lifted, wherever the pointer is (§9.1) | as for `drag` |
@@ -1224,6 +1225,7 @@ the program asked for it, and as often as this table says:
 | `dragstart`, `drag`, `dragend` | the element: `drag` in its `data-on`, and `drop` for a target (§9.1) | from a press to its release | for each element, cell or step crossed (§9.1) |
 | `press` | `p=1` on the surface (§5.2) | until `p=0` | each press |
 | `press` (secondary) | the element: `secondary` in its `data-on` | while it has it | each secondary press |
+| `press` (another button), `auxclick` | the element: `aux` in its `data-on` | while it has it | each press, and each release where it was pressed |
 | `hover` | `v=1` on the surface (§5.2) | until `v=0` | each change, at most one a frame (§9.4) |
 | `fit` | `f=1` on the surface (§5.2) | until `f=0` | at most one a frame, with the rows of the layout drawn in it |
 | `view` | the element: `view` in its `data-on` (§9.5) | while it has it | once a scroll rests, else at most one a frame |
@@ -1269,7 +1271,7 @@ the program asked for it, and as often as this table says:
 - **A press** is reported whatever it lands on: a control, an element with
   a handler, plain text, or empty space. `t` is the id of the nearest
   element that has one, from the pressed element outward, and absent if
-  none has (for a secondary press, see below). It comes before every other event the press causes, on this
+  none has (for a secondary press and another button's, see below). It comes before every other event the press causes, on this
   surface or another (`change`, `blur`, `focus`), and so before the `click`
   its release may make. A press the host takes for a hyperlink's own
   gesture (below) is the terminal's, and is not reported, and neither is
@@ -1297,6 +1299,70 @@ the program asked for it, and as often as this table says:
     outside a surface, a secondary press is the terminal's, as over the
     cells, and the surface hears nothing of it.
   - **Shift and Alt** make it the terminal's or the program's (§9.2).
+- **Another button** is a mouse's button other than the primary and the
+  secondary: the middle button, back and forward, and any other the
+  platform reports. What the platform makes one of them is one, such as a
+  touchpad's three-finger tap, which Linux makes the middle button. Its
+  `button` is its number as the DOM gives it: 1 the middle button, 3 back,
+  4 forward. A button the DOM has no number for is 6 or more, in the order
+  the platform numbers its buttons (HOST.md). A host **MUST NOT** send
+  `button` 5 in this version: Pointer Events give it to a pen's eraser.
+  - **One subscription for every button.** An element takes them all with
+    `aux` in its `data-on`, as `secondary` is one subscription for every
+    gesture of a secondary press: the surface needs no `p`, and `p` alone
+    never brings one. `aux` never takes the secondary button, which is a
+    secondary press. The DOM's `auxclick` comes for every button but the
+    primary; hotty's leaves the secondary out too.
+  - **The press, then its release.** The press is reported as a `press`
+    whose `t` is the nearest element with `aux`, from the pressed element
+    outward, that is not a hyperlink (below), with its `button`, and `c`
+    and `r`, the pointer's cell, as a secondary press has them. Until the
+    button is released, the pointer is the surface's, as in a drag
+    (§9.1), and its moves go nowhere. A release where that element is
+    again the nearest with `aux` under the pointer reports `auxclick`,
+    with the cell and the modifier keys held then: the press decides
+    (§9.2), so a key pressed in between changes only `mods`. A release
+    anywhere else reports nothing. What ends a drag early (§9.1) ends it,
+    with no `auxclick`, and nothing says so.
+  - **Without an id**, the element is reported with no `t` and no `area`,
+    as for a secondary press. A link is the exception, as for a `click`:
+    its `auxclick` carries its `href`, and its `area`.
+  - **It does nothing else.** No `click`, no drag, no selection, no change
+    of focus or of the keyboard (§10.1), and the terminal does nothing with
+    it: no paste of the primary selection, no mouse report to the program.
+  - **One button at a time.** While a press a surface took is held (a
+    primary press or a drag, a secondary press, or another button's), a
+    press of any other button is not reported and goes nowhere: not to
+    the terminal, nor to the program's mouse reporting. Its release goes
+    nowhere too.
+  - **Only where asked.** Over an element without `aux`, inside or outside
+    a surface, the press is the terminal's, as over the cells, and the
+    surface hears nothing of it. The terminal does what it does with the
+    press there: it pastes the primary selection, say, or reports the
+    press to a program that reads the mouse. A press on a hyperlink is the
+    terminal's too, unless an element with `aux` holds it: a hyperlink
+    belongs to the terminal (below), and its own `aux` counts for nothing.
+    An `auxclick` never carries a hyperlink's `href`.
+  - **A text field pastes.** On a platform where a middle press pastes the
+    primary selection, as Linux's do where the host's settings let it (such
+    as Ghostty's `middle-click-action`), a middle press on a text field
+    (§10.2) is the field's, as in a browser. The field takes focus, as a
+    click on it would (§10.1). The primary selection goes in at the
+    pointer, as if typed, with the field's own `input`, `caret` and
+    `change`. Nothing else hears of the press. A field with `aux` in its
+    own `data-on` takes the press as any element does, and the surface
+    reports it. An `aux` on an element around the field does not take it.
+    Elsewhere, and for back, forward and the later buttons, a field is like
+    any other element.
+  - **A host that cannot keep a button's own action** from its platform,
+    such as a browser's history navigation for back and forward, does not
+    report that button (HOST.md). It stays the platform's wherever it is
+    pressed. A program offers another way to do what a button does, a key
+    or a control, as it does for a secondary press.
+  - **Buttons a program does not use.** A program **MUST** ignore a
+    `press` or an `auxclick` whose `button` it does not use: later
+    versions report more buttons.
+  - **Shift and Alt** make it the terminal's or the program's (§9.2).
 - **Links.** A link's detail carries `href`, the program's value, and `url`,
   the `href` resolved against the document's base URL (§7.3). `url` is
   absent when it would be under `https://hotty.invalid/`.
@@ -1315,10 +1381,12 @@ the program asked for it, and as often as this table says:
     and a setting that turns hyperlinks off.
 
   Its address is its `url`: a link without one is not a hyperlink. A click
-  on a hyperlink is not reported.
+  on a hyperlink is not reported, and neither is another button's press on
+  it (above).
 - **Local behaviour stays local.** HTML's own default actions happen in the
   host without a round trip:
-  - focus, the caret and typing in text fields;
+  - focus, the caret and typing in text fields, and a middle press's
+    paste into one (above);
   - toggling checkboxes, radio buttons and `<details>`;
   - hover, and the pointer's shape: `:hover` needs no program (a
     placement may still ask to hear where the pointer is, §9.4). Over a
@@ -1497,17 +1565,19 @@ let go. An element that is only a place to drop on opts in with `drop`
 
 ### 9.2 Presses with Alt
 
-A press of the primary or the secondary button (§9) with Alt held is the
-program's, never a surface's. Wherever it lands, in any window and whatever
+A press of any button (§9) with Alt held is the program's, never a
+surface's. Wherever it lands, in any window and whatever
 its `z`, the host handles it as a press on the cells beneath the surface.
 
 - **With mouse reporting on,** the program hears it as it hears a press on
   the cells, Alt included: in the SGR encoding, `CSI < 8 ; <col> ; <row> M`
-  for the primary button, `CSI < 10 ; <col> ; <row> M` for the secondary.
+  for the primary button, `CSI < 10 ; <col> ; <row> M` for the secondary,
+  and each other button's code with 8 added to it: `CSI < 9` for the
+  middle button, `CSI < 136` and `CSI < 137` for back and forward.
   With mouse reporting off, the terminal does what it does with such a
   press on the cells, such as starting a rectangular selection.
 - **The surface hears nothing of it.** No `press`, whatever `p` asked for,
-  no `dragstart`, and no `click` on its release. It takes no focus, starts
+  no `dragstart`, and no `click` or `auxclick` on its release. It takes no focus, starts
   no selection, and opens no hyperlink. The surface under the pointer is no
   longer hovered: the pointer has left its window (§9.4).
 - **The keyboard** goes back to the terminal, as on a click on the cells
@@ -1524,11 +1594,13 @@ its `z`, the host handles it as a press on the cells beneath the surface.
   is about text, and a press has none.
 - **Mouse and pen only.** A tap is a click whatever the keys held, and a
   touch with Alt held scrolls (§9.1).
-- **Shift gives the terminal's menu.** A secondary press with Shift held
-  is the terminal's, even over an element with `secondary` in its
-  `data-on`: the host handles it as a secondary press on the cells beneath
-  the surface, and the terminal does what it does with one, such as opening
-  its own menu, with copy and paste. Shift is the terminal's way past a
+- **Shift gives the terminal its buttons.** A press of any button but the
+  primary with Shift held is the terminal's, even over an element with
+  `secondary` or `aux` in its `data-on`, and over a text field: the host
+  handles it as that press on the cells beneath the surface, and the
+  terminal does what it does with one, such as opening its own menu, with
+  copy and paste, for the secondary button, or pasting the primary
+  selection for the middle one. Shift is the terminal's way past a
   program's mouse reporting too. The surface hears nothing of it, as of a
   press with Alt, and the program no `press`. A primary press with Shift
   held is as without it.
@@ -1558,7 +1630,7 @@ the window were not there:
   gesture whose press a surface took (a drag, §9.1) stays that surface's
   over the parts that take no pointer.
 - **The surface hears nothing of it:** no `press`, whatever `p` asked for,
-  no `dragstart` and no `click`; it takes no focus and starts no selection.
+  no `dragstart`, no `click` and no `auxclick`; it takes no focus and starts no selection.
   A press passing through takes the keyboard back as a click on the cells
   does (§10.1). The pointer there hovers nothing in the surface, and
   `:hover` matches nothing under it: it is out of the window (§9.4).
@@ -1605,7 +1677,7 @@ program draws itself, such as cells it lit while the pointer was over them.
   release, no surface sends `hover`: the pointer is the gesture's, and a
   drag reports its own targets (§9.1). At the release, the surface reports
   where the pointer is now, if that differs from what the program last
-  heard, after every other event of the release (`dragend`, `click`,
+  heard, after every other event of the release (`dragend`, `click`, `auxclick`,
   `change`, `focus`, `blur`). A window the pointer is then in, another one
   included, reports it at the pointer's next move. A press itself sends no
   `hover`.
@@ -2690,15 +2762,17 @@ A host conforms to hotty version 0.8 when:
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
 The vectors check replies, error codes, every delta op, morph, context
-parsing, `a=field` and revisions, resources, drags and their steps, presses with Alt, secondary presses and long presses, `fit`, hover,
+parsing, `a=field` and revisions, resources, drags and their steps, presses with Alt, secondary presses, other buttons and long presses, `fit`, hover,
 `area`, scrolling and scroll snapping, `reveal`, `scroll` and `view`, `hit`, touch in the
 cells, backdrops, focus fixup, prefixes, edit commands, menus, keymaps and the envelope,
 and their `keys`, `keymap` and `edit` sections a host's key names (§10.4), keymaps and
 actions (§10.2). They inspect documents and events, not pixels. The vectors
 marked with a feature (`"passthrough"`, `"hover"`, `"count"`, `"menu"`,
 `"backdrop"`, §4) apply to a host that has it, those marked `"commands"` to
-a host with a terminal that takes edit commands (§10.6), and those marked
-`"mouse"` to a host with a terminal that reports the mouse (§9.6).
+a host with a terminal that takes edit commands (§10.6), those marked
+`"mouse"` to a host with a terminal that reports the mouse (§9.6), and
+those marked `"primary"` to a host on a platform where a middle press
+pastes the primary selection (§9).
 
 To be tested, a host exposes a way to *inspect* an element, reporting:
 - its tag;
@@ -2707,15 +2781,16 @@ To be tested, a host exposes a way to *inspect* an element, reporting:
 - its child elements as `[tag, id, text]`.
 
 It also lets a test move a mouse's pointer to the centre of an element, or
-of a cell of a surface, press and release its primary button there, or press its
-secondary button, with modifier keys held, turn its wheel there, take the pointer out of the
+of a cell of a surface, press and release its primary button there, or press and
+release its other buttons (the secondary, the middle, back and forward), with modifier keys held, turn its wheel there, take the pointer out of the
 terminal's window, and press keys where the keyboard is. A host that takes
 touch also lets a test touch a cell of a surface, or of the screen, with
 one finger, move it, hold it where it is until the host takes it as a long
 press, and lift it, and tells it whether a touch went on to
 the terminal as a scroll. One whose terminal reports the mouse also tells
 the test what the terminal reported of the mouse's primary button for a
-touch in the cells (§9.6). A host
+touch in the cells (§9.6), and of the mouse's buttons for each press and
+release. A host
 with `passthrough` or `backdrop` also tells the test whether each of those
 reached the surface or passed through it, and whether a wheel or a key went
 on to the terminal. A host with `menu` also tells a test the level of the
@@ -3105,6 +3180,53 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   pixels. An animated image is the one thing a redraw could change, by
   starting it again, so that is ruled out whether the host compares or
   not.
+- **Why other buttons, by number.** A browser closes a tab on a middle
+  click, and a mouse's back and forward buttons go back and forward
+  through a history. A surface took only the primary and the secondary
+  buttons, so a program could offer neither: a middle press over a
+  surface was the terminal's.
+  - **One word for every button,** not one for each. The secondary press
+    has a word for its meaning, because several devices make it: a mouse,
+    a pen, Control on macOS, a long touch. No other button is made by more
+    than one. The middle button has no touch or pen form. What a platform
+    makes one of, such as Linux's three-finger tap on a touchpad, is one as
+    far as a program can tell. Back's and forward's other forms, a
+    touchpad's swipes, are scrolls here (§9). A word for each button would
+    also need a new version for each. So `aux` takes them all, `button`
+    says which as the DOM numbers them, and a later button needs nothing
+    new: a program ignores one it does not use.
+  - **A press, then `auxclick`.** These buttons act on their release: a
+    browser closes a tab when the middle button comes up over it, so a
+    user who moves off first cancels. A menu opens on the press, which is
+    why the secondary press has no release. The press still comes first,
+    with a secondary press's detail, for a program that acts at once, and
+    as the place a drag of another button would begin if one is ever
+    added.
+  - **`auxclick`, not `click`.** `click` is activation, which a key makes
+    too, and every handler of it would have to check the button: the trap
+    the DOM added `auxclick` to avoid. Its detail is a click's, with the
+    button and the cell. Unlike the DOM's, it never comes for the
+    secondary button, whose press does nothing else.
+  - **One button at a time,** and no `buttons` field. hotty has no gesture
+    of two buttons, and no move is reported while one is held. A button
+    pressed by chance during a drag should neither end the drag nor reach
+    the program. A field can be added if chords are ever wanted.
+  - **The terminal keeps the rest.** A middle press nobody asked for pastes
+    the primary selection on Linux, as it always has over the cells, and
+    `p` brings only the primary button, so a surface that asks for presses
+    takes nothing from the user. A text field pastes as a browser's does,
+    and an `aux` around it leaves it that: a tab's rename field pastes, and
+    does not close the tab.
+  - **Shift for every button but the primary,** as for the secondary press:
+    one rule, though Shift with back or forward does little in a terminal.
+  - **A host reports only what it can take whole.** A browser cancels the
+    back button's navigation only in some engines, and only on the
+    release. A press the program heard while the page went back would be
+    worse than none.
+  - **Room for touch and pens:** `button` means the same on every device,
+    as in Pointer Events. A touch makes 0, and its long press 2; a pen
+    makes 0 and 2, and its eraser would be 5. A later field naming the
+    device needs no change to it.
 - **Why hide:** sending a document and laying it out costs far more than
   placing it. A program scrolling through many surfaces keeps the ones that
   will come back, and only it knows which those are.
