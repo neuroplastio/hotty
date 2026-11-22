@@ -177,7 +177,8 @@ its platform calls so. Nothing here is on the wire: a program hears a
 **When** is the platform's too: on the press on Linux and macOS, and on
 the release on Windows, where native menus and browsers open theirs then.
 A host on Windows finds the element at the press, the nearest with
-`contextmenu`, holds the pointer and hover from then, as for a press it
+`contextmenu` or `rightbutton`, where that one has `contextmenu` and not
+`rightbutton` (SPEC.md §9), holds the pointer and hover from then, as for a press it
 takes, and reports for that element at the release, with the release's
 cell. A browser host records the element at the secondary `pointerdown`,
 calls `setPointerCapture`, and reports the browser's later `contextmenu`
@@ -327,11 +328,15 @@ already happened.
 every button (`button` 0), as Ghostty's is, resets itself when a button
 other than the held one is pressed (GTK 4.24's `gtkgesturesingle.c`): it
 emits `cancel`, the second press never comes as `pressed`, and the first
-button's release never comes as `released`, its point being gone. A host
-that holds a button, for a surface or for the terminal, would hold it for
-good. It takes presses and releases where every one arrives, a
-`GtkEventControllerLegacy` beside the gesture, or ends its hold on the
-gesture's `cancel` and swallows the releases still to come.
+button's release never comes as `released`, its point being gone. Both
+releases still come, as `unpaired-release` with their buttons
+(`gtkgestureclick.c`), which Ghostty does not connect. A host that holds
+a button, for a surface or for the terminal, and listens only to
+`released`, would hold it for good. It takes presses and releases where
+every one arrives, a `GtkEventControllerLegacy` beside the gesture, or
+keeps every hold through the `cancel` and ends it from
+`unpaired-release`. Ending a hold at the `cancel` would end a drag at the
+second press, against one button at a time (SPEC.md §9).
 
 **A terminal host** (hottyterm) asks the surface before the terminal does
 anything with a press: before its paste, its mouse report, and any return

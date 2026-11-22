@@ -1210,7 +1210,7 @@ reads hotty messages from its input. A detached surface sends none (§5.5).
 | `input` | every edit of a control with `data-on~=input` | `{"value": str, "rev": int}`, with `"sel": [int, int]`, the selection after it, in a text field with `data-on~=caret` (below) |
 | `caret` | in a text field with `data-on~=caret`, the user moved the selection, and no `input` says so: a move, a click, or an edit in a field without `data-on~=input` | `{"sel": [int, int], "rev": int}`: the selection, its anchor then its caret, as `a=field` counts them (§6.4) |
 | `submit` | a form submitted (a submit button, or Enter in a text field, after the `change` it commits) | `{"fields": [[str, str]]}`: the form's fields, each its name and its value, in tree order, the submitter's included; `[]` for a form with none |
-| `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface whose `p` is on (§5.2); except a mouse's or a pen's press with Alt held (§9.2), where the pointer passes through (§9.3), and on a backdrop (§5.2). No other button makes one (below) | `{"area": area, "mods": int}`: the cells of the element `t` names (below), and the modifier keys held; no `area` without `t` |
+| `press` | the primary button pressed, a tap, or a touch that becomes a drag (§9.1), anywhere in the window of a surface whose `p` is on (§5.2); except a mouse's or a pen's press with Alt held (§9.2), Control with the primary button on macOS, a context click (below), where the pointer passes through (§9.3), and on a backdrop (§5.2). No other button makes one (below) | `{"area": area, "mods": int}`: the cells of the element `t` names (below), and the modifier keys held; no `area` without `t` |
 | `contextmenu` | a gesture for a context menu (below): a mouse's secondary button where no element with `rightbutton` takes it, a pen's barrel button, a touch's long press, the primary button with Control held on macOS, or the menu key where the host reports it, on an element with `contextmenu` in its `data-on`; except a pointer's with Shift or Alt held (§9.2), where the pointer passes through (§9.3), and on a backdrop (§5.2) | `{"area": area, "c": int, "r": int, "mods": int}`: the cells of the element `t` names, the pointer's cell (§9.1), and the modifier keys held; no `c` and `r` from the menu key, and no `area` without `t` |
 | `auxclick` | another button (below), pressed on an element with `aux` in its `data-on`, or the secondary button on one with `rightbutton`, and released where it was pressed, without a drag (§9.1) | `{"button": int, "area": area, "c": int, "r": int, "mods": int}`: as a `click`'s, with `"href": str` and `"url": str` when the element is a link and `"value": str` when it has a `value` attribute, but no `count`; with the button, and the pointer's cell and the modifier keys held at the release; no `area` without `t`, but a link's |
 | `dragstart` | a mouse's or a pen's primary button pressed, or a touch that drags (§9.1), on an element with `data-on~=drag`, without Alt (§9.2); or another button (below) moved past the slop on one with `aux` as well, or the secondary button on one with `rightbutton` as well (§9.1) | `{"c": int, "r": int, "mods": int}`: the pointer's cell and the modifier keys held, with `"x": int` and `"y": int`, its step, on an element with `data-steps`, and `"button": int` in another button's drag (§9.1) |
@@ -1305,8 +1305,8 @@ the program asked for it, and as often as this table says:
   - a mouse's secondary button, unless an element with `rightbutton` takes
     it (below);
   - on macOS, the primary button with Control held, which AppKit makes a
-    context click: `ctrl` is left out of its `mods`, so that it reads as a
-    secondary press does, and it is no `press` and no `click`, whatever
+    context click: `ctrl` is left out of its `mods`, so that it reads as
+    the secondary button's does, and it is no `press` and no `click`, whatever
     `p` asks for (Appendix B);
   - a pen's barrel button;
   - a touch's long press (§9.1);
@@ -1384,7 +1384,10 @@ the program asked for it, and as often as this table says:
     the modifier keys held then: the press decides (§9.2), so a key
     pressed in between changes only `mods`. A release anywhere else
     reports nothing. What ends a drag early (§9.1) ends it, with no
-    `auxclick`, and nothing says so.
+    `auxclick`, and nothing says so. For the secondary button, the element
+    is found at the release as at the press: the nearest with
+    `rightbutton` or `contextmenu`, which must be the press's, with
+    `rightbutton`.
   - **Drags.** An element with `drag` as well as `aux` in its `data-on`
     is dragged with these buttons too, and one with `drag` and
     `rightbutton` with the secondary (§9.1): moved past the slop before
@@ -3005,7 +3008,7 @@ To be tested, a host exposes a way to *inspect* an element, reporting:
 
 It also lets a test move a mouse's pointer to the centre of an element, or
 of a cell of a surface, press and release its primary button there, or press and
-release its other buttons (the secondary, the middle, back and forward), with modifier keys held, turn its wheel there, take the pointer out of the
+release its secondary button and its other buttons (the middle, back and forward), with modifier keys held, turn its wheel there, take the pointer out of the
 terminal's window, and press keys where the keyboard is. A host that takes
 touch also lets a test touch a cell of a surface, or of the screen, with
 one finger, move it, hold it where it is until the host takes it as a long
@@ -3365,9 +3368,13 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
   is a `pointerdown` of the primary button alone (below, *The terminal
   keeps the rest*). The physical button and the menu's gesture are apart,
   as in the DOM: `rightbutton` takes the secondary button as a button,
-  and an element that has it hears no `contextmenu` from that button, as
-  a page that cancels the DOM's `contextmenu` does not (below).
+  and an element that has it gets no menu from that button, as a page
+  that cancels the DOM's `contextmenu` gets none (below).
   - **Where hotty differs from the DOM,** each for a reason given here:
+    - `rightbutton` takes the secondary button before any `contextmenu`:
+      the element hears no `contextmenu` from it, where the DOM sends one
+      for the page to cancel, and without `rightbutton` there is no
+      `auxclick` 2, where the DOM sends one beside the menu;
     - one button at a time (*Why other buttons*), where the DOM reports a
       second button as a `pointermove`;
     - Control-click on macOS is a `contextmenu` without `ctrl`, and no

@@ -15072,7 +15072,7 @@
    ]
   },
   {
-   "name": "for the secondary button the nearer of rightbutton and contextmenu decides: a contextmenu inside a rightbutton keeps its menu, and a rightbutton inside a contextmenu keeps its button; each outer element has its own around them (SPEC \u00a79)",
+   "name": "for the secondary button the nearer of rightbutton and contextmenu decides, at the press and at the release: a contextmenu inside a rightbutton keeps its menu, and a rightbutton inside a contextmenu keeps its button; each outer element has its own around them; a rightbutton press released over a contextmenu inside it reports nothing (SPEC \u00a79)",
    "steps": [
     {
      "send": {
@@ -15222,6 +15222,31 @@
        }
       }
      ]
+    },
+    {
+     "pointer": "up",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      7,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "button": 2,
+     "events": []
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": "i",
+     "events": []
     },
     {
      "pointer": "up",
@@ -34229,14 +34254,15 @@
    ]
   },
   {
-   "name": "a press carries its element's area and the modifier keys; button, c and r are read where present, which only an 0.8 session's secondary press sends; a contextmenu carries its area, the pointer's cell and the modifier keys, with no cell from the menu key and no area without t; a cell that is no int makes the body undecodable, and the detail is read as none (SPEC \u00a73.3, \u00a79; HOST.md \u00a75.3)",
+   "name": "a press carries its element's area and the modifier keys; button, c and r are read where present, which only an 0.8 session's secondary press sends; a contextmenu carries its area, the pointer's cell and the modifier keys, with no cell from the menu key and no area without t; a cell or a button that is no int makes the body undecodable, and the detail is read as none (SPEC \u00a73.3, \u00a79; HOST.md \u00a75.3)",
    "seqs": [
     "\u001b]7279;a=ev:s=f:e=press:t=row;gqRhcmVhhKFjAqFyAaF3CqFoA6Rtb2RzCA==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=press:t=row;haZidXR0b24CpGFyZWGEoWMCoXIBoXcKoWgDoWMFoXICpG1vZHMB\u001b\\",
     "\u001b]7279;a=ev:s=f:e=contextmenu:t=row;hKRhcmVhhKFjAqFyAaF3CqFoA6FjBaFyAqRtb2RzAQ==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=contextmenu:t=row;gaRhcmVhhKFjAKFyAKF3AaFoAQ==\u001b\\",
     "\u001b]7279;a=ev:s=f:e=contextmenu;gqFjAKFy/w==\u001b\\",
-    "\u001b]7279;a=ev:s=f:e=contextmenu:t=row;gqFjoTShcgQ=\u001b\\"
+    "\u001b]7279;a=ev:s=f:e=contextmenu:t=row;gqFjoTShcgQ=\u001b\\",
+    "\u001b]7279;a=ev:s=f:e=press:t=row;hKZidXR0b26hMqRhcmVhhKFjAqFyAaF3CqFoA6FjBaFyAg==\u001b\\"
    ],
    "bodies": [
     {
@@ -34286,9 +34312,21 @@
     {
      "c": "4",
      "r": 4
+    },
+    {
+     "button": "2",
+     "area": {
+      "c": 2,
+      "r": 1,
+      "w": 10,
+      "h": 3
+     },
+     "c": 5,
+     "r": 2
     }
    ],
    "results": [
+    "complete",
     "complete",
     "complete",
     "complete",
@@ -34409,6 +34447,23 @@
      "event": {
       "kind": "contextmenu",
       "target": "row",
+      "area": null,
+      "c": null,
+      "r": null,
+      "mods": 0
+     }
+    },
+    {
+     "control": {
+      "a": "ev",
+      "s": "f",
+      "e": "press",
+      "t": "row"
+     },
+     "event": {
+      "kind": "press",
+      "target": "row",
+      "button": null,
       "area": null,
       "c": null,
       "r": null,

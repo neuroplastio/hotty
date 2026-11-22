@@ -623,13 +623,15 @@ carries, each absent when the event does not carry it:
 A handler of `press` hears the primary button only (SPEC.md §9), as
 before: a context menu's gesture is a `contextmenu`, and another button's
 an `auxclick` at the release where the press began, each from an element
-that asked, and `T` names that element. The secondary button is one of
-the other buttons, `ButtonSecondary`, where an element takes it with
-`rightbutton`: it hears it as an `auxclick` or a drag, and no
-`contextmenu` from it even where it has `contextmenu` too, which then comes only from the other gestures (a long
-press, a pen's barrel, Control-click, the menu key). A handler of `dragstart` that
-means the primary button checks `Button`: an element with `drag` and
-`aux` is dragged with the other buttons too, and its `drag` and `dragend`
+that asked, and `T` names that element. The secondary button,
+`ButtonSecondary`, is heard the same way where an element takes it with
+`rightbutton`: an `auxclick` or a drag, and no `contextmenu` from it even
+where the element has `contextmenu` too, which then comes only from the
+other gestures (a long press, a pen's barrel, Control-click, the menu
+key). A handler of `dragstart` that means the primary button checks
+`Button`: an element with `drag` and `aux` is dragged with the other
+buttons too, and one with `drag` and `rightbutton` with the secondary,
+and its `drag` and `dragend`
 carry no `Button`, so the program keeps the one its `dragstart` gave until
 the `dragend`. It ignores a `Button` it does not use, and the drag a
 `dragstart` with one begins: a later version may report more. An
