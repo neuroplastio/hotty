@@ -603,27 +603,37 @@ ESC ] 7279 ; a=place:s=<name>:c=<cols>[:r=<rows>|auto][:x=<col>][:y=<row>][:w=<c
   - A gesture scrolls the innermost element under the pointer that can
     still move that way. Where none can, it goes on outward, and past the
     root to the terminal, as if over the cells beneath (§9), unless CSS
-    `overscroll-behavior` stops it there, or it would become keys (below).
-  - **A gesture along an axis the document scrolls never becomes keys.**
-    Where the terminal would turn one that goes past the root into keys
-    for the program, the host stops it at the root, as
-    `overscroll-behavior: none` does, and it does nothing. That is the
-    alternate screen while the program reports no mouse, on a terminal
-    that sends the arrow keys for a wheel there (xterm's alternate scroll
-    mode). Elsewhere it goes on as above: on the main screen to the
+    `overscroll-behavior` stops it there, or the host does (below).
+  - **Past the edge on the alternate screen.** On the alternate screen,
+    while the program has no mouse tracking on (DECSET 9, 1000, 1002 or
+    1003; an encoding such as 1006 alone is no tracking), a gesture along
+    an axis the document scrolls that goes past the root would reach the
+    terminal only to become keys, or to do nothing, since that screen
+    keeps no scrollback. The host **MUST** stop it at the root, as
+    `overscroll-behavior: none` does, whatever the terminal's alternate
+    scroll setting. The gesture is then the document's: turned back, it
+    scrolls it. Elsewhere it goes on as above: on the main screen to the
     scrollback, as a browser chains a scroll from a frame to its page, and
-    to a program that reports the mouse as its wheel. A gesture along an
-    axis the document does not scroll is the terminal's, as over any other
-    surface (§9). A multiplexer that relays the surface (§2) does the same
-    for the program behind it: a gesture the host passes on over the
-    surface's window, along an axis its document scrolls, it turns into no
-    keys for that program.
+    to a program with mouse tracking on as its wheel. A gesture along an
+    axis the document does not scroll is the terminal's, as over any
+    other surface (§9).
+  - **A multiplexer that relays the surface** (§2) does the same for the
+    program behind it. Over the window of a surface whose document
+    scrolls, the host passes on only gestures past its edge, and those
+    along an axis it does not scroll. So the multiplexer drops a wheel
+    there along an axis the document scrolls, where it would turn it into
+    keys for that program (its alternate screen, with no mouse tracking
+    on), and needs nothing but what it relays already: the placement and
+    `scroll` (§5.1).
   - **A route kept for a gesture** holds per axis. A host that sends a
     gesture's events on where its first one went, as browsers latch a
-    scroll to the element it began in, decides each event along an axis
-    the document scrolls by that axis's route, never by one taken along
-    the other: a swipe that opens across, over a document that scrolls
-    only down, still scrolls it, and none of its events become keys.
+    scroll to the element it first scrolls, keeps a route for each axis,
+    set by the gesture's first event that moves mostly along it, and
+    sends each event whole by the route of the axis it moves mostly along
+    (down, where it moves as much across). So a swipe that opens across,
+    over a document that scrolls only down, still scrolls it, none of its
+    events become keys, and the small sideways part of a swipe down goes
+    with it.
   - **Scroll snapping:** CSS Scroll Snap applies to an element that scrolls,
     the root included, as in a browser: `scroll-snap-type`,
     `scroll-snap-align` and `scroll-padding`. A scroll comes to rest where
@@ -1405,10 +1415,11 @@ the program asked for it, and as often as this table says:
   - selecting text, where CSS `user-select` allows it (§11).
 - **Gestures that scroll are the terminal's,** except over a document that
   scrolls (§5.3), which takes them while it can move that way, and past
-  its edge keeps those that would become keys. A wheel, a touchpad's
-  scroll, or a touch drag over any other surface, unless it drags an
-  element (§9.1), does what it would do over the cells beneath it. That
-  is scrollback, or on the alternate screen, the program's wheel input.
+  its edge on the alternate screen keeps those along its axes (§5.3). A
+  wheel, a touchpad's scroll, or a touch drag over any other surface,
+  unless it drags an element (§9.1), does what it would do over the cells
+  beneath it. That is scrollback, or on the alternate screen, the
+  program's wheel input.
   The host **MUST** pass them on, with the position of the pointer or the
   finger. Taps and long presses, and clicks and drags (§9.1) that do not
   begin with Alt held (§9.2), stay the surface's. Over the cells, a
@@ -3338,14 +3349,22 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     on every wheel step costs a round trip per step. A document that asks
     scrolls locally, as a page's element does, and hands a gesture back
     to the terminal at its end, as a browser chains it to the page.
-  - **Except as keys.** On the alternate screen, while the program
-    reports no mouse, a terminal turns a wheel that reaches it into arrow
-    keys, so a gesture handed back at a list's end moved the program's
-    own selection, or its page, with the user's hand still on the list.
-    A browser's frame hands a scroll on only to something that scrolls.
-    So the document keeps every gesture along its axes that would become
-    keys, and the rest still chain, as on the main screen, where the
-    scrollback scrolls as a page around a frame does.
+  - **Except as keys.** On the alternate screen, while the program has no
+    mouse tracking on, a wheel that reaches the terminal becomes arrow
+    keys, on a terminal with alternate scroll, or nothing, since that
+    screen keeps no scrollback. So a gesture handed back at a list's end
+    moved the program's own selection, or its page, with the user's hand
+    still on the list. Stopping it there loses nothing, so the rule holds
+    whatever the terminal's setting, and a host need not know it. A
+    browser's frame hands a scroll on only to something that scrolls: the
+    rest still chain, as on the main screen, where the scrollback scrolls
+    as a page around a frame does.
+  - **A route per axis,** as browsers' touchpad rails have it, because a
+    swipe often opens with an event along the other axis, and a route
+    kept for the whole gesture sent the axis the document scrolls where
+    that first event went. Each event goes whole by its main axis, so a
+    swipe's small sideways part never reaches a program as a wheel of its
+    own.
   - **Per axis,** because a list scrolls down and a wide table across, and
     an axis a document did not ask for keeps the default.
   - **On the document,** because whether content scrolls is the content's

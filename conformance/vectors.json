@@ -15106,7 +15106,7 @@
    ]
   },
   {
-   "name": "on the alternate screen, while the program reports no mouse, a wheel past the edge of a document that scrolls that way goes nowhere, since the terminal would make it arrow keys; across, an axis it does not scroll, it is the terminal's; to a program that reports the mouse it goes on as its wheel, and on the main screen to the scrollback (SPEC \u00a75.3, \u00a79)",
+   "name": "on the alternate screen, while the program has no mouse tracking on, a wheel past the edge of a document that scrolls that way goes nowhere, whatever the terminal's alternate scroll setting; across, an axis it does not scroll, it is the terminal's; with mouse tracking on it goes on as the program's wheel, and on the main screen to the scrollback (SPEC \u00a75.3, \u00a79)",
    "requires": "scroll",
    "steps": [
     {
@@ -15263,6 +15263,237 @@
       20
      ],
      "terminal": true,
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "on the alternate screen, with no mouse tracking on, a route is kept per axis: a swipe that opens across, which goes to the terminal, and turns down still scrolls the document; a gesture stopped past its edge is the document's, and turned back it scrolls it (SPEC \u00a75.3)",
+   "requires": "scroll",
+   "steps": [
+    {
+     "write": "\u001b[?1049h"
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}div{height:var(--hotty-cell-h);width:calc(4*var(--hotty-cell-w))}</style><div id=a>a</div><div id=b>b</div><div id=c>c</div><div id=d>d</div><div id=e>e</div><div id=f>f</div><div id=g>g</div><div id=h>h</div><div id=i>i</div><div id=j>j</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "p": "1",
+      "q": "2"
+     }
+    },
+    {
+     "pointer": "move",
+     "s": "x",
+     "at": [
+      1,
+      0
+     ],
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "a",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      [
+       3,
+       0
+      ],
+      [
+       0,
+       20
+      ]
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "g",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    },
+    {
+     "pointer": "wheel",
+     "by": [
+      [
+       0,
+       5
+      ],
+      [
+       0,
+       -2
+      ]
+     ],
+     "terminal": false,
+     "events": []
+    },
+    {
+     "pointer": "down",
+     "events": [
+      {
+       "e": "press",
+       "s": "x",
+       "t": "e",
+       "detail": {
+        "area": {
+         "c": 0,
+         "r": 0,
+         "w": 4,
+         "h": 1
+        }
+       }
+      }
+     ]
+    },
+    {
+     "pointer": "up",
+     "events": []
+    }
+   ]
+  },
+  {
+   "name": "a touch drag past the edge of a document that scrolls that way is stopped on the alternate screen, with no mouse tracking on, as a wheel is, and goes on to the terminal as a scroll on the main screen (SPEC \u00a75.3, \u00a79)",
+   "requires": [
+    "touch",
+    "scroll"
+   ],
+   "steps": [
+    {
+     "write": "\u001b[?1049h"
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}#t{height:calc(5*var(--hotty-cell-h));width:calc(4*var(--hotty-cell-w))}</style><div id=t></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      2,
+      3
+     ],
+     "events": []
+    },
+    {
+     "touch": "move",
+     "s": "x",
+     "at": [
+      2,
+      0
+     ],
+     "terminal": false,
+     "mouse": [],
+     "events": []
+    },
+    {
+     "touch": "up",
+     "events": []
+    },
+    {
+     "write": "\u001b[?1049l"
+    },
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "scroll": "1",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}#t{height:calc(5*var(--hotty-cell-h));width:calc(4*var(--hotty-cell-w))}</style><div id=t></div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "10",
+      "r": "4",
+      "q": "2"
+     }
+    },
+    {
+     "touch": "down",
+     "s": "x",
+     "at": [
+      2,
+      3
+     ],
+     "events": []
+    },
+    {
+     "touch": "move",
+     "s": "x",
+     "at": [
+      2,
+      0
+     ],
+     "terminal": true,
+     "events": []
+    },
+    {
+     "touch": "up",
      "events": []
     }
    ]

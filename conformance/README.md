@@ -137,7 +137,11 @@ checked).
   It is one gesture: a runner may send it as several wheel events (a
   browser scrolls no more than a page for one), lets what it scrolls come
   to rest before the step's events are read, and lets the gesture end
-  before the next step, so each wheel step is a gesture of its own.
+  before the next step, so each wheel step is a gesture of its own. `"by"`
+  may also be a list of such moves, `[[c, r], …]`, made in order within
+  that one gesture, each sent as events of its own that move along its
+  direction only, with no end of the gesture between them: a swipe that
+  opens across and turns down, or one turned back.
 - `"leave"` takes the pointer out of the terminal's window.
 - `"keys"`: the modifier keys held during the step (`shift`, `ctrl`, `alt`,
   `super`); none when absent.
@@ -156,8 +160,12 @@ checked).
   checked; `[]` for nothing, and absent, not checked.
 - `"terminal"`, for a wheel: `true` if the gesture went on to the terminal,
   as over the cells beneath (SPEC §9), `false` if it did not (the document
-  scrolled, `overscroll-behavior` stopped it, or the host kept it from
-  becoming keys, §5.3). Absent: not checked.
+  scrolled, `overscroll-behavior` stopped it, or the host stopped it on
+  the alternate screen, §5.3); for a list of moves, `true` if any part of
+  it did. Absent: not checked. Whether the host stops a wheel on the
+  alternate screen does not depend on the terminal's alternate scroll
+  setting, so a runner sets none, and the result is the same whatever it
+  is.
 - `"events"`: every event (`a=ev`) the step makes the host send, in order,
   and nothing more. Each is compared as a reply is: every key but `detail`
   with the event's control, `null` for a key it must not have (`"t":
