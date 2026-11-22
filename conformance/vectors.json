@@ -4458,6 +4458,87 @@
    ]
   },
   {
+   "name": "a resource sent again with the same id, type and bytes is answered as any a=res and changes nothing: a placement with f=1 hears nothing; other bytes replace it, and are heard (SPEC \u00a77.1)",
+   "steps": [
+    {
+     "send": {
+      "a": "doc",
+      "s": "x",
+      "q": "2"
+     },
+     "payload": "<style>body{margin:0}</style><link rel=stylesheet href=\"cid:tall\"><div id=d>x</div>"
+    },
+    {
+     "send": {
+      "a": "place",
+      "s": "x",
+      "c": "20",
+      "r": "auto",
+      "f": "1",
+      "q": "2"
+     }
+    },
+    {
+     "send": {
+      "a": "res",
+      "id": "tall",
+      "type": "text/css",
+      "q": "0"
+     },
+     "payload": "#d { height: calc(5 * var(--hotty-cell-h)) }",
+     "reply": {
+      "a": "ok",
+      "re": "res"
+     },
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "detail": {
+        "r": 5
+       }
+      }
+     ]
+    },
+    {
+     "send": {
+      "a": "res",
+      "id": "tall",
+      "type": "text/css",
+      "q": "0"
+     },
+     "payload": "#d { height: calc(5 * var(--hotty-cell-h)) }",
+     "reply": {
+      "a": "ok",
+      "re": "res"
+     },
+     "events": []
+    },
+    {
+     "send": {
+      "a": "res",
+      "id": "tall",
+      "type": "text/css",
+      "q": "0"
+     },
+     "payload": "#d { height: calc(3 * var(--hotty-cell-h)) }",
+     "reply": {
+      "a": "ok",
+      "re": "res"
+     },
+     "events": [
+      {
+       "e": "fit",
+       "s": "x",
+       "detail": {
+        "r": 3
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "a session's resources are its own: after a full reset ends the session, a document of the next one that refers to a resource of the same name finds none, and one it sends itself is its own (SPEC \u00a77.1, \u00a712)",
    "steps": [
     {

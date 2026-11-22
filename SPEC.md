@@ -993,6 +993,11 @@ stylesheet shared by several surfaces, an image, a font.
 - **Updates:** sending a resource again replaces it, and every surface that
   refers to it is drawn again. `a=del:id=<id>` deletes it, after which
   references to it fail as if missing.
+  - **The same again.** A resend whose id, type and bytes match the stored
+    resource changes nothing, and a host **MAY** ignore it: it draws
+    nothing again, and is answered as any `a=res`. Ignored or not, a host
+    **MUST NOT** restart an animated image for one: the image goes on from
+    the frame it shows.
 - **Late arrival:** a reference to a resource that does not exist yet is
   resolved when it arrives. A placement made with `f=1` hears whether that
   changed the document's height (§5.2).
@@ -3065,6 +3070,14 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     would send a `blur` and a `focus` it did not ask for.
   - **No feature.** It is part of 0.7, as `click` is part of 0.1: a feature
     would only say what the version says.
+- **Why an identical resend may change nothing.** A program that keeps
+  no record of what the host holds, such as a multiplexer switching tabs,
+  sends its stylesheet again, and each surface that links it is styled
+  again for the same bytes. A host that compares them first skips that
+  work, and the program sees no difference: the same bytes draw the same
+  pixels. An animated image is the one thing a redraw could change, by
+  starting it again, so that is ruled out whether the host compares or
+  not.
 - **Why hide:** sending a document and laying it out costs far more than
   placing it. A program scrolling through many surfaces keeps the ones that
   will come back, and only it knows which those are.
