@@ -8,7 +8,7 @@ program opens a menu of its own, a second surface at a higher z with its top
 left at the pointer, flipped left or up at the screen's edge. The rows say
 `contextmenu` in their data-on, so the terminal opens none; elsewhere a
 right-click is the terminal's own menu. They say `secondary` too, which an
-0.8 session reads instead, as a press with button 2 (HOST.md §5.3).
+0.8 session reads instead, as a press with button 2 (HOST.md §5.2).
 
 The menu's document is sent once, unplaced, and each open only places it and
 updates its items. It has the keyboard: Enter or a click does an item;

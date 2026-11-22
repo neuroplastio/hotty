@@ -2,13 +2,13 @@
 group: Reference
 order: 10
 nav: Protocol
-description: the hotty protocol, version 0.8
+description: the hotty protocol, version 0.9
 path: protocol
 ---
 
 # hotty — HTML over the TTY
 
-    Version:  0.8
+    Version:  0.9
     Status:   Draft. Versions 0.x may change incompatibly (§15).
     Licence:  CC BY 4.0 (this document); the conformance vectors are
               Apache-2.0.
@@ -306,10 +306,10 @@ A program finds out whether it has a host by sending a query, then Primary
 Device Attributes as a fence:
 
 ```
-ESC ] 7279 ; a=q:n=1:v=0.8 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.9 ST   CSI c
 ```
 
-A program that speaks 0.7 as well asks `v=0.7,0.8` instead (Versions,
+A program that speaks 0.8 as well asks `v=0.8,0.9` instead (Versions,
 below).
 
 Every terminal answers DA1. A host answers the query first:
@@ -322,9 +322,10 @@ If the DA1 answer arrives with no hotty reply before it, there is no host. The
 program **SHOULD** then fall back (§14).
 
 **Versions.** `v` lists the hotty versions the program speaks,
-comma-separated: `v=0.8` for this document, and `v=0.7,0.8` for a
-program that speaks 0.7 as well. A version is `major.minor`, two numbers written without
-leading zeros, and versions compare as those numbers, the major first.
+comma-separated: `v=0.9` for this document, and `v=0.8,0.9` for a
+program that speaks 0.8 as well. A version is `major.minor`, two numbers
+written without leading zeros, and versions compare as those numbers, the
+major first.
 - A host answers in the highest version it shares with the program: `a=ok`,
   with that version's capabilities, whose `v` names it. It speaks that
   version from then on.
@@ -349,7 +350,7 @@ terminal attached. A program that can start using hotty after it has fallen
 back asks for a late answer with `late=1`:
 
 ```
-ESC ] 7279 ; a=q:n=1:v=0.8:late=1 ST   CSI c
+ESC ] 7279 ; a=q:n=1:v=0.9:late=1 ST   CSI c
 ```
 
 - A host answers it as any query, at once.
@@ -371,7 +372,7 @@ The capabilities, the body of that reply, are a map of these fields (§3.3):
 
 | field | type | meaning |
 | --- | --- | --- |
-| `v` | str | the hotty version the host answers in (Versions, above): `"0.8"` for this document |
+| `v` | str | the hotty version the host answers in (Versions, above): `"0.9"` for this document |
 | `cellcss` | `{"w": float, "h": float}` | one cell's size in CSS pixels (§5.3) |
 | `scale` | float | device pixels per CSS pixel when the host answers: a hint for the resolution of images, which a zoom changes without telling (§5.3) |
 | `scheme` | str | `"dark"` or `"light"`: the terminal's colour scheme |
@@ -2988,7 +2989,7 @@ the text of §11.
 
 ## 16. Conformance
 
-A host conforms to hotty version 0.8 when:
+A host conforms to hotty version 0.9 when:
 - it meets every **MUST** of this document;
 - it passes `conformance/vectors.json` (`conformance/README.md`).
 
@@ -3049,8 +3050,8 @@ The vectors do not test it.
 Detection (payload shortened):
 
 ```
-program → ESC ] 7279 ; a=q:n=1:v=0.8 ST  CSI c
-host    → ESC ] 7279 ; a=ok:n=1:re=q ; haF2ozAuOKdjZWxsY3Nz… ST  CSI ? 62 ; 22 c
+program → ESC ] 7279 ; a=q:n=1:v=0.9 ST  CSI c
+host    → ESC ] 7279 ; a=ok:n=1:re=q ; haF2ozAuOadjZWxsY3Nz… ST  CSI ? 62 ; 22 c
 ```
 
 A card placed below the prompt, asking for the rows it took, then a delta
@@ -3408,13 +3409,13 @@ program → ESC 7  ESC [ 1 ; 1 H  ESC ] 7279 ; a=place:s=canvas:c=80:r=24:b=1:C=
     DOM names it by its use for that reason. Its detail is 0.7's without
     the button, which said nothing a program used. This breaks the
     programs of 0.7 and 0.8, which is allowed below 1.0 (§15); a host that
-    speaks 0.8 as well keeps 0.8's press in a session of it (HOST.md §5.3).
+    speaks 0.8 as well keeps 0.8's press in a session of it (HOST.md §5.2).
   - **`contextmenu` in `data-on`, not `secondary`.** Each word that asks
     for one event is that event's name, as `click`, `input`, `caret` and
     `view` are, so the word and its handler read alike, and a program that
     moves to 0.9 changes both together. A document meant for an 0.8
     session as well carries both words, each version reading its own
-    (HOST.md §5.3). `aux` keeps its name: it names buttons, not an event,
+    (HOST.md §5.2). `aux` keeps its name: it names buttons, not an event,
     and with `drag` it brings their drags too.
   - **`rightbutton`, a word of its own,** because a program may want the
     secondary button for itself, and taking it is a separate act. In the

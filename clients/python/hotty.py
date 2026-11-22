@@ -38,8 +38,8 @@ OSC_NUMBER = NUMBER  # the name this client had first
 CHUNK = 4096
 MAX_SIZE = 1000
 MAX_NAME = 64
-VERSION = "0.8"
-VERSIONS = ("0.7", "0.8")  # every version this client speaks, which its query lists
+VERSION = "0.9"
+VERSIONS = ("0.8", "0.9")  # every version this client speaks, which its query lists
 COMPRESS_FROM = 256
 SCAN_MAX = 64 << 10
 
@@ -207,7 +207,7 @@ def _command(pairs, payload, default_q, n=None, q=None):
 
 def query(n=1, late=False):
     """Asks whether the terminal is a host that speaks a version in
-    VERSIONS (0.7 and 0.8), fenced with DA1 (SPEC §4); with late, a late answer is welcome."""
+    VERSIONS (0.8 and 0.9), fenced with DA1 (SPEC §4); with late, a late answer is welcome."""
     pairs = [("a", "q"), ("n", n), ("v", ",".join(VERSIONS))]
     if late:
         pairs.append(("late", 1))
@@ -806,7 +806,7 @@ _DRAG_START = dict(_DRAG, button="int")
 # Each kind's detail (SPEC §9); a kind not here carries none a program reads.
 _DETAIL = {
     EVENT_CLICK: {"value": "str", "href": "str", "url": "str", "area": _AREA, "mods": "int", "count": "int"},
-    # button, c and r only from an 0.8 session's secondary press (HOST.md §5.3).
+    # button, c and r only from an 0.8 session's secondary press (HOST.md §5.2).
     EVENT_PRESS: {"button": "int", "area": _AREA, "c": "int", "r": "int", "mods": "int"},
     EVENT_CONTEXTMENU: {"area": _AREA, "c": "int", "r": "int", "mods": "int"},
     EVENT_AUXCLICK: {
@@ -908,7 +908,7 @@ class Event:
         included, which is the primary button's alone. A drag's drag and
         dragend belong to its dragstart's button. A press's is read where
         present, which only an 0.8 session's secondary press sends (2,
-        HOST.md §5.3). A program ignores a button it does not use."""
+        HOST.md §5.2). A program ignores a button it does not use."""
         if self.kind in (EVENT_AUXCLICK, EVENT_PRESS):
             return self._d.get("button")
         if self.kind != EVENT_DRAG_START:

@@ -31,7 +31,7 @@ ask for it. A document may use what it describes, but it can't count on it
 2. Fonts
 3. Buttons
 4. Reduced motion
-5. Speaking 0.7 as well
+5. Speaking 0.8 as well
 6. Implementations
 
 Appendix: A. Rationale
@@ -368,38 +368,29 @@ Where a host reads the setting that `prefers-reduced-motion` follows
   `matchMedia('(prefers-reduced-motion: reduce)')`. The browser already
   applies it to the surfaces' CSS, so the addon does nothing.
 
-## 5. Speaking older versions
+## 5. Speaking 0.8 as well
 
-hotty's own stack, hosts and SDKs, speaks the versions before its newest
-too: 0.7 and 0.8 along with 0.9. SPEC.md §15 lets a host speak several
-versions, and the rest is what the stack does with it. A host that does
-not speak a program's version answers it with `EVERSION` (SPEC.md §4),
-and the program falls back. Each version is the session's: a host
-switches what it reads and reports by the version it answered in.
+hotty's own stack, hosts and SDKs, speaks 0.8 along with 0.9. SPEC.md §15
+lets a host speak several versions, and the rest is what the stack does
+with it. A host that does not speak a program's version answers it with
+`EVERSION` (SPEC.md §4), and the program falls back: a 0.7 program meets
+a 0.9 host so. Each version is the session's: a host switches what it
+reads and reports by the version it answered in.
 
-### 5.1 A 0.7 session
-
-- **A host that speaks 0.7 as well** answers a program that lists 0.7 and
-  not 0.8 in 0.7, and speaks 0.7 to it from then on (SPEC.md §4). A query
-  that lists both is answered in 0.8, the highest the two share.
-- **What a 0.7 program sends is 0.7's.** It never sends a `scroll` op or
-  a `hit`, and a host may answer either with `EINVAL` in a 0.7 session, as
-  a 0.7 host would.
-- **Its keymaps hold as 0.8 has them.** A 0.7 document that wrote
-  `tab=program` in a field, or `default`, asked for what 0.8 gives, though
-  a 0.7 host ignored it: a host gives it in a 0.7 session too, and keeps
-  no second reading of keymaps.
+- **A host that speaks 0.8 as well** answers a program that lists 0.8 and
+  not 0.9 in 0.8, and speaks 0.8 to it from then on (SPEC.md §4). A query
+  that lists both is answered in 0.9, the highest the two share.
 - **The rest is drawn, not told:** `prefers-reduced-motion` (SPEC.md §8)
   follows the setting in every session.
 
-### 5.2 Keymaps in an 0.8 session
+### 5.1 Keymaps in an 0.8 session
 
 From 0.9 a keymap is written in two attributes, an element's own
 `data-keys` and the `data-keys-inner` that holds for what is inside it
 (SPEC.md §10.2, *Keymaps*). An 0.8 document wrote one, `data-keys`, which
-held for everything inside its element, as a 0.7 one did. A host that
-speaks 0.8 as well reads an 0.8 document's keymaps, and a 0.7 one's where
-it speaks 0.7 too, with the same resolver, from other attributes:
+held for everything inside its element. A host that speaks 0.8 as well
+reads an 0.8 document's keymaps with the same resolver, from other
+attributes:
 - **Each `data-keys` is read as both its element's own `data-keys` and
   its `data-keys-inner`.** The keymap is then 0.8's: every ancestor's
   `data-keys` from the root down, then the focused element's. With
@@ -414,19 +405,18 @@ it speaks 0.7 too, with the same resolver, from other attributes:
   `space`); `default` holds where the focused element writes it, not
   above it; a selection reads the root's and the body's keymaps, not those
   around its text; and with nothing focused the body's keymap holds.
-- **No second reading,** as in a 0.7 session (§5.1): one resolver, with
-  the bindings taken from where 0.8 put them.
+- **No second reading:** one resolver, with the bindings taken from where
+  0.8 put them.
 
-### 5.3 Buttons in an 0.8 session
+### 5.2 Buttons in an 0.8 session
 
 From 0.9 a context menu's gesture is `contextmenu`, asked for with
 `contextmenu` in `data-on`, and another button is `aux`'s `auxclick`
-(SPEC.md §9). 0.7 and 0.8 had a `press` with `button` 2, asked for with
+(SPEC.md §9). 0.8 had a `press` with `button` 2, asked for with
 `secondary`, and no other button. A host that speaks 0.8 as well keeps
-that in an 0.8 session, and in a 0.7 one where it speaks 0.7 too:
+that in an 0.8 session:
 - **`secondary` is read, and `contextmenu`, `aux` and `rightbutton` are
-  not.** The
-  gesture is reported as a `press` with `button` 2, its `area`, and `c`
+  not.** The gesture is reported as a `press` with `button` 2, its `area`, and `c`
   and `r`, at the press on every platform, as 0.8 had it, and never from
   the menu key.
 - **No other button is the surface's:** each is the terminal's, as over

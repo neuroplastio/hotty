@@ -8,7 +8,7 @@ path: sdk-design
 
 # hotty SDKs
 
-    Version:  0.8, with SPEC.md 0.8
+    Version:  0.9, with SPEC.md 0.9
     Status:   Draft. It changes with SPEC.md (§15 there).
     Licence:  CC BY 4.0
 
@@ -38,7 +38,7 @@ The SDKs that follow it are listed in the documentation, not here
 4. The SDK layer
 5. Conformance
 
-Appendices: A. Names · B. Rationale · C–G. Moving from 0.2 to 0.7
+Appendices: A. Names · B. Rationale · C–H. Moving from 0.2 to 0.8
 
 ---
 
@@ -195,8 +195,8 @@ An SDK **MUST** provide every component of this section.
 | `Chunk` | 4096, the most base64 bytes in one sequence |
 | `MaxSize` | 1000, the most columns or rows of a surface |
 | `MaxName` | 64, the longest surface name |
-| `Version` | `"0.8"`, the newest protocol version the SDK speaks (SPEC.md §4) |
-| `Versions` | `["0.7", "0.8"]`, every version the SDK speaks, which its query lists (§3.8) |
+| `Version` | `"0.9"`, the newest protocol version the SDK speaks (SPEC.md §4) |
+| `Versions` | `["0.8", "0.9"]`, every version the SDK speaks, which its query lists (§3.8) |
 | `DefaultMax` | 16777216 (16 MiB), the most bytes a Decoder decodes one message to unless its `Max` says otherwise (§3.6) |
 
 And these sets, each value under its canonical name:
@@ -514,20 +514,23 @@ by step.
   `Tick` next, or none once done.
 - **Every input first lets the time pass**: whatever was due at or before
   `now` happens before the input is taken.
-- **It speaks both 0.7 and 0.8.** An SDK of 0.8 lists `0.7,0.8` in its
+- **It speaks both 0.8 and 0.9.** An SDK of 0.9 lists `0.8,0.9` in its
   query (`Versions`), and takes the host that answers in either (SPEC.md
   §4, §15).
-  - **A 0.7 host** has neither the `scroll` op nor `hit`: it refuses a
-    delta that holds one, and a `hit`, with `EINVAL`. It ignores
-    `tab=program` and `default` in a keymap. A program that met one
-    scrolls by focus and `reveal`, finds no element at a cell, and keeps
-    Tab for focus.
+  - **An 0.8 host** reads each `data-keys` for its element and everything
+    inside it, and no `data-keys-inner`. It reports a context menu's
+    gesture as a `press` with `Button` 2 (`ButtonSecondary`), `C` and `R`,
+    for an element with `secondary` in its `data-on`, and sends no
+    `contextmenu` and no `auxclick`: every other button is the terminal's.
+    A program that met one writes both words, as HOST.md §5 has a 0.9 host
+    read an 0.8 session, and opens the same menu from either.
   - **Which version it met** is the capabilities' `V`, in `Caps`, which the
     program reads when it must tell them apart. The host speaks that
     version from then on.
-  - An 0.8 host that speaks 0.7 too answers `v=0.7,0.8` in 0.8, and a 0.7
-    host answers it in 0.7. A host that speaks only 0.8 answers `v=0.7`
-    with `EVERSION`, and the terminal is `text` (§3.8's second rule).
+  - A 0.9 host that speaks 0.8 too answers `v=0.8,0.9` in 0.9, and an 0.8
+    host answers it in 0.8. A host that speaks only 0.9 answers `v=0.8`
+    with `EVERSION`, and so does a 0.7 host `v=0.8,0.9`: the terminal is
+    `text` (§3.8's second rule).
 
 The rules, with their times:
 
@@ -613,7 +616,7 @@ carries, each absent when the event does not carry it:
 | `Drag` | `c` and `r`; the steps `x` and `y` in the element dragged, and `tx` and `ty` in a `t` with `drop` (as `TX` and `TY` where the language capitalises), each absent when the detail has none (SPEC.md §9.1) | `dragstart`, `drag`, `dragend` |
 | `Hover` | `c` and `r`, or `out` | `hover` |
 | `Area` | `area`: `c`, `r`, `w` and `h`, the element's cells | `click`, `press`, `contextmenu`, `auxclick` |
-| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 1, 2, 3, 4, or 6 and up; on an `auxclick`, none when absent (0 where the language has no absent int), and on a `dragstart`, 0 when absent, the primary button's or a touch's. On a `press`, read where present, which only an 0.8 session's secondary press sends (2, HOST.md §5.3), and none when absent | `auxclick`, `dragstart`, `press` |
+| `Button` | `button`: the DOM's number for the button (SPEC.md §9), 1, 2, 3, 4, or 6 and up; on an `auxclick`, none when absent (0 where the language has no absent int), and on a `dragstart`, 0 when absent, the primary button's or a touch's. On a `press`, read where present, which only an 0.8 session's secondary press sends (2, HOST.md §5.2), and none when absent | `auxclick`, `dragstart`, `press` |
 | `C`, `R` | `c` and `r`: the pointer's cell on a `contextmenu` and at an `auxclick`'s release, each absent when the detail has none, as on a `contextmenu` from the menu key (SPEC.md §9); on a `press`, read where present, as `Button` is | `contextmenu`, `auxclick`, `press` |
 | `Count` | `count`: the click's place in its run of clicks (SPEC.md §9), 2 for the second click of a double click; 1 for a click whose detail has none | `click` |
 | `View` | `Areas`, from `in`: each id in view to its cells as `Area` holds them, leaving out one whose area lacks a field, and none when `in` is absent; and `AtEnd`, from `end`, false when absent (SPEC.md §9.5) | `view` |
@@ -733,7 +736,7 @@ host.
   inner: a host passes the ancestors' `data-keys` values as `inner` and
   the focused element's as `own`, or with nothing focused and for a
   selection the root's and the body's as `inner` and the body's as `own`
-  (HOST.md §5.2). A binding to
+  (HOST.md §5.1). A binding to
   `default` gives the key back: `Lookup` then answers as with no keymap of
   the program's, from the default keymap or `insert`.
 - **`Binds(key)`** says whether a keymap binds the key, or, for a key with
@@ -982,7 +985,7 @@ A host that runs inside a test, so that a program's tests need no terminal.
   passes the host vectors' `send`, `inspect` and `key` steps. It speaks
   the SDK's `Version` only: it answers a query that lists it with its
   capabilities, in it, and any other with `EVERSION` (SPEC.md §4). The
-  vectors that need a host that speaks 0.7 as well (`speaks-0.7`,
+  vectors that need a host that speaks 0.8 as well (`speaks-0.8`,
   conformance/README.md) are skipped by it, unless it does. It lays
   nothing out: `r=auto` gets an estimate the test may replace, nothing in
   it scrolls, so a key bound to a scroll action goes on as if its keymap
@@ -1107,7 +1110,7 @@ menu: SPEC.md Appendix B says why.
   `contextmenu` then names it in `T`, with `Area`, and the pointer's cell
   in `C` and `R`. A document meant for an 0.8 session as well writes
   `secondary` beside it, and in that session hears a `press` with
-  `Button` 2 (`ButtonSecondary`), `C` and `R` instead (HOST.md §5.3): the
+  `Button` 2 (`ButtonSecondary`), `C` and `R` instead (HOST.md §5.2): the
   SDK reads them on a `press` where present. A program opens the same
   menu from either.
 - **The keys that open a menu** are `shift+f10` and `context_menu`
@@ -1169,8 +1172,9 @@ every SDK section, `edit` where it provides a Field.
   what keeps SDKs aligned.
 - **`requires`.** A vector that needs something an SDK may not have yet
   names it in `requires`. A runner declares what it implements, and skips
-  the vectors whose `requires` it lacks (the host sections' `speaks-0.7`
-  among them, for a test host that speaks 0.8 only), so the list of what an SDK lacks is
+  the vectors whose `requires` it lacks (the host sections' `speaks-0.8`
+  among them, for a test host that speaks 0.9 only), so the list of what
+  an SDK lacks is
   its runner's, not a list kept by hand.
 - **A copy, checked.** An SDK keeps a copy of `vectors.json` in its tests,
   a way to refresh it from a checkout of this repository, and a test that
@@ -1422,7 +1426,19 @@ places a port goes wrong:
 - **`default`** is an action `ParseKeymap` keeps. In a resolved keymap,
   `Lookup` of a key bound to it answers from the default keymap, or
   `insert`; outside a field it is none of `Program`'s, `Prefix`'s or
-  `Scroll`'s (§3.10). `Resolve` takes it from `own` only.
+  `Scroll`'s (§3.10).
+- **A test host** that speaks 0.8 only skips the `speaks-0.7` vectors
+  (§4.4).
+
+## Appendix H. Moving from 0.8
+
+Informative. hotty 0.9 breaks 0.8 (SPEC.md §15) only for a host or a
+program that speaks one of them: the SDKs speak both (§3.8). These are the
+places a port goes wrong:
+
+- **`Version` is `"0.9"`, `Versions` `["0.8", "0.9"]`,** and the runner's
+  copy of the vectors moves with them (§5.2). A 0.7 host is no longer
+  one the SDK takes.
 - **`Resolve`'s readers** are `input`, `multiline`, `button`, `select`,
   `date`, `element` and `selection`, each as its language names a closed
   set of values (§3.10). A reader outside them is an error, raised or
@@ -1431,5 +1447,13 @@ places a port goes wrong:
   0.8 call such as `resolve(platform, false, …)` fails loudly.
   `input` and `multiline` take the place of the `multiline` flag that
   `Resolve` took before 0.9.
-- **A test host** that speaks 0.8 only skips the `speaks-0.7` vectors
+- **`Resolve` takes its keymaps as `own` and `inner`** (§3.10), and
+  `default` from `own` only. In an 0.8 session a host passes each
+  `data-keys` as both (HOST.md §5.1).
+- **`contextmenu` and `auxclick`** are event kinds (§3.1), with `Area`,
+  `C`, `R` and `Button` (§3.9). The `Button` constants, `ButtonSecondary`
+  among them, name the DOM's numbers (§3.1). A `press` still reads
+  `Button`, `C` and `R` where present, which only an 0.8 session's
+  secondary press sends (HOST.md §5.2).
+- **A test host** that speaks 0.9 only skips the `speaks-0.8` vectors
   (§4.4).

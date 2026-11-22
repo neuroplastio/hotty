@@ -29,7 +29,7 @@ too little.
 ## Format
 
 ```
-{ "version": "0.8",
+{ "version": "0.9",
   "vectors": [ { "name": …, "steps": [ step, … ] } ],
   "wire":    [ { "name": …, "stream": …, "commands": [ … ], "invalid": n } ],
   "build":   [ … ], "encode": [ … ], "decode": [ … ], "scan": [ … ],
@@ -68,14 +68,14 @@ it. A list names several, all required:
 - `"pressed"`, a host that sees the key the user pressed (§10.4): its
   runner offers a key step's key as pressed, by both its names, and then
   as the bytes a terminal sends for it, as the host would;
-- `"speaks-0.7"`: a host that speaks 0.7 as well as 0.8 (SPEC §15;
-  HOST.md §5), which answers a `v=0.7` query in 0.7 and keeps a 0.7
-  session as HOST.md §5.1 has it. A host that speaks 0.8 only, and an SDK's
-  test host (SDK.md §4.4) that does, skips these vectors. The vectors
-  without it hold for every 0.8 host: `v=0.7,0.8` is answered in 0.8, and
-  an `EVERSION` reply is checked for its code, not its detail (the versions
-  the host speaks, SPEC §4), which differs between a host that speaks 0.7
-  and one that does not;
+- `"speaks-0.8"`: a host that speaks 0.8 as well as 0.9 (SPEC §15;
+  HOST.md §5), which answers a `v=0.8` query in 0.8. A host that speaks
+  0.9 only, and an SDK's test host (SDK.md §4.4) that does, skips these
+  vectors. The vectors without it hold for every 0.9 host: `v=0.8,0.9` is
+  answered in 0.9, a `v=0.7` query is `EVERSION`, and an `EVERSION` reply
+  is checked for its code, not its detail (the versions the host speaks,
+  SPEC §4), which differs between a host that speaks 0.8 and one that does
+  not;
 - `"scroll"` (§5.3), `"steps"`, `"drop"` (§9.1), `"view"` (§9.5) and
   `"layout"`, whether CSS renders an element (§10.1, focus fixup): what
   every host of this version does, named so that a host that lays nothing
