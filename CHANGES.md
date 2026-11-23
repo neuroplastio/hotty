@@ -10,9 +10,7 @@ path: changes
 
 ## 0.9
 
-A draft, as every 0.x is, not yet released: the spec, SDK.md and the
-vectors are on hotty's `hotty-0.9` branch, and the SDKs and hosts follow
-on theirs.
+Released on 2026-11-23.
 
 hotty's 0.9 hosts and SDKs speak 0.8 too, and no longer 0.7 (SPEC.md
 §15), so versions meet as follows (§4, §14):
